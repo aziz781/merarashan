@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
 
     const upstream = await fetch(
       `${BASE_URL}/${resource}?mobile=${encodeURIComponent(mobile)}`,
-      { headers: { "X-api-token": token, Accept: "application/json" } },
+      { headers: { "x-api-key": token, Accept: "application/json" } },
     );
 
     const text = await upstream.text();
