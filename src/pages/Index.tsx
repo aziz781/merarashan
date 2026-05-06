@@ -235,10 +235,18 @@ function RecordCard({
 
   if (resource === "cards") {
     const title =
+      (item.person_name as string) ||
       (item.card_name as string) ||
       (item.name as string) ||
-      (item.card_number as string) ||
+      (item.cm_card_number as string) ||
       "Card";
+    const summaryFields: { key: string; label: string }[] = [
+      { key: "person_name", label: "Name" },
+      { key: "cm_card_number", label: "Card Number" },
+      { key: "mobile_number", label: "Mobile" },
+      { key: "city", label: "City" },
+      { key: "card_status", label: "Status" },
+    ];
     return (
       <>
         <Card
