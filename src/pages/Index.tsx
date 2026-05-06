@@ -149,8 +149,14 @@ function TransactionsView({ items }: { items: Record<string, unknown>[] }) {
     if (filters.status !== "all" && i.things_status !== filters.status) return false;
     if (filters.validFrom) {
       const vf = (i.valid_from as string) || "";
-      const m = vf.slice(0, 7);
-      if (!m || m !== filters.validFrom) return false;
+      const dmy = vf.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+      let m = "";
+      if (dmy) {
+        m = `${dmy[3]}-${dmy[2].padStart(2, "0")}`;
+      } else {
+        m = vf.slice(0, 7);
+      }
+      if (m !== filters.validFrom) return false;
     }
     return true;
   });
