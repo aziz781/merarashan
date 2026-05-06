@@ -346,6 +346,59 @@ function RecordCard({
     );
   }
 
+  if (resource === "statements") {
+    const fields: { key: string; label: string }[] = [
+      { key: "statement_period", label: "Statement Period" },
+      { key: "invoice_charges", label: "Invoice Charges" },
+      { key: "payment_status", label: "Payment Status" },
+    ];
+    const fileUrl = (item.statement_fileS3 as string) || "";
+    const paid = String(item.payment_status ?? "").toLowerCase() === "paid";
+    return (
+      <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+        <div className="space-y-1.5">
+          {fields.map(({ key, label }) => {
+            const raw = item[key];
+            const isEmpty = raw == null || raw === "";
+            let display: React.ReactNode;
+            if (isEmpty) {
+              display = "—";
+            } else if (key === "invoice_charges") {
+              const n = Number(raw);
+              display = Number.isFinite(n)
+                ? `Rs. ${n.toLocaleString("en-PK")}`
+                : String(raw);
+            } else if (key === "payment_status") {
+              display = (
+                <Badge variant={paid ? "default" : "outline"} className="font-normal">
+                  {String(raw)}
+                </Badge>
+              );
+            } else {
+              display = String(raw);
+            }
+            return (
+              <div key={key} className="flex justify-between gap-3 text-sm items-center">
+                <span className="text-muted-foreground">{label}</span>
+                <span className="font-medium text-foreground text-right break-all">
+                  {display}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        {fileUrl && (
+          <Button asChild variant="outline" size="sm" className="w-full mt-3">
+            <a href={fileUrl} target="_blank" rel="noopener noreferrer" download>
+              <Download className="w-4 h-4 mr-2" />
+              Download PDF
+            </a>
+          </Button>
+        )}
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
       <div className="space-y-1.5">
