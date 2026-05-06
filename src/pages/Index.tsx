@@ -353,7 +353,7 @@ function RecordCard({
       { key: "invoice_charges", label: "Invoice Charges" },
       { key: "payment_status", label: "Payment Status" },
     ];
-    const fileUrl = (item.statement_fileS3 as string) || "";
+    const fileUrl = (item.statement_file as string) || "";
     const paid = String(item.payment_status ?? "").toLowerCase() === "paid";
     return (
       <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
