@@ -316,6 +316,26 @@ function RecordCard({
                 </div>
               ))}
             </div>
+            <div className="mt-4">
+              <h4 className="text-sm font-semibold text-foreground mb-2">Transactions</h4>
+              {txnLoading ? (
+                <div className="space-y-2">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Skeleton key={i} className="h-16 w-full rounded-xl" />
+                  ))}
+                </div>
+              ) : txnError ? (
+                <p className="text-xs text-destructive break-all">{txnError}</p>
+              ) : !txns || txns.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No transactions found.</p>
+              ) : (
+                <div className="space-y-2">
+                  {txns.map((t, i) => (
+                    <TransactionCard key={i} item={t} />
+                  ))}
+                </div>
+              )}
+            </div>
           </DialogContent>
         </Dialog>
       </>
