@@ -31,26 +31,26 @@ export function TransactionCard({ item }: { item: Txn }) {
     <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
+          {when && (
+            <p className="text-sm font-bold text-foreground">{when}</p>
+          )}
+          <p className="text-xs text-muted-foreground font-mono break-all mt-1.5">
+            {code}
+          </p>
+        </div>
+        <div className="flex flex-col items-end gap-1.5 shrink-0">
           <p className="font-bold text-foreground">
             Rs. {amount.toLocaleString("en-PK")}
           </p>
           {status && (
             <Badge
               variant={delivered ? "default" : "outline"}
-              className="font-normal mt-1.5"
+              className="font-normal"
             >
               {status}
             </Badge>
           )}
-          <p className="text-xs text-muted-foreground font-mono break-all mt-2">
-            {code}
-          </p>
         </div>
-        {when && (
-          <span className="text-sm font-bold text-foreground shrink-0">
-            {when}
-          </span>
-        )}
       </div>
     </Card>
   );
