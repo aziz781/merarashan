@@ -132,11 +132,62 @@ function GenericResourceView({ resource, mobile }: { resource: Resource; mobile:
     return <CardsList items={items as Record<string, unknown>[]} mobile={mobile} />;
   }
 
+  if (resource === "statements") {
+    return <StatementsList items={items as Record<string, unknown>[]} mobile={mobile} />;
+  }
+
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
         <RecordCard key={i} resource={resource} mobile={mobile} item={item as Record<string, unknown>} />
       ))}
+    </div>
+  );
+}
+
+function StatementsList({
+  items,
+  mobile,
+}: {
+  items: Record<string, unknown>[];
+  mobile: string;
+}) {
+  const extractYear = (it: Record<string, unknown>): string => {
+    const period = String(it.statement_period ?? "");
+    const m = period.match(/(\d{4})/);
+    return m ? m[1] : "";
+  };
+  const [selected, setSelected] = useState<string>("all");
+  const years = Array.from(
+    new Set(items.map(extractYear).filter((y) => y.length > 0)),
+  ).sort((a, b) => b.localeCompare(a));
+  const filtered =
+    selected === "all" ? items : items.filter((it) => extractYear(it) === selected);
+
+  return (
+    <div className="space-y-3">
+      <Select value={selected} onValueChange={setSelected}>
+        <SelectTrigger className="h-11">
+          <SelectValue placeholder="Filter by year" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All years</SelectItem>
+          {years.map((y) => (
+            <SelectItem key={y} value={y}>
+              {y}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {filtered.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-6">
+          No statements match the filter.
+        </p>
+      ) : (
+        filtered.map((item, i) => (
+          <RecordCard key={i} resource="statements" mobile={mobile} item={item} />
+        ))
+      )}
     </div>
   );
 }
