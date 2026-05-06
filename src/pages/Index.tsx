@@ -126,16 +126,7 @@ function ResourceView({ resource, mobile }: { resource: Resource; mobile: string
 
   if (resource === "transactions") {
     const txns = items as Record<string, unknown>[];
-    return (
-      <>
-        <TransactionStats items={txns} />
-        <div className="space-y-3">
-          {txns.map((item, i) => (
-            <TransactionCard key={i} item={item} />
-          ))}
-        </div>
-      </>
-    );
+    return <TransactionsView items={txns} />;
   }
 
   return (
