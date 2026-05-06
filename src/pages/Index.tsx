@@ -129,7 +129,7 @@ function GenericResourceView({ resource, mobile }: { resource: Resource; mobile:
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
-        <RecordCard key={i} resource={resource} item={item as Record<string, unknown>} />
+        <RecordCard key={i} resource={resource} mobile={mobile} item={item as Record<string, unknown>} />
       ))}
     </div>
   );
@@ -223,15 +223,39 @@ function TransactionsView({ mobile }: { mobile: string }) {
 }
 function RecordCard({
   resource,
+  mobile,
   item,
 }: {
   resource: Resource;
+  mobile: string;
   item: Record<string, unknown>;
 }) {
   const [open, setOpen] = useState(false);
+  const [txns, setTxns] = useState<Record<string, unknown>[] | null>(null);
+  const [txnLoading, setTxnLoading] = useState(false);
+  const [txnError, setTxnError] = useState<string | null>(null);
   const entries = Object.entries(item).filter(
     ([, v]) => v !== null && v !== "" && typeof v !== "object",
   );
+
+  const rcNum = (item.cm_card_number as string) || "";
+
+  useEffect(() => {
+    if (!open || resource !== "cards" || !rcNum) return;
+    let cancelled = false;
+    setTxnLoading(true);
+    setTxnError(null);
+    fetchResource<unknown>("transactions", mobile, { rcNum })
+      .then((d) => {
+        if (cancelled) return;
+        setTxns((extractItems(d) ?? []) as Record<string, unknown>[]);
+      })
+      .catch((e) => !cancelled && setTxnError(e.message))
+      .finally(() => !cancelled && setTxnLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [open, resource, mobile, rcNum]);
 
   if (resource === "cards") {
     const title =
@@ -291,6 +315,26 @@ function RecordCard({
                   </span>
                 </div>
               ))}
+            </div>
+            <div className="mt-4">
+              <h4 className="text-sm font-semibold text-foreground mb-2">Transactions</h4>
+              {txnLoading ? (
+                <div className="space-y-2">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Skeleton key={i} className="h-16 w-full rounded-xl" />
+                  ))}
+                </div>
+              ) : txnError ? (
+                <p className="text-xs text-destructive break-all">{txnError}</p>
+              ) : !txns || txns.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No transactions found.</p>
+              ) : (
+                <div className="space-y-2">
+                  {txns.map((t, i) => (
+                    <TransactionCard key={i} item={t} />
+                  ))}
+                </div>
+              )}
             </div>
           </DialogContent>
         </Dialog>
