@@ -128,7 +128,7 @@ const CardDetails = () => {
           ) : (
             <div className="space-y-3">
               {txns.map((t, i) => (
-                <TransactionCard key={i} item={t} />
+                <TransactionCard key={i} item={t} variant="compact" />
               ))}
             </div>
           )}
