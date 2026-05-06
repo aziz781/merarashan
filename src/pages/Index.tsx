@@ -149,14 +149,9 @@ function TransactionsView({ items }: { items: Record<string, unknown>[] }) {
     if (filters.status !== "all" && i.things_status !== filters.status) return false;
     if (filters.validFrom) {
       const vf = (i.valid_from as string) || "";
-      const dmy = vf.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-      let m = "";
-      if (dmy) {
-        m = `${dmy[3]}-${dmy[2].padStart(2, "0")}`;
-      } else {
-        m = vf.slice(0, 7);
-      }
-      if (m !== filters.validFrom) return false;
+      const [yyyy, mm] = filters.validFrom.split("-");
+      const needle = `${mm}/${yyyy}`;
+      if (!vf.includes(needle)) return false;
     }
     return true;
   });
