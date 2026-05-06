@@ -223,15 +223,39 @@ function TransactionsView({ mobile }: { mobile: string }) {
 }
 function RecordCard({
   resource,
+  mobile,
   item,
 }: {
   resource: Resource;
+  mobile: string;
   item: Record<string, unknown>;
 }) {
   const [open, setOpen] = useState(false);
+  const [txns, setTxns] = useState<Record<string, unknown>[] | null>(null);
+  const [txnLoading, setTxnLoading] = useState(false);
+  const [txnError, setTxnError] = useState<string | null>(null);
   const entries = Object.entries(item).filter(
     ([, v]) => v !== null && v !== "" && typeof v !== "object",
   );
+
+  const rcNum = (item.cm_card_number as string) || "";
+
+  useEffect(() => {
+    if (!open || resource !== "cards" || !rcNum) return;
+    let cancelled = false;
+    setTxnLoading(true);
+    setTxnError(null);
+    fetchResource<unknown>("transactions", mobile, { rcNum })
+      .then((d) => {
+        if (cancelled) return;
+        setTxns((extractItems(d) ?? []) as Record<string, unknown>[]);
+      })
+      .catch((e) => !cancelled && setTxnError(e.message))
+      .finally(() => !cancelled && setTxnLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [open, resource, mobile, rcNum]);
 
   if (resource === "cards") {
     const title =
