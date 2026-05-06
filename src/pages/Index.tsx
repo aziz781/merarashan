@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { fetchResource, formatMobile, Resource } from "@/lib/api";
 import { TransactionStats } from "@/components/TransactionStats";
@@ -230,40 +230,13 @@ function RecordCard({
   mobile: string;
   item: Record<string, unknown>;
 }) {
-  const [open, setOpen] = useState(false);
-  const [txns, setTxns] = useState<Record<string, unknown>[] | null>(null);
-  const [txnLoading, setTxnLoading] = useState(false);
-  const [txnError, setTxnError] = useState<string | null>(null);
+  const navigate = useNavigate();
   const entries = Object.entries(item).filter(
     ([, v]) => v !== null && v !== "" && typeof v !== "object",
   );
 
-  const rcNum = (item.cm_card_number as string) || "";
-
-  useEffect(() => {
-    if (!open || resource !== "cards" || !rcNum) return;
-    let cancelled = false;
-    setTxnLoading(true);
-    setTxnError(null);
-    fetchResource<unknown>("transactions", mobile, { rcNum })
-      .then((d) => {
-        if (cancelled) return;
-        setTxns((extractItems(d) ?? []) as Record<string, unknown>[]);
-      })
-      .catch((e) => !cancelled && setTxnError(e.message))
-      .finally(() => !cancelled && setTxnLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [open, resource, mobile, rcNum]);
-
   if (resource === "cards") {
-    const title =
-      (item.person_name as string) ||
-      (item.card_name as string) ||
-      (item.name as string) ||
-      (item.cm_card_number as string) ||
-      "Card";
+    const rcNum = (item.cm_card_number as string) || "";
     const summaryFields: { key: string; label: string }[] = [
       { key: "person_name", label: "Name" },
       { key: "cm_card_number", label: "Card Number" },
@@ -271,74 +244,38 @@ function RecordCard({
       { key: "city", label: "City" },
       { key: "card_status", label: "Status" },
     ];
+    const open = () => {
+      if (rcNum) navigate(`/cards/${encodeURIComponent(rcNum)}`, { state: { card: item } });
+    };
     return (
-      <>
-        <Card
-          role="button"
-          tabIndex={0}
-          onClick={() => setOpen(true)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              setOpen(true);
-            }
-          }}
-          className="p-5 border-0 text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
-          style={{ background: "var(--gradient-card)" }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <CreditCard className="w-6 h-6 opacity-90" />
-            <span className="text-xs uppercase tracking-wider opacity-75">Card</span>
-          </div>
-          <div className="space-y-1">
-            {summaryFields.map(({ key, label }) => (
-              <div key={key} className="flex justify-between text-sm">
-                <span className="opacity-75">{label}</span>
-                <span className="font-medium text-right break-all">
-                  {item[key] != null && item[key] !== "" ? String(item[key]) : "—"}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Card>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{title}</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-1.5 mt-2">
-              {entries.map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-3 text-sm border-b border-border/50 py-1.5 last:border-0">
-                  <span className="text-muted-foreground capitalize">{k.replace(/_/g, " ")}</span>
-                  <span className="font-medium text-foreground text-right break-all">
-                    {String(v)}
-                  </span>
-                </div>
-              ))}
+      <Card
+        role="button"
+        tabIndex={0}
+        onClick={open}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            open();
+          }
+        }}
+        className="p-5 border-0 text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
+        style={{ background: "var(--gradient-card)" }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <CreditCard className="w-6 h-6 opacity-90" />
+          <span className="text-xs uppercase tracking-wider opacity-75">Card</span>
+        </div>
+        <div className="space-y-1">
+          {summaryFields.map(({ key, label }) => (
+            <div key={key} className="flex justify-between text-sm">
+              <span className="opacity-75">{label}</span>
+              <span className="font-medium text-right break-all">
+                {item[key] != null && item[key] !== "" ? String(item[key]) : "—"}
+              </span>
             </div>
-            <div className="mt-4">
-              <h4 className="text-sm font-semibold text-foreground mb-2">Transactions</h4>
-              {txnLoading ? (
-                <div className="space-y-2">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <Skeleton key={i} className="h-16 w-full rounded-xl" />
-                  ))}
-                </div>
-              ) : txnError ? (
-                <p className="text-xs text-destructive break-all">{txnError}</p>
-              ) : !txns || txns.length === 0 ? (
-                <p className="text-xs text-muted-foreground">No transactions found.</p>
-              ) : (
-                <div className="space-y-2">
-                  {txns.map((t, i) => (
-                    <TransactionCard key={i} item={t} />
-                  ))}
-                </div>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-      </>
+          ))}
+        </div>
+      </Card>
     );
   }
 
