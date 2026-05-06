@@ -43,7 +43,7 @@ export function TransactionCard({
           {showExtras && userName && (
             <p className="font-semibold text-foreground truncate">{userName}</p>
           )}
-          {when && (
+          {!showExtras && when && (
             <p className="text-sm font-bold text-foreground mt-0.5">{when}</p>
           )}
           <p className="text-xs text-muted-foreground font-mono break-all mt-1.5">
@@ -66,6 +66,9 @@ export function TransactionCard({
             >
               {status}
             </Badge>
+          )}
+          {showExtras && when && (
+            <p className="text-xs font-semibold text-muted-foreground">{when}</p>
           )}
         </div>
       </div>
