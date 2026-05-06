@@ -135,10 +135,6 @@ function GenericResourceView({ resource, mobile }: { resource: Resource; mobile:
     return <CardsList items={items as Record<string, unknown>[]} mobile={mobile} />;
   }
 
-  if (resource === "statements") {
-    return <StatementsList items={items as Record<string, unknown>[]} mobile={mobile} />;
-  }
-
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
