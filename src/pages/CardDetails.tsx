@@ -49,11 +49,13 @@ const CardDetails = () => {
     };
   }, [mobile, rcNum]);
 
-  const entries = card
-    ? Object.entries(card).filter(
-        ([, v]) => v !== null && v !== "" && typeof v !== "object",
-      )
-    : [];
+  const fields: { key: string; label: string }[] = [
+    { key: "person_name", label: "Name" },
+    { key: "cm_card_number", label: "Card Number" },
+    { key: "mobile_number", label: "Mobile" },
+    { key: "city", label: "City" },
+    { key: "card_status", label: "Status" },
+  ];
 
   const title =
     (card?.person_name as string) ||
@@ -87,16 +89,14 @@ const CardDetails = () => {
           <Card className="p-5 bg-card/90 backdrop-blur shadow-[var(--shadow-card)] border-0">
             <h2 className="text-sm font-semibold text-foreground mb-3">Card Information</h2>
             <div className="space-y-1.5">
-              {entries.map(([k, v]) => (
+              {fields.map(({ key, label }) => (
                 <div
-                  key={k}
+                  key={key}
                   className="flex justify-between gap-3 text-sm border-b border-border/50 py-1.5 last:border-0"
                 >
-                  <span className="text-muted-foreground capitalize">
-                    {k.replace(/_/g, " ")}
-                  </span>
+                  <span className="text-muted-foreground">{label}</span>
                   <span className="font-medium text-foreground text-right break-all">
-                    {String(v)}
+                    {card[key] != null && card[key] !== "" ? String(card[key]) : "—"}
                   </span>
                 </div>
               ))}
