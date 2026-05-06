@@ -292,6 +292,7 @@ function RecordCard({
     const rcNum = (item.cm_card_number as string) || "";
     const summaryFields: { key: string; label: string }[] = [
       { key: "person_name", label: "Name" },
+      { key: "amount", label: "Amount" },
       { key: "cm_card_number", label: "Card Number" },
       { key: "mobile_number", label: "Mobile" },
       { key: "city", label: "City" },
