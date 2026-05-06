@@ -45,7 +45,7 @@ export function TransactionFilters({
         <div className="space-y-1">
           <Label className="text-xs text-muted-foreground">Valid from</Label>
           <Input
-            type="date"
+            type="month"
             value={value.validFrom}
             onChange={(e) => onChange({ ...value, validFrom: e.target.value })}
             className="h-10"
