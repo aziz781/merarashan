@@ -44,7 +44,7 @@ export function TransactionFilters({
           </Select>
         </div>
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Valid from</Label>
+          <Label className="text-xs text-muted-foreground">Month</Label>
           <Input
             type="text"
             inputMode="numeric"
