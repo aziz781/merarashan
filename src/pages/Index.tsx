@@ -76,6 +76,9 @@ function ResourceView({ resource, mobile }: { resource: Resource; mobile: string
   if (resource === "transactions") {
     return <TransactionsView mobile={mobile} />;
   }
+  if (resource === "statements") {
+    return <StatementsView mobile={mobile} />;
+  }
   return <GenericResourceView resource={resource} mobile={mobile} />;
 }
 
