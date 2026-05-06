@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { fetchResource, formatMobile, Resource } from "@/lib/api";
 import { TransactionStats } from "@/components/TransactionStats";
@@ -227,29 +228,63 @@ function RecordCard({
   resource: Resource;
   item: Record<string, unknown>;
 }) {
+  const [open, setOpen] = useState(false);
   const entries = Object.entries(item).filter(
     ([, v]) => v !== null && v !== "" && typeof v !== "object",
   );
 
   if (resource === "cards") {
+    const title =
+      (item.card_name as string) ||
+      (item.name as string) ||
+      (item.card_number as string) ||
+      "Card";
     return (
-      <Card
-        className="p-5 border-0 text-primary-foreground shadow-[var(--shadow-card)]"
-        style={{ background: "var(--gradient-card)" }}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <CreditCard className="w-6 h-6 opacity-90" />
-          <span className="text-xs uppercase tracking-wider opacity-75">Card</span>
-        </div>
-        <div className="space-y-1">
-          {entries.slice(0, 4).map(([k, v]) => (
-            <div key={k} className="flex justify-between text-sm">
-              <span className="opacity-75">{k}</span>
-              <span className="font-medium">{String(v)}</span>
+      <>
+        <Card
+          role="button"
+          tabIndex={0}
+          onClick={() => setOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setOpen(true);
+            }
+          }}
+          className="p-5 border-0 text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
+          style={{ background: "var(--gradient-card)" }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <CreditCard className="w-6 h-6 opacity-90" />
+            <span className="text-xs uppercase tracking-wider opacity-75">Card</span>
+          </div>
+          <div className="space-y-1">
+            {entries.slice(0, 4).map(([k, v]) => (
+              <div key={k} className="flex justify-between text-sm">
+                <span className="opacity-75">{k}</span>
+                <span className="font-medium">{String(v)}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{title}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-1.5 mt-2">
+              {entries.map(([k, v]) => (
+                <div key={k} className="flex justify-between gap-3 text-sm border-b border-border/50 py-1.5 last:border-0">
+                  <span className="text-muted-foreground capitalize">{k.replace(/_/g, " ")}</span>
+                  <span className="font-medium text-foreground text-right break-all">
+                    {String(v)}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </Card>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
