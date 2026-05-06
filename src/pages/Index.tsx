@@ -8,6 +8,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import { fetchResource, formatMobile, Resource } from "@/lib/api";
+import { TransactionStats } from "@/components/TransactionStats";
+import { TransactionCard } from "@/components/TransactionCard";
 
 const STORAGE_KEY = "mr_mobile";
 
@@ -105,18 +107,33 @@ function ResourceView({ resource, mobile }: { resource: Resource; mobile: string
 
   const items = Array.isArray(data)
     ? data
-    : Array.isArray((data as { data?: unknown[] })?.data)
-      ? (data as { data: unknown[] }).data
-      : null;
+    : Array.isArray((data as { items?: unknown[] })?.items)
+      ? (data as { items: unknown[] }).items
+      : Array.isArray((data as { data?: unknown[] })?.data)
+        ? (data as { data: unknown[] }).data
+        : null;
 
   if (!items || items.length === 0) {
-    // Render single object or empty
     return (
       <Card className="p-5">
         <pre className="text-xs whitespace-pre-wrap break-all text-muted-foreground">
           {JSON.stringify(data, null, 2)}
         </pre>
       </Card>
+    );
+  }
+
+  if (resource === "transactions") {
+    const txns = items as Record<string, unknown>[];
+    return (
+      <>
+        <TransactionStats items={txns} />
+        <div className="space-y-3">
+          {txns.map((item, i) => (
+            <TransactionCard key={i} item={item} />
+          ))}
+        </div>
+      </>
     );
   }
 
