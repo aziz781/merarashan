@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { fetchResource, formatMobile, Resource } from "@/lib/api";
 import { TransactionStats } from "@/components/TransactionStats";
@@ -146,20 +147,34 @@ function CardsList({
   items: Record<string, unknown>[];
   mobile: string;
 }) {
-  const [query, setQuery] = useState("");
-  const q = query.trim().toLowerCase();
-  const filtered = q
-    ? items.filter((it) => String(it.person_name ?? "").toLowerCase().includes(q))
-    : items;
+  const [selected, setSelected] = useState<string>("all");
+  const names = Array.from(
+    new Set(
+      items
+        .map((it) => String(it.person_name ?? "").trim())
+        .filter((n) => n.length > 0),
+    ),
+  ).sort();
+  const filtered =
+    selected === "all"
+      ? items
+      : items.filter((it) => String(it.person_name ?? "") === selected);
 
   return (
     <div className="space-y-3">
-      <Input
-        placeholder="Filter by name…"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        className="h-11"
-      />
+      <Select value={selected} onValueChange={setSelected}>
+        <SelectTrigger className="h-11">
+          <SelectValue placeholder="Filter by name" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All names</SelectItem>
+          {names.map((n) => (
+            <SelectItem key={n} value={n}>
+              {n}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       {filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-6">
           No cards match the filter.
