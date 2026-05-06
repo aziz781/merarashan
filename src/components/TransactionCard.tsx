@@ -6,7 +6,7 @@ type Txn = Record<string, unknown>;
 export function TransactionCard({ item }: { item: Txn }) {
   const name = (item.code_user_name as string) || "—";
   const code = (item.unique_code as string) || "";
-  const amount = Number(item.totalAmount) || 0;
+  const amount = Number(item.amount ?? item.totalAmount) || 0;
   const method = (item.payment_method as string) || "";
   const status = (item.things_status as string) || "";
   const when = (item.confirm_datetime as string) || (item.created_date as string) || "";
