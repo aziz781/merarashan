@@ -129,7 +129,7 @@ function GenericResourceView({ resource, mobile }: { resource: Resource; mobile:
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
-        <RecordCard key={i} resource={resource} item={item as Record<string, unknown>} />
+        <RecordCard key={i} resource={resource} mobile={mobile} item={item as Record<string, unknown>} />
       ))}
     </div>
   );
