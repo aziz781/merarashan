@@ -138,6 +138,40 @@ function ResourceView({ resource, mobile }: { resource: Resource; mobile: string
   );
 }
 
+function TransactionsView({ items }: { items: Record<string, unknown>[] }) {
+  const [filters, setFilters] = useState<TxnFilters>({ status: "all", validFrom: "" });
+
+  const statuses = Array.from(
+    new Set(items.map((i) => (i.things_status as string) || "").filter(Boolean)),
+  ).sort();
+
+  const filtered = items.filter((i) => {
+    if (filters.status !== "all" && i.things_status !== filters.status) return false;
+    if (filters.validFrom) {
+      const vf = (i.valid_from as string) || "";
+      const d = vf.slice(0, 10);
+      if (!d || d < filters.validFrom) return false;
+    }
+    return true;
+  });
+
+  return (
+    <>
+      <TransactionStats items={filtered} />
+      <TransactionFilters statuses={statuses} value={filters} onChange={setFilters} />
+      <div className="space-y-3">
+        {filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">
+            No transactions match the filters.
+          </p>
+        ) : (
+          filtered.map((item, i) => <TransactionCard key={i} item={item} />)
+        )}
+      </div>
+    </>
+  );
+}
+
 function RecordCard({
   resource,
   item,
