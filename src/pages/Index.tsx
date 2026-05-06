@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, Download } from "lucide-react";
+import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -353,7 +353,7 @@ function RecordCard({
       { key: "invoice_charges", label: "Invoice Charges" },
       { key: "payment_status", label: "Payment Status" },
     ];
-    const fileUrl = (item.statement_fileS3 as string) || "";
+    const fileUrl = (item.statement_file as string) || "";
     const paid = String(item.payment_status ?? "").toLowerCase() === "paid";
     return (
       <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
@@ -391,7 +391,7 @@ function RecordCard({
         {fileUrl && (
           <Button asChild variant="outline" size="sm" className="w-full mt-3">
             <a href={fileUrl} target="_blank" rel="noopener noreferrer" download>
-              <Download className="w-4 h-4 mr-2" />
+              <FileDown className="w-4 h-4 mr-2" />
               Download PDF
             </a>
           </Button>
