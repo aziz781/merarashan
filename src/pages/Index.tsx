@@ -320,14 +320,27 @@ function RecordCard({
           <span className="text-xs uppercase tracking-wider opacity-75">Card</span>
         </div>
         <div className="space-y-1">
-          {summaryFields.map(({ key, label }) => (
-            <div key={key} className="flex justify-between text-sm">
-              <span className="opacity-75">{label}</span>
-              <span className="font-medium text-right break-all">
-                {item[key] != null && item[key] !== "" ? String(item[key]) : "—"}
-              </span>
-            </div>
-          ))}
+          {summaryFields.map(({ key, label }) => {
+            const raw = item[key];
+            const isEmpty = raw == null || raw === "";
+            let display: string;
+            if (isEmpty) {
+              display = "—";
+            } else if (key === "amount") {
+              const n = Number(raw);
+              display = Number.isFinite(n)
+                ? `Rs. ${n.toLocaleString("en-PK")}`
+                : String(raw);
+            } else {
+              display = String(raw);
+            }
+            return (
+              <div key={key} className="flex justify-between text-sm">
+                <span className="opacity-75">{label}</span>
+                <span className="font-medium text-right break-all">{display}</span>
+              </div>
+            );
+          })}
         </div>
       </Card>
     );
