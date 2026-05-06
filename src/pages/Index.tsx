@@ -70,6 +70,13 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
 }
 
 function ResourceView({ resource, mobile }: { resource: Resource; mobile: string }) {
+  if (resource === "transactions") {
+    return <TransactionsView mobile={mobile} />;
+  }
+  return <GenericResourceView resource={resource} mobile={mobile} />;
+}
+
+function GenericResourceView({ resource, mobile }: { resource: Resource; mobile: string }) {
   const [data, setData] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,13 +113,7 @@ function ResourceView({ resource, mobile }: { resource: Resource; mobile: string
     );
   }
 
-  const items = Array.isArray(data)
-    ? data
-    : Array.isArray((data as { items?: unknown[] })?.items)
-      ? (data as { items: unknown[] }).items
-      : Array.isArray((data as { data?: unknown[] })?.data)
-        ? (data as { data: unknown[] }).data
-        : null;
+  const items = extractItems(data);
 
   if (!items || items.length === 0) {
     return (
@@ -124,11 +125,6 @@ function ResourceView({ resource, mobile }: { resource: Resource; mobile: string
     );
   }
 
-  if (resource === "transactions") {
-    const txns = items as Record<string, unknown>[];
-    return <TransactionsView items={txns} />;
-  }
-
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
@@ -138,39 +134,92 @@ function ResourceView({ resource, mobile }: { resource: Resource; mobile: string
   );
 }
 
-function TransactionsView({ items }: { items: Record<string, unknown>[] }) {
-  const [filters, setFilters] = useState<TxnFilters>({ status: "all", validFrom: "" });
+function extractItems(data: unknown): unknown[] | null {
+  if (Array.isArray(data)) return data;
+  const d = data as { items?: unknown[]; data?: unknown[] };
+  if (Array.isArray(d?.items)) return d.items;
+  if (Array.isArray(d?.data)) return d.data;
+  return null;
+}
 
-  const statuses = Array.from(
-    new Set(items.map((i) => (i.things_status as string) || "").filter(Boolean)),
-  ).sort();
+function TransactionsView({ mobile }: { mobile: string }) {
+  const [filters, setFilters] = useState<TxnFilters>({ status: "all", validFrom: "" });
+  const [items, setItems] = useState<Record<string, unknown>[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [statuses, setStatuses] = useState<string[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    const params: Record<string, string> = {};
+    const m = filters.validFrom.match(/^(\d{2})\/(\d{4})$/);
+    if (m) {
+      params.month = m[1];
+      params.year = m[2];
+    }
+
+    fetchResource("transactions", mobile, params)
+      .then((d) => {
+        if (cancelled) return;
+        const list = (extractItems(d) ?? []) as Record<string, unknown>[];
+        setItems(list);
+        setStatuses((prev) => {
+          const merged = new Set<string>(prev);
+          for (const i of list) {
+            const s = i.things_status as string;
+            if (s) merged.add(s);
+          }
+          return Array.from(merged).sort();
+        });
+      })
+      .catch((e) => !cancelled && setError(e.message))
+      .finally(() => !cancelled && setLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [mobile, filters.validFrom]);
 
   const filtered = items.filter((i) => {
     if (filters.status !== "all" && i.things_status !== filters.status) return false;
-    if (filters.validFrom) {
-      const vf = (i.valid_from as string) || "";
-      if (!vf.includes(filters.validFrom)) return false;
-    }
     return true;
   });
+
+  if (error) {
+    return (
+      <Card className="p-5 border-destructive/30 bg-destructive/5">
+        <p className="text-sm font-medium text-destructive mb-1">Failed to load</p>
+        <p className="text-xs text-muted-foreground break-all">{error}</p>
+      </Card>
+    );
+  }
 
   return (
     <>
       <TransactionStats items={filtered} />
       <TransactionFilters statuses={statuses} value={filters} onChange={setFilters} />
-      <div className="space-y-3">
-        {filtered.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">
-            No transactions match the filters.
-          </p>
-        ) : (
-          filtered.map((item, i) => <TransactionCard key={i} item={item} />)
-        )}
-      </div>
+      {loading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">
+              No transactions match the filters.
+            </p>
+          ) : (
+            filtered.map((item, i) => <TransactionCard key={i} item={item} />)
+          )}
+        </div>
+      )}
     </>
   );
 }
-
 function RecordCard({
   resource,
   item,
