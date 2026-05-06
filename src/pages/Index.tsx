@@ -458,7 +458,7 @@ function RecordCard({
         </div>
         {fileUrl && (
           <Button asChild variant="outline" size="sm" className="w-full mt-3">
-            <a href={fileUrl} target="_blank" rel="noopener noreferrer" download>
+            <a href={fileUrl} target="_blank" rel="noopener noreferrer">
               <FileDown className="w-4 h-4 mr-2" />
               Download PDF
             </a>
