@@ -126,11 +126,49 @@ function GenericResourceView({ resource, mobile }: { resource: Resource; mobile:
     );
   }
 
+  if (resource === "cards") {
+    return <CardsList items={items as Record<string, unknown>[]} mobile={mobile} />;
+  }
+
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
         <RecordCard key={i} resource={resource} mobile={mobile} item={item as Record<string, unknown>} />
       ))}
+    </div>
+  );
+}
+
+function CardsList({
+  items,
+  mobile,
+}: {
+  items: Record<string, unknown>[];
+  mobile: string;
+}) {
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? items.filter((it) => String(it.person_name ?? "").toLowerCase().includes(q))
+    : items;
+
+  return (
+    <div className="space-y-3">
+      <Input
+        placeholder="Filter by name…"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="h-11"
+      />
+      {filtered.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-6">
+          No cards match the filter.
+        </p>
+      ) : (
+        filtered.map((item, i) => (
+          <RecordCard key={i} resource="cards" mobile={mobile} item={item} />
+        ))
+      )}
     </div>
   );
 }
