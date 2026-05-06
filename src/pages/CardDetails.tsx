@@ -89,16 +89,14 @@ const CardDetails = () => {
           <Card className="p-5 bg-card/90 backdrop-blur shadow-[var(--shadow-card)] border-0">
             <h2 className="text-sm font-semibold text-foreground mb-3">Card Information</h2>
             <div className="space-y-1.5">
-              {entries.map(([k, v]) => (
+              {fields.map(({ key, label }) => (
                 <div
-                  key={k}
+                  key={key}
                   className="flex justify-between gap-3 text-sm border-b border-border/50 py-1.5 last:border-0"
                 >
-                  <span className="text-muted-foreground capitalize">
-                    {k.replace(/_/g, " ")}
-                  </span>
+                  <span className="text-muted-foreground">{label}</span>
                   <span className="font-medium text-foreground text-right break-all">
-                    {String(v)}
+                    {card[key] != null && card[key] !== "" ? String(card[key]) : "—"}
                   </span>
                 </div>
               ))}
