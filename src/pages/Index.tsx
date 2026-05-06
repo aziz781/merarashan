@@ -76,6 +76,9 @@ function ResourceView({ resource, mobile }: { resource: Resource; mobile: string
   if (resource === "transactions") {
     return <TransactionsView mobile={mobile} />;
   }
+  if (resource === "statements") {
+    return <StatementsView mobile={mobile} />;
+  }
   return <GenericResourceView resource={resource} mobile={mobile} />;
 }
 
@@ -132,10 +135,6 @@ function GenericResourceView({ resource, mobile }: { resource: Resource; mobile:
     return <CardsList items={items as Record<string, unknown>[]} mobile={mobile} />;
   }
 
-  if (resource === "statements") {
-    return <StatementsList items={items as Record<string, unknown>[]} mobile={mobile} />;
-  }
-
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
@@ -145,23 +144,31 @@ function GenericResourceView({ resource, mobile }: { resource: Resource; mobile:
   );
 }
 
-function StatementsList({
-  items,
-  mobile,
-}: {
-  items: Record<string, unknown>[];
-  mobile: string;
-}) {
-  const extractYear = (it: Record<string, unknown>): string => {
-    const period = String(it.statement_period ?? "");
-    const m = period.match(/(\d{4})/);
-    return m ? m[1] : "";
-  };
-  const [selected, setSelected] = useState<string>("all");
+function StatementsView({ mobile }: { mobile: string }) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 6 }, (_, i) => String(currentYear - i));
-  const filtered =
-    selected === "all" ? items : items.filter((it) => extractYear(it) === selected);
+  const [selected, setSelected] = useState<string>("all");
+  const [items, setItems] = useState<Record<string, unknown>[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    const params: Record<string, string> = {};
+    if (selected !== "all") params.year = selected;
+    fetchResource("statements", mobile, params)
+      .then((d) => {
+        if (cancelled) return;
+        setItems((extractItems(d) ?? []) as Record<string, unknown>[]);
+      })
+      .catch((e) => !cancelled && setError(e.message))
+      .finally(() => !cancelled && setLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [mobile, selected]);
 
   return (
     <div className="space-y-3">
@@ -178,12 +185,23 @@ function StatementsList({
           ))}
         </SelectContent>
       </Select>
-      {filtered.length === 0 ? (
+      {error ? (
+        <Card className="p-5 border-destructive/30 bg-destructive/5">
+          <p className="text-sm font-medium text-destructive mb-1">Failed to load</p>
+          <p className="text-xs text-muted-foreground break-all">{error}</p>
+        </Card>
+      ) : loading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+          ))}
+        </div>
+      ) : items.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-6">
-          No statements match the filter.
+          No statements found.
         </p>
       ) : (
-        filtered.map((item, i) => (
+        items.map((item, i) => (
           <RecordCard key={i} resource="statements" mobile={mobile} item={item} />
         ))
       )}
