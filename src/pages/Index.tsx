@@ -235,10 +235,18 @@ function RecordCard({
 
   if (resource === "cards") {
     const title =
+      (item.person_name as string) ||
       (item.card_name as string) ||
       (item.name as string) ||
-      (item.card_number as string) ||
+      (item.cm_card_number as string) ||
       "Card";
+    const summaryFields: { key: string; label: string }[] = [
+      { key: "person_name", label: "Name" },
+      { key: "cm_card_number", label: "Card Number" },
+      { key: "mobile_number", label: "Mobile" },
+      { key: "city", label: "City" },
+      { key: "card_status", label: "Status" },
+    ];
     return (
       <>
         <Card
@@ -259,10 +267,12 @@ function RecordCard({
             <span className="text-xs uppercase tracking-wider opacity-75">Card</span>
           </div>
           <div className="space-y-1">
-            {entries.slice(0, 4).map(([k, v]) => (
-              <div key={k} className="flex justify-between text-sm">
-                <span className="opacity-75">{k}</span>
-                <span className="font-medium">{String(v)}</span>
+            {summaryFields.map(({ key, label }) => (
+              <div key={key} className="flex justify-between text-sm">
+                <span className="opacity-75">{label}</span>
+                <span className="font-medium text-right break-all">
+                  {item[key] != null && item[key] !== "" ? String(item[key]) : "—"}
+                </span>
               </div>
             ))}
           </div>
