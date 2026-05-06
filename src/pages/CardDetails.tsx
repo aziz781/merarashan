@@ -49,11 +49,13 @@ const CardDetails = () => {
     };
   }, [mobile, rcNum]);
 
-  const entries = card
-    ? Object.entries(card).filter(
-        ([, v]) => v !== null && v !== "" && typeof v !== "object",
-      )
-    : [];
+  const fields: { key: string; label: string }[] = [
+    { key: "person_name", label: "Name" },
+    { key: "cm_card_number", label: "Card Number" },
+    { key: "mobile_number", label: "Mobile" },
+    { key: "city", label: "City" },
+    { key: "card_status", label: "Status" },
+  ];
 
   const title =
     (card?.person_name as string) ||
