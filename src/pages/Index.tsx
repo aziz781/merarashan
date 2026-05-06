@@ -158,9 +158,8 @@ function StatementsList({
     return m ? m[1] : "";
   };
   const [selected, setSelected] = useState<string>("all");
-  const years = Array.from(
-    new Set(items.map(extractYear).filter((y) => y.length > 0)),
-  ).sort((a, b) => b.localeCompare(a));
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 6 }, (_, i) => String(currentYear - i));
   const filtered =
     selected === "all" ? items : items.filter((it) => extractYear(it) === selected);
 
