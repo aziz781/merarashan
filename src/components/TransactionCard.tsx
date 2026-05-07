@@ -16,6 +16,7 @@ export function TransactionCard({
   const userName = (item.code_user_name as string) || "";
   const rcNum = (item.rc_num as string) || "";
   const datetimeDisplay = (item.datetime_display as string) || "";
+  const monthYear = (item.month_year as string) || "";
 
   const delivered = status === "Delivered";
   const showExtras = variant === "full";
