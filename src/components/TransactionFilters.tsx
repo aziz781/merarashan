@@ -1,14 +1,20 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { X } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon, X } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export type TxnFilters = {
   status: string;
   validFrom: string;
 };
+
+const MONTHS = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
 
 export function TransactionFilters({
   statuses,
@@ -20,6 +26,24 @@ export function TransactionFilters({
   onChange: (v: TxnFilters) => void;
 }) {
   const hasFilter = value.status !== "all" || value.validFrom !== "";
+  const now = new Date();
+  const currentYear = now.getFullYear();
+
+  const parsed = value.validFrom.match(/^(\d{2})\/(\d{4})$/);
+  const selectedMonth = parsed ? parseInt(parsed[1], 10) : 0;
+  const selectedYear = parsed ? parseInt(parsed[2], 10) : 0;
+
+  const [open, setOpen] = useState(false);
+  const [draftMonth, setDraftMonth] = useState<number>(selectedMonth || now.getMonth() + 1);
+  const [draftYear, setDraftYear] = useState<number>(selectedYear || currentYear);
+
+  const years = Array.from({ length: 8 }, (_, i) => currentYear - i);
+
+  const apply = () => {
+    const mm = String(draftMonth).padStart(2, "0");
+    onChange({ ...value, validFrom: `${mm}/${draftYear}` });
+    setOpen(false);
+  };
 
   return (
     <div className="mb-4 p-3 rounded-2xl bg-card/80 backdrop-blur border border-border/50 shadow-[var(--shadow-soft)]">
@@ -45,18 +69,78 @@ export function TransactionFilters({
         </div>
         <div className="space-y-1">
           <Label className="text-xs text-muted-foreground">Month</Label>
-          <Input
-            type="text"
-            inputMode="numeric"
-            placeholder="MM/YYYY"
-            value={value.validFrom}
-            onChange={(e) => {
-              let v = e.target.value.replace(/\D/g, "");
-              if (v.length >= 2) v = v.slice(0, 2) + "/" + v.slice(2, 6);
-              onChange({ ...value, validFrom: v });
-            }}
-            className="h-10"
-          />
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "h-10 w-full justify-start font-normal",
+                  !value.validFrom && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="w-4 h-4 mr-2" />
+                {value.validFrom || "MM/YYYY"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-3 pointer-events-auto" align="start">
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-xs text-muted-foreground">Month</Label>
+                  <div className="grid grid-cols-4 gap-1.5 mt-1.5">
+                    {MONTHS.map((m, i) => {
+                      const mNum = i + 1;
+                      const active = mNum === draftMonth;
+                      return (
+                        <Button
+                          key={m}
+                          variant={active ? "default" : "outline"}
+                          size="sm"
+                          className="h-8 text-xs"
+                          onClick={() => setDraftMonth(mNum)}
+                        >
+                          {m}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Year</Label>
+                  <Select
+                    value={String(draftYear)}
+                    onValueChange={(v) => setDraftYear(parseInt(v, 10))}
+                  >
+                    <SelectTrigger className="h-9 mt-1.5">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map((y) => (
+                        <SelectItem key={y} value={String(y)}>
+                          {y}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => {
+                      onChange({ ...value, validFrom: "" });
+                      setOpen(false);
+                    }}
+                  >
+                    Clear
+                  </Button>
+                  <Button size="sm" className="flex-1" onClick={apply}>
+                    Apply
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
       {hasFilter && (
@@ -72,3 +156,4 @@ export function TransactionFilters({
     </div>
   );
 }
+
