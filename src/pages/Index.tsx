@@ -499,7 +499,7 @@ function RecordCard({
             let display: React.ReactNode;
             if (isEmpty) {
               display = "—";
-            } else if (key === "invoice_charges") {
+            } else if (key === "invoice_subtotal") {
               const n = Number(raw);
               display = Number.isFinite(n)
                 ? `Rs. ${n.toLocaleString("en-PK")}`
