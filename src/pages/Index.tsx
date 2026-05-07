@@ -151,7 +151,7 @@ function ProfileView({ mobile, onNavigate }: { mobile: string; onNavigate?: (r: 
     } else if (key === "is_active") {
       const isActive = raw === true || raw === "true" || raw === 1 || raw === "1";
       display = isActive ? (
-        <Check className="w-5 h-5 text-green-500" />
+        <CheckCircle2 className="w-5 h-5 text-green-500" />
       ) : (
         <X className="w-5 h-5 text-destructive" />
       );
