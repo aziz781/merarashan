@@ -355,37 +355,48 @@ function StatementPdfButton({ url, title }: { url: string; title: string }) {
         className="w-full mt-3"
         onClick={() => setOpen(true)}
       >
-        <FileDown className="w-4 h-4 mr-2" />
-        Download PDF
+        <FileText className="w-4 h-4 mr-2" />
+        View PDF
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-3xl w-[95vw] h-[85vh] p-0 flex flex-col">
           <DialogHeader className="px-4 py-3 border-b">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <DialogTitle className="truncate text-base">{title}</DialogTitle>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}`;
-                  const win = window.open(url, "_blank", "noopener,noreferrer");
-                  if (!win) {
-                    // Popup blocked or failed — fall back immediately.
-                    window.open(viewerUrl, "_blank", "noopener,noreferrer");
-                    return;
-                  }
-                  // If the popup closes almost immediately, the PDF likely failed to load.
-                  window.setTimeout(() => {
-                    if (win.closed) {
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}`;
+                    const win = window.open(url, "_blank", "noopener,noreferrer");
+                    if (!win) {
                       window.open(viewerUrl, "_blank", "noopener,noreferrer");
+                      return;
                     }
-                  }, 1500);
-                }}
-              >
-                <ExternalLink className="w-4 h-4 mr-2" />
-                Open in new tab
-              </Button>
+                    window.setTimeout(() => {
+                      if (win.closed) {
+                        window.open(viewerUrl, "_blank", "noopener,noreferrer");
+                      }
+                    }, 1500);
+                  }}
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Open in new tab
+                </Button>
+                <Button asChild type="button" variant="default" size="sm">
+                  <a
+                    href={url}
+                    download={`${title}.pdf`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <FileDown className="w-4 h-4 mr-2" />
+                    Download PDF
+                  </a>
+                </Button>
+              </div>
             </div>
           </DialogHeader>
           <iframe
