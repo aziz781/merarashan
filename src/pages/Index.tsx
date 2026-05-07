@@ -76,7 +76,7 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
 
 function ResourceView({ resource, mobile, onNavigate }: { resource: Resource; mobile: string; onNavigate?: (r: Resource) => void }) {
   if (resource === "transactions") {
-    return <TransactionsView mobile={mobile} />;
+    return <RashansView mobile={mobile} />;
   }
   if (resource === "statements") {
     return <StatementsView mobile={mobile} />;
@@ -391,7 +391,7 @@ function extractItems(data: unknown): unknown[] | null {
   return null;
 }
 
-function TransactionsView({ mobile }: { mobile: string }) {
+function RashansView({ mobile }: { mobile: string }) {
   const [filters, setFilters] = useState<TxnFilters>({ status: "all", validFrom: "" });
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
@@ -676,7 +676,7 @@ function RecordCard({
 const TABS: { id: Resource; label: string; icon: typeof CreditCard }[] = [
   { id: "customers", label: "Home", icon: User },
   { id: "cards", label: "Cards", icon: CreditCard },
-  { id: "transactions", label: "Transactions", icon: ArrowLeftRight },
+  { id: "transactions", label: "Rashans", icon: ArrowLeftRight },
   { id: "statements", label: "Statements", icon: FileText },
 ];
 

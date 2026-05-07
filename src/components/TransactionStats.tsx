@@ -17,7 +17,7 @@ export function TransactionStats({ items }: { items: Txn[] }) {
   const pending = total - delivered;
 
   const stats = [
-    { label: "Transactions", value: String(total), icon: Receipt },
+    { label: "Rashans", value: String(total), icon: Receipt },
     { label: "Total Amount", value: formatPKR(totalAmount), icon: Wallet },
     { label: "Delivered", value: String(delivered), icon: CheckCircle2 },
     { label: "Pending", value: String(pending), icon: Clock },
