@@ -367,7 +367,21 @@ function StatementPdfButton({ url, title }: { url: string; title: string }) {
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => window.open(url, "_blank", "noopener,noreferrer")}
+                onClick={() => {
+                  const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}`;
+                  const win = window.open(url, "_blank", "noopener,noreferrer");
+                  if (!win) {
+                    // Popup blocked or failed — fall back immediately.
+                    window.open(viewerUrl, "_blank", "noopener,noreferrer");
+                    return;
+                  }
+                  // If the popup closes almost immediately, the PDF likely failed to load.
+                  window.setTimeout(() => {
+                    if (win.closed) {
+                      window.open(viewerUrl, "_blank", "noopener,noreferrer");
+                    }
+                  }, 1500);
+                }}
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
                 Open in new tab
