@@ -74,7 +74,7 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
   );
 }
 
-function ResourceView({ resource, mobile }: { resource: Resource; mobile: string }) {
+function ResourceView({ resource, mobile, onNavigate }: { resource: Resource; mobile: string; onNavigate?: (r: Resource) => void }) {
   if (resource === "transactions") {
     return <TransactionsView mobile={mobile} />;
   }
@@ -82,12 +82,12 @@ function ResourceView({ resource, mobile }: { resource: Resource; mobile: string
     return <StatementsView mobile={mobile} />;
   }
   if (resource === "customers") {
-    return <ProfileView mobile={mobile} />;
+    return <ProfileView mobile={mobile} onNavigate={onNavigate} />;
   }
   return <GenericResourceView resource={resource} mobile={mobile} />;
 }
 
-function ProfileView({ mobile }: { mobile: string }) {
+function ProfileView({ mobile, onNavigate }: { mobile: string; onNavigate?: (r: Resource) => void }) {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -171,7 +171,18 @@ function ProfileView({ mobile }: { mobile: string }) {
         <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">PROFILE</p>
         <div className="space-y-1.5">{section1.map(renderRow)}</div>
       </Card>
-      <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+      <Card
+        role="button"
+        tabIndex={0}
+        onClick={() => onNavigate?.("cards")}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onNavigate?.("cards");
+          }
+        }}
+        className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
+      >
         <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">CARDS</p>
         <div className="space-y-1.5">{section2.map(renderRow)}</div>
       </Card>
@@ -652,6 +663,7 @@ const TABS: { id: Resource; label: string; icon: typeof CreditCard }[] = [
 
 const Index = () => {
   const [mobile, setMobile] = useState<string | null>(null);
+  const [tab, setTab] = useState<Resource>("customers");
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -695,7 +707,7 @@ const Index = () => {
       </header>
 
       <main className="px-5 -mt-3">
-        <Tabs defaultValue="customers" className="w-full">
+        <Tabs value={tab} onValueChange={(v) => setTab(v as Resource)} className="w-full">
           <TabsList className="grid grid-cols-4 w-full h-14 bg-card shadow-[var(--shadow-soft)] rounded-2xl p-1">
             {TABS.map(({ id, label, icon: Icon }) => (
               <TabsTrigger
@@ -711,7 +723,7 @@ const Index = () => {
 
           {TABS.map(({ id }) => (
             <TabsContent key={id} value={id} className="mt-5">
-              <ResourceView resource={id} mobile={mobile} />
+              <ResourceView resource={id} mobile={mobile} onNavigate={setTab} />
             </TabsContent>
           ))}
         </Tabs>
