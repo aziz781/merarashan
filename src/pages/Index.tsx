@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown } from "lucide-react";
+import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { fetchResource, formatMobile, Resource } from "@/lib/api";
 import { TransactionStats } from "@/components/TransactionStats";
@@ -343,6 +344,44 @@ function TransactionsView({ mobile }: { mobile: string }) {
     </>
   );
 }
+function StatementPdfButton({ url, title }: { url: string; title: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="w-full mt-3"
+        onClick={() => setOpen(true)}
+      >
+        <FileDown className="w-4 h-4 mr-2" />
+        Download PDF
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-3xl w-[95vw] h-[85vh] p-0 flex flex-col">
+          <DialogHeader className="px-4 py-3 border-b">
+            <div className="flex items-center justify-between gap-3">
+              <DialogTitle className="truncate text-base">{title}</DialogTitle>
+              <Button asChild variant="outline" size="sm">
+                <a href={url} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Open in new tab
+                </a>
+              </Button>
+            </div>
+          </DialogHeader>
+          <iframe
+            src={url}
+            title={title}
+            className="flex-1 w-full border-0"
+          />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 function RecordCard({
   resource,
   mobile,
@@ -457,12 +496,7 @@ function RecordCard({
           })}
         </div>
         {fileUrl && (
-          <Button asChild variant="outline" size="sm" className="w-full mt-3">
-            <a href={fileUrl} target="_blank" rel="noopener noreferrer">
-              <FileDown className="w-4 h-4 mr-2" />
-              Download PDF
-            </a>
-          </Button>
+          <StatementPdfButton url={fileUrl} title={String(item.statement_period ?? "Statement")} />
         )}
       </Card>
     );
