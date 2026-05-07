@@ -156,14 +156,6 @@ function ProfileView({ mobile }: { mobile: string }) {
 
   return (
     <div className="space-y-3">
-      <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Payer Info</p>
-        <div className="space-y-1.5">{section1.map(renderRow)}</div>
-      </Card>
-      <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Cards</p>
-        <div className="space-y-1.5">{section2.map(renderRow)}</div>
-      </Card>
       {data.msg != null && data.msg !== "" && (
         <Card className="p-4 border-primary/30 bg-primary/5 shadow-[var(--shadow-soft)]">
           <div className="flex items-start gap-3">
@@ -175,6 +167,14 @@ function ProfileView({ mobile }: { mobile: string }) {
           </div>
         </Card>
       )}
+      <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Payer Info</p>
+        <div className="space-y-1.5">{section1.map(renderRow)}</div>
+      </Card>
+      <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Cards</p>
+        <div className="space-y-1.5">{section2.map(renderRow)}</div>
+      </Card>
     </div>
   );
 }
