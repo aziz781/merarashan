@@ -3,22 +3,6 @@ import { Badge } from "@/components/ui/badge";
 
 type Txn = Record<string, unknown>;
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-function formatMonthYear(input: string): string {
-  if (!input) return "";
-  const d = new Date(input);
-  if (!isNaN(d.getTime())) {
-    return `${MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(-2)}`;
-  }
-  const m = input.match(/^(\d{4})-(\d{2})/);
-  if (m) {
-    const idx = Number(m[2]) - 1;
-    return `${MONTHS[idx] ?? m[2]} ${m[1].slice(-2)}`;
-  }
-  return input;
-}
-
 export function TransactionCard({
   item,
   variant = "full",
@@ -29,8 +13,6 @@ export function TransactionCard({
   const code = (item.unique_code as string) || "—";
   const amount = Number(item.amount ?? item.totalAmount) || 0;
   const status = (item.things_status as string) || "";
-  const when = formatMonthYear((item.confirm_datetime as string) || "");
-  const confirmDatetime = (item.confirm_datetime as string) || "";
   const userName = (item.code_user_name as string) || "";
   const rcNum = (item.rc_num as string) || "";
 
@@ -43,9 +25,6 @@ export function TransactionCard({
         <div className="min-w-0">
           {showExtras && userName && (
             <p className="font-semibold text-foreground truncate">{userName}</p>
-          )}
-          {!showExtras && when && (
-            <p className="text-sm font-bold text-foreground mt-0.5">{when}</p>
           )}
           <p className="text-xs text-muted-foreground font-mono break-all mt-1.5">
             {code}
@@ -68,17 +47,8 @@ export function TransactionCard({
               {status}
             </Badge>
           )}
-          {showExtras && when && (
-            <p className="text-xs font-semibold text-muted-foreground">{when}</p>
-          )}
         </div>
       </div>
-      {showExtras && confirmDatetime && (
-        <div className="mt-3 pt-2 border-t border-border/30 flex justify-between text-sm">
-          <span className="text-muted-foreground">Date</span>
-          <span className="font-medium text-foreground">{confirmDatetime}</span>
-        </div>
-      )}
     </Card>
   );
 }
