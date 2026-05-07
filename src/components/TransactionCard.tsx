@@ -13,12 +13,14 @@ export function TransactionCard({
   const code = (item.unique_code as string) || "—";
   const amount = Number(item.amount ?? item.totalAmount) || 0;
   const status = (item.things_status as string) || "";
+  const paymentStatus = (item.payment_status as string) || "";
   const userName = (item.code_user_name as string) || "";
   const rcNum = (item.rc_num as string) || "";
   const datetimeDisplay = (item.datetime_display as string) || "";
   const monthYear = (item.month_year as string) || "";
 
   const delivered = status === "Delivered";
+  const notPaid = paymentStatus === "NOT_PAID";
   const showExtras = variant === "full";
 
   return (
@@ -41,12 +43,12 @@ export function TransactionCard({
           )}
         </div>
         <div className="flex flex-col items-end gap-1.5 shrink-0">
-          <p className="font-bold text-foreground">
+          <p className={`font-bold ${notPaid ? "text-destructive" : "text-foreground"}`}>
             Rs. {amount.toLocaleString("en-PK")}
           </p>
           {status && (
             <Badge
-              variant={delivered ? "default" : "outline"}
+              variant={delivered ? "default" : notPaid ? "destructive" : "outline"}
               className="font-normal"
             >
               {status}
