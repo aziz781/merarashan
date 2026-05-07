@@ -10,7 +10,7 @@ function formatPKR(n: number) {
 export function StatementStats({ items }: { items: Stmt[] }) {
   const total = items.length;
   const totalAmount = items.reduce(
-    (s, i) => s + (Number(i.invoice_subtotal) || 0),
+    (s, i) => s + (Number(i.totalGrossAmount) || 0),
     0,
   );
   const paid = items.filter(
@@ -20,7 +20,7 @@ export function StatementStats({ items }: { items: Stmt[] }) {
 
   const stats = [
     { label: "Statements", value: String(total), icon: FileText },
-    { label: "Total Subtotal", value: formatPKR(totalAmount), icon: Wallet },
+    { label: "Total Gross", value: formatPKR(totalAmount), icon: Wallet },
     { label: "Paid", value: String(paid), icon: CheckCircle2 },
     { label: "Unpaid", value: String(unpaid), icon: Clock },
   ];
