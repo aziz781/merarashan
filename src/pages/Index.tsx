@@ -132,11 +132,11 @@ function ProfileView({ mobile }: { mobile: string }) {
   }
 
   const section1: { key: string; label: string }[] = [
-    { key: "payer_id", label: "Status" },
-    { key: "contact_person", label: "Contact Person" },
-    { key: "payer_contact_wa_number", label: "WhatsApp Number" },
+    { key: "payer_id", label: "ID" },
+    { key: "contact_person", label: "Name" },
+    { key: "payer_contact_wa_number", label: "WhatsApp" },
     { key: "payer_joined_date", label: "Joined Date" },
-    { key: "is_active", label: "Is Active" },
+    { key: "is_active", label: "Status" },
   ];
   const section2: { key: string; label: string }[] = [
     { key: "card_name", label: "Card Name" },
