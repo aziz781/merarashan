@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink } from "lucide-react";
+import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -165,9 +165,14 @@ function ProfileView({ mobile }: { mobile: string }) {
         <div className="space-y-1.5">{section2.map(renderRow)}</div>
       </Card>
       {data.msg != null && data.msg !== "" && (
-        <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Message</p>
-          <p className="text-sm text-foreground whitespace-pre-wrap break-words">{String(data.msg)}</p>
+        <Card className="p-4 border-primary/30 bg-primary/5 shadow-[var(--shadow-soft)]">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-xs uppercase tracking-wider text-primary mb-1 font-semibold">Message</p>
+              <p className="text-sm text-foreground whitespace-pre-wrap break-words">{String(data.msg)}</p>
+            </div>
+          </div>
         </Card>
       )}
     </div>
