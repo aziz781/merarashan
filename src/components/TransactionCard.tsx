@@ -28,7 +28,7 @@ export function TransactionCard({
           {showExtras && userName && (
             <p className="font-semibold text-foreground truncate">{userName}</p>
           )}
-          {monthYear && (
+          {!showExtras && monthYear && (
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
           <p className="text-xs text-muted-foreground font-mono break-all mt-1.5">
