@@ -561,7 +561,7 @@ function RecordCard({
       >
         <div className="flex items-center justify-between mb-4">
           <CreditCard className="w-6 h-6 opacity-90" />
-          <span className="text-xs uppercase tracking-wider opacity-75">Card</span>
+          <span className="text-xs uppercase tracking-wider opacity-75">میرا راشن کارڈ</span>
         </div>
         <div className="space-y-1">
           {summaryFields.map(({ key, label }) => {
