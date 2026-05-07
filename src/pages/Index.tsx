@@ -15,6 +15,7 @@ import { fetchResource, formatMobile, Resource } from "@/lib/api";
 import { TransactionStats } from "@/components/TransactionStats";
 import { TransactionCard } from "@/components/TransactionCard";
 import { TransactionFilters, type TxnFilters } from "@/components/TransactionFilters";
+import { StatementStats } from "@/components/StatementStats";
 
 const STORAGE_KEY = "mr_mobile";
 
