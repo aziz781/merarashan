@@ -132,7 +132,7 @@ function ProfileView({ mobile }: { mobile: string }) {
   }
 
   const section1: { key: string; label: string }[] = [
-    { key: "payer_id", label: "Payer ID" },
+    { key: "payer_id", label: "Card Type" },
     { key: "contact_person", label: "Contact Person" },
     { key: "payer_contact_wa_number", label: "WhatsApp Number" },
     { key: "payer_joined_date", label: "Joined Date" },
@@ -172,7 +172,7 @@ function ProfileView({ mobile }: { mobile: string }) {
         <div className="space-y-1.5">{section1.map(renderRow)}</div>
       </Card>
       <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Cards</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">CARDS</p>
         <div className="space-y-1.5">{section2.map(renderRow)}</div>
       </Card>
     </div>
