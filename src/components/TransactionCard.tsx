@@ -35,6 +35,9 @@ export function TransactionCard({
               {rcNum}
             </p>
           )}
+          {confirmDatetime && (
+            <p className="text-xs text-muted-foreground mt-1">{confirmDatetime}</p>
+          )}
         </div>
         <div className="flex flex-col items-end gap-1.5 shrink-0">
           <p className="font-bold text-foreground">
