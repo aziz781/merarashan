@@ -56,7 +56,7 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
         <form onSubmit={submit} className="space-y-3">
           <Input
             inputMode="numeric"
-            placeholder="447525776781"
+            placeholder="Mobile number i.e 9203030812222"
             value={value}
             onChange={(e) => {
               setValue(e.target.value);
