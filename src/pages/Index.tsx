@@ -168,7 +168,7 @@ function ProfileView({ mobile }: { mobile: string }) {
         </Card>
       )}
       <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Payer Info</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">PROFILE</p>
         <div className="space-y-1.5">{section1.map(renderRow)}</div>
       </Card>
       <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
