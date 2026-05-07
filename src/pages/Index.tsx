@@ -363,11 +363,14 @@ function StatementPdfButton({ url, title }: { url: string; title: string }) {
           <DialogHeader className="px-4 py-3 border-b">
             <div className="flex items-center justify-between gap-3">
               <DialogTitle className="truncate text-base">{title}</DialogTitle>
-              <Button asChild variant="outline" size="sm">
-                <a href={url} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Open in new tab
-                </a>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(url, "_blank", "noopener,noreferrer")}
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Open in new tab
               </Button>
             </div>
           </DialogHeader>
