@@ -155,6 +155,8 @@ function ProfileView({ mobile, onNavigate }: { mobile: string; onNavigate?: (r: 
       ) : (
         <X className="w-5 h-5 text-destructive" />
       );
+    } else if (key === "active_cards") {
+      display = <Badge variant="default" className="font-normal">{String(raw)}</Badge>;
     } else {
       display = String(raw);
     }
