@@ -344,6 +344,44 @@ function TransactionsView({ mobile }: { mobile: string }) {
     </>
   );
 }
+function StatementPdfButton({ url, title }: { url: string; title: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="w-full mt-3"
+        onClick={() => setOpen(true)}
+      >
+        <FileDown className="w-4 h-4 mr-2" />
+        Download PDF
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-3xl w-[95vw] h-[85vh] p-0 flex flex-col">
+          <DialogHeader className="px-4 py-3 border-b">
+            <div className="flex items-center justify-between gap-3">
+              <DialogTitle className="truncate text-base">{title}</DialogTitle>
+              <Button asChild variant="outline" size="sm">
+                <a href={url} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Open in new tab
+                </a>
+              </Button>
+            </div>
+          </DialogHeader>
+          <iframe
+            src={url}
+            title={title}
+            className="flex-1 w-full border-0"
+          />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 function RecordCard({
   resource,
   mobile,
