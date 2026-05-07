@@ -62,7 +62,7 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
               setValue(e.target.value);
               setError(null);
             }}
-            className="h-12 text-base"
+            className="h-12 text-base text-left"
           />
           {error && <p className="text-xs text-destructive">{error}</p>}
           <Button type="submit" className="w-full h-12 text-base font-semibold">
