@@ -16,6 +16,7 @@ export function TransactionCard({
   const userName = (item.code_user_name as string) || "";
   const rcNum = (item.rc_num as string) || "";
   const datetimeDisplay = (item.datetime_display as string) || "";
+  const monthYear = (item.month_year as string) || "";
 
   const delivered = status === "Delivered";
   const showExtras = variant === "full";
@@ -26,6 +27,9 @@ export function TransactionCard({
         <div className="min-w-0">
           {showExtras && userName && (
             <p className="font-semibold text-foreground truncate">{userName}</p>
+          )}
+          {monthYear && (
+            <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
           <p className="text-xs text-muted-foreground font-mono break-all mt-1.5">
             {code}
