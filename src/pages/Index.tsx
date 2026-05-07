@@ -139,7 +139,7 @@ function ProfileView({ mobile }: { mobile: string }) {
     { key: "is_active", label: "Status" },
   ];
   const section2: { key: string; label: string }[] = [
-    { key: "card_name", label: "Card Name" },
+    { key: "card_name", label: "Card Type" },
     { key: "active_cards", label: "Active Cards" },
   ];
 
@@ -168,11 +168,11 @@ function ProfileView({ mobile }: { mobile: string }) {
         </Card>
       )}
       <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">PROFILE</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">PROFILE</p>
         <div className="space-y-1.5">{section1.map(renderRow)}</div>
       </Card>
       <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">CARDS</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">CARDS</p>
         <div className="space-y-1.5">{section2.map(renderRow)}</div>
       </Card>
     </div>
