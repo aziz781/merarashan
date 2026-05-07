@@ -432,6 +432,7 @@ function RecordCard({
       { key: "cm_card_number", label: "Card Number" },
       { key: "mobile_number", label: "Mobile" },
       { key: "city", label: "City" },
+      { key: "reg_date", label: "Registration Date" },
       { key: "card_status", label: "Status" },
     ];
     const open = () => {
