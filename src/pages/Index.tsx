@@ -633,9 +633,9 @@ function RecordCard({
 }
 
 const TABS: { id: Resource; label: string; icon: typeof CreditCard }[] = [
+  { id: "customers", label: "Home", icon: User },
   { id: "cards", label: "Cards", icon: CreditCard },
   { id: "transactions", label: "Transactions", icon: ArrowLeftRight },
-  { id: "customers", label: "Profile", icon: User },
   { id: "statements", label: "Statements", icon: FileText },
 ];
 
