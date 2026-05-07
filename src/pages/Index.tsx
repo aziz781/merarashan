@@ -47,7 +47,7 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
           className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center"
           style={{ background: "var(--gradient-primary)" }}
         >
-          <Phone className="w-7 h-7 text-primary-foreground" />
+          <CreditCard className="w-7 h-7 text-primary-foreground" />
         </div>
         <h1 className="text-2xl font-bold text-center text-foreground">Mera Rashan</h1>
         <p className="text-sm text-muted-foreground text-center mt-1 mb-6">
