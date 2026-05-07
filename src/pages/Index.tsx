@@ -174,6 +174,7 @@ function StatementsView({ mobile }: { mobile: string }) {
 
   return (
     <div className="space-y-3">
+      <StatementStats items={items} />
       <Select value={selected} onValueChange={setSelected}>
         <SelectTrigger className="h-11">
           <SelectValue placeholder="Filter by year" />
