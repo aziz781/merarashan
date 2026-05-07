@@ -7,18 +7,23 @@ function formatPKR(n: number) {
   return `Rs. ${n.toLocaleString("en-PK")}`;
 }
 
-export function StatementStats({ items }: { items: Stmt[] }) {
+export function StatementStats({
+  items,
+  stats,
+}: {
+  items: Stmt[];
+  stats?: Record<string, unknown> | null;
+}) {
   const total = items.length;
-  const totalAmount = items.reduce(
-    (s, i) => s + (Number(i.totalGrossAmount) || 0),
-    0,
-  );
+  const totalAmount =
+    Number(stats?.totalGrossAmount) ||
+    items.reduce((s, i) => s + (Number(i.invoice_total) || 0), 0);
   const paid = items.filter(
     (i) => String(i.payment_status ?? "").toLowerCase() === "paid",
   ).length;
   const unpaid = total - paid;
 
-  const stats = [
+  const statsList = [
     { label: "Statements", value: String(total), icon: FileText },
     { label: "Total Gross", value: formatPKR(totalAmount), icon: Wallet },
     { label: "Paid", value: String(paid), icon: CheckCircle2 },
@@ -27,7 +32,7 @@ export function StatementStats({ items }: { items: Stmt[] }) {
 
   return (
     <div className="grid grid-cols-2 gap-3 mb-4">
-      {stats.map(({ label, value, icon: Icon }) => (
+      {statsList.map(({ label, value, icon: Icon }) => (
         <Card
           key={label}
           className="p-4 border-border/50 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)]"
