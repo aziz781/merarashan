@@ -132,7 +132,7 @@ function ProfileView({ mobile }: { mobile: string }) {
   }
 
   const section1: { key: string; label: string }[] = [
-    { key: "payer_id", label: "Payer ID" },
+    { key: "payer_id", label: "Card Type" },
     { key: "contact_person", label: "Contact Person" },
     { key: "payer_contact_wa_number", label: "WhatsApp Number" },
     { key: "payer_joined_date", label: "Joined Date" },
