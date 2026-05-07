@@ -663,6 +663,7 @@ const TABS: { id: Resource; label: string; icon: typeof CreditCard }[] = [
 
 const Index = () => {
   const [mobile, setMobile] = useState<string | null>(null);
+  const [tab, setTab] = useState<Resource>("customers");
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
