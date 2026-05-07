@@ -80,14 +80,13 @@ const CardDetails = () => {
         </Button>
         <div className="flex items-center gap-3">
           <CreditCard className="w-6 h-6 opacity-90" />
-          <h1 className="text-xl font-bold truncate">{title}</h1>
+          <h1 className="text-xl font-bold truncate">میرا راشن کارڈ</h1>
         </div>
       </header>
 
       <main className="px-5 -mt-3 space-y-5">
         {card ? (
           <Card className="p-5 bg-card/90 backdrop-blur shadow-[var(--shadow-card)] border-0">
-            <h2 className="text-sm font-semibold text-foreground mb-3">میرا راشن کارڈ</h2>
             <div className="space-y-1.5">
               {fields.map(({ key, label }) => (
                 <div
