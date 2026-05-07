@@ -607,7 +607,7 @@ function RecordCard({
   if (resource === "statements") {
     const fields: { key: string; label: string }[] = [
       { key: "statement_period", label: "Statement Period" },
-      { key: "invoice_subtotal", label: "Invoice Subtotal" },
+      { key: "invoice_total", label: "Invoice Total" },
       { key: "payment_status", label: "Payment Status" },
     ];
     const fileUrl = (item.statement_file as string) || "";
@@ -623,7 +623,7 @@ function RecordCard({
             let display: React.ReactNode;
             if (isEmpty) {
               display = "—";
-            } else if (key === "invoice_subtotal") {
+            } else if (key === "invoice_total") {
               const n = Number(raw);
               display = Number.isFinite(n)
                 ? `Rs. ${n.toLocaleString("en-PK")}`
