@@ -684,7 +684,7 @@ const Index = () => {
       </header>
 
       <main className="px-5 -mt-3">
-        <Tabs defaultValue="cards" className="w-full">
+        <Tabs defaultValue="customers" className="w-full">
           <TabsList className="grid grid-cols-4 w-full h-14 bg-card shadow-[var(--shadow-soft)] rounded-2xl p-1">
             {TABS.map(({ id, label, icon: Icon }) => (
               <TabsTrigger
