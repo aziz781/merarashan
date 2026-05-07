@@ -707,7 +707,26 @@ const Index = () => {
       </header>
 
       <main className="px-5 -mt-3">
-        <Tabs defaultValue="customers" className="w-full">
+        <Tabs value={tab} onValueChange={(v) => setTab(v as Resource)} className="w-full">
+          <TabsList className="grid grid-cols-4 w-full h-14 bg-card shadow-[var(--shadow-soft)] rounded-2xl p-1">
+            {TABS.map(({ id, label, icon: Icon }) => (
+              <TabsTrigger
+                key={id}
+                value={id}
+                className="flex flex-col gap-0.5 h-full rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <Icon className="w-4 h-4" />
+                <span className="text-[10px] font-medium">{label}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {TABS.map(({ id }) => (
+            <TabsContent key={id} value={id} className="mt-5">
+              <ResourceView resource={id} mobile={mobile} onNavigate={setTab} />
+            </TabsContent>
+          ))}
+        </Tabs>
           <TabsList className="grid grid-cols-4 w-full h-14 bg-card shadow-[var(--shadow-soft)] rounded-2xl p-1">
             {TABS.map(({ id, label, icon: Icon }) => (
               <TabsTrigger
