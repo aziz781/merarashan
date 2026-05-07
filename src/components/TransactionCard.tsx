@@ -73,6 +73,12 @@ export function TransactionCard({
           )}
         </div>
       </div>
+      {showExtras && confirmDatetime && (
+        <div className="mt-3 pt-2 border-t border-border/30 flex justify-between text-sm">
+          <span className="text-muted-foreground">Date</span>
+          <span className="font-medium text-foreground">{confirmDatetime}</span>
+        </div>
+      )}
     </Card>
   );
 }
