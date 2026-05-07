@@ -54,7 +54,7 @@ const CardDetails = () => {
     { key: "cm_card_number", label: "Card Number" },
     { key: "mobile_number", label: "Mobile" },
     { key: "city", label: "City" },
-    { key: "card_status", label: "Status" },
+    { key: "reg_date", label: "Registration Date" },
   ];
 
   const title =
