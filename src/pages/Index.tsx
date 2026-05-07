@@ -607,7 +607,7 @@ function RecordCard({
   if (resource === "statements") {
     const fields: { key: string; label: string }[] = [
       { key: "statement_period", label: "Statement Period" },
-      { key: "invoice_subtotal", label: "Invoice Subtotal" },
+      { key: "invoice_total", label: "Invoice Total" },
       { key: "payment_status", label: "Payment Status" },
     ];
     const fileUrl = (item.statement_file as string) || "";
