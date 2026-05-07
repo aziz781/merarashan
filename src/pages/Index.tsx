@@ -55,11 +55,14 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
         </p>
         <form onSubmit={submit} className="space-y-3">
           <Input
+            type="tel"
             inputMode="numeric"
+            autoComplete="tel"
+            maxLength={15}
             placeholder="923030812222"
             value={value}
             onChange={(e) => {
-              setValue(e.target.value);
+              setValue(e.target.value.replace(/\D/g, ""));
               setError(null);
             }}
             className="h-12 text-base text-left"
