@@ -15,6 +15,7 @@ export function TransactionCard({
   const status = (item.things_status as string) || "";
   const userName = (item.code_user_name as string) || "";
   const rcNum = (item.rc_num as string) || "";
+  const confirmDatetime = (item.confirm_datetime as string) || "";
 
   const delivered = status === "Delivered";
   const showExtras = variant === "full";
