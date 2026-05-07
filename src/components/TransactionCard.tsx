@@ -15,6 +15,7 @@ export function TransactionCard({
   const status = (item.things_status as string) || "";
   const userName = (item.code_user_name as string) || "";
   const rcNum = (item.rc_num as string) || "";
+  const confirmDatetime = (item.confirm_datetime as string) || "";
 
   const delivered = status === "Delivered";
   const showExtras = variant === "full";
@@ -33,6 +34,9 @@ export function TransactionCard({
             <p className="text-[11px] text-muted-foreground font-mono break-all mt-1">
               {rcNum}
             </p>
+          )}
+          {confirmDatetime && (
+            <p className="text-xs text-muted-foreground mt-1">{confirmDatetime}</p>
           )}
         </div>
         <div className="flex flex-col items-end gap-1.5 shrink-0">
