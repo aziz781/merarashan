@@ -271,6 +271,7 @@ function StatementsView({ mobile }: { mobile: string }) {
   const years = Array.from({ length: 6 }, (_, i) => String(currentYear - i));
   const [selected, setSelected] = useState<string>("all");
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
+  const [stats, setStats] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -284,6 +285,8 @@ function StatementsView({ mobile }: { mobile: string }) {
       .then((d) => {
         if (cancelled) return;
         setItems((extractItems(d) ?? []) as Record<string, unknown>[]);
+        const s = (d as { stats?: Record<string, unknown> })?.stats ?? null;
+        setStats(s);
       })
       .catch((e) => !cancelled && setError(e.message))
       .finally(() => !cancelled && setLoading(false));
@@ -294,7 +297,7 @@ function StatementsView({ mobile }: { mobile: string }) {
 
   return (
     <div className="space-y-3">
-      <StatementStats items={items} />
+      <StatementStats items={items} stats={stats} />
       <Select value={selected} onValueChange={setSelected}>
         <SelectTrigger className="h-11">
           <SelectValue placeholder="Filter by year" />
