@@ -156,7 +156,7 @@ function ProfileView({ mobile, onNavigate }: { mobile: string; onNavigate?: (r: 
 
   return (
     <div className="space-y-3">
-      {data.msg != null && data.msg !== "" && (
+      {data.msg != null && String(data.msg).trim() !== "" && (
         <Card className="p-4 border-primary/30 bg-primary/5 shadow-[var(--shadow-soft)]">
           <div className="flex items-start gap-3">
             <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
