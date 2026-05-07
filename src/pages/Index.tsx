@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink, Info } from "lucide-react";
+import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink, Info, Check, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -145,7 +145,19 @@ function ProfileView({ mobile, onNavigate }: { mobile: string; onNavigate?: (r: 
 
   const renderRow = ({ key, label }: { key: string; label: string }) => {
     const raw = data[key];
-    const display = raw == null || raw === "" ? "—" : String(raw);
+    let display: React.ReactNode;
+    if (raw == null || raw === "") {
+      display = "—";
+    } else if (key === "is_active") {
+      const isActive = raw === true || raw === "true" || raw === 1 || raw === "1";
+      display = isActive ? (
+        <Check className="w-5 h-5 text-green-500" />
+      ) : (
+        <X className="w-5 h-5 text-destructive" />
+      );
+    } else {
+      display = String(raw);
+    }
     return (
       <div key={key} className="flex justify-between gap-3 text-sm items-center">
         <span className="text-muted-foreground">{label}</span>
