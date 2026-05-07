@@ -433,7 +433,6 @@ function RecordCard({
       { key: "mobile_number", label: "Mobile" },
       { key: "city", label: "City" },
       { key: "reg_date", label: "Registration Date" },
-      { key: "card_status", label: "Status" },
     ];
     const open = () => {
       if (rcNum) navigate(`/cards/${encodeURIComponent(rcNum)}`, { state: { card: item } });
