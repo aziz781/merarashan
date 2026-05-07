@@ -633,9 +633,9 @@ function RecordCard({
 }
 
 const TABS: { id: Resource; label: string; icon: typeof CreditCard }[] = [
+  { id: "customers", label: "Home", icon: User },
   { id: "cards", label: "Cards", icon: CreditCard },
   { id: "transactions", label: "Transactions", icon: ArrowLeftRight },
-  { id: "customers", label: "Profile", icon: User },
   { id: "statements", label: "Statements", icon: FileText },
 ];
 
@@ -684,7 +684,7 @@ const Index = () => {
       </header>
 
       <main className="px-5 -mt-3">
-        <Tabs defaultValue="cards" className="w-full">
+        <Tabs defaultValue="customers" className="w-full">
           <TabsList className="grid grid-cols-4 w-full h-14 bg-card shadow-[var(--shadow-soft)] rounded-2xl p-1">
             {TABS.map(({ id, label, icon: Icon }) => (
               <TabsTrigger
