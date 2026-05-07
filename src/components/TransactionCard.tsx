@@ -15,7 +15,7 @@ export function TransactionCard({
   const status = (item.things_status as string) || "";
   const userName = (item.code_user_name as string) || "";
   const rcNum = (item.rc_num as string) || "";
-  const confirmDatetime = (item.confirm_datetime as string) || "";
+  const datetimeDisplay = (item.datetime_display as string) || "";
 
   const delivered = status === "Delivered";
   const showExtras = variant === "full";
@@ -48,8 +48,8 @@ export function TransactionCard({
               {status}
             </Badge>
           )}
-          {confirmDatetime && (
-            <p className="text-xs text-muted-foreground">{confirmDatetime}</p>
+          {datetimeDisplay && (
+            <p className="text-xs text-muted-foreground">{datetimeDisplay}</p>
           )}
         </div>
       </div>
