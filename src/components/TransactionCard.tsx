@@ -30,6 +30,7 @@ export function TransactionCard({
   const amount = Number(item.amount ?? item.totalAmount) || 0;
   const status = (item.things_status as string) || "";
   const when = formatMonthYear((item.confirm_datetime as string) || "");
+  const confirmDatetime = (item.confirm_datetime as string) || "";
   const userName = (item.code_user_name as string) || "";
   const rcNum = (item.rc_num as string) || "";
 
