@@ -164,6 +164,12 @@ function ProfileView({ mobile }: { mobile: string }) {
         <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Cards</p>
         <div className="space-y-1.5">{section2.map(renderRow)}</div>
       </Card>
+      {data.msg != null && data.msg !== "" && (
+        <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Message</p>
+          <p className="text-sm text-foreground whitespace-pre-wrap break-words">{String(data.msg)}</p>
+        </Card>
+      )}
     </div>
   );
 }
