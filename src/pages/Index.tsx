@@ -81,7 +81,91 @@ function ResourceView({ resource, mobile }: { resource: Resource; mobile: string
   if (resource === "statements") {
     return <StatementsView mobile={mobile} />;
   }
+  if (resource === "customers") {
+    return <ProfileView mobile={mobile} />;
+  }
   return <GenericResourceView resource={resource} mobile={mobile} />;
+}
+
+function ProfileView({ mobile }: { mobile: string }) {
+  const [data, setData] = useState<Record<string, unknown> | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    fetchResource("customers", mobile)
+      .then((d) => {
+        if (cancelled) return;
+        const items = extractItems(d);
+        const first = (items && items[0]) || d;
+        setData(first as Record<string, unknown>);
+      })
+      .catch((e) => !cancelled && setError(e.message))
+      .finally(() => !cancelled && setLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [mobile]);
+
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+        ))}
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <Card className="p-5 border-destructive/30 bg-destructive/5">
+        <p className="text-sm font-medium text-destructive mb-1">Failed to load</p>
+        <p className="text-xs text-muted-foreground break-all">{error}</p>
+      </Card>
+    );
+  }
+  if (!data) {
+    return <p className="text-sm text-muted-foreground text-center py-6">No profile data.</p>;
+  }
+
+  const section1: { key: string; label: string }[] = [
+    { key: "payer_id", label: "Payer ID" },
+    { key: "contact_person", label: "Contact Person" },
+    { key: "payer_contact_wa_number", label: "WhatsApp Number" },
+    { key: "payer_joined_date", label: "Joined Date" },
+    { key: "is_active", label: "Is Active" },
+  ];
+  const section2: { key: string; label: string }[] = [
+    { key: "card_name", label: "Card Name" },
+    { key: "active_cards", label: "Active Cards" },
+  ];
+
+  const renderRow = ({ key, label }: { key: string; label: string }) => {
+    const raw = data[key];
+    const display = raw == null || raw === "" ? "—" : String(raw);
+    return (
+      <div key={key} className="flex justify-between gap-3 text-sm items-center">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="font-medium text-foreground text-right break-all">{display}</span>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-3">
+      <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Payer Info</p>
+        <div className="space-y-1.5">{section1.map(renderRow)}</div>
+      </Card>
+      <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Cards</p>
+        <div className="space-y-1.5">{section2.map(renderRow)}</div>
+      </Card>
+    </div>
+  );
 }
 
 function GenericResourceView({ resource, mobile }: { resource: Resource; mobile: string }) {
