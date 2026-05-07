@@ -74,7 +74,7 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
   );
 }
 
-function ResourceView({ resource, mobile }: { resource: Resource; mobile: string }) {
+function ResourceView({ resource, mobile, onNavigate }: { resource: Resource; mobile: string; onNavigate?: (r: Resource) => void }) {
   if (resource === "transactions") {
     return <TransactionsView mobile={mobile} />;
   }
@@ -82,12 +82,12 @@ function ResourceView({ resource, mobile }: { resource: Resource; mobile: string
     return <StatementsView mobile={mobile} />;
   }
   if (resource === "customers") {
-    return <ProfileView mobile={mobile} />;
+    return <ProfileView mobile={mobile} onNavigate={onNavigate} />;
   }
   return <GenericResourceView resource={resource} mobile={mobile} />;
 }
 
-function ProfileView({ mobile }: { mobile: string }) {
+function ProfileView({ mobile, onNavigate }: { mobile: string; onNavigate?: (r: Resource) => void }) {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
