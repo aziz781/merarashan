@@ -453,7 +453,7 @@ function StatementPdfButton({ url, title }: { url: string; title: string }) {
         onClick={() => setOpen(true)}
       >
         <FileText className="w-4 h-4 mr-2" />
-        View PDF
+        View Statement
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-3xl w-[95vw] h-[85vh] p-0 flex flex-col">
