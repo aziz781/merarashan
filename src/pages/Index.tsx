@@ -597,7 +597,9 @@ function RecordCard({
       { key: "payment_status", label: "Payment Status" },
     ];
     const fileUrl = (item.statement_file as string) || "";
-    const paid = String(item.payment_status ?? "").toLowerCase() === "paid";
+    const statusLower = String(item.payment_status ?? "").toLowerCase();
+    const paid = statusLower === "paid";
+    const notPaid = statusLower === "not_paid";
     return (
       <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
         <div className="space-y-1.5">
@@ -614,7 +616,7 @@ function RecordCard({
                 : String(raw);
             } else if (key === "payment_status") {
               display = (
-                <Badge variant={paid ? "default" : "outline"} className="font-normal">
+                <Badge variant={paid ? "default" : notPaid ? "destructive" : "outline"} className="font-normal">
                   {String(raw)}
                 </Badge>
               );
