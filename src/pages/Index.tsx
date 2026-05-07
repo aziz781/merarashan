@@ -372,9 +372,9 @@ function StatementPdfButton({ url, title }: { url: string; title: string }) {
             </div>
           </DialogHeader>
           <iframe
-            src={url}
+            src={`https://docs.google.com/viewer?embedded=true&url=${encodeURIComponent(url)}`}
             title={title}
-            className="flex-1 w-full border-0"
+            className="flex-1 w-full border-0 bg-muted"
           />
         </DialogContent>
       </Dialog>
