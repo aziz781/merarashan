@@ -779,6 +779,15 @@ const Index = () => {
           ))}
         </Tabs>
       </main>
+
+      <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
+        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Profile</DialogTitle>
+          </DialogHeader>
+          <ProfileView mobile={mobile} onNavigate={(r) => { setProfileOpen(false); setTab(r); }} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
