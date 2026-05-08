@@ -10,7 +10,6 @@ export function TransactionCard({
   item: Txn;
   variant?: "full" | "compact";
 }) {
-  const code = (item.unique_code as string) || "—";
   const amount = Number(item.amount ?? item.totalAmount) || 0;
   const status = (item.things_status as string) || "";
   const paymentStatus = (item.payment_status as string) || "";
@@ -33,9 +32,6 @@ export function TransactionCard({
           {!showExtras && monthYear && (
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
-          <p className="text-xs text-muted-foreground font-mono break-all mt-1.5">
-            {code}
-          </p>
           {showExtras && rcNum && (
             <p className="text-[11px] text-muted-foreground font-mono break-all mt-1">
               {rcNum}
