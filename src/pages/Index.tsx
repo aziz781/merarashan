@@ -90,6 +90,69 @@ function ResourceView({ resource, mobile, onNavigate }: { resource: Resource; mo
   return <GenericResourceView resource={resource} mobile={mobile} />;
 }
 
+function RecentRashans({ mobile, onViewAll }: { mobile: string; onViewAll?: () => void }) {
+  const [items, setItems] = useState<Record<string, unknown>[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    fetchResource("transactions", mobile)
+      .then((d) => {
+        if (cancelled) return;
+        const list = (extractItems(d) ?? []) as Record<string, unknown>[];
+        setItems(list);
+      })
+      .catch((e) => !cancelled && setError(e.message))
+      .finally(() => !cancelled && setLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [mobile]);
+
+  const latest = [...items]
+    .sort((a, b) => {
+      const da = new Date(String(a.created_at ?? a.date ?? a.txn_date ?? a.valid_from ?? 0)).getTime();
+      const db = new Date(String(b.created_at ?? b.date ?? b.txn_date ?? b.valid_from ?? 0)).getTime();
+      return db - da;
+    })
+    .slice(0, 3);
+
+  return (
+    <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Recent Rashans</p>
+        <button
+          type="button"
+          onClick={onViewAll}
+          className="text-xs font-medium text-primary hover:underline"
+        >
+          View all
+        </button>
+      </div>
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-16 w-full rounded-xl" />
+          ))}
+        </div>
+      ) : error ? (
+        <p className="text-xs text-destructive break-all">{error}</p>
+      ) : latest.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-3">No rashans yet.</p>
+      ) : (
+        <div className="space-y-2">
+          {latest.map((item, i) => (
+            <TransactionCard key={i} item={item} />
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: string; onNavigate?: (r: Resource) => void; profileOnly?: boolean }) {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
