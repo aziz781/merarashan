@@ -10,7 +10,6 @@ export function TransactionCard({
   item: Txn;
   variant?: "full" | "compact";
 }) {
-  const code = (item.unique_code as string) || "—";
   const amount = Number(item.amount ?? item.totalAmount) || 0;
   const status = (item.things_status as string) || "";
   const paymentStatus = (item.payment_status as string) || "";
