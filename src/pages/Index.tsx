@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink, Info, CheckCircle2, X, MessageCircle } from "lucide-react";
+import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink, Info, CheckCircle2, X, MessageCircle, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -291,6 +291,11 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
             </Card>
           )}
           <RecentRashans mobile={mobile} onViewAll={() => onNavigate?.("transactions")} />
+          <div className="flex flex-col items-center text-center pt-2 pb-1">
+            <ShieldCheck className="w-5 h-5 text-muted-foreground mb-1" />
+            <p className="text-sm font-semibold text-muted-foreground">MeraRashan.pk</p>
+            <p className="text-xs text-muted-foreground">Safe and transparent service in every step of the way.</p>
+          </div>
         </>
       )}
     </div>
