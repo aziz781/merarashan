@@ -707,6 +707,7 @@ const TABS: { id: Resource; label: string; icon: typeof CreditCard }[] = [
 const Index = () => {
   const [mobile, setMobile] = useState<string | null>(null);
   const [tab, setTab] = useState<Resource>("customers");
+  const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -735,7 +736,14 @@ const Index = () => {
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs uppercase tracking-wider opacity-75">Signed in</p>
-            <h1 className="text-2xl font-bold mt-1">+{mobile}</h1>
+            <button
+              type="button"
+              onClick={() => setProfileOpen(true)}
+              className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-md"
+              aria-label="Open profile"
+            >
+              <h1 className="text-2xl font-bold mt-1 hover:underline underline-offset-4">+{mobile}</h1>
+            </button>
           </div>
           <Button
             variant="ghost"
@@ -771,6 +779,15 @@ const Index = () => {
           ))}
         </Tabs>
       </main>
+
+      <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
+        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Profile</DialogTitle>
+          </DialogHeader>
+          <ProfileView mobile={mobile} onNavigate={(r) => { setProfileOpen(false); setTab(r); }} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
