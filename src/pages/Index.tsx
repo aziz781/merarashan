@@ -236,25 +236,12 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
 
   return (
     <div className="space-y-3">
-      {data.msg != null && String(data.msg).trim() !== "" && (
-        <Card className="p-4 border-primary/30 bg-primary/5 shadow-[var(--shadow-soft)]">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-xs uppercase tracking-wider text-primary mb-1 font-semibold">Message</p>
-              <p className="text-sm text-foreground whitespace-pre-wrap break-words">{String(data.msg)}</p>
-            </div>
-          </div>
-        </Card>
-      )}
       {profileOnly && (
-        <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">PROFILE</p>
-          <div className="space-y-1.5">{section1.map(renderRow)}</div>
-        </Card>
-      )}
-      {!profileOnly && (
         <>
+          <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">PROFILE</p>
+            <div className="space-y-1.5">{section1.map(renderRow)}</div>
+          </Card>
           <a
             href="https://wa.me/923030812222"
             target="_blank"
@@ -273,6 +260,10 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
               </div>
             </Card>
           </a>
+        </>
+      )}
+      {!profileOnly && (
+        <>
           <Card
             role="button"
             tabIndex={0}
@@ -289,6 +280,17 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
             <div className="space-y-1.5">{section2.map(renderRow)}</div>
           </Card>
           <RecentRashans mobile={mobile} onViewAll={() => onNavigate?.("transactions")} />
+          {data.msg != null && String(data.msg).trim() !== "" && (
+            <Card className="p-4 border-primary/30 bg-primary/5 shadow-[var(--shadow-soft)]">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-xs uppercase tracking-wider text-primary mb-1 font-semibold">Message</p>
+                  <p className="text-sm text-foreground whitespace-pre-wrap break-words">{String(data.msg)}</p>
+                </div>
+              </div>
+            </Card>
+          )}
         </>
       )}
     </div>
