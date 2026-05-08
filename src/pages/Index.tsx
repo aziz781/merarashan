@@ -279,7 +279,6 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
             <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">CARDS</p>
             <div className="space-y-1.5">{section2.map(renderRow)}</div>
           </Card>
-          <RecentRashans mobile={mobile} onViewAll={() => onNavigate?.("transactions")} />
           {data.msg != null && String(data.msg).trim() !== "" && (
             <Card className="p-4 border-primary/30 bg-primary/5 shadow-[var(--shadow-soft)]">
               <div className="flex items-start gap-3">
@@ -291,6 +290,7 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
               </div>
             </Card>
           )}
+          <RecentRashans mobile={mobile} onViewAll={() => onNavigate?.("transactions")} />
         </>
       )}
     </div>
