@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink, Info, CheckCircle2, X } from "lucide-react";
+import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink, Info, CheckCircle2, X, MessageCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -203,6 +203,24 @@ function ProfileView({ mobile, onNavigate }: { mobile: string; onNavigate?: (r: 
         <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">CARDS</p>
         <div className="space-y-1.5">{section2.map(renderRow)}</div>
       </Card>
+      <a
+        href="https://wa.me/923030812222"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
+        <Card className="p-4 bg-[#25D366]/10 border-[#25D366]/30 shadow-[var(--shadow-soft)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
+              <MessageCircle className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Contact Support</p>
+              <p className="text-xs text-muted-foreground">Chat on WhatsApp</p>
+            </div>
+          </div>
+        </Card>
+      </a>
     </div>
   );
 }
