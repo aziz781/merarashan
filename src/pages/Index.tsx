@@ -736,7 +736,14 @@ const Index = () => {
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs uppercase tracking-wider opacity-75">Signed in</p>
-            <h1 className="text-2xl font-bold mt-1">+{mobile}</h1>
+            <button
+              type="button"
+              onClick={() => setProfileOpen(true)}
+              className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-md"
+              aria-label="Open profile"
+            >
+              <h1 className="text-2xl font-bold mt-1 hover:underline underline-offset-4">+{mobile}</h1>
+            </button>
           </div>
           <Button
             variant="ghost"
