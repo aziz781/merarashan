@@ -395,7 +395,10 @@ function extractItems(data: unknown): unknown[] | null {
 }
 
 function RashansView({ mobile }: { mobile: string }) {
-  const [filters, setFilters] = useState<TxnFilters>({ status: "all", validFrom: "" });
+  const now = new Date();
+  const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
+  const currentYear = String(now.getFullYear());
+  const [filters, setFilters] = useState<TxnFilters>({ status: "all", validFrom: `${currentMonth}/${currentYear}` });
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
