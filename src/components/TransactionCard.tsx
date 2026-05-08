@@ -32,6 +32,9 @@ export function TransactionCard({
           {!showExtras && monthYear && (
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
+          {datetimeDisplay && (
+            <p className="text-xs text-muted-foreground mt-1">{datetimeDisplay}</p>
+          )}
           {showExtras && rcNum && (
             <p className="text-[11px] text-muted-foreground font-mono break-all mt-1">
               {rcNum}
@@ -49,9 +52,6 @@ export function TransactionCard({
             >
               {status}
             </Badge>
-          )}
-          {datetimeDisplay && (
-            <p className="text-xs text-muted-foreground">{datetimeDisplay}</p>
           )}
         </div>
       </div>
