@@ -207,6 +207,7 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
             <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">CARDS</p>
             <div className="space-y-1.5">{section2.map(renderRow)}</div>
           </Card>
+          <RecentRashans mobile={mobile} onViewAll={() => onNavigate?.("transactions")} />
           <a
             href="https://wa.me/923030812222"
             target="_blank"
