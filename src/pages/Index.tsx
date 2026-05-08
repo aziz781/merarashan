@@ -90,7 +90,7 @@ function ResourceView({ resource, mobile, onNavigate }: { resource: Resource; mo
   return <GenericResourceView resource={resource} mobile={mobile} />;
 }
 
-function ProfileView({ mobile, onNavigate }: { mobile: string; onNavigate?: (r: Resource) => void }) {
+function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: string; onNavigate?: (r: Resource) => void; profileOnly?: boolean }) {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -188,39 +188,43 @@ function ProfileView({ mobile, onNavigate }: { mobile: string; onNavigate?: (r: 
         <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">PROFILE</p>
         <div className="space-y-1.5">{section1.map(renderRow)}</div>
       </Card>
-      <Card
-        role="button"
-        tabIndex={0}
-        onClick={() => onNavigate?.("cards")}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onNavigate?.("cards");
-          }
-        }}
-        className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
-      >
-        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">CARDS</p>
-        <div className="space-y-1.5">{section2.map(renderRow)}</div>
-      </Card>
-      <a
-        href="https://wa.me/923030812222"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-      >
-        <Card className="p-4 bg-[#25D366]/10 border-[#25D366]/30 shadow-[var(--shadow-soft)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
-              <MessageCircle className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">Contact Support</p>
-              <p className="text-xs text-muted-foreground">Chat on WhatsApp</p>
-            </div>
-          </div>
-        </Card>
-      </a>
+      {!profileOnly && (
+        <>
+          <Card
+            role="button"
+            tabIndex={0}
+            onClick={() => onNavigate?.("cards")}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onNavigate?.("cards");
+              }
+            }}
+            className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
+          >
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">CARDS</p>
+            <div className="space-y-1.5">{section2.map(renderRow)}</div>
+          </Card>
+          <a
+            href="https://wa.me/923030812222"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <Card className="p-4 bg-[#25D366]/10 border-[#25D366]/30 shadow-[var(--shadow-soft)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
+                  <MessageCircle className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Contact Support</p>
+                  <p className="text-xs text-muted-foreground">Chat on WhatsApp</p>
+                </div>
+              </div>
+            </Card>
+          </a>
+        </>
+      )}
     </div>
   );
 }
@@ -785,7 +789,7 @@ const Index = () => {
           <DialogHeader>
             <DialogTitle>Profile</DialogTitle>
           </DialogHeader>
-          <ProfileView mobile={mobile} onNavigate={(r) => { setProfileOpen(false); setTab(r); }} />
+          <ProfileView mobile={mobile} profileOnly />
         </DialogContent>
       </Dialog>
     </div>
