@@ -789,7 +789,7 @@ const Index = () => {
           <DialogHeader>
             <DialogTitle>Profile</DialogTitle>
           </DialogHeader>
-          <ProfileView mobile={mobile} onNavigate={(r) => { setProfileOpen(false); setTab(r); }} />
+          <ProfileView mobile={mobile} profileOnly />
         </DialogContent>
       </Dialog>
     </div>
