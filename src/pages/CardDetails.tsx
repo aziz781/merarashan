@@ -89,17 +89,22 @@ const CardDetails = () => {
         {card ? (
           <Card className="p-5 bg-card/90 backdrop-blur shadow-[var(--shadow-card)] border-0">
             <div className="space-y-1.5">
-              {fields.map(({ key, label }) => (
-                <div
-                  key={key}
-                  className="flex justify-between gap-3 text-sm border-b border-border/50 py-1.5 last:border-0"
-                >
-                  <span className="text-muted-foreground">{label}</span>
-                  <span className="font-medium text-foreground text-right break-all">
-                    {card[key] != null && card[key] !== "" ? String(card[key]) : "—"}
-                  </span>
-                </div>
-              ))}
+              {fields.map(({ key, label }) => {
+                const isBold = key === "person_name" || key === "amount";
+                return (
+                  <div
+                    key={key}
+                    className="flex justify-between gap-3 text-sm border-b border-border/50 py-1.5 last:border-0"
+                  >
+                    <span className={isBold ? "font-bold text-foreground" : "text-muted-foreground"}>
+                      {label}
+                    </span>
+                    <span className={`text-right break-all ${isBold ? "font-bold text-foreground" : "text-muted-foreground"}`}>
+                      {card[key] != null && card[key] !== "" ? String(card[key]) : "—"}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </Card>
         ) : (
