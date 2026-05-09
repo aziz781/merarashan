@@ -92,6 +92,7 @@ const CardDetails = () => {
               {fields.map(({ key, label }) => {
                 const isBold = key === "person_name" || key === "amount";
                 const hideLabel = key === "person_name" || key === "amount";
+                const isName = key === "person_name";
                 const raw = card[key];
                 let display: string;
                 if (raw == null || raw === "") {
@@ -107,14 +108,14 @@ const CardDetails = () => {
                 return (
                   <div
                     key={key}
-                    className={`flex justify-between gap-3 text-sm border-b border-border/50 py-1.5 last:border-0 ${hideLabel ? "" : ""}`}
+                    className={`flex justify-between gap-3 border-b border-border/50 py-1.5 last:border-0 ${isName ? "" : "text-sm"}`}
                   >
                     {!hideLabel && (
                       <span className={isBold ? "font-bold text-foreground" : "text-muted-foreground"}>
                         {label}
                       </span>
                     )}
-                    <span className={`break-all ${isBold ? "font-bold text-foreground" : "text-muted-foreground"} ${hideLabel ? "w-full text-right" : "text-right"}`}>
+                    <span className={`break-all ${isBold ? "font-bold text-foreground" : "text-muted-foreground"} ${hideLabel ? "w-full text-right" : "text-right"} ${isName ? "text-xl" : ""}`}>
                       {display}
                     </span>
                   </div>
