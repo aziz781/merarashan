@@ -51,7 +51,7 @@ export function MessageBox({ type = "INFO", title, message }: MessageBoxProps) {
           <p className={`text-xs uppercase tracking-wider ${textClass} mb-1 font-semibold`}>
             {title ? String(title) : "Message"}
           </p>
-          <p className="text-sm text-foreground whitespace-pre-wrap break-words">{String(message)}</p>
+          <div className="text-sm text-foreground whitespace-pre-wrap break-words">{message}</div>
         </div>
       </div>
     </Card>
