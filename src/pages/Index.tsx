@@ -17,7 +17,7 @@ import { TransactionCard } from "@/components/TransactionCard";
 import { TransactionFilters, type TxnFilters } from "@/components/TransactionFilters";
 import { StatementStats } from "@/components/StatementStats";
 import { PageFooter } from "@/components/PageFooter";
-
+import { MessageBox } from "@/components/MessageBox";
 const STORAGE_KEY = "mr_mobile";
 
 const mobileSchema = z
@@ -280,28 +280,13 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
             <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">CARDS</p>
             <div className="space-y-1.5">{section2.map(renderRow)}</div>
           </Card>
-          {data.msg != null && String(data.msg).trim() !== "" && (() => {
-            const msgType = String(data.msg_type ?? "").toUpperCase();
-            const isInfo = msgType === "INFO";
-            const isWarning = msgType === "WARNING";
-            const isSuccess = msgType === "SUCCESS";
-            const isFailed = msgType === "FAILURE";
-            const borderClass = isWarning ? "border-yellow-500/30" : isSuccess ? "border-green-500/30" : isFailed ? "border-destructive/30" : "border-primary/30";
-            const bgClass = isWarning ? "bg-yellow-500/5" : isSuccess ? "bg-green-500/5" : isFailed ? "bg-destructive/5" : "bg-primary/5";
-            const textClass = isWarning ? "text-yellow-600" : isSuccess ? "text-green-600" : isFailed ? "text-destructive" : "text-primary";
-            const Icon = isWarning ? AlertTriangle : isSuccess ? CheckCircle2 : isFailed ? X : Info;
-            return (
-              <Card className={`p-4 ${borderClass} ${bgClass} shadow-[var(--shadow-soft)]`}>
-                <div className="flex items-start gap-3">
-                  <Icon className={`w-5 h-5 ${textClass} shrink-0 mt-0.5`} />
-                  <div className="flex-1">
-                    <p className={`text-xs uppercase tracking-wider ${textClass} mb-1 font-semibold`}>{data.msg_title ? String(data.msg_title) : "Message"}</p>
-                    <p className="text-sm text-foreground whitespace-pre-wrap break-words">{String(data.msg)}</p>
-                  </div>
-                </div>
-              </Card>
-            );
-          })()}
+          {data.msg != null && String(data.msg).trim() !== "" && (
+            <MessageBox
+              type={String(data.msg_type ?? "")}
+              title={data.msg_title ? String(data.msg_title) : undefined}
+              message={String(data.msg)}
+            />
+          )}
           <RecentRashans mobile={mobile} onViewAll={() => onNavigate?.("transactions")} />
         </>
       )}
