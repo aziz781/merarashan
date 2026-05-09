@@ -2,14 +2,24 @@ import { ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Info, CheckCircle2, X, AlertTriangle } from "lucide-react";
 
 export type MessageType = "INFO" | "WARNING" | "SUCCESS" | "FAILURE";
+
+export interface MessageAction {
+  label: string;
+  onClick?: () => void;
+  href?: string;
+  variant?: "default" | "secondary" | "outline" | "ghost" | "destructive" | "link";
+}
 
 interface MessageBoxProps {
   type?: MessageType | string;
   title?: string;
   message: ReactNode;
+  actions?: MessageAction[];
+  onDismiss?: () => void;
 }
 
 export function MessageBox({ type = "INFO", title, message }: MessageBoxProps) {
