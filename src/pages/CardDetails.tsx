@@ -92,6 +92,18 @@ const CardDetails = () => {
               {fields.map(({ key, label }) => {
                 const isBold = key === "person_name" || key === "amount";
                 const hideLabel = key === "person_name" || key === "amount";
+                const raw = card[key];
+                let display: string;
+                if (raw == null || raw === "") {
+                  display = "—";
+                } else if (key === "amount") {
+                  const n = Number(raw);
+                  display = Number.isFinite(n)
+                    ? `Rs. ${n.toLocaleString("en-PK")}`
+                    : String(raw);
+                } else {
+                  display = String(raw);
+                }
                 return (
                   <div
                     key={key}
@@ -103,7 +115,7 @@ const CardDetails = () => {
                       </span>
                     )}
                     <span className={`break-all ${isBold ? "font-bold text-foreground" : "text-muted-foreground"} ${hideLabel ? "w-full text-right" : "text-right"}`}>
-                      {card[key] != null && card[key] !== "" ? String(card[key]) : "—"}
+                      {display}
                     </span>
                   </div>
                 );
