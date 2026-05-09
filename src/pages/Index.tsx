@@ -682,33 +682,39 @@ function RecordCard({
           <span className="text-xs uppercase tracking-wider opacity-75">میرا راشن کارڈ</span>
         </div>
         <div className="space-y-1">
-          {summaryFields.map(({ key, label }) => {
-            const raw = item[key];
-            const isEmpty = raw == null || raw === "";
-            let display: string;
-            if (isEmpty) {
-              display = "—";
-            } else if (key === "amount") {
-              const n = Number(raw);
-              display = Number.isFinite(n)
-                ? `Rs. ${n.toLocaleString("en-PK")}`
-                : String(raw);
-            } else {
-              display = String(raw);
-            }
-            const isBold = key === "person_name" || key === "amount";
-            const hideLabel = key === "person_name" || key === "amount";
-            return (
-              <div key={key} className="flex justify-between text-sm">
-                {!hideLabel && (
-                  <span className={`${isBold ? "font-bold" : "opacity-75"}`}>{label}</span>
-                )}
-                <span className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"} ${hideLabel ? "w-full text-left" : ""}`}>
-                  {display}
-                </span>
-              </div>
-            );
-          })}
+          {/* Name: large, left-aligned */}
+          <div className="text-lg font-bold text-left mb-1">
+            {item.person_name ? String(item.person_name) : "—"}
+          </div>
+          {summaryFields
+            .filter(({ key }) => key !== "person_name")
+            .map(({ key, label }) => {
+              const raw = item[key];
+              const isEmpty = raw == null || raw === "";
+              let display: string;
+              if (isEmpty) {
+                display = "—";
+              } else if (key === "amount") {
+                const n = Number(raw);
+                display = Number.isFinite(n)
+                  ? `Rs. ${n.toLocaleString("en-PK")}`
+                  : String(raw);
+              } else {
+                display = String(raw);
+              }
+              const isBold = key === "amount";
+              const hideLabel = key === "amount";
+              return (
+                <div key={key} className="flex justify-between text-sm">
+                  {!hideLabel && (
+                    <span className={`${isBold ? "font-bold" : "opacity-75"}`}>{label}</span>
+                  )}
+                  <span className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"} ${hideLabel ? "w-full" : ""}`}>
+                    {display}
+                  </span>
+                </div>
+              );
+            })}
         </div>
       </Card>
     );
