@@ -294,7 +294,7 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
                 <div className="flex items-start gap-3">
                   <Icon className={`w-5 h-5 ${textClass} shrink-0 mt-0.5`} />
                   <div className="flex-1">
-                    <p className={`text-xs uppercase tracking-wider ${textClass} mb-1 font-semibold`}>Message</p>
+                    <p className={`text-xs uppercase tracking-wider ${textClass} mb-1 font-semibold`}>{data.msg_title ? String(data.msg_title) : "Message"}</p>
                     <p className="text-sm text-foreground whitespace-pre-wrap break-words">{String(data.msg)}</p>
                   </div>
                 </div>
