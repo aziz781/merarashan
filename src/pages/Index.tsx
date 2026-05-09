@@ -474,7 +474,7 @@ function CardsList({
         </p>
       ) : (
         filtered.map((item, i) => (
-          <RecordCard key={i} resource="cards" mobile={mobile} item={item} />
+          <RecordCard key={i} resource="cards" mobile={mobile} item={item} index={i + 1} />
         ))
       )}
     </div>
