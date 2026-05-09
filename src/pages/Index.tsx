@@ -367,7 +367,7 @@ function GenericResourceView({ resource, mobile }: { resource: Resource; mobile:
 function StatementsView({ mobile }: { mobile: string }) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 6 }, (_, i) => String(currentYear - i));
-  const [selected, setSelected] = useState<string>("all");
+  const [selected, setSelected] = useState<string>(String(currentYear));
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [stats, setStats] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
