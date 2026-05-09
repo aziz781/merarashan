@@ -22,7 +22,7 @@ interface MessageBoxProps {
   onDismiss?: () => void;
 }
 
-export function MessageBox({ type = "INFO", title, message }: MessageBoxProps) {
+export function MessageBox({ type = "INFO", title, message, actions, onDismiss }: MessageBoxProps) {
   const msgType = String(type ?? "").toUpperCase() as MessageType;
   const isInfo = msgType === "INFO";
   const isWarning = msgType === "WARNING";
