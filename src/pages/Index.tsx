@@ -788,11 +788,30 @@ const Index = () => {
   const [mobile, setMobile] = useState<string | null>(null);
   const [tab, setTab] = useState<Resource>("customers");
   const [profileOpen, setProfileOpen] = useState(false);
+  const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) setMobile(saved);
   }, []);
+
+  useEffect(() => {
+    if (!mobile) return;
+    let cancelled = false;
+    fetchResource("customers", mobile)
+      .then((d) => {
+        if (cancelled) return;
+        const items = extractItems(d);
+        const first = (items && items[0]) || d;
+        setProfileData(first as Record<string, unknown>);
+      })
+      .catch(() => {
+        // silently fail; header falls back to mobile number
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [mobile]);
 
   const handleLogin = (m: string) => {
     localStorage.setItem(STORAGE_KEY, m);
@@ -803,9 +822,17 @@ const Index = () => {
   const handleLogout = () => {
     localStorage.removeItem(STORAGE_KEY);
     setMobile(null);
+    setProfileData(null);
   };
 
   if (!mobile) return <Login onLogin={handleLogin} />;
+
+  const displayName = profileData?.contact_person || `+${mobile}`;
+  const isActive =
+    profileData?.is_active === true ||
+    profileData?.is_active === "true" ||
+    profileData?.is_active === 1 ||
+    profileData?.is_active === "1";
 
   return (
     <div className="min-h-screen pb-24">
@@ -815,14 +842,22 @@ const Index = () => {
       >
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wider opacity-75">Signed in</p>
             <button
               type="button"
               onClick={() => setProfileOpen(true)}
               className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-md"
               aria-label="Open profile"
             >
-              <h1 className="text-2xl font-bold mt-1 hover:underline underline-offset-4">+{mobile}</h1>
+              <h1 className="text-2xl font-bold hover:underline underline-offset-4 flex items-center gap-2">
+                {String(displayName)}
+                {profileData && (
+                  isActive ? (
+                    <CheckCircle2 className="w-5 h-5 text-green-400" />
+                  ) : (
+                    <X className="w-5 h-5 text-red-400" />
+                  )
+                )}
+              </h1>
             </button>
           </div>
           <Button
