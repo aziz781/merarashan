@@ -72,7 +72,44 @@ export function MessageBox({ type = "INFO", title, message, actions, onDismiss }
               message
             )}
           </div>
+          {actions && actions.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {actions.map((action, i) =>
+                action.href ? (
+                  <Button
+                    key={i}
+                    asChild
+                    size="sm"
+                    variant={action.variant ?? (i === 0 ? "default" : "outline")}
+                  >
+                    <a href={action.href} target={action.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">
+                      {action.label}
+                    </a>
+                  </Button>
+                ) : (
+                  <Button
+                    key={i}
+                    size="sm"
+                    variant={action.variant ?? (i === 0 ? "default" : "outline")}
+                    onClick={action.onClick}
+                  >
+                    {action.label}
+                  </Button>
+                )
+              )}
+            </div>
+          )}
         </div>
+        {onDismiss && (
+          <button
+            type="button"
+            onClick={onDismiss}
+            aria-label="Dismiss"
+            className={`shrink-0 rounded p-1 ${textClass} hover:bg-foreground/5 transition-colors`}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </Card>
   );
