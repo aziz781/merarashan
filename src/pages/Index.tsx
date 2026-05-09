@@ -640,10 +640,12 @@ function RecordCard({
   resource,
   mobile,
   item,
+  index,
 }: {
   resource: Resource;
   mobile: string;
   item: Record<string, unknown>;
+  index?: number;
 }) {
   const navigate = useNavigate();
   const entries = Object.entries(item).filter(
