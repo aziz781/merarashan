@@ -848,6 +848,9 @@ const Index = () => {
               className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-md"
               aria-label="Open profile"
             >
+              {profileData?.payer_id && (
+                <p className="text-xs opacity-75">{String(profileData.payer_id)}</p>
+              )}
               <h1 className="text-2xl font-bold hover:underline underline-offset-4 flex items-center gap-2">
                 {String(displayName)}
                 {profileData && (
