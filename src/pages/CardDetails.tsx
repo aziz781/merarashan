@@ -102,7 +102,7 @@ const CardDetails = () => {
                         {label}
                       </span>
                     )}
-                    <span className={`break-all ${isBold ? "font-bold text-foreground" : "text-muted-foreground"} ${hideLabel ? "w-full text-left" : "text-right"}`}>
+                    <span className={`break-all ${isBold ? "font-bold text-foreground" : "text-muted-foreground"} ${hideLabel ? "w-full text-right" : "text-right"}`}>
                       {card[key] != null && card[key] !== "" ? String(card[key]) : "—"}
                     </span>
                   </div>
