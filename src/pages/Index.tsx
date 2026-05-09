@@ -681,10 +681,10 @@ function RecordCard({
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 opacity-90" />
             {index != null && (
               <span className="text-sm font-mono opacity-90">{String(index).padStart(2, "0")}</span>
             )}
+            <CreditCard className="w-5 h-5 opacity-90" />
           </div>
           <span className="text-xs uppercase tracking-wider opacity-75">میرا راشن کارڈ</span>
         </div>
