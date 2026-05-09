@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchResource } from "@/lib/api";
 import { TransactionCard } from "@/components/TransactionCard";
+import { PageFooter } from "@/components/PageFooter";
 
 const STORAGE_KEY = "mr_mobile";
 
@@ -155,6 +156,7 @@ const CardDetails = () => {
           )}
         </section>
       </main>
+      <PageFooter />
     </div>
   );
 };
