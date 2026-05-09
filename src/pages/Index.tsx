@@ -280,17 +280,27 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
             <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">CARDS</p>
             <div className="space-y-1.5">{section2.map(renderRow)}</div>
           </Card>
-          {data.msg != null && String(data.msg).trim() !== "" && (
-            <Card className="p-4 border-primary/30 bg-primary/5 shadow-[var(--shadow-soft)]">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-xs uppercase tracking-wider text-primary mb-1 font-semibold">Message</p>
-                  <p className="text-sm text-foreground whitespace-pre-wrap break-words">{String(data.msg)}</p>
+          {data.msg != null && String(data.msg).trim() !== "" && (() => {
+            const msgType = String(data.msg_type ?? "").toUpperCase();
+            const isWarning = msgType === "WARNING";
+            const isSuccess = msgType === "SUCCESS";
+            const isFailed = msgType === "FAILED" || msgType === "FAILEF";
+            const borderClass = isWarning ? "border-yellow-500/30" : isSuccess ? "border-green-500/30" : isFailed ? "border-destructive/30" : "border-primary/30";
+            const bgClass = isWarning ? "bg-yellow-500/5" : isSuccess ? "bg-green-500/5" : isFailed ? "bg-destructive/5" : "bg-primary/5";
+            const textClass = isWarning ? "text-yellow-600" : isSuccess ? "text-green-600" : isFailed ? "text-destructive" : "text-primary";
+            const Icon = isWarning ? AlertTriangle : isSuccess ? CheckCircle2 : isFailed ? X : Info;
+            return (
+              <Card className={`p-4 ${borderClass} ${bgClass} shadow-[var(--shadow-soft)]`}>
+                <div className="flex items-start gap-3">
+                  <Icon className={`w-5 h-5 ${textClass} shrink-0 mt-0.5`} />
+                  <div className="flex-1">
+                    <p className={`text-xs uppercase tracking-wider ${textClass} mb-1 font-semibold`}>Message</p>
+                    <p className="text-sm text-foreground whitespace-pre-wrap break-words">{String(data.msg)}</p>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          )}
+              </Card>
+            );
+          })()}
           <RecentRashans mobile={mobile} onViewAll={() => onNavigate?.("transactions")} />
         </>
       )}
