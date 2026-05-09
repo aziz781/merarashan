@@ -699,7 +699,9 @@ function RecordCard({
             return (
               <div key={key} className="flex justify-between text-sm">
                 <span className="opacity-75">{label}</span>
-                <span className="font-medium text-right break-all">{display}</span>
+                <span className={`text-right break-all ${key === "person_name" ? "font-bold" : "font-medium"}`}>
+                  {display}
+                </span>
               </div>
             );
           })}
