@@ -474,7 +474,7 @@ function CardsList({
         </p>
       ) : (
         filtered.map((item, i) => (
-          <RecordCard key={i} resource="cards" mobile={mobile} item={item} />
+          <RecordCard key={i} resource="cards" mobile={mobile} item={item} index={i + 1} />
         ))
       )}
     </div>
@@ -640,10 +640,12 @@ function RecordCard({
   resource,
   mobile,
   item,
+  index,
 }: {
   resource: Resource;
   mobile: string;
   item: Record<string, unknown>;
+  index?: number;
 }) {
   const navigate = useNavigate();
   const entries = Object.entries(item).filter(
@@ -678,7 +680,12 @@ function RecordCard({
         style={{ background: "var(--gradient-card)" }}
       >
         <div className="flex items-center justify-between mb-4">
-          <CreditCard className="w-6 h-6 opacity-90" />
+          <div className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5 opacity-90" />
+            {index != null && (
+              <span className="text-sm font-mono opacity-90">{String(index).padStart(2, "0")}</span>
+            )}
+          </div>
           <span className="text-xs uppercase tracking-wider opacity-75">میرا راشن کارڈ</span>
         </div>
         <div className="space-y-1">
