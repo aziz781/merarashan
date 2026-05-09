@@ -854,11 +854,13 @@ const Index = () => {
               <h1 className="text-2xl font-bold hover:underline underline-offset-4 flex items-center gap-2">
                 {String(displayName)}
                 {profileData && (
-                  isActive ? (
-                    <CheckCircle2 className="w-5 h-5 text-green-400" />
-                  ) : (
-                    <X className="w-5 h-5 text-red-400" />
-                  )
+                  <span title={isActive ? "Active" : "Inactive"}>
+                    {isActive ? (
+                      <CheckCircle2 className="w-5 h-5 text-green-400" />
+                    ) : (
+                      <X className="w-5 h-5 text-red-400" />
+                    )}
+                  </span>
                 )}
               </h1>
             </button>
