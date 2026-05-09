@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Card } from "@/components/ui/card";
 import { Info, CheckCircle2, X, AlertTriangle } from "lucide-react";
 
@@ -6,7 +7,7 @@ export type MessageType = "INFO" | "WARNING" | "SUCCESS" | "FAILURE";
 interface MessageBoxProps {
   type?: MessageType | string;
   title?: string;
-  message: string;
+  message: ReactNode;
 }
 
 export function MessageBox({ type = "INFO", title, message }: MessageBoxProps) {
