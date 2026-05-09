@@ -683,28 +683,32 @@ function RecordCard({
         </div>
         <div className="space-y-1">
           {summaryFields.map(({ key, label }) => {
-            if (key === "person_name" || key === "amount") return null;
             const raw = item[key];
             const isEmpty = raw == null || raw === "";
-            const display = isEmpty ? "—" : String(raw);
+            let display: string;
+            if (isEmpty) {
+              display = "—";
+            } else if (key === "amount") {
+              const n = Number(raw);
+              display = Number.isFinite(n)
+                ? `Rs. ${n.toLocaleString("en-PK")}`
+                : String(raw);
+            } else {
+              display = String(raw);
+            }
+            const isBold = key === "person_name" || key === "amount";
+            const hideLabel = key === "person_name" || key === "amount";
             return (
               <div key={key} className="flex justify-between text-sm">
-                <span className="opacity-75">{label}</span>
-                <span className="text-right break-all opacity-75">{display}</span>
+                {!hideLabel && (
+                  <span className={`${isBold ? "font-bold" : "opacity-75"}`}>{label}</span>
+                )}
+                <span className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"} ${hideLabel ? "w-full text-left" : ""}`}>
+                  {display}
+                </span>
               </div>
             );
           })}
-        </div>
-        <div className="mt-3 pt-3 border-t border-white/20">
-          <p className="text-lg font-bold">{String(item.person_name ?? "—")}</p>
-          <p className="text-sm font-bold mt-0.5">
-            {(() => {
-              const raw = item.amount;
-              if (raw == null || raw === "") return "—";
-              const n = Number(raw);
-              return Number.isFinite(n) ? `Rs. ${n.toLocaleString("en-PK")}` : String(raw);
-            })()}
-          </p>
         </div>
       </Card>
     );
