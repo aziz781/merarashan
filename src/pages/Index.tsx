@@ -680,7 +680,12 @@ function RecordCard({
         style={{ background: "var(--gradient-card)" }}
       >
         <div className="flex items-center justify-between mb-4">
-          <CreditCard className="w-6 h-6 opacity-90" />
+          <div className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5 opacity-90" />
+            {index != null && (
+              <span className="text-sm font-mono opacity-90">{String(index).padStart(2, "0")}</span>
+            )}
+          </div>
           <span className="text-xs uppercase tracking-wider opacity-75">میرا راشن کارڈ</span>
         </div>
         <div className="space-y-1">
