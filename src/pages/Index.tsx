@@ -703,7 +703,7 @@ function RecordCard({
                 {!hideLabel && (
                   <span className={`${isBold ? "font-bold" : "opacity-75"}`}>{label}</span>
                 )}
-                <span className={`break-all ${isBold ? "font-bold" : "opacity-75"} ${hideLabel ? "w-full text-left" : "text-right"}`}>
+                <span className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"} ${hideLabel ? "w-full text-left" : ""}`}>
                   {display}
                 </span>
               </div>
