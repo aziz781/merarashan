@@ -653,8 +653,8 @@ function RecordCard({
   if (resource === "cards") {
     const rcNum = (item.cm_card_number as string) || "";
     const summaryFields: { key: string; label: string }[] = [
-      { key: "person_name", label: "Name" },
       { key: "amount", label: "Amount" },
+      { key: "person_name", label: "Name" },
       { key: "cm_card_number", label: "Card Number" },
       { key: "mobile_number", label: "Mobile" },
       { key: "city", label: "City" },
