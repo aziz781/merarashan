@@ -699,8 +699,8 @@ function RecordCard({
             const isBold = key === "person_name" || key === "amount";
             return (
               <div key={key} className="flex justify-between text-sm">
-                <span className={`opacity-75 ${isBold ? "font-bold" : ""}`}>{label}</span>
-                <span className={`text-right break-all ${isBold ? "font-bold" : ""}`}>
+                <span className={`${isBold ? "font-bold" : "opacity-75"}`}>{label}</span>
+                <span className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"}`}>
                   {display}
                 </span>
               </div>
