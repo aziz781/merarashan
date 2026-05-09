@@ -653,8 +653,8 @@ function RecordCard({
   if (resource === "cards") {
     const rcNum = (item.cm_card_number as string) || "";
     const summaryFields: { key: string; label: string }[] = [
-      { key: "person_name", label: "Name" },
       { key: "amount", label: "Amount" },
+      { key: "person_name", label: "Name" },
       { key: "cm_card_number", label: "Card Number" },
       { key: "mobile_number", label: "Mobile" },
       { key: "city", label: "City" },
@@ -698,12 +698,17 @@ function RecordCard({
             }
             const isBold = key === "person_name" || key === "amount";
             const hideLabel = key === "person_name" || key === "amount";
+            const alignClass = hideLabel
+              ? key === "person_name"
+                ? "w-full text-right"
+                : "w-full text-left"
+              : "";
             return (
               <div key={key} className="flex justify-between text-sm">
                 {!hideLabel && (
                   <span className={`${isBold ? "font-bold" : "opacity-75"}`}>{label}</span>
                 )}
-                <span className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"} ${hideLabel ? "w-full text-left" : ""}`}>
+                <span className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"} ${alignClass}`}>
                   {display}
                 </span>
               </div>
