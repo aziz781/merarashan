@@ -282,9 +282,10 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
           </Card>
           {data.msg != null && String(data.msg).trim() !== "" && (() => {
             const msgType = String(data.msg_type ?? "").toUpperCase();
+            const isInfo = msgType === "INFO";
             const isWarning = msgType === "WARNING";
             const isSuccess = msgType === "SUCCESS";
-            const isFailed = msgType === "FAILED" || msgType === "FAILEF";
+            const isFailed = msgType === "FAILURE";
             const borderClass = isWarning ? "border-yellow-500/30" : isSuccess ? "border-green-500/30" : isFailed ? "border-destructive/30" : "border-primary/30";
             const bgClass = isWarning ? "bg-yellow-500/5" : isSuccess ? "bg-green-500/5" : isFailed ? "bg-destructive/5" : "bg-primary/5";
             const textClass = isWarning ? "text-yellow-600" : isSuccess ? "text-green-600" : isFailed ? "text-destructive" : "text-primary";
