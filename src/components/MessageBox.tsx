@@ -1,4 +1,6 @@
 import { ReactNode } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Card } from "@/components/ui/card";
 import { Info, CheckCircle2, X, AlertTriangle } from "lucide-react";
 
