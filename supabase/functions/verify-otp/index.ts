@@ -11,6 +11,8 @@ async function sha256(text: string): Promise<string> {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+const EMAIL_DOMAIN = "phone.merarashan.local";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -63,7 +65,37 @@ Deno.serve(async (req) => {
 
     await supabase.from("otp_codes").update({ consumed: true }).eq("id", row.id);
 
-    return new Response(JSON.stringify({ ok: true }), {
+    // Ensure a Supabase auth user exists for this mobile, then issue a
+    // single-use magiclink token the client can exchange for a real session.
+    const email = `${cleaned}@${EMAIL_DOMAIN}`;
+
+    const { data: existing } = await supabase.auth.admin.listUsers({
+      page: 1,
+      perPage: 1,
+      // listUsers doesn't support filtering by email directly in v2; we rely on
+      // createUser idempotency below and ignore "already registered" errors.
+    });
+    void existing;
+
+    const { error: createErr } = await supabase.auth.admin.createUser({
+      email,
+      email_confirm: true,
+      user_metadata: { mobile: cleaned },
+    });
+    if (createErr && !/already|registered|exists/i.test(createErr.message)) {
+      throw new Error(createErr.message);
+    }
+
+    const { data: linkData, error: linkErr } = await supabase.auth.admin.generateLink({
+      type: "magiclink",
+      email,
+    });
+    if (linkErr) throw new Error(linkErr.message);
+
+    const tokenHash = (linkData as { properties?: { hashed_token?: string } })?.properties?.hashed_token;
+    if (!tokenHash) throw new Error("Could not issue session token");
+
+    return new Response(JSON.stringify({ ok: true, email, token_hash: tokenHash }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {

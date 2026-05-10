@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { fetchResource, formatMobile, Resource } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
 import { TransactionStats } from "@/components/TransactionStats";
 import { TransactionCard } from "@/components/TransactionCard";
 import { TransactionFilters, type TxnFilters } from "@/components/TransactionFilters";
@@ -19,6 +20,7 @@ import { StatementStats } from "@/components/StatementStats";
 import { PageFooter } from "@/components/PageFooter";
 import { MessageBox } from "@/components/MessageBox";
 const STORAGE_KEY = "mr_mobile";
+const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
 
 const mobileSchema = z
   .string()
@@ -95,6 +97,12 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Verification failed");
+      if (!data?.token_hash) throw new Error("Missing session token");
+      const { error: vErr } = await supabase.auth.verifyOtp({
+        token_hash: data.token_hash,
+        type: "magiclink",
+      });
+      if (vErr) throw new Error(vErr.message);
       onLogin(mobile);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Verification failed");
@@ -929,8 +937,35 @@ const Index = () => {
   const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) setMobile(saved);
+    const extract = (email?: string | null, meta?: Record<string, unknown> | null) => {
+      const fromMeta = typeof meta?.mobile === "string" ? (meta.mobile as string) : null;
+      if (fromMeta) return fromMeta;
+      if (email && email.endsWith(`@${PHONE_EMAIL_DOMAIN}`)) {
+        return email.slice(0, -1 - PHONE_EMAIL_DOMAIN.length);
+      }
+      return null;
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      const m = extract(session?.user?.email, session?.user?.user_metadata as Record<string, unknown> | null);
+      setMobile(m);
+      if (m) localStorage.setItem(STORAGE_KEY, m);
+      else localStorage.removeItem(STORAGE_KEY);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const m = extract(session?.user?.email, session?.user?.user_metadata as Record<string, unknown> | null);
+      if (m) {
+        setMobile(m);
+        localStorage.setItem(STORAGE_KEY, m);
+      } else {
+        // fall back to legacy local storage value during migration
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) setMobile(saved);
+      }
+    });
+
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -957,7 +992,8 @@ const Index = () => {
     toast({ title: "Welcome", description: `Signed in as ${m}` });
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     localStorage.removeItem(STORAGE_KEY);
     setMobile(null);
     setProfileData(null);
