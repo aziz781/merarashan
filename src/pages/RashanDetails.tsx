@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Receipt, CreditCard, Wallet, Calendar, Tag, Info } from "lucide-react";
+import { ArrowLeft, Receipt, CreditCard, Calendar, Tag, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,13 +23,7 @@ const CATEGORIES: {
     id: "card",
     title: "Card",
     icon: CreditCard,
-    match: (k) => /(rc_num|card|cm_)/i.test(k),
-  },
-  {
-    id: "amounts",
-    title: "Amounts",
-    icon: Wallet,
-    match: (k) => /(amount|charge|price|total|gross|net|fee|discount|paid|balance)/i.test(k),
+    match: (k) => /(rc_num|card|cm_|amount|charge|price|total|gross|net|fee|discount|paid|balance)/i.test(k),
   },
   {
     id: "dates",
