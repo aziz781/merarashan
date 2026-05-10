@@ -93,7 +93,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     label: "Rashan Code Issued",
     dateKey: "created_date",
     timeKey: "created_time",
-    detailKey: "code_user_mobile",
+    detailKey: "userMobileNumber",
     detailPrefix: "SMS sent at",
   },
   {
