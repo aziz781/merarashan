@@ -45,7 +45,10 @@ export function TransactionCard({
             <p className="font-semibold text-foreground truncate">{userName}</p>
           )}
           {!showExtras && monthYear && (
-            <p className="text-xs font-bold text-foreground">{monthYear}</p>
+            <p className="text-xs text-foreground">
+              <span className="text-muted-foreground">Month Year: </span>
+              <span className="font-bold">{monthYear}</span>
+            </p>
           )}
           {!showExtras && datetimeDisplay && (
             <p className="text-xs text-muted-foreground mt-1">{datetimeDisplay}</p>
@@ -61,12 +64,15 @@ export function TransactionCard({
             Rs. {amount.toLocaleString("en-PK")}
           </p>
           {status && (
-            <Badge
-              variant={delivered ? "default" : notPaid ? "destructive" : "outline"}
-              className="font-normal"
-            >
-              {status}
-            </Badge>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-muted-foreground">Status:</span>
+              <Badge
+                variant={delivered ? "default" : notPaid ? "destructive" : "outline"}
+                className="font-normal"
+              >
+                {status}
+              </Badge>
+            </div>
           )}
           {showExtras && datetimeDisplay && (
             <p className="text-xs text-muted-foreground">{datetimeDisplay}</p>
