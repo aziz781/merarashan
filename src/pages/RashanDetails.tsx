@@ -124,7 +124,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     timeKey: "",
     statusKey: "payment_status",
     detailKey: "payment_method",
-    detailPrefix: "Karyana Store paid in",
+    detailPrefix: "Karyana Store ({registered_business_number}) paid in",
     detailSuffixKey: "payment_account",
     detailSuffixLabel: "account",
   },
@@ -189,7 +189,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
             )}
             {detail && step.detailPrefix && (step.statusKey === "things_status" ? statusVal.toLowerCase() === "delivered" : (date || time)) && (
               <p className="mt-1 text-xs text-muted-foreground">
-                {step.detailPrefix} {step.detailCodeKey && `(${get(step.detailCodeKey)})`} {step.detailConnector && `${step.detailConnector} `}{detail}
+                {step.detailPrefix.replace(/\{(\w+)\}/g, (_, key) => get(key))} {step.detailCodeKey && `(${get(step.detailCodeKey)})`} {step.detailConnector && `${step.detailConnector} `}{detail}
                 {step.detailSuffixKey && step.detailSuffixLabel && ` ${step.detailSuffixLabel} (${get(step.detailSuffixKey)})`}
               </p>
             )}
