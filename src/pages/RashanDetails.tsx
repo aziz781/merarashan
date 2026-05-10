@@ -20,13 +20,6 @@ const CATEGORIES: {
     match: (k) => /(status|state|delivered|pending)/i.test(k),
   },
   {
-    id: "customer",
-    title: "Customer",
-    icon: User,
-    match: (k) =>
-      /(user|person|customer|name|mobile|phone|whatsapp|contact|city|address|area)/i.test(k),
-  },
-  {
     id: "card",
     title: "Card",
     icon: CreditCard,
