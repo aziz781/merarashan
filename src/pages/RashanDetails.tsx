@@ -174,7 +174,9 @@ const RashanDetails = () => {
                   key={k}
                   className="flex justify-between gap-3 text-sm items-center border-b border-border/40 py-1.5 last:border-0"
                 >
-                  {k !== "rc_num" && (
+                  {k === "rc_num" ? (
+                    <span className="text-muted-foreground">Number</span>
+                  ) : (
                     <span className="text-muted-foreground">{humanizeKey(k)}</span>
                   )}
                   <span className="font-medium text-foreground text-right break-all">
