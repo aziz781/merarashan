@@ -175,23 +175,27 @@ const RashanDetails = () => {
                 {title}
               </p>
             </div>
-            <div className="space-y-1.5">
-              {rows.map(([k, v]) => (
-                <div
-                  key={k}
-                  className="flex justify-between gap-3 text-sm items-center border-b border-border/40 py-1.5 last:border-0"
-                >
-                  {k === "rc_num" ? (
-                    <span className="text-muted-foreground">Number</span>
-                  ) : k === "datetime_display" ? null : (
-                    <span className="text-muted-foreground">{humanizeKey(k)}</span>
-                  )}
-                  <span className="font-medium text-foreground text-right break-all ml-auto">
-                    {formatValue(k, v)}
-                  </span>
-                </div>
-              ))}
-            </div>
+            {id === "dates" ? (
+              <UpdatesTimeline item={item} />
+            ) : (
+              <div className="space-y-1.5">
+                {rows.map(([k, v]) => (
+                  <div
+                    key={k}
+                    className="flex justify-between gap-3 text-sm items-center border-b border-border/40 py-1.5 last:border-0"
+                  >
+                    {k === "rc_num" ? (
+                      <span className="text-muted-foreground">Number</span>
+                    ) : k === "datetime_display" ? null : (
+                      <span className="text-muted-foreground">{humanizeKey(k)}</span>
+                    )}
+                    <span className="font-medium text-foreground text-right break-all ml-auto">
+                      {formatValue(k, v)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </Card>
         ))}
       </main>
