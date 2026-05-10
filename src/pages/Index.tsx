@@ -377,7 +377,6 @@ function StatementsView({ mobile }: { mobile: string }) {
     setError(null);
     const params: Record<string, string> = {};
     if (selected !== "all") params.year = selected;
-    if (statusFilter !== "all") params.status = statusFilter;
     fetchResource("statements", mobile, params)
       .then((d) => {
         if (cancelled) return;
