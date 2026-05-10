@@ -88,7 +88,7 @@ type TimelineStep = {
 
 const TIMELINE_STEPS: TimelineStep[] = [
   {
-    label: "Rashan code sent in SMS",
+    label: "Rashan Code Issued",
     dateKey: "created_date",
     timeKey: "created_time",
   },
