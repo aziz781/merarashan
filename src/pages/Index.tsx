@@ -937,8 +937,35 @@ const Index = () => {
   const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) setMobile(saved);
+    const extract = (email?: string | null, meta?: Record<string, unknown> | null) => {
+      const fromMeta = typeof meta?.mobile === "string" ? (meta.mobile as string) : null;
+      if (fromMeta) return fromMeta;
+      if (email && email.endsWith(`@${PHONE_EMAIL_DOMAIN}`)) {
+        return email.slice(0, -1 - PHONE_EMAIL_DOMAIN.length);
+      }
+      return null;
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      const m = extract(session?.user?.email, session?.user?.user_metadata as Record<string, unknown> | null);
+      setMobile(m);
+      if (m) localStorage.setItem(STORAGE_KEY, m);
+      else localStorage.removeItem(STORAGE_KEY);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const m = extract(session?.user?.email, session?.user?.user_metadata as Record<string, unknown> | null);
+      if (m) {
+        setMobile(m);
+        localStorage.setItem(STORAGE_KEY, m);
+      } else {
+        // fall back to legacy local storage value during migration
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) setMobile(saved);
+      }
+    });
+
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -965,7 +992,8 @@ const Index = () => {
     toast({ title: "Welcome", description: `Signed in as ${m}` });
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     localStorage.removeItem(STORAGE_KEY);
     setMobile(null);
     setProfileData(null);
