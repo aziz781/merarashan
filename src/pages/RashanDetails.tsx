@@ -176,7 +176,7 @@ const RashanDetails = () => {
                 >
                   {k === "rc_num" ? (
                     <span className="text-muted-foreground">Number</span>
-                  ) : (
+                  ) : k === "datetime_display" ? null : (
                     <span className="text-muted-foreground">{humanizeKey(k)}</span>
                   )}
                   <span className="font-medium text-foreground text-right break-all">
