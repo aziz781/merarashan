@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Receipt, CreditCard, Calendar, Tag, Info } from "lucide-react";
+import { ArrowLeft, Receipt, CreditCard, Calendar, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -72,6 +72,7 @@ function formatValue(key: string, raw: unknown): React.ReactNode {
 }
 
 function humanizeKey(k: string) {
+  if (k === "things_status") return "Rashan";
   return k
     .replace(/_/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
@@ -119,16 +120,6 @@ const RashanDetails = () => {
     return { ...c, rows };
   }).filter((g) => g.rows.length > 0);
 
-  const otherRows = entries.filter(([k]) => !used.has(k));
-  if (otherRows.length > 0) {
-    grouped.push({
-      id: "other",
-      title: "Other",
-      icon: Info,
-      match: () => true,
-      rows: otherRows,
-    });
-  }
 
   const title =
     (item.code_user_name as string) ||
