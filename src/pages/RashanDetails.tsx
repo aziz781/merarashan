@@ -84,6 +84,8 @@ type TimelineStep = {
   timeKey: string;
   statusKey?: string;
   fallbackStatus?: string;
+  detailKey?: string;
+  detailPrefix?: string;
 };
 
 const TIMELINE_STEPS: TimelineStep[] = [
@@ -91,6 +93,8 @@ const TIMELINE_STEPS: TimelineStep[] = [
     label: "Rashan Code Issued",
     dateKey: "created_date",
     timeKey: "created_time",
+    detailKey: "code_user_mobile",
+    detailPrefix: "SMS sent at",
   },
   {
     label: "Rashan Code Validated",
