@@ -913,7 +913,7 @@ const Index = () => {
       <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
         <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Profile</DialogTitle>
+            <DialogTitle>Mera Rashan</DialogTitle>
           </DialogHeader>
           <ProfileView mobile={mobile} profileOnly />
         </DialogContent>
