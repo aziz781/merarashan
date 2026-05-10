@@ -76,7 +76,7 @@ export function TransactionCard({
           </p>
           {status && (
             <Badge
-              variant={delivered ? "default" : notPaid ? "destructive" : "outline"}
+              variant={delivered ? "default" : notDelivered || notPaid ? "destructive" : "outline"}
               className="font-normal"
             >
               {status}
