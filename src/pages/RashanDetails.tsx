@@ -105,6 +105,12 @@ const TIMELINE_STEPS: TimelineStep[] = [
     timeKey: "",
     statusKey: "things_status",
   },
+  {
+    label: "Payment sent to Shop",
+    dateKey: "payment_datetime",
+    timeKey: "",
+    statusKey: "payment_status",
+  },
 ];
 
 function UpdatesTimeline({ item }: { item: Item }) {
