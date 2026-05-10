@@ -72,7 +72,7 @@ function formatValue(key: string, raw: unknown): React.ReactNode {
 }
 
 function humanizeKey(k: string) {
-  if (k === "things_status") return "Rashan";
+  if (k === "things_status") return "Status";
   return k
     .replace(/_/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
