@@ -66,7 +66,7 @@ export function TransactionCard({
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
           {!showExtras && displayText && (
-            <p className="text-xs text-muted-foreground mt-1">{displayText}</p>
+            <p className={`text-xs mt-1 ${textClass}`}>{displayText}</p>
           )}
           {showExtras && rcNum && (
             <p className="text-[11px] text-muted-foreground font-mono break-all mt-1">
