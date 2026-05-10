@@ -99,7 +99,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     statusKey: "code_status",
   },
   {
-    label: "Rashan Collection",
+    label: "Rashan Collected",
     dateKey: "confirm_datetime",
     timeKey: "",
     statusKey: "things_status",
