@@ -549,6 +549,7 @@ function RashansView({ mobile }: { mobile: string }) {
     <>
       <TransactionStats
         items={items}
+        activeStatus={filters.status}
         onStatClick={(status) => setFilters((f) => ({ ...f, status }))}
       />
       <TransactionFilters statuses={statuses} value={filters} onChange={setFilters} />
