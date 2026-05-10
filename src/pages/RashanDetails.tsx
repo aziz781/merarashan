@@ -320,7 +320,7 @@ const RashanDetails = () => {
                       const showPlaceholder = k === "datetime_display" && empty && !isExpired;
                       const colorCls = showExpired
                         ? "text-destructive font-normal italic"
-                        : k === "datetime_display" || isMoneyKey(k)
+                        : k === "datetime_display" || k === "rc_num" || isMoneyKey(k)
                           ? "text-muted-foreground font-normal italic"
                           : "text-foreground";
                       return (
