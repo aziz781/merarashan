@@ -128,7 +128,7 @@ const CardDetails = () => {
       )}
 
       <section>
-        <h2 className="text-sm font-semibold text-foreground mb-3">Rashan</h2>
+        <h2 className="text-sm font-semibold text-foreground mb-3">Monthly Rashan</h2>
           {loading ? (
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, i) => (
