@@ -10,9 +10,11 @@ function formatPKR(n: number) {
 export function StatementStats({
   items,
   stats,
+  onStatClick,
 }: {
   items: Stmt[];
   stats?: Record<string, unknown> | null;
+  onStatClick?: (status: string) => void;
 }) {
   const total = items.length;
   const totalAmount =
@@ -24,26 +26,44 @@ export function StatementStats({
   const unpaid = total - paid;
 
   const statsList = [
-    { label: "Statements", value: String(total), icon: FileText },
+    { label: "Statements", value: String(total), icon: FileText, status: "all" },
     { label: "Total Gross", value: formatPKR(totalAmount), icon: Wallet },
-    { label: "Paid", value: String(paid), icon: CheckCircle2 },
-    { label: "Unpaid", value: String(unpaid), icon: Clock },
+    { label: "Paid", value: String(paid), icon: CheckCircle2, status: "PAID" },
+    { label: "Unpaid", value: String(unpaid), icon: Clock, status: "NOT_PAID" },
   ];
 
   return (
     <div className="grid grid-cols-2 gap-3 mb-4">
-      {statsList.map(({ label, value, icon: Icon }) => (
-        <Card
-          key={label}
-          className="p-4 border-border/50 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)]"
-        >
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <Icon className="w-4 h-4" />
-            <span className="text-xs font-medium">{label}</span>
-          </div>
-          <p className="text-lg font-bold text-foreground truncate">{value}</p>
-        </Card>
-      ))}
+      {statsList.map(({ label, value, icon: Icon, status }) => {
+        const clickable = !!status && !!onStatClick;
+        return (
+          <Card
+            key={label}
+            onClick={clickable ? () => onStatClick!(status!) : undefined}
+            role={clickable ? "button" : undefined}
+            tabIndex={clickable ? 0 : undefined}
+            onKeyDown={
+              clickable
+                ? (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onStatClick!(status!);
+                    }
+                  }
+                : undefined
+            }
+            className={`p-4 border-border/50 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] ${
+              clickable ? "cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]" : ""
+            }`}
+          >
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <Icon className="w-4 h-4" />
+              <span className="text-xs font-medium">{label}</span>
+            </div>
+            <p className="text-lg font-bold text-foreground truncate">{value}</p>
+          </Card>
+        );
+      })}
     </div>
   );
 }
