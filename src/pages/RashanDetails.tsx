@@ -315,10 +315,21 @@ const RashanDetails = () => {
                     {(() => {
                       const cd = item.confirm_datetime;
                       const empty = cd == null || String(cd).trim() === "" || String(cd).trim().toUpperCase() === "N/A";
-                      const showPlaceholder = k === "datetime_display" && empty;
+                      const isExpired = String(item.code_status ?? "").toUpperCase() === "EXPIRED";
+                      const showExpired = k === "datetime_display" && isExpired;
+                      const showPlaceholder = k === "datetime_display" && empty && !isExpired;
+                      const colorCls = showExpired
+                        ? "text-destructive font-normal italic"
+                        : k === "datetime_display" || isMoneyKey(k)
+                          ? "text-muted-foreground font-normal italic"
+                          : "text-foreground";
                       return (
-                        <span className={`font-medium text-right break-all ml-auto ${k === "datetime_display" || isMoneyKey(k) ? "text-muted-foreground font-normal italic" : "text-foreground"}`}>
-                          {showPlaceholder ? "Rashan code has not been used yet." : formatValue(k, v)}
+                        <span className={`font-medium text-right break-all ml-auto ${colorCls}`}>
+                          {showExpired
+                            ? "Rashan code is expired as not used on time."
+                            : showPlaceholder
+                              ? "Rashan code has not been used yet."
+                              : formatValue(k, v)}
                         </span>
                       );
                     })()}
