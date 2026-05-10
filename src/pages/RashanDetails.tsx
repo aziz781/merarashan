@@ -310,9 +310,11 @@ const RashanDetails = () => {
                       ? null
                       : k === "datetime_display"
                         ? null
-                        : (
-                          <span className="text-muted-foreground">{humanizeKey(k)}</span>
-                        )}
+                        : k.toLowerCase() === "status"
+                          ? null
+                          : (
+                            <span className="text-muted-foreground">{humanizeKey(k)}</span>
+                          )}
                     <span className="font-medium text-foreground text-right break-all ml-auto">
                       {formatValue(k, v)}
                     </span>
