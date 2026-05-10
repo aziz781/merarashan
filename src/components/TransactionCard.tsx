@@ -17,16 +17,7 @@ export function TransactionCard({
   const paymentStatus = (item.payment_status as string) || "";
   const userName = (item.code_user_name as string) || "";
   const rcNum = (item.rc_num as string) || "";
-  const rawDatetime = (item.datetime_display as string) || "";
-  const codeStatus = String(item.code_status ?? "").toUpperCase();
-  const isExpired = codeStatus === "EXPIRED";
-  const datetimeEmpty = !rawDatetime || rawDatetime.trim() === "" || rawDatetime.trim().toUpperCase() === "N/A";
-  const datetimeDisplay = datetimeEmpty
-    ? (isExpired ? "Rashan code expired" : "Rashan code not used yet.")
-    : rawDatetime;
-  const datetimeCls = datetimeEmpty
-    ? (isExpired ? "text-destructive italic" : "text-muted-foreground italic")
-    : "text-muted-foreground";
+  const datetimeDisplay = (item.datetime_display as string) || "";
   const monthYear = (item.month_year as string) || "";
 
   const delivered = status === "Delivered";
@@ -56,8 +47,8 @@ export function TransactionCard({
           {!showExtras && monthYear && (
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
-          {!showExtras && (
-            <p className={`text-xs mt-1 ${datetimeCls}`}>{datetimeDisplay}</p>
+          {!showExtras && datetimeDisplay && (
+            <p className="text-xs text-muted-foreground mt-1">{datetimeDisplay}</p>
           )}
           {showExtras && rcNum && (
             <p className="text-[11px] text-muted-foreground font-mono break-all mt-1">
@@ -77,8 +68,8 @@ export function TransactionCard({
               {status}
             </Badge>
           )}
-          {showExtras && (
-            <p className={`text-xs ${datetimeCls}`}>{datetimeDisplay}</p>
+          {showExtras && datetimeDisplay && (
+            <p className="text-xs text-muted-foreground">{datetimeDisplay}</p>
           )}
         </div>
       </div>
