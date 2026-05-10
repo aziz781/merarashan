@@ -78,6 +78,96 @@ function humanizeKey(k: string) {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+type TimelineStep = {
+  label: string;
+  dateKey: string;
+  timeKey: string;
+  statusKey?: string;
+  fallbackStatus?: string;
+};
+
+const TIMELINE_STEPS: TimelineStep[] = [
+  {
+    label: "Rashan code sent in SMS",
+    dateKey: "created_date",
+    timeKey: "created_time",
+    fallbackStatus: "Completed",
+  },
+  {
+    label: "Code validated at Shop",
+    dateKey: "accept_date",
+    timeKey: "accept_time",
+    statusKey: "code_status",
+  },
+  {
+    label: "Rashan Collected",
+    dateKey: "confirm_date",
+    timeKey: "confirm_time",
+    statusKey: "things_status",
+  },
+];
+
+function UpdatesTimeline({ item }: { item: Item }) {
+  const get = (k: string) => {
+    const v = item[k];
+    return v == null || v === "" ? "" : String(v);
+  };
+
+  return (
+    <ol className="relative">
+      {TIMELINE_STEPS.map((step, idx) => {
+        const date = get(step.dateKey);
+        const time = get(step.timeKey);
+        const statusVal = step.statusKey ? get(step.statusKey) : step.fallbackStatus || "";
+        const done = Boolean(date || time || statusVal);
+        const isLast = idx === TIMELINE_STEPS.length - 1;
+        const lower = statusVal.toLowerCase();
+        const variant: "default" | "destructive" | "outline" =
+          lower === "delivered" || lower === "paid" || lower === "completed" || lower === "accepted" || lower === "confirmed"
+            ? "default"
+            : lower === "not_paid" || lower === "cancelled" || lower === "rejected"
+              ? "destructive"
+              : "outline";
+
+        return (
+          <li key={step.label} className="relative pl-7 pb-5 last:pb-0">
+            {!isLast && (
+              <span
+                aria-hidden
+                className={`absolute left-[9px] top-4 bottom-0 w-px ${done ? "bg-primary/40" : "bg-border"}`}
+              />
+            )}
+            <span
+              aria-hidden
+              className={`absolute left-0 top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 ${
+                done ? "border-primary bg-primary" : "border-border bg-background"
+              }`}
+            >
+              {done && <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />}
+            </span>
+            <div className="flex items-start justify-between gap-3">
+              <p className={`text-sm font-medium ${done ? "text-foreground" : "text-muted-foreground"}`}>
+                {step.label}
+              </p>
+              {statusVal && (
+                <Badge variant={variant} className="font-normal shrink-0">
+                  {statusVal}
+                </Badge>
+              )}
+            </div>
+            {(date || time) && (
+              <p className="mt-1 text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5">
+                {date && <span>📅 {date}</span>}
+                {time && <span>🕒 {time}</span>}
+              </p>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 const RashanDetails = () => {
   const navigate = useNavigate();
   const location = useLocation() as { state?: { item?: Item } };
