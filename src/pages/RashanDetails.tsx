@@ -30,7 +30,7 @@ const CATEGORIES: {
     title: "UPDATES",
     icon: Calendar,
     match: (k) =>
-      /(date|time|period|created|updated|delivered_at)/i.test(k) && k !== "month_year" && k !== "payment_datetime",
+      /(date|time|period|created|updated|delivered_at)/i.test(k) && k !== "month_year" && k !== "payment_datetime" && k !== "accept_datetime",
   },
 ];
 
