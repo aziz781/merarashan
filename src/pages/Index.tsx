@@ -394,7 +394,7 @@ function StatementsView({ mobile }: { mobile: string }) {
 
   return (
     <div className="space-y-3">
-      <StatementStats items={items} stats={stats} onStatClick={setStatusFilter} />
+      <StatementStats items={items} stats={stats} activeStatus={statusFilter} onStatClick={setStatusFilter} />
       <Select value={selected} onValueChange={setSelected}>
         <SelectTrigger className="h-11">
           <SelectValue placeholder="Filter by year" />
