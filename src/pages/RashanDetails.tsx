@@ -128,8 +128,8 @@ const RashanDetails = () => {
     "Rashan Details";
 
   const subtitle =
-    (item.datetime_display as string) ||
     (item.month_year as string) ||
+    (item.datetime_display as string) ||
     "";
 
   return (
