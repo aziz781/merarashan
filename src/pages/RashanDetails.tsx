@@ -86,6 +86,8 @@ type TimelineStep = {
   fallbackStatus?: string;
   detailKey?: string;
   detailPrefix?: string;
+  detailSuffixKey?: string;
+  detailSuffixLabel?: string;
 };
 
 const TIMELINE_STEPS: TimelineStep[] = [
