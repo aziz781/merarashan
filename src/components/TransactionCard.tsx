@@ -32,11 +32,6 @@ export function TransactionCard({
       : codeStatus === "NEW"
         ? "text-orange-500"
         : "text-muted-foreground";
-    codeStatus === "EXPIRED"
-      ? "text-destructive"
-      : codeStatus === "NEW"
-        ? "text-orange-500"
-        : "text-muted-foreground";
 
   const delivered = status === "Delivered";
   const notPaid = paymentStatus === "NOT_PAID";
