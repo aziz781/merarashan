@@ -310,7 +310,7 @@ const RashanDetails = () => {
                       ? null
                       : k === "datetime_display"
                         ? null
-                        : k.toLowerCase() === "status"
+                        : humanizeKey(k).toLowerCase() === "status"
                           ? null
                           : (
                             <span className="text-muted-foreground">{humanizeKey(k)}</span>
