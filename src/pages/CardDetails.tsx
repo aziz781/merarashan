@@ -88,7 +88,7 @@ const CardDetails = () => {
       <main className="px-5 -mt-3 space-y-5">
       {card ? (
         <>
-          <h2 className="text-sm font-semibold text-foreground mb-3">Status</h2>
+          
           <Card className="p-5 bg-card/90 backdrop-blur shadow-[var(--shadow-card)] border-0">
             <div className="space-y-1.5">
               {fields.map(({ key, label }) => {
