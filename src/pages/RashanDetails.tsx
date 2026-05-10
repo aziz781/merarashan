@@ -124,7 +124,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     timeKey: "",
     statusKey: "payment_status",
     detailKey: "payment_method",
-    detailPrefix: "Karyana Store paid in",
+    detailPrefix: "Karyana Store ({registered_business_number}) paid in",
     detailSuffixKey: "payment_account",
     detailSuffixLabel: "account",
   },
