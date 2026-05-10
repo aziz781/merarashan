@@ -109,6 +109,8 @@ const TIMELINE_STEPS: TimelineStep[] = [
     dateKey: "confirm_datetime",
     timeKey: "",
     statusKey: "things_status",
+    detailKey: "registered_business_number",
+    detailPrefix: "at Karyana Store",
   },
   {
     label: "Rashan Paid",
