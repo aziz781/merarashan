@@ -97,7 +97,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     detailPrefix: "SMS sent at",
   },
   {
-    label: "Rashan Code Validated",
+    label: "Rashan Code Redeemed",
     dateKey: "accept_datetime",
     timeKey: "",
     statusKey: "code_status",
