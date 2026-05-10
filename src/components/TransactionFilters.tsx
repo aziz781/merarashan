@@ -67,7 +67,7 @@ export function TransactionFilters({
           </Select>
         </div>
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Month</Label>
+          <Label className="text-xs text-muted-foreground">Month/Year</Label>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
