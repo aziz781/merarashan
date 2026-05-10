@@ -105,7 +105,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     statusKey: "things_status",
   },
   {
-    label: "Payment sent to Shop",
+    label: "Rashan Payment",
     dateKey: "payment_datetime",
     timeKey: "",
     statusKey: "payment_status",
