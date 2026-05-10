@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
       body: new URLSearchParams({
         To: to,
         MessagingServiceSid: MSG_SERVICE_SID,
-        Body: `Your Mera Rashan verification code is ${code}. It expires in 5 minutes.`,
+        Body: `Your Mera Rashan App verification code is ${code}. It expires in 5 minutes.`,
       }),
     });
     const data = await res.json();
