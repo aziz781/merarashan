@@ -545,7 +545,10 @@ function RashansView({ mobile }: { mobile: string }) {
 
   return (
     <>
-      <TransactionStats items={filtered} />
+      <TransactionStats
+        items={items}
+        onStatClick={(status) => setFilters((f) => ({ ...f, status }))}
+      />
       <TransactionFilters statuses={statuses} value={filters} onChange={setFilters} />
       {loading ? (
         <div className="space-y-3">
