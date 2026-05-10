@@ -30,7 +30,7 @@ export function TransactionCard({
     codeStatus === "EXPIRED"
       ? "text-destructive"
       : codeStatus === "NEW"
-        ? "text-orange-500"
+        ? "text-muted-foreground"
         : "text-muted-foreground";
 
   const delivered = status === "Delivered";
