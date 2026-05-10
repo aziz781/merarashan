@@ -26,6 +26,12 @@ export function TransactionCard({
       : codeStatus === "NEW"
         ? "Rashan code not used yet."
         : datetimeDisplay;
+  const textClass =
+    codeStatus === "EXPIRED"
+      ? "text-destructive"
+      : codeStatus === "NEW"
+        ? "text-orange-500"
+        : "text-muted-foreground";
 
   const delivered = status === "Delivered";
   const notPaid = paymentStatus === "NOT_PAID";
@@ -55,7 +61,7 @@ export function TransactionCard({
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
           {!showExtras && displayText && (
-            <p className="text-xs text-muted-foreground mt-1">{displayText}</p>
+            <p className={`text-xs mt-1 ${textClass}`}>{displayText}</p>
           )}
           {showExtras && rcNum && (
             <p className="text-[11px] text-muted-foreground font-mono break-all mt-1">
@@ -76,7 +82,7 @@ export function TransactionCard({
             </Badge>
           )}
           {showExtras && displayText && (
-            <p className="text-xs text-muted-foreground">{displayText}</p>
+            <p className={`text-xs ${textClass}`}>{displayText}</p>
           )}
         </div>
       </div>
