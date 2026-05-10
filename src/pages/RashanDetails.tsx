@@ -17,7 +17,7 @@ const CATEGORIES: {
     id: "status",
     title: "Status",
     icon: Tag,
-    match: (k) => /(status|state|delivered|pending)/i.test(k),
+    match: (k) => /(status|state|delivered|pending)/i.test(k) && !/(payment_status|code_status)/i.test(k),
   },
   {
     id: "card",
