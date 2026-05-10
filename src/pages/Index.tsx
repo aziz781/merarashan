@@ -218,9 +218,15 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
     } else if (key === "is_active") {
       const isActive = raw === true || raw === "true" || raw === 1 || raw === "1";
       display = isActive ? (
-        <CheckCircle2 className="w-5 h-5 text-green-500" />
+        <span className="inline-flex items-center gap-1.5 font-medium">
+          <CheckCircle2 className="w-4 h-4 text-green-500" />
+          Active
+        </span>
       ) : (
-        <X className="w-5 h-5 text-destructive" />
+        <span className="inline-flex items-center gap-1.5 font-medium">
+          <X className="w-4 h-4 text-destructive" />
+          Inactive
+        </span>
       );
     } else if (key === "active_cards") {
       display = <Badge variant="default" className="font-normal">{String(raw)}</Badge>;
