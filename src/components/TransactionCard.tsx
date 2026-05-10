@@ -54,8 +54,8 @@ export function TransactionCard({
           {!showExtras && monthYear && (
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
-          {!showExtras && datetimeDisplay && (
-            <p className="text-xs text-muted-foreground mt-1">{datetimeDisplay}</p>
+          {!showExtras && displayText && (
+            <p className="text-xs text-muted-foreground mt-1">{displayText}</p>
           )}
           {showExtras && rcNum && (
             <p className="text-[11px] text-muted-foreground font-mono break-all mt-1">
