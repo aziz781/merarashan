@@ -317,7 +317,7 @@ const RashanDetails = () => {
                       const empty = cd == null || String(cd).trim() === "" || String(cd).trim().toUpperCase() === "N/A";
                       const showPlaceholder = k === "datetime_display" && empty;
                       return (
-                        <span className={`font-medium text-right break-all ml-auto ${showPlaceholder ? "text-muted-foreground font-normal italic" : "text-foreground"}`}>
+                        <span className={`font-medium text-right break-all ml-auto ${k === "datetime_display" ? "text-muted-foreground font-normal italic" : "text-foreground"}`}>
                           {showPlaceholder ? "Rashan code has not been used yet." : formatValue(k, v)}
                         </span>
                       );
