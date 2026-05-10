@@ -127,7 +127,9 @@ function UpdatesTimeline({ item }: { item: Item }) {
         const done =
           step.statusKey === "code_status"
             ? statusVal.toUpperCase() === "USED"
-            : Boolean(date || time || statusVal);
+            : step.statusKey === "things_status"
+              ? statusVal.toLowerCase() === "delivered"
+              : Boolean(date || time || statusVal);
         const isLast = idx === TIMELINE_STEPS.length - 1;
         const lower = statusVal.toLowerCase();
         const variant: "default" | "destructive" | "outline" =
