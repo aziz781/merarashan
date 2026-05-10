@@ -312,11 +312,16 @@ const RashanDetails = () => {
                           : (
                             <span className="text-muted-foreground">{humanizeKey(k)}</span>
                           )}
-                    <span className={`font-medium text-right break-all ml-auto ${k === "datetime_display" && (item.confirm_datetime == null || item.confirm_datetime === "") ? "text-muted-foreground font-normal italic" : "text-foreground"}`}>
-                      {k === "datetime_display" && (item.confirm_datetime == null || item.confirm_datetime === "")
-                        ? "Rashan code has not been used yet."
-                        : formatValue(k, v)}
-                    </span>
+                    {(() => {
+                      const cd = item.confirm_datetime;
+                      const empty = cd == null || String(cd).trim() === "" || String(cd).trim().toUpperCase() === "N/A";
+                      const showPlaceholder = k === "datetime_display" && empty;
+                      return (
+                        <span className={`font-medium text-right break-all ml-auto ${showPlaceholder ? "text-muted-foreground font-normal italic" : "text-foreground"}`}>
+                          {showPlaceholder ? "Rashan code has not been used yet." : formatValue(k, v)}
+                        </span>
+                      );
+                    })()}
                   </div>
                 ))}
               </div>
