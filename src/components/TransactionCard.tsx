@@ -34,6 +34,7 @@ export function TransactionCard({
         : "text-muted-foreground";
 
   const delivered = status === "Delivered";
+  const notDelivered = status === "NOT_DELIVERED";
   const notPaid = paymentStatus === "NOT_PAID";
   const showExtras = variant === "full";
 
