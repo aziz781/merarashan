@@ -25,7 +25,12 @@ export function TransactionCard({
       ? "Rashan code expired"
       : codeStatus === "NEW"
         ? "Rashan code not used yet."
-        : datetimeDisplay;
+  const textClass =
+    codeStatus === "EXPIRED"
+      ? "text-destructive"
+      : codeStatus === "NEW"
+        ? "text-orange-500"
+        : "text-muted-foreground";
 
   const delivered = status === "Delivered";
   const notPaid = paymentStatus === "NOT_PAID";
