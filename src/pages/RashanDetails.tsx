@@ -320,9 +320,13 @@ const RashanDetails = () => {
                       const showPlaceholder = k === "datetime_display" && empty && !isExpired;
                       const colorCls = showExpired
                         ? "text-destructive font-normal italic"
-                        : k === "datetime_display" || k === "rc_num" || isMoneyKey(k)
+                        : k === "datetime_display"
                           ? "text-muted-foreground font-normal italic"
-                          : "text-foreground";
+                          : k === "rc_num"
+                            ? "text-muted-foreground font-bold italic"
+                            : isMoneyKey(k)
+                              ? "text-muted-foreground font-normal italic"
+                              : "text-foreground";
                       return (
                         <span className={`font-medium text-right break-all ml-auto ${colorCls}`}>
                           {showExpired
