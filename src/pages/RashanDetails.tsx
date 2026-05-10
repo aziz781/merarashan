@@ -98,7 +98,9 @@ const TIMELINE_STEPS: TimelineStep[] = [
     dateKey: "created_date",
     timeKey: "created_time",
     detailKey: "userMobileNumber",
-    detailPrefix: "SMS sent at",
+    detailPrefix: "Rashan Code",
+    detailCodeKey: "unique_code",
+    detailConnector: "sent in SMS at",
   },
   {
     label: "Rashan Code Redeemed",
