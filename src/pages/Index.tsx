@@ -97,6 +97,12 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Verification failed");
+      if (!data?.token_hash) throw new Error("Missing session token");
+      const { error: vErr } = await supabase.auth.verifyOtp({
+        token_hash: data.token_hash,
+        type: "magiclink",
+      });
+      if (vErr) throw new Error(vErr.message);
       onLogin(mobile);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Verification failed");
