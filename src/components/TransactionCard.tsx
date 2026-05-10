@@ -87,7 +87,7 @@ export function TransactionCard({
             </Badge>
           )}
           {showExtras && displayText && (
-            <p className="text-xs text-muted-foreground">{displayText}</p>
+            <p className={`text-xs ${textClass}`}>{displayText}</p>
           )}
         </div>
       </div>
