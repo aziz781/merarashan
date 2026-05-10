@@ -124,7 +124,10 @@ function UpdatesTimeline({ item }: { item: Item }) {
         const date = get(step.dateKey);
         const time = get(step.timeKey);
         const statusVal = step.statusKey ? get(step.statusKey) : step.fallbackStatus || "";
-        const done = Boolean(date || time || statusVal);
+        const done =
+          step.statusKey === "code_status"
+            ? statusVal.toUpperCase() === "USED"
+            : Boolean(date || time || statusVal);
         const isLast = idx === TIMELINE_STEPS.length - 1;
         const lower = statusVal.toLowerCase();
         const variant: "default" | "destructive" | "outline" =
