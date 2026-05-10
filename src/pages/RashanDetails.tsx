@@ -101,8 +101,8 @@ const TIMELINE_STEPS: TimelineStep[] = [
   },
   {
     label: "Rashan Collected",
-    dateKey: "confirm_date",
-    timeKey: "confirm_time",
+    dateKey: "confirm_datetime",
+    timeKey: "",
     statusKey: "things_status",
   },
 ];
