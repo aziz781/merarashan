@@ -20,6 +20,7 @@ import { StatementStats } from "@/components/StatementStats";
 import { PageFooter } from "@/components/PageFooter";
 import { MessageBox } from "@/components/MessageBox";
 const STORAGE_KEY = "mr_mobile";
+const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
 
 const mobileSchema = z
   .string()
