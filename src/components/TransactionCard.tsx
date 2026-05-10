@@ -34,6 +34,7 @@ export function TransactionCard({
         : "text-muted-foreground";
 
   const delivered = status === "Delivered";
+  const notDelivered = status === "NOT_DELIVERED";
   const notPaid = paymentStatus === "NOT_PAID";
   const showExtras = variant === "full";
 
@@ -75,7 +76,7 @@ export function TransactionCard({
           </p>
           {status && (
             <Badge
-              variant={delivered ? "default" : notPaid ? "destructive" : "outline"}
+              variant={delivered ? "default" : notDelivered || notPaid ? "destructive" : "outline"}
               className="font-normal"
             >
               {status}
