@@ -161,11 +161,6 @@ function UpdatesTimeline({ item }: { item: Item }) {
               <p className={`text-sm font-medium ${done ? "text-foreground" : "text-muted-foreground"}`}>
                 {step.label}
               </p>
-              {statusVal && step.statusKey !== "code_status" && step.statusKey !== "things_status" && (
-                <Badge variant={variant} className="font-normal shrink-0">
-                  {statusVal}
-                </Badge>
-              )}
             </div>
             {(date || time) && (
               <p className="mt-1 text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5">
