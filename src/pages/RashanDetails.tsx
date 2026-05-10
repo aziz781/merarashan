@@ -53,7 +53,7 @@ function formatValue(key: string, raw: unknown): React.ReactNode {
     const variant =
       lower === "delivered" || lower === "paid"
         ? "default"
-        : lower === "not_paid" || lower === "cancelled"
+        : lower === "not_paid" || lower === "cancelled" || lower === "not_delivered"
           ? "destructive"
           : "outline";
     return (
