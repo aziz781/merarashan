@@ -17,7 +17,9 @@ const CATEGORIES: {
     id: "status",
     title: "RASHAN",
     icon: Tag,
-    match: (k) => /(status|state|delivered|pending)/i.test(k) && !/(payment_status|code_status)/i.test(k),
+    match: (k) =>
+      k === "month_year" ||
+      (/(status|state|delivered|pending)/i.test(k) && !/(payment_status|code_status)/i.test(k)),
   },
   {
     id: "card",
