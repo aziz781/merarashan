@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -10,6 +11,7 @@ export function TransactionCard({
   item: Txn;
   variant?: "full" | "compact";
 }) {
+  const navigate = useNavigate();
   const amount = Number(item.amount ?? item.totalAmount) || 0;
   const status = (item.things_status as string) || "";
   const paymentStatus = (item.payment_status as string) || "";
@@ -22,8 +24,21 @@ export function TransactionCard({
   const notPaid = paymentStatus === "NOT_PAID";
   const showExtras = variant === "full";
 
+  const open = () => navigate("/rashans/detail", { state: { item } });
+
   return (
-    <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+    <Card
+      role="button"
+      tabIndex={0}
+      onClick={open}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
+        }
+      }}
+      className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           {showExtras && userName && (
