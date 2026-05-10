@@ -111,7 +111,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     detailPrefix: "at Karyana Store",
   },
   {
-    label: "Rashan Collected",
+    label: "Rashan Delivered",
     dateKey: "confirm_datetime",
     timeKey: "",
     statusKey: "things_status",
