@@ -84,6 +84,8 @@ type TimelineStep = {
   timeKey: string;
   statusKey?: string;
   fallbackStatus?: string;
+  detailKey?: string;
+  detailPrefix?: string;
 };
 
 const TIMELINE_STEPS: TimelineStep[] = [
@@ -91,6 +93,8 @@ const TIMELINE_STEPS: TimelineStep[] = [
     label: "Rashan Code Issued",
     dateKey: "created_date",
     timeKey: "created_time",
+    detailKey: "code_user_mobile",
+    detailPrefix: "SMS sent at",
   },
   {
     label: "Rashan Code Validated",
@@ -123,6 +127,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
       {TIMELINE_STEPS.map((step, idx) => {
         const date = get(step.dateKey);
         const time = get(step.timeKey);
+        const detail = step.detailKey ? get(step.detailKey) : "";
         const statusVal = step.statusKey ? get(step.statusKey) : step.fallbackStatus || "";
         const done =
           step.statusKey === "code_status"
@@ -166,6 +171,11 @@ function UpdatesTimeline({ item }: { item: Item }) {
               <p className="mt-1 text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5">
                 {date && <span>📅 {date}</span>}
                 {time && <span>🕒 {time}</span>}
+              </p>
+            )}
+            {detail && step.detailPrefix && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {step.detailPrefix} {detail}
               </p>
             )}
           </li>
