@@ -86,7 +86,9 @@ const CardDetails = () => {
       </header>
 
       <main className="px-5 -mt-3 space-y-5">
-        {card ? (
+      {card ? (
+        <>
+          <h2 className="text-sm font-semibold text-foreground mb-3">Rashan</h2>
           <Card className="p-5 bg-card/90 backdrop-blur shadow-[var(--shadow-card)] border-0">
             <div className="space-y-1.5">
               {fields.map(({ key, label }) => {
@@ -116,16 +118,17 @@ const CardDetails = () => {
               })}
             </div>
           </Card>
-        ) : (
-          <Card className="p-5">
-            <p className="text-sm text-muted-foreground">
-              No card data. Open this page from the cards list.
-            </p>
-          </Card>
-        )}
+        </>
+      ) : (
+        <Card className="p-5">
+          <p className="text-sm text-muted-foreground">
+            No card data. Open this page from the cards list.
+          </p>
+        </Card>
+      )}
 
-        <section>
-          <h2 className="text-sm font-semibold text-foreground mb-3">Rashan</h2>
+      <section>
+        <h2 className="text-sm font-semibold text-foreground mb-3">Status</h2>
           {loading ? (
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, i) => (
