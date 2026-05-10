@@ -2,7 +2,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, X } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +25,6 @@ export function TransactionFilters({
   value: TxnFilters;
   onChange: (v: TxnFilters) => void;
 }) {
-  const hasFilter = value.status !== "all" || value.validFrom !== "";
   const now = new Date();
   const currentYear = now.getFullYear();
 
@@ -143,16 +142,6 @@ export function TransactionFilters({
           </Popover>
         </div>
       </div>
-      {hasFilter && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mt-2 h-8 text-xs"
-          onClick={() => onChange({ status: "all", validFrom: "" })}
-        >
-          <X className="w-3 h-3 mr-1" /> Clear filters
-        </Button>
-      )}
     </div>
   );
 }
