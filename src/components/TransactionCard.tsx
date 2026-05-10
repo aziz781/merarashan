@@ -77,8 +77,8 @@ export function TransactionCard({
               {status}
             </Badge>
           )}
-          {showExtras && datetimeDisplay && (
-            <p className="text-xs text-muted-foreground">{datetimeDisplay}</p>
+          {showExtras && (
+            <p className={`text-xs ${datetimeCls}`}>{datetimeDisplay}</p>
           )}
         </div>
       </div>
