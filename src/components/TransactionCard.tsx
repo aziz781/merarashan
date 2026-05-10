@@ -17,7 +17,16 @@ export function TransactionCard({
   const paymentStatus = (item.payment_status as string) || "";
   const userName = (item.code_user_name as string) || "";
   const rcNum = (item.rc_num as string) || "";
-  const datetimeDisplay = (item.datetime_display as string) || "";
+  const rawDatetime = (item.datetime_display as string) || "";
+  const codeStatus = String(item.code_status ?? "").toUpperCase();
+  const isExpired = codeStatus === "EXPIRED";
+  const datetimeEmpty = !rawDatetime || rawDatetime.trim() === "" || rawDatetime.trim().toUpperCase() === "N/A";
+  const datetimeDisplay = datetimeEmpty
+    ? (isExpired ? "Rashan code expired" : "Rashan code not used yet.")
+    : rawDatetime;
+  const datetimeCls = datetimeEmpty
+    ? (isExpired ? "text-destructive italic" : "text-muted-foreground italic")
+    : "text-muted-foreground";
   const monthYear = (item.month_year as string) || "";
 
   const delivered = status === "Delivered";
