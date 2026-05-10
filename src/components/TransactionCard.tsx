@@ -19,6 +19,13 @@ export function TransactionCard({
   const rcNum = (item.rc_num as string) || "";
   const datetimeDisplay = (item.datetime_display as string) || "";
   const monthYear = (item.month_year as string) || "";
+  const codeStatus = (item.code_status as string) || "";
+  const displayText =
+    codeStatus === "EXPIRED"
+      ? "Rashan code expired"
+      : codeStatus === "NEW"
+        ? "Rashan code not used yet."
+        : datetimeDisplay;
 
   const delivered = status === "Delivered";
   const notPaid = paymentStatus === "NOT_PAID";
@@ -47,8 +54,8 @@ export function TransactionCard({
           {!showExtras && monthYear && (
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
-          {!showExtras && datetimeDisplay && (
-            <p className="text-xs text-muted-foreground mt-1">{datetimeDisplay}</p>
+          {!showExtras && displayText && (
+            <p className="text-xs text-muted-foreground mt-1">{displayText}</p>
           )}
           {showExtras && rcNum && (
             <p className="text-[11px] text-muted-foreground font-mono break-all mt-1">
@@ -68,8 +75,8 @@ export function TransactionCard({
               {status}
             </Badge>
           )}
-          {showExtras && datetimeDisplay && (
-            <p className="text-xs text-muted-foreground">{datetimeDisplay}</p>
+          {showExtras && displayText && (
+            <p className="text-xs text-muted-foreground">{displayText}</p>
           )}
         </div>
       </div>
