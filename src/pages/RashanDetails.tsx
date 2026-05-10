@@ -86,6 +86,8 @@ type TimelineStep = {
   fallbackStatus?: string;
   detailKey?: string;
   detailPrefix?: string;
+  detailCodeKey?: string;
+  detailConnector?: string;
   detailSuffixKey?: string;
   detailSuffixLabel?: string;
 };
