@@ -93,7 +93,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     timeKey: "created_time",
   },
   {
-    label: "Rashan Card Validation",
+    label: "Rashan Code Validated",
     dateKey: "accept_datetime",
     timeKey: "",
     statusKey: "code_status",
