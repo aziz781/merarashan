@@ -120,16 +120,6 @@ const RashanDetails = () => {
     return { ...c, rows };
   }).filter((g) => g.rows.length > 0);
 
-  const otherRows = entries.filter(([k]) => !used.has(k));
-  if (otherRows.length > 0) {
-    grouped.push({
-      id: "other",
-      title: "Other",
-      icon: Info,
-      match: () => true,
-      rows: otherRows,
-    });
-  }
 
   const title =
     (item.code_user_name as string) ||
