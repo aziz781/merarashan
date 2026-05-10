@@ -90,18 +90,11 @@ const CardDetails = () => {
           <Card className="p-5 bg-card/90 backdrop-blur shadow-[var(--shadow-card)] border-0">
             <div className="space-y-1.5">
               {fields.map(({ key, label }) => {
-                const isBold = key === "person_name" || key === "amount";
-                const hideLabel = key === "person_name" || key === "amount";
                 const isName = key === "person_name";
                 const raw = card[key];
                 let display: string;
                 if (raw == null || raw === "") {
                   display = "—";
-                } else if (key === "amount") {
-                  const n = Number(raw);
-                  display = Number.isFinite(n)
-                    ? `Rs. ${n.toLocaleString("en-PK")}`
-                    : String(raw);
                 } else {
                   display = String(raw);
                 }
@@ -110,12 +103,12 @@ const CardDetails = () => {
                     key={key}
                     className={`flex justify-between gap-3 border-b border-border/50 py-1.5 last:border-0 ${isName ? "" : "text-sm"}`}
                   >
-                    {!hideLabel && (
-                      <span className={isBold ? "font-bold text-foreground" : "text-muted-foreground"}>
+                    {!isName && (
+                      <span className={isName ? "font-bold text-foreground" : "text-muted-foreground"}>
                         {label}
                       </span>
                     )}
-                    <span className={`break-all ${isBold ? "font-bold text-foreground" : "text-muted-foreground"} ${hideLabel ? "w-full text-right" : "text-right"} ${isName ? "text-xl" : ""}`}>
+                    <span className={`break-all ${isName ? "font-bold text-foreground" : "text-muted-foreground"} ${isName ? "w-full text-right" : "text-right"} ${isName ? "text-xl" : ""}`}>
                       {display}
                     </span>
                   </div>
