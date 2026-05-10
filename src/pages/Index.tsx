@@ -27,18 +27,80 @@ const mobileSchema = z
   .regex(/^\d+$/, "Digits only");
 
 function Login({ onLogin }: { onLogin: (m: string) => void }) {
-  const [value, setValue] = useState("");
+  const [step, setStep] = useState<"mobile" | "otp">("mobile");
+  const [mobile, setMobile] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const sendOtp = async (m: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ mobile: m }),
+        },
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Failed to send code");
+      setStep("otp");
+      toast({ title: "Code sent", description: `OTP sent to ${m}` });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to send code");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitMobile = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleaned = formatMobile(value);
+    const cleaned = formatMobile(mobile);
     const parsed = mobileSchema.safeParse(cleaned);
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
       return;
     }
-    onLogin(cleaned);
+    setMobile(cleaned);
+    sendOtp(cleaned);
+  };
+
+  const submitOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!/^\d{6}$/.test(code)) {
+      setError("Enter the 6-digit code");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ mobile, code }),
+        },
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Verification failed");
+      onLogin(mobile);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Verification failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,27 +114,70 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
         </div>
         <h1 className="text-2xl font-bold text-center text-foreground">Mera Rashan</h1>
         <p className="text-sm text-muted-foreground text-center mt-1 mb-6">
-          Sign in with your mobile number
+          {step === "mobile" ? "Sign in with your mobile number" : `Enter the code sent to ${mobile}`}
         </p>
-        <form onSubmit={submit} className="space-y-3">
-          <Input
-            type="tel"
-            inputMode="numeric"
-            autoComplete="tel"
-            maxLength={15}
-            placeholder="923030812222"
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value.replace(/\D/g, ""));
-              setError(null);
-            }}
-            className="h-12 text-base text-left"
-          />
-          {error && <p className="text-xs text-destructive">{error}</p>}
-          <Button type="submit" className="w-full h-12 text-base font-semibold">
-            Continue
-          </Button>
-        </form>
+        {step === "mobile" ? (
+          <form onSubmit={submitMobile} className="space-y-3">
+            <Input
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel"
+              maxLength={15}
+              placeholder="923030812222"
+              value={mobile}
+              onChange={(e) => {
+                setMobile(e.target.value.replace(/\D/g, ""));
+                setError(null);
+              }}
+              className="h-12 text-base text-left"
+              disabled={loading}
+            />
+            {error && <p className="text-xs text-destructive">{error}</p>}
+            <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={loading}>
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send code"}
+            </Button>
+          </form>
+        ) : (
+          <form onSubmit={submitOtp} className="space-y-3">
+            <Input
+              type="tel"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={6}
+              placeholder="6-digit code"
+              value={code}
+              onChange={(e) => {
+                setCode(e.target.value.replace(/\D/g, ""));
+                setError(null);
+              }}
+              className="h-12 text-base text-center tracking-[0.4em] font-semibold"
+              disabled={loading}
+              autoFocus
+            />
+            {error && <p className="text-xs text-destructive">{error}</p>}
+            <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={loading}>
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify & continue"}
+            </Button>
+            <div className="flex items-center justify-between text-xs">
+              <button
+                type="button"
+                className="text-muted-foreground hover:text-foreground"
+                onClick={() => { setStep("mobile"); setCode(""); setError(null); }}
+                disabled={loading}
+              >
+                Change number
+              </button>
+              <button
+                type="button"
+                className="text-primary font-medium hover:underline"
+                onClick={() => sendOtp(mobile)}
+                disabled={loading}
+              >
+                Resend code
+              </button>
+            </div>
+          </form>
+        )}
       </Card>
     </div>
   );
