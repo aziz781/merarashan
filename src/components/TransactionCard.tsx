@@ -64,15 +64,12 @@ export function TransactionCard({
             Rs. {amount.toLocaleString("en-PK")}
           </p>
           {status && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground">Status:</span>
-              <Badge
-                variant={delivered ? "default" : notPaid ? "destructive" : "outline"}
-                className="font-normal"
-              >
-                {status}
-              </Badge>
-            </div>
+            <Badge
+              variant={delivered ? "default" : notPaid ? "destructive" : "outline"}
+              className="font-normal"
+            >
+              {status}
+            </Badge>
           )}
           {showExtras && datetimeDisplay && (
             <p className="text-xs text-muted-foreground">{datetimeDisplay}</p>
