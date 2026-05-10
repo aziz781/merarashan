@@ -315,7 +315,7 @@ const RashanDetails = () => {
                           : (
                             <span className="text-muted-foreground">{humanizeKey(k)}</span>
                           )}
-                    <span className="font-medium text-foreground text-right break-all ml-auto">
+                    <span className={`font-medium text-right break-all ml-auto ${k === "datetime_display" && (item.confirm_datetime == null || item.confirm_datetime === "") ? "text-muted-foreground font-normal italic" : "text-foreground"}`}>
                       {k === "datetime_display" && (item.confirm_datetime == null || item.confirm_datetime === "")
                         ? "Rashan code has not been used yet."
                         : formatValue(k, v)}
