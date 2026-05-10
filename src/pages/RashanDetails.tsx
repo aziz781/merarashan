@@ -256,10 +256,7 @@ const RashanDetails = () => {
     (item.month_year as string) ||
     "Rashan Details";
 
-  const subtitle =
-    (item.month_year as string) ||
-    (item.datetime_display as string) ||
-    "";
+  const subtitle = (item.month_year as string) || "";
 
   return (
     <div className="min-h-screen pb-16">
