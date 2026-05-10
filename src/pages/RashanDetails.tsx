@@ -30,7 +30,7 @@ const CATEGORIES: {
     title: "Dates & Period",
     icon: Calendar,
     match: (k) =>
-      /(date|time|month|year|period|created|updated|delivered_at)/i.test(k),
+      /(date|time|period|created|updated|delivered_at)/i.test(k) && k !== "month_year",
   },
 ];
 
