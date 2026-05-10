@@ -39,7 +39,7 @@ function isMoneyKey(k: string) {
 }
 
 function formatValue(key: string, raw: unknown): React.ReactNode {
-  if (raw == null || raw === "") return "—";
+  if (raw == null || raw === "" || String(raw).trim().toUpperCase() === "N/A") return "";
   if (typeof raw === "boolean") {
     return (
       <Badge variant={raw ? "default" : "outline"} className="font-normal">
