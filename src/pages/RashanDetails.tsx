@@ -127,6 +127,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
       {TIMELINE_STEPS.map((step, idx) => {
         const date = get(step.dateKey);
         const time = get(step.timeKey);
+        const detail = step.detailKey ? get(step.detailKey) : "";
         const statusVal = step.statusKey ? get(step.statusKey) : step.fallbackStatus || "";
         const done =
           step.statusKey === "code_status"
