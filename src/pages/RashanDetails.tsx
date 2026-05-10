@@ -189,7 +189,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
             )}
             {detail && step.detailPrefix && (date || time) && (
               <p className="mt-1 text-xs text-muted-foreground">
-                {step.detailPrefix} {detail}
+                {step.detailPrefix} {step.detailCodeKey && `(${get(step.detailCodeKey)})`} {step.detailConnector && `${step.detailConnector} `}{detail}
                 {step.detailSuffixKey && step.detailSuffixLabel && ` ${step.detailSuffixLabel} (${get(step.detailSuffixKey)})`}
               </p>
             )}
