@@ -52,7 +52,7 @@ const CardDetails = () => {
 
   const fields: { key: string; label: string }[] = [
     { key: "person_name", label: "Name" },
-    { key: "cm_card_number", label: "Card Number" },
+    { key: "cm_card_number", label: "Rashan" },
     { key: "mobile_number", label: "Mobile" },
     { key: "city", label: "City" },
     { key: "reg_date", label: "Registration Date" },
@@ -62,7 +62,7 @@ const CardDetails = () => {
     (card?.person_name as string) ||
     (card?.card_name as string) ||
     (card?.cm_card_number as string) ||
-    "Card Details";
+    "Rashan Details";
 
   return (
     <div className="min-h-screen pb-16">
