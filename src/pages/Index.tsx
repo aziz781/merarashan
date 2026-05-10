@@ -377,7 +377,6 @@ function StatementsView({ mobile }: { mobile: string }) {
     setError(null);
     const params: Record<string, string> = {};
     if (selected !== "all") params.year = selected;
-    if (statusFilter !== "all") params.status = statusFilter;
     fetchResource("statements", mobile, params)
       .then((d) => {
         if (cancelled) return;
@@ -390,7 +389,15 @@ function StatementsView({ mobile }: { mobile: string }) {
     return () => {
       cancelled = true;
     };
-  }, [mobile, selected, statusFilter]);
+  }, [mobile, selected]);
+
+  const filteredItems =
+    statusFilter === "all"
+      ? items
+      : items.filter((i) => {
+          const s = String(i.payment_status ?? "").toLowerCase();
+          return statusFilter === "PAID" ? s === "paid" : s !== "paid";
+        });
 
   return (
     <div className="space-y-3">
@@ -431,12 +438,12 @@ function StatementsView({ mobile }: { mobile: string }) {
             <Skeleton key={i} className="h-20 w-full rounded-2xl" />
           ))}
         </div>
-      ) : items.length === 0 ? (
+      ) : filteredItems.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-6">
           No statements found.
         </p>
       ) : (
-        items.map((item, i) => (
+        filteredItems.map((item, i) => (
           <RecordCard key={i} resource="statements" mobile={mobile} item={item} />
         ))
       )}
