@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Receipt, User, CreditCard, Wallet, Calendar, Tag, Info } from "lucide-react";
+import { ArrowLeft, Receipt, CreditCard, Wallet, Calendar, Tag, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
