@@ -62,7 +62,7 @@ const CardDetails = () => {
     (card?.person_name as string) ||
     (card?.card_name as string) ||
     (card?.cm_card_number as string) ||
-    "Card Details";
+    "Rashan Details";
 
   return (
     <div className="min-h-screen pb-16">
