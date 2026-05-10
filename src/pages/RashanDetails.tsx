@@ -129,7 +129,9 @@ function UpdatesTimeline({ item }: { item: Item }) {
             ? statusVal.toUpperCase() === "USED"
             : step.statusKey === "things_status"
               ? statusVal.toLowerCase() === "delivered"
-              : Boolean(date || time || statusVal);
+              : step.statusKey === "payment_status"
+                ? statusVal.toUpperCase() === "PAID"
+                : Boolean(date || time || statusVal);
         const isLast = idx === TIMELINE_STEPS.length - 1;
         const lower = statusVal.toLowerCase();
         const variant: "default" | "destructive" | "outline" =
