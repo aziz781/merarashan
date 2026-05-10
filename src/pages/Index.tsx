@@ -395,19 +395,31 @@ function StatementsView({ mobile }: { mobile: string }) {
   return (
     <div className="space-y-3">
       <StatementStats items={items} stats={stats} activeStatus={statusFilter} onStatClick={setStatusFilter} />
-      <Select value={selected} onValueChange={setSelected}>
-        <SelectTrigger className="h-11">
-          <SelectValue placeholder="Filter by year" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All years</SelectItem>
-          {years.map((y) => (
-            <SelectItem key={y} value={y}>
-              {y}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="grid grid-cols-2 gap-3">
+        <Select value={selected} onValueChange={setSelected}>
+          <SelectTrigger className="h-11">
+            <SelectValue placeholder="Filter by year" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All years</SelectItem>
+            {years.map((y) => (
+              <SelectItem key={y} value={y}>
+                {y}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="h-11">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="PAID">Paid</SelectItem>
+            <SelectItem value="NOT_PAID">Unpaid</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       {error ? (
         <Card className="p-5 border-destructive/30 bg-destructive/5">
           <p className="text-sm font-medium text-destructive mb-1">Failed to load</p>
