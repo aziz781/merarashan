@@ -23,7 +23,7 @@ const CATEGORIES: {
     id: "card",
     title: "Card",
     icon: CreditCard,
-    match: (k) => /(rc_num|card|cm_|amount|charge|price|total|gross|net|fee|discount|paid|balance)/i.test(k),
+    match: (k) => /(rc_num|card|cm_|amount|price|gross|net|fee|discount|paid|balance)/i.test(k) && !/(charge|total)/i.test(k),
   },
   {
     id: "dates",
@@ -109,6 +109,13 @@ const RashanDetails = () => {
       used.add(k);
       return true;
     });
+    if (c.id === "card") {
+      rows.sort((a, b) => {
+        if (a[0] === "rc_num") return -1;
+        if (b[0] === "rc_num") return 1;
+        return a[0].localeCompare(b[0]);
+      });
+    }
     return { ...c, rows };
   }).filter((g) => g.rows.length > 0);
 
@@ -176,7 +183,9 @@ const RashanDetails = () => {
                   key={k}
                   className="flex justify-between gap-3 text-sm items-center border-b border-border/40 py-1.5 last:border-0"
                 >
-                  <span className="text-muted-foreground">{humanizeKey(k)}</span>
+                  {k !== "rc_num" && (
+                    <span className="text-muted-foreground">{humanizeKey(k)}</span>
+                  )}
                   <span className="font-medium text-foreground text-right break-all">
                     {formatValue(k, v)}
                   </span>
