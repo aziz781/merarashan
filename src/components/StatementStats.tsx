@@ -10,10 +10,12 @@ function formatPKR(n: number) {
 export function StatementStats({
   items,
   stats,
+  activeStatus,
   onStatClick,
 }: {
   items: Stmt[];
   stats?: Record<string, unknown> | null;
+  activeStatus?: string;
   onStatClick?: (status: string) => void;
 }) {
   const total = items.length;
@@ -36,6 +38,7 @@ export function StatementStats({
     <div className="grid grid-cols-2 gap-3 mb-4">
       {statsList.map(({ label, value, icon: Icon, status }) => {
         const clickable = !!status && !!onStatClick;
+        const active = clickable && activeStatus === status && status !== "all";
         return (
           <Card
             key={label}
@@ -54,9 +57,9 @@ export function StatementStats({
             }
             className={`p-4 border-border/50 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] ${
               clickable ? "cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]" : ""
-            }`}
+            } ${active ? "ring-2 ring-primary border-primary bg-primary/5" : ""}`}
           >
-            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+            <div className={`flex items-center gap-2 mb-1 ${active ? "text-primary" : "text-muted-foreground"}`}>
               <Icon className="w-4 h-4" />
               <span className="text-xs font-medium">{label}</span>
             </div>
