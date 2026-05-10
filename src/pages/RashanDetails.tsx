@@ -116,6 +116,7 @@ const RashanDetails = () => {
         if (b[0] === "rc_num") return 1;
         return a[0].localeCompare(b[0]);
       });
+    }
     if (c.id === "dates") {
       rows.sort((a, b) => {
         if (a[0] === "created_date") return -1;
