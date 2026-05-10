@@ -91,10 +91,9 @@ const TIMELINE_STEPS: TimelineStep[] = [
     label: "Rashan code sent in SMS",
     dateKey: "created_date",
     timeKey: "created_time",
-    fallbackStatus: "Completed",
   },
   {
-    label: "Code validated at Shop",
+    label: "Rashan Card Validated at Karyana Store",
     dateKey: "accept_datetime",
     timeKey: "",
     statusKey: "code_status",
