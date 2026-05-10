@@ -95,8 +95,8 @@ const TIMELINE_STEPS: TimelineStep[] = [
   },
   {
     label: "Code validated at Shop",
-    dateKey: "accept_date",
-    timeKey: "accept_time",
+    dateKey: "accept_datetime",
+    timeKey: "",
     statusKey: "code_status",
   },
   {
