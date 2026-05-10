@@ -19,6 +19,13 @@ export function TransactionCard({
   const rcNum = (item.rc_num as string) || "";
   const datetimeDisplay = (item.datetime_display as string) || "";
   const monthYear = (item.month_year as string) || "";
+  const codeStatus = (item.code_status as string) || "";
+  const displayText =
+    codeStatus === "EXPIRED"
+      ? "Rashan code expired"
+      : codeStatus === "NEW"
+        ? "Rashan code not used yet."
+        : datetimeDisplay;
 
   const delivered = status === "Delivered";
   const notPaid = paymentStatus === "NOT_PAID";
