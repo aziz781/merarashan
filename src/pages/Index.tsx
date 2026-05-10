@@ -365,6 +365,7 @@ function StatementsView({ mobile }: { mobile: string }) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 6 }, (_, i) => String(currentYear - i));
   const [selected, setSelected] = useState<string>(String(currentYear));
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [stats, setStats] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -376,6 +377,7 @@ function StatementsView({ mobile }: { mobile: string }) {
     setError(null);
     const params: Record<string, string> = {};
     if (selected !== "all") params.year = selected;
+    if (statusFilter !== "all") params.status = statusFilter;
     fetchResource("statements", mobile, params)
       .then((d) => {
         if (cancelled) return;
@@ -388,11 +390,11 @@ function StatementsView({ mobile }: { mobile: string }) {
     return () => {
       cancelled = true;
     };
-  }, [mobile, selected]);
+  }, [mobile, selected, statusFilter]);
 
   return (
     <div className="space-y-3">
-      <StatementStats items={items} stats={stats} />
+      <StatementStats items={items} stats={stats} onStatClick={setStatusFilter} />
       <Select value={selected} onValueChange={setSelected}>
         <SelectTrigger className="h-11">
           <SelectValue placeholder="Filter by year" />
