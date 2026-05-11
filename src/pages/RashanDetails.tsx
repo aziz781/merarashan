@@ -150,7 +150,12 @@ function UpdatesTimeline({ item }: { item: Item }) {
 
   return (
     <ol className="relative">
-      {TIMELINE_STEPS.filter((s) => s.label !== "Delivered" || get(s.statusKey!).toUpperCase() === "PAID").map((step, idx, arr) => {
+      {TIMELINE_STEPS.filter((s) => {
+        const status = get(s.statusKey!);
+        if (s.label === "Delivered") return status.toUpperCase() === "PAID";
+        if (s.label === "Not Delivered") return status.toLowerCase() === "not_delivered";
+        return true;
+      }).map((step, idx, arr) => {
         const date = get(step.dateKey);
         const time = get(step.timeKey);
         const detail = step.detailKey ? get(step.detailKey) : "";
