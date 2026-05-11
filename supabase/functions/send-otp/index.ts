@@ -21,7 +21,8 @@ Deno.serve(async (req) => {
     const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
     // Reused secret name — value should be a Twilio Messaging Service SID (MG...)
     const MSG_SERVICE_SID = Deno.env.get("TWILIO_VERIFY_SERVICE_SID");
-    if (!LOVABLE_API_KEY || !TWILIO_API_KEY || !MSG_SERVICE_SID) {
+    const DEV_SKIP_SMS = Deno.env.get("DEV_SKIP_SMS") === "true";
+    if (!DEV_SKIP_SMS && (!LOVABLE_API_KEY || !TWILIO_API_KEY || !MSG_SERVICE_SID)) {
       throw new Error("Twilio is not configured");
     }
 
@@ -65,23 +66,27 @@ Deno.serve(async (req) => {
     });
     if (insertErr) throw new Error(insertErr.message);
 
-    const res = await fetch(`${GATEWAY_URL}/Messages.json`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "X-Connection-Api-Key": TWILIO_API_KEY,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        To: to,
-        MessagingServiceSid: MSG_SERVICE_SID,
-        Body: `Your Mera Rashan App verification code is ${code}. It expires in 5 minutes.`,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      console.error("Twilio send error", res.status, data);
-      throw new Error(data?.message || "Failed to send SMS");
+    if (DEV_SKIP_SMS) {
+      console.log(`[DEV_SKIP_SMS] OTP for ${cleaned}: ${code}`);
+    } else {
+      const res = await fetch(`${GATEWAY_URL}/Messages.json`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "X-Connection-Api-Key": TWILIO_API_KEY!,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          To: to,
+          MessagingServiceSid: MSG_SERVICE_SID!,
+          Body: `Your Mera Rashan App verification code is ${code}. It expires in 5 minutes.`,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        console.error("Twilio send error", res.status, data);
+        throw new Error(data?.message || "Failed to send SMS");
+      }
     }
 
     return new Response(JSON.stringify({ ok: true }), {
