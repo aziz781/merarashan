@@ -138,7 +138,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     label: "Not Delivered",
     dateKey: "",
     timeKey: "",
-    statusKey: "things_status",
+    statusKey: "code_status",
   },
 ];
 
@@ -153,7 +153,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
       {TIMELINE_STEPS.filter((s) => {
         const status = get(s.statusKey!);
         if (s.label === "Delivered") return status.toUpperCase() === "PAID";
-        if (s.label === "Not Delivered") return status.toLowerCase() === "not_delivered";
+        if (s.label === "Not Delivered") return status.toUpperCase() === "EXPIRED";
         return true;
       }).map((step, idx, arr) => {
         const date = get(step.dateKey);
@@ -162,9 +162,9 @@ function UpdatesTimeline({ item }: { item: Item }) {
         const statusVal = step.statusKey ? get(step.statusKey) : step.fallbackStatus || "";
         const done =
           step.statusKey === "code_status"
-            ? statusVal.toUpperCase() === "USED"
+            ? (step.label === "Not Delivered" ? statusVal.toUpperCase() === "EXPIRED" : statusVal.toUpperCase() === "USED")
             : step.statusKey === "things_status"
-              ? (step.label === "Not Delivered" ? statusVal.toLowerCase() === "not_delivered" : statusVal.toLowerCase() === "delivered")
+              ? statusVal.toLowerCase() === "delivered"
               : step.statusKey === "payment_status"
                 ? statusVal.toUpperCase() === "PAID"
                 : Boolean(date || time || statusVal);
