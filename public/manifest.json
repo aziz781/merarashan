@@ -1,7 +1,7 @@
 {
-  "name": "Mera Rashan App",
-  "short_name": "Mera Rashan",
-  "description": "Mera Rashan App - Manage your Rashan distribution",
+  "name": "Mera Rashan Card",
+  "short_name": "Mera Rashan Card",
+  "description": "Mera Rashan Card - Manage your Rashan distribution",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
