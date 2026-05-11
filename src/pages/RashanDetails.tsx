@@ -192,6 +192,9 @@ function UpdatesTimeline({ item }: { item: Item }) {
                 {step.detailConnector?.toLowerCase().includes("sms") && (
                   <MessageSquare className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
                 )}
+                {step.statusKey === "code_status" && (
+                  <TicketPercent className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
+                )}
                 <span>
                   {step.detailPrefix.replace(/\{(\w+)\}/g, (_, key) => get(key))} {step.detailCodeKey && `(${get(step.detailCodeKey)})`} {step.detailConnector && `${step.detailConnector} `}{detail}
                   {step.detailSuffixKey && step.detailSuffixLabel && ` ${step.detailSuffixLabel} (${get(step.detailSuffixKey)})`}
