@@ -816,8 +816,7 @@ function RecordCard({
             open();
           }
         }}
-        className="p-5 border-0 text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
-        style={{ background: "var(--gradient-card)" }}
+        className="p-5 border-0 bg-primary text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
