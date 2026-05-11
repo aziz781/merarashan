@@ -173,7 +173,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
         const variant: "default" | "destructive" | "outline" =
           lower === "delivered" || lower === "paid" || lower === "completed" || lower === "accepted" || lower === "confirmed"
             ? "default"
-            : lower === "not_paid" || lower === "cancelled" || lower === "rejected"
+            : lower === "not_paid" || lower === "not_delivered" || lower === "cancelled" || lower === "rejected"
               ? "destructive"
               : "outline";
 
