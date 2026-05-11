@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Receipt, CreditCard, Calendar, Tag, MessageSquare, TicketPercent, ShoppingBag, Check, X } from "lucide-react";
+import { ArrowLeft, Receipt, CreditCard, Calendar, Tag, MessageSquare, TicketPercent, ShoppingBag, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -134,12 +134,6 @@ const TIMELINE_STEPS: TimelineStep[] = [
     timeKey: "",
     statusKey: "payment_status",
   },
-  {
-    label: "Not Delivered",
-    dateKey: "",
-    timeKey: "",
-    statusKey: "code_status",
-  },
 ];
 
 function UpdatesTimeline({ item }: { item: Item }) {
@@ -153,7 +147,6 @@ function UpdatesTimeline({ item }: { item: Item }) {
       {TIMELINE_STEPS.filter((s) => {
         const status = get(s.statusKey!);
         if (s.label === "Delivered") return status.toUpperCase() === "PAID";
-        if (s.label === "Not Delivered") return status.toUpperCase() === "EXPIRED";
         return true;
       }).map((step, idx, arr) => {
         const date = get(step.dateKey);
@@ -162,7 +155,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
         const statusVal = step.statusKey ? get(step.statusKey) : step.fallbackStatus || "";
         const done =
           step.statusKey === "code_status"
-            ? (step.label === "Not Delivered" ? statusVal.toUpperCase() === "EXPIRED" : statusVal.toUpperCase() === "USED")
+            ? statusVal.toUpperCase() === "USED"
             : step.statusKey === "things_status"
               ? statusVal.toLowerCase() === "delivered"
               : step.statusKey === "payment_status"
@@ -190,17 +183,13 @@ function UpdatesTimeline({ item }: { item: Item }) {
               className={`absolute left-0 top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 ${
                 step.label === "Delivered" && done
                   ? "border-emerald-700 bg-emerald-700"
-                  : step.label === "Not Delivered" && done
-                    ? "border-red-500 bg-red-500"
-                    : done
+                  : done
                       ? "border-primary bg-primary"
                       : "border-border bg-background"
               }`}
             >
             {step.label === "Delivered" && done ? (
               <Check className="h-3 w-3 text-white" />
-            ) : step.label === "Not Delivered" && done ? (
-              <X className="h-3 w-3 text-white" />
             ) : done ? (
               <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
             ) : null}
@@ -210,11 +199,6 @@ function UpdatesTimeline({ item }: { item: Item }) {
                 {step.label}
               </p>
             </div>
-            {step.label === "Not Delivered" && done && (
-              <p className="mt-1 text-xs text-destructive">
-                Rashan code is expired as not used by {get("valid_to") || "—"}
-              </p>
-            )}
             {(date || time) && ((step.statusKey !== "things_status" && step.statusKey !== "code_status" && step.statusKey !== "payment_status") || (step.statusKey === "payment_status" ? statusVal.toUpperCase() === "PAID" : get("things_status").toLowerCase() === "delivered")) && (
               <p className="mt-1 text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5">
                 {date && <span>📅 {date}</span>}
