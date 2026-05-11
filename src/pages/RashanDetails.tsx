@@ -329,9 +329,9 @@ const RashanDetails = () => {
                               : "text-foreground";
                       return (
                         <span className={`font-medium text-right break-all ml-auto ${colorCls}`}>
-                          {showExpired
-                            ? "Rashan code is expired as not used on time."
-                            : showPlaceholder
+                      {showExpired
+                        ? "Rashan code is expired as not used on-time."
+                        : showPlaceholder
                               ? "Rashan code has not been used yet."
                               : formatValue(k, v)}
                         </span>
