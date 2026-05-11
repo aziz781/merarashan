@@ -52,5 +52,27 @@ No redeploy needed — the change applies on the next function invocation.
 
 - OTP still expires in **5 minutes**
 - Rate limit: **3 sends per number per 10 minutes**
-- For real SMS, ensure the Twilio connector is linked and `TWILIO_VERIFY_SERVICE_SID` is set
-- An in-app version of this guide is available at [`/dev/troubleshooting`](/dev/troubleshooting)
+## Install as PWA (Standalone App)
+
+Mera Rashan App is a Progressive Web App (PWA). You can install it on your device for a native app-like experience.
+
+### Android (Chrome)
+
+1. Open the app in Chrome.
+2. Tap the **⋮** menu (top right) → **"Add to Home screen"** → **"Install"**.
+3. The app will appear as a standalone icon on your home screen.
+
+### iPhone / iPad (Safari)
+
+1. Open the app in Safari.
+2. Tap the **Share** button (rectangle with arrow).
+3. Scroll down and tap **"Add to Home Screen"**.
+4. Tap **"Add"** in the top right.
+
+### Desktop (Chrome / Edge)
+
+1. Open the app in the browser.
+2. Look for the **install icon** (➕ inside a monitor icon) in the address bar on the right.
+3. Click it and follow the prompts to install.
+
+Once installed, it opens in full-screen standalone mode without the browser address bar.
