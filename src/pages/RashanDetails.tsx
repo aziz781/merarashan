@@ -199,10 +199,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
                   <ShoppingBag className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
                 )}
                 {step.statusKey === "payment_status" && (
-                  <>
-                    <Wallet className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
-                    <Receipt className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
-                  </>
+                  <Receipt className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
                 )}
                 <span>
                   {step.detailPrefix.replace(/\{(\w+)\}/g, (_, key) => get(key))} {step.detailCodeKey && `(${get(step.detailCodeKey)})`} {step.detailConnector && `${step.detailConnector} `}{detail}
