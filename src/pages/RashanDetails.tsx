@@ -380,7 +380,7 @@ const RashanDetails = () => {
                       {showExpired
                         ? "Rashan code is expired as not used on-time."
                         : showPlaceholder
-                              ? "Rashan code has not been used yet."
+                              ? `Rashan code has not been used yet. Use by ${item.valid_to || "—"}`
                               : formatValue(k, v)}
                         </span>
                       );
