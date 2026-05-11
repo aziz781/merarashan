@@ -198,7 +198,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
               }`}
             >
               {(step.label === "Delivered" || step.label === "Not Delivered") && done ? (
-                <Check className="h-3 w-3 text-white" />
+                <Check className={`h-3 w-3 ${step.label === "Delivered" ? "text-emerald-900" : "text-white"}`} />
               ) : done ? (
                 <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
               ) : null}
