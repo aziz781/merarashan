@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "@/hooks/use-toast";
 import { fetchResource, formatMobile, Resource } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
+import meraRashanLogo from "@/assets/mera-rashan-logo.png";
 import { TransactionStats } from "@/components/TransactionStats";
 import { TransactionCard } from "@/components/TransactionCard";
 import { TransactionFilters, type TxnFilters } from "@/components/TransactionFilters";
@@ -114,13 +115,12 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
   return (
     <div className="min-h-screen flex items-center justify-center px-5">
       <Card className="w-full max-w-sm p-8 shadow-[var(--shadow-card)] border-0 bg-card/80 backdrop-blur">
-        <div
-          className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center"
-          style={{ background: "var(--gradient-primary)" }}
-        >
-          <CreditCard className="w-7 h-7 text-primary-foreground" />
-        </div>
-        <h1 className="text-2xl font-bold text-center text-foreground">Mera Rashan</h1>
+        <img
+          src={meraRashanLogo}
+          alt="Mera Rashan Card"
+          className="w-32 h-32 mx-auto mb-4 object-contain"
+        />
+        <h1 className="sr-only">Mera Rashan</h1>
         <p className="text-sm text-muted-foreground text-center mt-1 mb-6">
           {step === "mobile" ? "Sign in with your mobile number" : `Enter the code sent to ${mobile}`}
         </p>
