@@ -128,6 +128,12 @@ const TIMELINE_STEPS: TimelineStep[] = [
     detailSuffixKey: "payment_account",
     detailSuffixLabel: "account",
   },
+  {
+    label: "Completed",
+    dateKey: "",
+    timeKey: "",
+    statusKey: "payment_status",
+  },
 ];
 
 function UpdatesTimeline({ item }: { item: Item }) {
