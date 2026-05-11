@@ -134,6 +134,12 @@ const TIMELINE_STEPS: TimelineStep[] = [
     timeKey: "",
     statusKey: "payment_status",
   },
+  {
+    label: "Not Delivered",
+    dateKey: "",
+    timeKey: "",
+    statusKey: "things_status",
+  },
 ];
 
 function UpdatesTimeline({ item }: { item: Item }) {
