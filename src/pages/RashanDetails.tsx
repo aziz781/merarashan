@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Receipt, CreditCard, Calendar, Tag } from "lucide-react";
+import { ArrowLeft, Receipt, CreditCard, Calendar, Tag, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -188,9 +188,14 @@ function UpdatesTimeline({ item }: { item: Item }) {
               </p>
             )}
             {detail && step.detailPrefix && (step.statusKey === "things_status" ? statusVal.toLowerCase() === "delivered" : (date || time)) && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                {step.detailPrefix.replace(/\{(\w+)\}/g, (_, key) => get(key))} {step.detailCodeKey && `(${get(step.detailCodeKey)})`} {step.detailConnector && `${step.detailConnector} `}{detail}
-                {step.detailSuffixKey && step.detailSuffixLabel && ` ${step.detailSuffixLabel} (${get(step.detailSuffixKey)})`}
+              <p className="mt-1 text-xs text-muted-foreground flex items-start gap-1.5">
+                {step.detailConnector?.toLowerCase().includes("sms") && (
+                  <MessageSquare className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
+                )}
+                <span>
+                  {step.detailPrefix.replace(/\{(\w+)\}/g, (_, key) => get(key))} {step.detailCodeKey && `(${get(step.detailCodeKey)})`} {step.detailConnector && `${step.detailConnector} `}{detail}
+                  {step.detailSuffixKey && step.detailSuffixLabel && ` ${step.detailSuffixLabel} (${get(step.detailSuffixKey)})`}
+                </span>
               </p>
             )}
           </li>
