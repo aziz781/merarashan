@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Receipt, CreditCard, Calendar, Tag, MessageSquare, TicketPercent, ShoppingBag, Check } from "lucide-react";
+import { ArrowLeft, Receipt, CreditCard, Calendar, Tag, MessageSquare, TicketPercent, ShoppingBag, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -197,13 +197,13 @@ function UpdatesTimeline({ item }: { item: Item }) {
                       : "border-border bg-background"
               }`}
             >
-              {step.label === "Delivered" && done ? (
-                <Check className="h-3 w-3 text-white" />
-              ) : step.label === "Not Delivered" && done ? (
-                <Check className="h-3 w-3 text-white" />
-              ) : done ? (
-                <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
-              ) : null}
+            {step.label === "Delivered" && done ? (
+              <Check className="h-3 w-3 text-white" />
+            ) : step.label === "Not Delivered" && done ? (
+              <X className="h-3 w-3 text-white" />
+            ) : done ? (
+              <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
+            ) : null}
             </span>
             <div className="flex items-start justify-between gap-3">
               <p className={`text-sm font-medium ${done ? "text-foreground" : "text-muted-foreground"}`}>
