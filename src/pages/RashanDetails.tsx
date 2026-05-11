@@ -188,14 +188,16 @@ function UpdatesTimeline({ item }: { item: Item }) {
             <span
               aria-hidden
               className={`absolute left-0 top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 ${
-                step.label === "Not Delivered" && done
+                step.label === "Delivered" && done
                   ? "border-emerald-500 bg-emerald-500"
-                  : done
-                    ? "border-primary bg-primary"
-                    : "border-border bg-background"
+                  : step.label === "Not Delivered" && done
+                    ? "border-red-500 bg-red-500"
+                    : done
+                      ? "border-primary bg-primary"
+                      : "border-border bg-background"
               }`}
             >
-              {step.label === "Not Delivered" && done ? (
+              {(step.label === "Delivered" || step.label === "Not Delivered") && done ? (
                 <Check className="h-3 w-3 text-white" />
               ) : done ? (
                 <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
