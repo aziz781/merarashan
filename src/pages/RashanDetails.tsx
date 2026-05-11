@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Receipt, CreditCard, Calendar, Tag, MessageSquare, TicketPercent, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Receipt, CreditCard, Calendar, Tag, MessageSquare, TicketPercent, ShoppingBag, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -197,6 +197,9 @@ function UpdatesTimeline({ item }: { item: Item }) {
                 )}
                 {step.statusKey === "things_status" && (
                   <ShoppingBag className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
+                )}
+                {step.statusKey === "payment_status" && (
+                  <Wallet className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
                 )}
                 <span>
                   {step.detailPrefix.replace(/\{(\w+)\}/g, (_, key) => get(key))} {step.detailCodeKey && `(${get(step.detailCodeKey)})`} {step.detailConnector && `${step.detailConnector} `}{detail}
