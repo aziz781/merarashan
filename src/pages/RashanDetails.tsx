@@ -129,7 +129,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     detailSuffixLabel: "account",
   },
   {
-    label: "Completed",
+    label: "Delivered",
     dateKey: "",
     timeKey: "",
     statusKey: "payment_status",
@@ -144,7 +144,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
 
   return (
     <ol className="relative">
-      {TIMELINE_STEPS.filter((s) => s.label !== "Completed" || get(s.statusKey!).toUpperCase() === "PAID").map((step, idx, arr) => {
+      {TIMELINE_STEPS.filter((s) => s.label !== "Delivered" || get(s.statusKey!).toUpperCase() === "PAID").map((step, idx, arr) => {
         const date = get(step.dateKey);
         const time = get(step.timeKey);
         const detail = step.detailKey ? get(step.detailKey) : "";
