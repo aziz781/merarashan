@@ -164,7 +164,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
           step.statusKey === "code_status"
             ? statusVal.toUpperCase() === "USED"
             : step.statusKey === "things_status"
-              ? statusVal.toLowerCase() === "delivered"
+              ? (step.label === "Not Delivered" ? statusVal.toLowerCase() === "not_delivered" : statusVal.toLowerCase() === "delivered")
               : step.statusKey === "payment_status"
                 ? statusVal.toUpperCase() === "PAID"
                 : Boolean(date || time || statusVal);
