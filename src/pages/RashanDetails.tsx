@@ -362,7 +362,7 @@ const RashanDetails = () => {
                       return (
                         <span className={`font-medium text-right break-all ml-auto ${colorCls}`}>
                       {showExpired
-                        ? "Rashan code is expired as not used on-time."
+                        ? `Rashan code is expired as not used by ${item.valid_to || "—"}.`
                         : showPlaceholder
                               ? `Rashan code has not been used yet. Use by ${item.valid_to || "—"}`
                               : formatValue(k, v)}
