@@ -1,5 +1,25 @@
 # Mera Rashan App
 
+## Required Secrets for OTP Verification
+
+The `send-otp` and `verify-otp` edge functions rely on the following secrets.
+Manage them in **Cloud → Edge Functions → Secrets**.
+
+| Secret | Required | Source | What it does |
+|--------|----------|--------|--------------|
+| `TWILIO_API_KEY` | Yes (prod) | Twilio connector (auto-managed) | Connection key passed to the Lovable connector gateway as `X-Connection-Api-Key` to authenticate Twilio API calls. Created automatically when the Twilio connector is linked — do not edit manually. |
+| `TWILIO_VERIFY_SERVICE_SID` | Yes (prod) | Twilio Console → Messaging → Services | Twilio **Messaging Service SID** (starts with `MG…`) used as the `MessagingServiceSid` when sending the OTP SMS. Despite the legacy name, this must be a Messaging Service SID, not a Verify Service SID. |
+| `LOVABLE_API_KEY` | Yes | Auto-provisioned by Lovable Cloud | Bearer token for the Lovable connector gateway (`Authorization: Bearer …`). Managed by Lovable — rotate via the rotate tool, not edit. |
+| `SUPABASE_URL` | Yes | Auto-provisioned | Project URL used by the edge function's Supabase service-role client to read/write `otp_codes`. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Auto-provisioned | Service-role key used server-side to insert OTP hashes and verify codes, bypassing RLS. Never expose to the client. |
+| `DEV_SKIP_SMS` | Optional | Manually set | When `true`, `send-otp` skips Twilio and logs the OTP to the function logs (see dev mode section below). Leave unset or `false` in production. |
+
+### How OTPs flow
+
+1. **`send-otp`** — generates a 6-digit code, stores its SHA-256 hash in the `otp_codes` table (5-minute expiry, max 3 sends per number per 10 minutes), then sends the SMS via the Twilio gateway using `TWILIO_API_KEY` + `TWILIO_VERIFY_SERVICE_SID`.
+2. **`verify-otp`** — hashes the user-submitted code and compares it against the stored hash for that mobile number.
+
+
 ## Development: Bypass SMS OTP (`DEV_SKIP_SMS`)
 
 For local/dev testing without burning Twilio credits, the `send-otp` edge function
