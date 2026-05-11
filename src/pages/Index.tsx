@@ -141,7 +141,12 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
               disabled={loading}
             />
             {error && <p className="text-xs text-destructive">{error}</p>}
-            <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full h-12 text-base font-semibold text-primary-foreground border-0 hover:opacity-90"
+              style={{ background: "var(--gradient-primary)" }}
+              disabled={loading}
+            >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send code"}
             </Button>
           </form>
