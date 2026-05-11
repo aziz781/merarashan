@@ -25,7 +25,7 @@ const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
 
 const mobileSchema = z
   .string()
-  .min(6, "Too short")
+  .min(6, "Enter a valid mobile number.")
   .max(15, "Too long")
   .regex(/^\d+$/, "Digits only");
 
