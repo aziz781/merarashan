@@ -197,13 +197,13 @@ function UpdatesTimeline({ item }: { item: Item }) {
                       : "border-border bg-background"
               }`}
             >
-              {step.label === "Delivered" && done ? (
-                <Check className="h-3 w-3 text-white" />
-              ) : step.label === "Not Delivered" && done ? (
-                <Check className="h-3 w-3 text-white" />
-              ) : done ? (
-                <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
-              ) : null}
+            {step.label === "Delivered" && done ? (
+              <Check className="h-3 w-3 text-white" />
+            ) : step.label === "Not Delivered" && done ? (
+              <X className="h-3 w-3 text-white" />
+            ) : done ? (
+              <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
+            ) : null}
             </span>
             <div className="flex items-start justify-between gap-3">
               <p className={`text-sm font-medium ${done ? "text-foreground" : "text-muted-foreground"}`}>
