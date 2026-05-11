@@ -134,6 +134,12 @@ const TIMELINE_STEPS: TimelineStep[] = [
     timeKey: "",
     statusKey: "payment_status",
   },
+  {
+    label: "Not Delivered",
+    dateKey: "",
+    timeKey: "",
+    statusKey: "things_status",
+  },
 ];
 
 function UpdatesTimeline({ item }: { item: Item }) {
@@ -144,7 +150,12 @@ function UpdatesTimeline({ item }: { item: Item }) {
 
   return (
     <ol className="relative">
-      {TIMELINE_STEPS.filter((s) => s.label !== "Delivered" || get(s.statusKey!).toUpperCase() === "PAID").map((step, idx, arr) => {
+      {TIMELINE_STEPS.filter((s) => {
+        const status = get(s.statusKey!);
+        if (s.label === "Delivered") return status.toUpperCase() === "PAID";
+        if (s.label === "Not Delivered") return status.toLowerCase() === "not_delivered";
+        return true;
+      }).map((step, idx, arr) => {
         const date = get(step.dateKey);
         const time = get(step.timeKey);
         const detail = step.detailKey ? get(step.detailKey) : "";
@@ -153,7 +164,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
           step.statusKey === "code_status"
             ? statusVal.toUpperCase() === "USED"
             : step.statusKey === "things_status"
-              ? statusVal.toLowerCase() === "delivered"
+              ? (step.label === "Not Delivered" ? statusVal.toLowerCase() === "not_delivered" : statusVal.toLowerCase() === "delivered")
               : step.statusKey === "payment_status"
                 ? statusVal.toUpperCase() === "PAID"
                 : Boolean(date || time || statusVal);
@@ -162,7 +173,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
         const variant: "default" | "destructive" | "outline" =
           lower === "delivered" || lower === "paid" || lower === "completed" || lower === "accepted" || lower === "confirmed"
             ? "default"
-            : lower === "not_paid" || lower === "cancelled" || lower === "rejected"
+            : lower === "not_paid" || lower === "not_delivered" || lower === "cancelled" || lower === "rejected"
               ? "destructive"
               : "outline";
 
