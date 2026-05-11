@@ -197,8 +197,8 @@ function UpdatesTimeline({ item }: { item: Item }) {
                       : "border-border bg-background"
               }`}
             >
-              {step.label === "Delivered" && done ? (
-                <Check className="h-3 w-3 text-white" />
+            {step.label === "Delivered" && done ? (
+                <X className="h-3 w-3 text-white" />
               ) : step.label === "Not Delivered" && done ? (
                 <Check className="h-3 w-3 text-white" />
               ) : done ? (
