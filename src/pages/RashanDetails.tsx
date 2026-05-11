@@ -199,11 +199,6 @@ function UpdatesTimeline({ item }: { item: Item }) {
                 {step.label}
               </p>
             </div>
-            {step.label === "Not Delivered" && done && (
-              <p className="mt-1 text-xs text-destructive">
-                Rashan code is expired as not used by {get("valid_to") || "—"}
-              </p>
-            )}
             {(date || time) && ((step.statusKey !== "things_status" && step.statusKey !== "code_status" && step.statusKey !== "payment_status") || (step.statusKey === "payment_status" ? statusVal.toUpperCase() === "PAID" : get("things_status").toLowerCase() === "delivered")) && (
               <p className="mt-1 text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5">
                 {date && <span>📅 {date}</span>}
