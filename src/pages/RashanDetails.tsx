@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Receipt, CreditCard, Calendar, Tag, MessageSquare, TicketPercent, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Receipt, CreditCard, Calendar, Tag, MessageSquare, TicketPercent, ShoppingBag, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
