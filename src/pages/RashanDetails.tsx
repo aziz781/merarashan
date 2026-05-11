@@ -155,7 +155,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
         const statusVal = step.statusKey ? get(step.statusKey) : step.fallbackStatus || "";
         const done =
           step.statusKey === "code_status"
-            ? (step.label === "Not Delivered" ? statusVal.toUpperCase() === "EXPIRED" : statusVal.toUpperCase() === "USED")
+            ? statusVal.toUpperCase() === "USED"
             : step.statusKey === "things_status"
               ? statusVal.toLowerCase() === "delivered"
               : step.statusKey === "payment_status"
@@ -183,17 +183,13 @@ function UpdatesTimeline({ item }: { item: Item }) {
               className={`absolute left-0 top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 ${
                 step.label === "Delivered" && done
                   ? "border-emerald-700 bg-emerald-700"
-                  : step.label === "Not Delivered" && done
-                    ? "border-red-500 bg-red-500"
-                    : done
+                  : done
                       ? "border-primary bg-primary"
                       : "border-border bg-background"
               }`}
             >
             {step.label === "Delivered" && done ? (
               <Check className="h-3 w-3 text-white" />
-            ) : step.label === "Not Delivered" && done ? (
-              <X className="h-3 w-3 text-white" />
             ) : done ? (
               <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
             ) : null}
