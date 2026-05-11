@@ -188,10 +188,18 @@ function UpdatesTimeline({ item }: { item: Item }) {
             <span
               aria-hidden
               className={`absolute left-0 top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 ${
-                done ? "border-primary bg-primary" : "border-border bg-background"
+                step.label === "Not Delivered" && done
+                  ? "border-emerald-500 bg-emerald-500"
+                  : done
+                    ? "border-primary bg-primary"
+                    : "border-border bg-background"
               }`}
             >
-              {done && <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />}
+              {step.label === "Not Delivered" && done ? (
+                <Check className="h-3 w-3 text-white" />
+              ) : done ? (
+                <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
+              ) : null}
             </span>
             <div className="flex items-start justify-between gap-3">
               <p className={`text-sm font-medium ${done ? "text-foreground" : "text-muted-foreground"}`}>
