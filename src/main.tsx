@@ -31,7 +31,27 @@ if (isPreviewHost || isInIframe) {
   window.addEventListener("load", () => {
     import("virtual:pwa-register")
       .then(({ registerSW }) => {
-        registerSW({ immediate: true });
+        const updateSW = registerSW({
+          immediate: true,
+          onNeedRefresh() {
+            // Auto-reload when a new build is ready so users always see the latest version.
+            window.location.reload();
+          },
+          onRegistered(r) {
+            if (!r) return;
+            // Re-check for updates every 30 minutes while the page is open.
+            setInterval(() => {
+              r.update();
+            }, 30 * 60 * 1000);
+          },
+        });
+
+        // Also check for updates when the app comes back to the foreground.
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") {
+            navigator.serviceWorker.ready.then((reg) => reg.update());
+          }
+        });
       })
       .catch(() => {
         // PWA register module not available; ignore.
