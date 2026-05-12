@@ -6,8 +6,16 @@ import { requireAdmin, unauthorizedResponse } from "../_shared/admin.ts";
 const VAPID_PUBLIC_KEY =
   "BFOMGfHnkg6KuM_uPa6fNpz_C9XA9aUVf5ez1IGoJNr9ssEik2KtYg3Gc-t7DyzWfatqIaIPLxpiJCX_WbmMEWE";
 
+function normalizeSubject(raw: string | undefined): string {
+  const v = (raw || "").trim();
+  if (!v) return "mailto:admin@merarashan.pk";
+  if (v.startsWith("mailto:") || v.startsWith("http://") || v.startsWith("https://")) return v;
+  if (v.includes("@")) return `mailto:${v}`;
+  return `https://${v}`;
+}
+
 webpush.setVapidDetails(
-  Deno.env.get("VAPID_SUBJECT") || "mailto:admin@merarashan.pk",
+  normalizeSubject(Deno.env.get("VAPID_SUBJECT")),
   VAPID_PUBLIC_KEY,
   Deno.env.get("VAPID_PRIVATE_KEY")!
 );
