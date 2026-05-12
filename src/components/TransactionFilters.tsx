@@ -28,19 +28,28 @@ export function TransactionFilters({
   const now = new Date();
   const currentYear = now.getFullYear();
 
-  const parsed = value.validFrom.match(/^(\d{2})\/(\d{4})$/);
-  const selectedMonth = parsed ? parseInt(parsed[1], 10) : 0;
-  const selectedYear = parsed ? parseInt(parsed[2], 10) : 0;
+  const parsedFull = value.validFrom.match(/^(\d{2})\/(\d{4})$/);
+  const parsedYear = value.validFrom.match(/^(\d{4})$/);
+  const selectedMonth = parsedFull ? parseInt(parsedFull[1], 10) : 0;
+  const selectedYear = parsedFull
+    ? parseInt(parsedFull[2], 10)
+    : parsedYear
+      ? parseInt(parsedYear[1], 10)
+      : 0;
 
   const [open, setOpen] = useState(false);
-  const [draftMonth, setDraftMonth] = useState<number>(selectedMonth || now.getMonth() + 1);
+  const [draftMonth, setDraftMonth] = useState<number>(selectedMonth || 0);
   const [draftYear, setDraftYear] = useState<number>(selectedYear || currentYear);
 
   const years = Array.from({ length: 8 }, (_, i) => currentYear - i);
 
   const apply = () => {
-    const mm = String(draftMonth).padStart(2, "0");
-    onChange({ ...value, validFrom: `${mm}/${draftYear}` });
+    if (draftMonth === 0) {
+      onChange({ ...value, validFrom: `${draftYear}` });
+    } else {
+      const mm = String(draftMonth).padStart(2, "0");
+      onChange({ ...value, validFrom: `${mm}/${draftYear}` });
+    }
     setOpen(false);
   };
 
@@ -78,13 +87,23 @@ export function TransactionFilters({
                 )}
               >
                 <CalendarIcon className="w-4 h-4 mr-2" />
-                {value.validFrom || "MM/YYYY"}
+                {value.validFrom || "MM/YYYY or YYYY"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-72 p-3 pointer-events-auto" align="start">
               <div className="space-y-3">
                 <div>
-                  <Label className="text-xs text-muted-foreground">Month</Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-muted-foreground">Month</Label>
+                    <Button
+                      variant={draftMonth === 0 ? "default" : "ghost"}
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => setDraftMonth(0)}
+                    >
+                      Any
+                    </Button>
+                  </div>
                   <div className="grid grid-cols-4 gap-1.5 mt-1.5">
                     {MONTHS.map((m, i) => {
                       const mNum = i + 1;
