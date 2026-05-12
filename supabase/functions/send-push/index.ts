@@ -1,6 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import webpush from "npm:web-push@3.6.7";
+import { requireAdmin, unauthorizedResponse } from "../_shared/admin.ts";
 
 const VAPID_PUBLIC_KEY =
   "BFOMGfHnkg6KuM_uPa6fNpz_C9XA9aUVf5ez1IGoJNr9ssEik2KtYg3Gc-t7DyzWfatqIaIPLxpiJCX_WbmMEWE";
@@ -21,6 +22,12 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    try {
+      await requireAdmin(req);
+    } catch (e) {
+      return unauthorizedResponse(e);
+    }
+
     const body = await req.json();
     const { mobile, mobiles, title, body: msg, url, icon, tag } = body || {};
 
