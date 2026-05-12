@@ -96,7 +96,7 @@ export function InstallAppLinks() {
           <button
             type="button"
             onClick={handleAndroidInstall}
-            disabled={!deferredPrompt}
+            
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card/80 backdrop-blur text-sm font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-60"
             aria-label="Install app on Android"
           >
