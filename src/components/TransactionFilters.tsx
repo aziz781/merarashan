@@ -93,7 +93,17 @@ export function TransactionFilters({
             <PopoverContent className="w-72 p-3 pointer-events-auto" align="start">
               <div className="space-y-3">
                 <div>
-                  <Label className="text-xs text-muted-foreground">Month</Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-muted-foreground">Month</Label>
+                    <Button
+                      variant={draftMonth === 0 ? "default" : "ghost"}
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => setDraftMonth(0)}
+                    >
+                      Any
+                    </Button>
+                  </div>
                   <div className="grid grid-cols-4 gap-1.5 mt-1.5">
                     {MONTHS.map((m, i) => {
                       const mNum = i + 1;
