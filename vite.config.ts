@@ -29,9 +29,11 @@ export default defineConfig(({ mode }) => ({
       },
       manifest: false,
       workbox: {
+        clientsClaim: true,
+        skipWaiting: true,
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,woff,woff2}"],
         navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/~oauth/, /^\/api/, /^\/functions/],
+        navigateFallbackDenylist: [/^\/\~oauth/, /^\/api/, /^\/functions/],
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.mode === "navigate",
