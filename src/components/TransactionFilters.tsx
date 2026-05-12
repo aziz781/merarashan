@@ -87,7 +87,7 @@ export function TransactionFilters({
                 )}
               >
                 <CalendarIcon className="w-4 h-4 mr-2" />
-                {value.validFrom || "MM/YYYY"}
+                {value.validFrom || "MM/YYYY or YYYY"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-72 p-3 pointer-events-auto" align="start">
