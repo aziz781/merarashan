@@ -741,6 +741,12 @@ function RashansView({ mobile }: { mobile: string }) {
         if (cancelled) return;
         const list = (extractItems(d) ?? []) as Record<string, unknown>[];
         setItems(list);
+        const tta = Number(
+          (d as Record<string, unknown>)?.totalTransactionAmount ??
+            ((d as Record<string, unknown>)?.data as Record<string, unknown>)?.totalTransactionAmount ??
+            0,
+        );
+        setTotalTransactionAmount(isNaN(tta) ? 0 : tta);
         setStatuses((prev) => {
           const merged = new Set<string>(prev);
           for (const i of list) {
