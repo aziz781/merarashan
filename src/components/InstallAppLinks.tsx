@@ -77,11 +77,16 @@ export function InstallAppLinks() {
   if (platform === "other") return null;
 
   const handleAndroidInstall = async () => {
-    if (!deferredPrompt) return;
-    await deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") setInstalled(true);
-    setDeferredPrompt(null);
+    if (deferredPrompt) {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") setInstalled(true);
+      setDeferredPrompt(null);
+      return;
+    }
+    // Fallback: show manual instructions when the native prompt isn't available
+    // (e.g. already dismissed, in-app browser, or browser doesn't support it).
+    setShowIosHelp(true);
   };
 
   return (
@@ -91,8 +96,8 @@ export function InstallAppLinks() {
           <button
             type="button"
             onClick={handleAndroidInstall}
-            disabled={!deferredPrompt}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card/80 backdrop-blur text-sm font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-60"
+            
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card/80 backdrop-blur text-sm font-medium text-foreground hover:bg-accent transition-colors"
             aria-label="Install app on Android"
           >
             <AndroidIcon className="w-4 h-4" />
