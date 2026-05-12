@@ -2,7 +2,7 @@ import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
 
 const BASE_URL = "https://data.merarashan.pk";
 const ALLOWED = new Set(["cards", "transactions", "customers", "statements"]);
-const FORWARD_PARAMS = ["month", "year", "rcNum", "status"];
+const FORWARD_PARAMS = ["month", "year", "monthYear", "rcNum", "status"];
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });

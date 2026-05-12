@@ -733,11 +733,9 @@ function RashansView({ mobile }: { mobile: string }) {
     const mFull = filters.validFrom.match(/^(\d{1,2})\/(\d{4})$/);
     const mMonthOnly = filters.validFrom.match(/^(\d{1,2})$/);
     if (mFull) {
-      params.month = mFull[1].padStart(2, "0");
-      params.year = mFull[2];
+      params.monthYear = `${mFull[1].padStart(2, "0")}/${mFull[2]}`;
     } else if (mMonthOnly) {
-      params.month = mMonthOnly[1].padStart(2, "0");
-      params.year = currentYear;
+      params.monthYear = `${mMonthOnly[1].padStart(2, "0")}/${currentYear}`;
     }
 
     fetchResource("transactions", mobile, params)
