@@ -1049,7 +1049,16 @@ const TABS: { id: Resource; label: string; icon: typeof CreditCard }[] = [
 
 const Index = () => {
   const [mobile, setMobile] = useState<string | null>(null);
-  const [tab, setTab] = useState<Resource>("customers");
+  const [tab, setTab] = useState<Resource>(() => {
+    try {
+      const saved = sessionStorage.getItem("activeTab");
+      if (saved) return saved as Resource;
+    } catch (_) { /* ignore */ }
+    return "customers";
+  });
+  useEffect(() => {
+    try { sessionStorage.setItem("activeTab", tab); } catch (_) { /* ignore */ }
+  }, [tab]);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
 
