@@ -1079,6 +1079,7 @@ const Index = () => {
         </Tabs>
       </main>
 
+      <InstallApp />
       <PageFooter />
 
       <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
