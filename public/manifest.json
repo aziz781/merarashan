@@ -2,22 +2,26 @@
   "name": "Mera Rashan",
   "short_name": "Mera Rashan",
   "description": "Mera Rashan - Manage your Rashan distribution",
-  "start_url": "/",
+  "id": "/",
+  "start_url": "/?source=pwa",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3B82F6",
+  "categories": ["business", "productivity"],
   "orientation": "portrait",
   "scope": "/",
   "icons": [
     {
       "src": "/favicon.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/favicon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

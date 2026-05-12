@@ -13,6 +13,32 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
+declare global {
+  interface Window {
+    __meraRashanInstallPrompt?: BeforeInstallPromptEvent | null;
+    __meraRashanInstallPromptListenerReady?: boolean;
+  }
+}
+
+const INSTALL_PROMPT_READY_EVENT = "mera-rashan-install-prompt-ready";
+
+function getDeferredPrompt(): BeforeInstallPromptEvent | null {
+  if (typeof window === "undefined") return null;
+  return window.__meraRashanInstallPrompt ?? null;
+}
+
+if (typeof window !== "undefined" && !window.__meraRashanInstallPromptListenerReady) {
+  window.__meraRashanInstallPromptListenerReady = true;
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    window.__meraRashanInstallPrompt = e as BeforeInstallPromptEvent;
+    window.dispatchEvent(new Event(INSTALL_PROMPT_READY_EVENT));
+  });
+  window.addEventListener("appinstalled", () => {
+    window.__meraRashanInstallPrompt = null;
+  });
+}
+
 function isStandalone(): boolean {
   if (typeof window === "undefined") return false;
   const mq = window.matchMedia?.("(display-mode: standalone)").matches;
@@ -49,44 +75,53 @@ const AppleIcon = ({ className }: { className?: string }) => (
 export function InstallAppLinks() {
   const [installed, setInstalled] = useState<boolean>(() => isStandalone());
   const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
+    useState<BeforeInstallPromptEvent | null>(() => getDeferredPrompt());
   const [platform, setPlatform] = useState<"ios" | "android" | "other">("other");
   const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     setPlatform(detectPlatform());
+    setDeferredPrompt(getDeferredPrompt());
 
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      window.__meraRashanInstallPrompt = e as BeforeInstallPromptEvent;
+      setDeferredPrompt(window.__meraRashanInstallPrompt);
     };
+    const handlePromptReady = () => setDeferredPrompt(getDeferredPrompt());
     const handleInstalled = () => {
       setInstalled(true);
+      window.__meraRashanInstallPrompt = null;
       setDeferredPrompt(null);
     };
     const mq = window.matchMedia("(display-mode: standalone)");
     const handleDisplayChange = () => setInstalled(isStandalone());
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
+    window.addEventListener(INSTALL_PROMPT_READY_EVENT, handlePromptReady);
     window.addEventListener("appinstalled", handleInstalled);
     mq.addEventListener?.("change", handleDisplayChange);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
+      window.removeEventListener(INSTALL_PROMPT_READY_EVENT, handlePromptReady);
       window.removeEventListener("appinstalled", handleInstalled);
       mq.removeEventListener?.("change", handleDisplayChange);
     };
   }, []);
 
   if (installed) return null;
-  if (platform === "other") return null;
 
   const handleClick = async () => {
-    if (platform === "android" && deferredPrompt) {
+    const promptEvent = deferredPrompt ?? getDeferredPrompt();
+
+    if (platform !== "ios" && promptEvent) {
       try {
-        await deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
+        await promptEvent.prompt();
+        const { outcome } = await promptEvent.userChoice;
         if (outcome === "accepted") setInstalled(true);
+        else setShowHelp(true);
+        window.__meraRashanInstallPrompt = null;
         setDeferredPrompt(null);
         return;
       } catch {
@@ -144,7 +179,7 @@ export function InstallAppLinks() {
                 </li>
               </ol>
             </>
-          ) : (
+          ) : platform === "android" ? (
             <>
               <DialogHeader>
                 <DialogTitle>Install on Android</DialogTitle>
@@ -170,6 +205,31 @@ export function InstallAppLinks() {
                 <li className="flex items-start gap-2">
                   <span className="font-semibold">3.</span>
                   <span>Tap <strong>Install</strong> to finish.</span>
+                </li>
+              </ol>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle>Install Mera Rashan App</DialogTitle>
+                <DialogDescription>
+                  Use your browser menu to install this app on your device.
+                </DialogDescription>
+              </DialogHeader>
+              <ol className="space-y-3 text-sm text-foreground">
+                <li className="flex items-start gap-2">
+                  <span className="font-semibold">1.</span>
+                  <span>Open the browser menu or share menu.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-semibold">2.</span>
+                  <span>
+                    Choose <strong>Install app</strong> or <strong>Add to Home Screen</strong>.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-semibold">3.</span>
+                  <span>Confirm to add Mera Rashan to your home screen.</span>
                 </li>
               </ol>
             </>
