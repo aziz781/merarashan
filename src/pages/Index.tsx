@@ -485,8 +485,26 @@ function GenericResourceView({ resource, mobile }: { resource: Resource; mobile:
 function StatementsView({ mobile }: { mobile: string }) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 6 }, (_, i) => String(currentYear - i));
-  const [selected, setSelected] = useState<string>(String(currentYear));
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [selected, setSelected] = useState<string>(() => {
+    try {
+      const v = sessionStorage.getItem("statementsYear");
+      if (v) return v;
+    } catch (_) { /* ignore */ }
+    return String(currentYear);
+  });
+  const [statusFilter, setStatusFilter] = useState<string>(() => {
+    try {
+      const v = sessionStorage.getItem("statementsStatus");
+      if (v) return v;
+    } catch (_) { /* ignore */ }
+    return "all";
+  });
+  useEffect(() => {
+    try { sessionStorage.setItem("statementsYear", selected); } catch (_) { /* ignore */ }
+  }, [selected]);
+  useEffect(() => {
+    try { sessionStorage.setItem("statementsStatus", statusFilter); } catch (_) { /* ignore */ }
+  }, [statusFilter]);
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [stats, setStats] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
