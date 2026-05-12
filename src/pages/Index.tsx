@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink, Info, CheckCircle2, X, MessageCircle, AlertTriangle } from "lucide-react";
+import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink, Info, CheckCircle2, X, MessageCircle, AlertTriangle, LayoutGrid, List } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -579,7 +579,21 @@ function CardsList({
   items: Record<string, unknown>[];
   mobile: string;
 }) {
+  const VIEW_KEY = "mr_cards_view";
   const [selected, setSelected] = useState<string>("all");
+  const [view, setView] = useState<"list" | "grid">(() => {
+    if (typeof window === "undefined") return "list";
+    return (localStorage.getItem(VIEW_KEY) as "list" | "grid") || "list";
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(VIEW_KEY, view);
+    } catch {
+      // ignore
+    }
+  }, [view]);
+
   const names = Array.from(
     new Set(
       items
@@ -594,23 +608,55 @@ function CardsList({
 
   return (
     <div className="space-y-3">
-      <Select value={selected} onValueChange={setSelected}>
-        <SelectTrigger className="h-11">
-          <SelectValue placeholder="Filter by name" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All names</SelectItem>
-          {names.map((n) => (
-            <SelectItem key={n} value={n}>
-              {n}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex items-center gap-2">
+        <Select value={selected} onValueChange={setSelected}>
+          <SelectTrigger className="h-11 flex-1">
+            <SelectValue placeholder="Filter by name" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All names</SelectItem>
+            {names.map((n) => (
+              <SelectItem key={n} value={n}>
+                {n}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <div className="inline-flex h-11 rounded-md border border-input bg-background p-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setView("list")}
+            aria-label="List view"
+            aria-pressed={view === "list"}
+            className={`flex items-center justify-center w-9 rounded-sm transition-colors ${
+              view === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <List className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("grid")}
+            aria-label="Grid view"
+            aria-pressed={view === "grid"}
+            className={`flex items-center justify-center w-9 rounded-sm transition-colors ${
+              view === "grid" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <LayoutGrid className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
       {filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-6">
           No cards match the filter.
         </p>
+      ) : view === "grid" ? (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+          {filtered.map((item, i) => (
+            <CardGridTile key={i} item={item} index={i + 1} />
+          ))}
+        </div>
       ) : (
         filtered.map((item, i) => (
           <RecordCard key={i} resource="cards" mobile={mobile} item={item} index={i + 1} />
@@ -619,6 +665,45 @@ function CardsList({
     </div>
   );
 }
+
+function CardGridTile({ item, index }: { item: Record<string, unknown>; index: number }) {
+  const navigate = useNavigate();
+  const rcNum = (item.cm_card_number as string) || "";
+  const name = String(item.person_name ?? "—");
+  const amountRaw = item.amount;
+  const amountNum = Number(amountRaw);
+  const amount = Number.isFinite(amountNum) && amountRaw != null && amountRaw !== ""
+    ? `Rs. ${amountNum.toLocaleString("en-PK")}`
+    : "—";
+  const open = () => {
+    if (rcNum) navigate(`/cards/${encodeURIComponent(rcNum)}`, { state: { card: item } });
+  };
+  return (
+    <Card
+      role="button"
+      tabIndex={0}
+      onClick={open}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
+        }
+      }}
+      className="p-3 border-0 bg-primary text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
+    >
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-mono opacity-90">{String(index).padStart(2, "0")}</span>
+        <CreditCard className="w-4 h-4 opacity-90" />
+      </div>
+      <p className="text-base font-bold leading-tight break-words mb-1">{name}</p>
+      <p className="text-sm font-bold mb-2">{amount}</p>
+      {rcNum && (
+        <p className="text-[11px] opacity-75 break-all font-mono">{rcNum}</p>
+      )}
+    </Card>
+  );
+}
+
 
 function extractItems(data: unknown): unknown[] | null {
   if (Array.isArray(data)) return data;
