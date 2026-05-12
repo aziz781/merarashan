@@ -717,7 +717,19 @@ function RashansView({ mobile }: { mobile: string }) {
   const now = new Date();
   const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
   const currentYear = String(now.getFullYear());
-  const [filters, setFilters] = useState<TxnFilters>({ status: "all", validFrom: `${currentMonth}/${currentYear}` });
+  const [filters, setFilters] = useState<TxnFilters>(() => {
+    try {
+      const saved = sessionStorage.getItem("rashanFilters");
+      if (saved) return JSON.parse(saved) as TxnFilters;
+    } catch (_) { /* ignore */ }
+    return { status: "all", validFrom: `${currentMonth}/${currentYear}` };
+  });
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("rashanFilters", JSON.stringify(filters));
+    } catch (_) { /* ignore */ }
+  }, [filters]);
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
