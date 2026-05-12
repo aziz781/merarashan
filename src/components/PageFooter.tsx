@@ -8,7 +8,7 @@ export function PageFooter() {
       <ShieldCheck className="w-5 h-5 text-muted-foreground mb-1" />
       <p className="text-sm font-semibold text-muted-foreground">MeraRashan.pk</p>
       <p className="text-xs text-muted-foreground">Safe and transparent service in every step of the way.</p>
-      <p className="text-xs font-mono text-muted-foreground/80 mt-2 bg-muted-foreground/10 px-2 py-0.5 rounded">Build {__BUILD_VERSION__}</p>
+      <p className="text-[10px] text-muted-foreground/60 mt-2">Build {__BUILD_VERSION__}</p>
     </div>
   );
 }
