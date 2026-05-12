@@ -179,7 +179,7 @@ export function InstallAppLinks() {
                 </li>
               </ol>
             </>
-          ) : (
+          ) : platform === "android" ? (
             <>
               <DialogHeader>
                 <DialogTitle>Install on Android</DialogTitle>
@@ -205,6 +205,31 @@ export function InstallAppLinks() {
                 <li className="flex items-start gap-2">
                   <span className="font-semibold">3.</span>
                   <span>Tap <strong>Install</strong> to finish.</span>
+                </li>
+              </ol>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle>Install Mera Rashan App</DialogTitle>
+                <DialogDescription>
+                  Use your browser menu to install this app on your device.
+                </DialogDescription>
+              </DialogHeader>
+              <ol className="space-y-3 text-sm text-foreground">
+                <li className="flex items-start gap-2">
+                  <span className="font-semibold">1.</span>
+                  <span>Open the browser menu or share menu.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-semibold">2.</span>
+                  <span>
+                    Choose <strong>Install app</strong> or <strong>Add to Home Screen</strong>.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-semibold">3.</span>
+                  <span>Confirm to add Mera Rashan to your home screen.</span>
                 </li>
               </ol>
             </>
