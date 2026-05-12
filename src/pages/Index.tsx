@@ -598,7 +598,16 @@ function CardsList({
   mobile: string;
 }) {
   const VIEW_KEY = "mr_cards_view";
-  const [selected, setSelected] = useState<string>("all");
+  const [selected, setSelected] = useState<string>(() => {
+    try {
+      const v = sessionStorage.getItem("cardsFilter");
+      if (v) return v;
+    } catch (_) { /* ignore */ }
+    return "all";
+  });
+  useEffect(() => {
+    try { sessionStorage.setItem("cardsFilter", selected); } catch (_) { /* ignore */ }
+  }, [selected]);
   const [view, setView] = useState<"list" | "grid">(() => {
     if (typeof window === "undefined") return "list";
     return (localStorage.getItem(VIEW_KEY) as "list" | "grid") || "list";
