@@ -14,6 +14,36 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+type InstallPromptWindow = Window & {
+  __meraRashanInstallPrompt?: BeforeInstallPromptEvent | null;
+  __meraRashanInstallPromptCallbacks?: Set<
+    (event: BeforeInstallPromptEvent | null) => void
+  >;
+  __meraRashanInstallPromptListenerAttached?: boolean;
+};
+
+const getInstallPromptWindow = () => window as InstallPromptWindow;
+
+function attachInstallPromptListener() {
+  if (typeof window === "undefined") return;
+
+  const promptWindow = getInstallPromptWindow();
+  promptWindow.__meraRashanInstallPromptCallbacks ??= new Set();
+
+  if (promptWindow.__meraRashanInstallPromptListenerAttached) return;
+  promptWindow.__meraRashanInstallPromptListenerAttached = true;
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    promptWindow.__meraRashanInstallPrompt = event as BeforeInstallPromptEvent;
+    promptWindow.__meraRashanInstallPromptCallbacks?.forEach((callback) =>
+      callback(promptWindow.__meraRashanInstallPrompt ?? null)
+    );
+  });
+}
+
+attachInstallPromptListener();
+
 function isIOS() {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent || "";
@@ -39,19 +69,24 @@ export function InstallAppLinks() {
   useEffect(() => {
     if (isStandalone()) setInstalled(true);
 
-    const onPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    const promptWindow = getInstallPromptWindow();
+    if (promptWindow.__meraRashanInstallPrompt) {
+      setDeferredPrompt(promptWindow.__meraRashanInstallPrompt);
+    }
+
+    const onPromptReady = (event: BeforeInstallPromptEvent | null) => {
+      setDeferredPrompt(event);
     };
     const onInstalled = () => {
       setInstalled(true);
       setDeferredPrompt(null);
+      promptWindow.__meraRashanInstallPrompt = null;
     };
 
-    window.addEventListener("beforeinstallprompt", onPrompt);
+    promptWindow.__meraRashanInstallPromptCallbacks?.add(onPromptReady);
     window.addEventListener("appinstalled", onInstalled);
     return () => {
-      window.removeEventListener("beforeinstallprompt", onPrompt);
+      promptWindow.__meraRashanInstallPromptCallbacks?.delete(onPromptReady);
       window.removeEventListener("appinstalled", onInstalled);
     };
   }, []);
@@ -59,11 +94,14 @@ export function InstallAppLinks() {
   if (installed) return null;
 
   const handleClick = async () => {
-    if (deferredPrompt) {
+    const promptEvent = deferredPrompt ?? getInstallPromptWindow().__meraRashanInstallPrompt;
+
+    if (promptEvent) {
       try {
-        await deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
+        await promptEvent.prompt();
+        const { outcome } = await promptEvent.userChoice;
         if (outcome === "accepted") setInstalled(true);
+        getInstallPromptWindow().__meraRashanInstallPrompt = null;
         setDeferredPrompt(null);
         return;
       } catch {
@@ -93,7 +131,7 @@ export function InstallAppLinks() {
             <DialogTitle>Install Mera Rashan App</DialogTitle>
             <DialogDescription>
               {ios
-                ? "Add to your Home Screen in 3 steps:"
+                ? "iOS requires adding the app from Safari:"
                 : "Install from your browser menu in 3 steps:"}
             </DialogDescription>
           </DialogHeader>
