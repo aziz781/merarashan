@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Download, Share, Plus } from "lucide-react";
+import { Share, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,6 @@ type BeforeInstallPromptEvent = Event & {
 function isStandalone(): boolean {
   if (typeof window === "undefined") return false;
   const mq = window.matchMedia?.("(display-mode: standalone)").matches;
-  // iOS Safari
   const iosStandalone = (window.navigator as unknown as { standalone?: boolean })
     .standalone === true;
   return Boolean(mq || iosStandalone);
@@ -29,6 +28,18 @@ function detectPlatform(): "ios" | "android" | "other" {
   if (/Android/i.test(ua)) return "android";
   return "other";
 }
+
+const AndroidIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+    <path d="M17.6 9.48l1.84-3.18a.4.4 0 10-.69-.4l-1.86 3.22A11.4 11.4 0 0012 8c-1.78 0-3.46.4-4.9 1.12L5.25 5.9a.4.4 0 10-.69.4L6.4 9.48A10.7 10.7 0 001 18h22a10.7 10.7 0 00-5.4-8.52zM7 15.25a1.05 1.05 0 110-2.1 1.05 1.05 0 010 2.1zm10 0a1.05 1.05 0 110-2.1 1.05 1.05 0 010 2.1z"/>
+  </svg>
+);
+
+const AppleIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+    <path d="M16.365 1.43c0 1.14-.42 2.18-1.13 2.95-.84.93-2.21 1.65-3.32 1.56-.14-1.1.42-2.27 1.13-3.04.79-.86 2.18-1.5 3.32-1.47zM20.5 17.27c-.55 1.27-.81 1.83-1.52 2.95-.99 1.55-2.39 3.48-4.13 3.5-1.55.02-1.95-1.01-4.05-1-2.1.01-2.54 1.02-4.09 1-1.74-.02-3.07-1.77-4.06-3.32C-.16 17.07-.45 12.18 1.83 9.6c1.61-1.83 4.16-2.9 6.55-2.9 2.43 0 3.96 1.33 5.97 1.33 1.95 0 3.13-1.34 5.94-1.34 2.13 0 4.39 1.16 6 3.17-5.27 2.89-4.41 10.42.21 7.41z"/>
+  </svg>
+);
 
 export function InstallAppLinks() {
   const [installed, setInstalled] = useState<boolean>(() => isStandalone());
@@ -63,46 +74,39 @@ export function InstallAppLinks() {
   }, []);
 
   if (installed) return null;
+  if (platform === "other") return null;
 
   const handleAndroidInstall = async () => {
     if (!deferredPrompt) return;
     await deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      setInstalled(true);
-    }
+    if (outcome === "accepted") setInstalled(true);
     setDeferredPrompt(null);
   };
 
-  // Show Android button only if browser supports install prompt OR user is on Android
-  const showAndroid =
-    platform === "android" || (platform === "other" && Boolean(deferredPrompt));
-  const showIos = platform === "ios" || platform === "other";
-
   return (
     <>
-      <div className="flex items-center justify-center gap-2 pt-2">
-        {showAndroid && (
+      <div className="flex items-center justify-center pt-1">
+        {platform === "android" ? (
           <button
             type="button"
             onClick={handleAndroidInstall}
             disabled={!deferredPrompt}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-60"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card/80 backdrop-blur text-sm font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-60"
             aria-label="Install app on Android"
           >
-            <Download className="w-3.5 h-3.5" />
-            Install on Android
+            <AndroidIcon className="w-4 h-4" />
+            Install App
           </button>
-        )}
-        {showIos && (
+        ) : (
           <button
             type="button"
             onClick={() => setShowIosHelp(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card/80 backdrop-blur text-sm font-medium text-foreground hover:bg-accent transition-colors"
             aria-label="Install app on iOS"
           >
-            <Download className="w-3.5 h-3.5" />
-            Install on iOS
+            <AppleIcon className="w-4 h-4" />
+            Install App
           </button>
         )}
       </div>
