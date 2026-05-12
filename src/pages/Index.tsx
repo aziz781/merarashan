@@ -730,10 +730,14 @@ function RashansView({ mobile }: { mobile: string }) {
     setError(null);
 
     const params: Record<string, string> = {};
-    const m = filters.validFrom.match(/^(\d{2})\/(\d{4})$/);
-    if (m) {
-      params.month = m[1];
-      params.year = m[2];
+    const mFull = filters.validFrom.match(/^(\d{1,2})\/(\d{4})$/);
+    const mMonthOnly = filters.validFrom.match(/^(\d{1,2})$/);
+    if (mFull) {
+      params.month = mFull[1].padStart(2, "0");
+      params.year = mFull[2];
+    } else if (mMonthOnly) {
+      params.month = mMonthOnly[1].padStart(2, "0");
+      params.year = currentYear;
     }
 
     fetchResource("transactions", mobile, params)
