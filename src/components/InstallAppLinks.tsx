@@ -77,11 +77,16 @@ export function InstallAppLinks() {
   if (platform === "other") return null;
 
   const handleAndroidInstall = async () => {
-    if (!deferredPrompt) return;
-    await deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") setInstalled(true);
-    setDeferredPrompt(null);
+    if (deferredPrompt) {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") setInstalled(true);
+      setDeferredPrompt(null);
+      return;
+    }
+    // Fallback: show manual instructions when the native prompt isn't available
+    // (e.g. already dismissed, in-app browser, or browser doesn't support it).
+    setShowIosHelp(true);
   };
 
   return (
