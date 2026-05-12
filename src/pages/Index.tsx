@@ -722,6 +722,7 @@ function RashansView({ mobile }: { mobile: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statuses, setStatuses] = useState<string[]>([]);
+  const [totalTransactionAmount, setTotalTransactionAmount] = useState<number>(0);
 
   useEffect(() => {
     let cancelled = false;
