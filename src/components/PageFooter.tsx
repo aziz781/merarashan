@@ -1,5 +1,4 @@
 import { ShieldCheck } from "lucide-react";
-import { InstallAppLinks } from "./InstallAppLinks";
 
 export function PageFooter() {
   return (
@@ -7,7 +6,6 @@ export function PageFooter() {
       <ShieldCheck className="w-5 h-5 text-muted-foreground mb-1" />
       <p className="text-sm font-semibold text-muted-foreground">MeraRashan.pk</p>
       <p className="text-xs text-muted-foreground">Safe and transparent service in every step of the way.</p>
-      <InstallAppLinks />
     </div>
   );
 }

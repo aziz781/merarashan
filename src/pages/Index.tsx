@@ -20,6 +20,7 @@ import { TransactionFilters, type TxnFilters } from "@/components/TransactionFil
 import { StatementStats } from "@/components/StatementStats";
 import { PageFooter } from "@/components/PageFooter";
 import { MessageBox } from "@/components/MessageBox";
+import { InstallAppLinks } from "@/components/InstallAppLinks";
 const STORAGE_KEY = "mr_mobile";
 const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
 
@@ -403,6 +404,7 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
             <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">CARDS</p>
             <div className="space-y-1.5">{section2.map(renderRow)}</div>
           </Card>
+          <InstallAppLinks />
           {data.msg != null && String(data.msg).trim() !== "" && (
             <MessageBox
               type={String(data.msg_type ?? "")}
