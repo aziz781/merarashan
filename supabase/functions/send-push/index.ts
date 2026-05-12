@@ -14,10 +14,14 @@ function normalizeSubject(raw: string | undefined): string {
   return `https://${v}`;
 }
 
+function normalizeB64Url(raw: string | undefined): string {
+  return (raw || "").trim().replace(/\s+/g, "").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
 webpush.setVapidDetails(
   normalizeSubject(Deno.env.get("VAPID_SUBJECT")),
   VAPID_PUBLIC_KEY,
-  Deno.env.get("VAPID_PRIVATE_KEY")!
+  normalizeB64Url(Deno.env.get("VAPID_PRIVATE_KEY"))
 );
 
 type Sub = {
