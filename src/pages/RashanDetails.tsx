@@ -234,13 +234,20 @@ function UpdatesTimeline({ item }: { item: Item }) {
 
 const RashanDetails = () => {
   const navigate = useNavigate();
-  const location = useLocation() as { state?: { item?: Item } };
+  const location = useLocation() as { state?: { item?: Item; origin?: "home" | "rashans" } };
   const item = location.state?.item;
+  const origin = location.state?.origin ?? "home";
+  const goBack = () => {
+    try {
+      sessionStorage.setItem("activeTab", origin === "rashans" ? "transactions" : "customers");
+    } catch (_) { /* ignore */ }
+    navigate("/");
+  };
 
   if (!item) {
     return (
       <div className="min-h-screen px-5 pt-10">
-        <Button variant="ghost" size="sm" onClick={() => { try { sessionStorage.setItem("activeTab", "transactions"); } catch (_) {} navigate("/"); }} className="-ml-2 mb-4">
+        <Button variant="ghost" size="sm" onClick={goBack} className="-ml-2 mb-4">
           <ArrowLeft className="w-4 h-4 mr-1" /> Back
         </Button>
         <Card className="p-5">
@@ -299,7 +306,7 @@ const RashanDetails = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => { try { sessionStorage.setItem("activeTab", "transactions"); } catch (_) {} navigate("/"); }}
+          onClick={goBack}
           className="text-primary-foreground hover:bg-white/10 -ml-2 mb-3"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />

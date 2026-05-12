@@ -7,9 +7,11 @@ type Txn = Record<string, unknown>;
 export function TransactionCard({
   item,
   variant = "full",
+  origin = "home",
 }: {
   item: Txn;
   variant?: "full" | "compact";
+  origin?: "home" | "rashans";
 }) {
   const navigate = useNavigate();
   const amount = Number(item.amount ?? item.totalAmount) || 0;
@@ -38,7 +40,7 @@ export function TransactionCard({
   const notPaid = paymentStatus === "NOT_PAID";
   const showExtras = variant === "full";
 
-  const open = () => navigate("/rashans/detail", { state: { item } });
+  const open = () => navigate("/rashans/detail", { state: { item, origin } });
 
   return (
     <Card
