@@ -698,7 +698,7 @@ function CardGridTile({ item, index }: { item: Record<string, unknown>; index: n
       <p className="text-base font-bold leading-tight break-words mb-1">{name}</p>
       <p className="text-sm font-bold mb-2">{amount}</p>
       {rcNum && (
-        <p className="text-[11px] opacity-75 break-all font-mono">{rcNum}</p>
+        <p className="text-[11px] opacity-75 break-all font-serif">{rcNum}</p>
       )}
     </Card>
   );
