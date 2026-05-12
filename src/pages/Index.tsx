@@ -19,7 +19,6 @@ import { TransactionCard } from "@/components/TransactionCard";
 import { TransactionFilters, type TxnFilters } from "@/components/TransactionFilters";
 import { StatementStats } from "@/components/StatementStats";
 import { PageFooter } from "@/components/PageFooter";
-import { InstallApp } from "@/components/InstallApp";
 import { MessageBox } from "@/components/MessageBox";
 const STORAGE_KEY = "mr_mobile";
 const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
@@ -1079,7 +1078,6 @@ const Index = () => {
         </Tabs>
       </main>
 
-      <InstallApp />
       <PageFooter />
 
       <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
