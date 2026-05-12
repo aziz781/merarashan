@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Share, Plus } from "lucide-react";
+import { Share, Plus, MoreVertical } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +24,12 @@ function isStandalone(): boolean {
 function detectPlatform(): "ios" | "android" | "other" {
   if (typeof navigator === "undefined") return "other";
   const ua = navigator.userAgent || "";
-  if (/iPad|iPhone|iPod/.test(ua)) return "ios";
+  // iPadOS 13+ reports as Mac; detect via touch points
+  const isIpadOS =
+    /Macintosh/.test(ua) &&
+    typeof navigator.maxTouchPoints === "number" &&
+    navigator.maxTouchPoints > 1;
+  if (/iPad|iPhone|iPod/.test(ua) || isIpadOS) return "ios";
   if (/Android/i.test(ua)) return "android";
   return "other";
 }
@@ -46,7 +51,7 @@ export function InstallAppLinks() {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [platform, setPlatform] = useState<"ios" | "android" | "other">("other");
-  const [showIosHelp, setShowIosHelp] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     setPlatform(detectPlatform());
@@ -76,75 +81,99 @@ export function InstallAppLinks() {
   if (installed) return null;
   if (platform === "other") return null;
 
-  const handleAndroidInstall = async () => {
-    if (deferredPrompt) {
-      await deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === "accepted") setInstalled(true);
-      setDeferredPrompt(null);
-      return;
+  const handleClick = async () => {
+    if (platform === "android" && deferredPrompt) {
+      try {
+        await deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === "accepted") setInstalled(true);
+        setDeferredPrompt(null);
+        return;
+      } catch {
+        // fall through to manual instructions
+      }
     }
-    // Fallback: show manual instructions when the native prompt isn't available
-    // (e.g. already dismissed, in-app browser, or browser doesn't support it).
-    setShowIosHelp(true);
+    setShowHelp(true);
   };
+
+  const Icon = platform === "ios" ? AppleIcon : AndroidIcon;
 
   return (
     <>
       <div className="flex items-center justify-center pt-1">
-        {platform === "android" ? (
-          <button
-            type="button"
-            onClick={handleAndroidInstall}
-            
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card/80 backdrop-blur text-sm font-medium text-foreground hover:bg-accent transition-colors"
-            aria-label="Install app on Android"
-          >
-            <AndroidIcon className="w-4 h-4" />
-            Install Mera Rashan App
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setShowIosHelp(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card/80 backdrop-blur text-sm font-medium text-foreground hover:bg-accent transition-colors"
-            aria-label="Install app on iOS"
-          >
-            <AppleIcon className="w-4 h-4" />
-            Install Mera Rashan App
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleClick}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card/80 backdrop-blur text-sm font-medium text-foreground hover:bg-accent transition-colors"
+          aria-label="Install Mera Rashan App"
+        >
+          <Icon className="w-4 h-4" />
+          Install Mera Rashan App
+        </button>
       </div>
 
-      <Dialog open={showIosHelp} onOpenChange={setShowIosHelp}>
+      <Dialog open={showHelp} onOpenChange={setShowHelp}>
         <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Install on iPhone / iPad</DialogTitle>
-            <DialogDescription>
-              Open this site in Safari, then follow these steps:
-            </DialogDescription>
-          </DialogHeader>
-          <ol className="space-y-3 text-sm text-foreground">
-            <li className="flex items-start gap-2">
-              <span className="font-semibold">1.</span>
-              <span className="flex items-center gap-1.5">
-                Tap the Share icon
-                <Share className="w-4 h-4 inline" />
-                in the toolbar.
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="font-semibold">2.</span>
-              <span className="flex items-center gap-1.5">
-                Choose <strong>Add to Home Screen</strong>
-                <Plus className="w-4 h-4 inline" />.
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="font-semibold">3.</span>
-              <span>Tap <strong>Add</strong> to finish.</span>
-            </li>
-          </ol>
+          {platform === "ios" ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>Install on iPhone / iPad</DialogTitle>
+                <DialogDescription>
+                  Open this site in Safari, then follow these steps:
+                </DialogDescription>
+              </DialogHeader>
+              <ol className="space-y-3 text-sm text-foreground">
+                <li className="flex items-start gap-2">
+                  <span className="font-semibold">1.</span>
+                  <span className="flex items-center gap-1.5">
+                    Tap the Share icon
+                    <Share className="w-4 h-4 inline" />
+                    in the toolbar.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-semibold">2.</span>
+                  <span className="flex items-center gap-1.5">
+                    Choose <strong>Add to Home Screen</strong>
+                    <Plus className="w-4 h-4 inline" />.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-semibold">3.</span>
+                  <span>Tap <strong>Add</strong> to finish.</span>
+                </li>
+              </ol>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle>Install on Android</DialogTitle>
+                <DialogDescription>
+                  Open this site in Chrome, then follow these steps:
+                </DialogDescription>
+              </DialogHeader>
+              <ol className="space-y-3 text-sm text-foreground">
+                <li className="flex items-start gap-2">
+                  <span className="font-semibold">1.</span>
+                  <span className="flex items-center gap-1.5">
+                    Tap the menu
+                    <MoreVertical className="w-4 h-4 inline" />
+                    in the top-right corner.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-semibold">2.</span>
+                  <span>
+                    Choose <strong>Install app</strong> or <strong>Add to Home screen</strong>.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-semibold">3.</span>
+                  <span>Tap <strong>Install</strong> to finish.</span>
+                </li>
+              </ol>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </>
