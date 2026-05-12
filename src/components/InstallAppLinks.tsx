@@ -96,7 +96,7 @@ export function InstallAppLinks() {
             aria-label="Install app on Android"
           >
             <AndroidIcon className="w-4 h-4" />
-            Install App
+            Install Mera Rashan App
           </button>
         ) : (
           <button
@@ -106,7 +106,7 @@ export function InstallAppLinks() {
             aria-label="Install app on iOS"
           >
             <AppleIcon className="w-4 h-4" />
-            Install App
+            Install Mera Rashan App
           </button>
         )}
       </div>
