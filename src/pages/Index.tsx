@@ -736,7 +736,7 @@ function RashansView({ mobile }: { mobile: string }) {
     if (mFull) {
       params.monthYear = `${mFull[1].padStart(2, "0")}/${mFull[2]}`;
     } else if (mYearOnly) {
-      params.year = mYearOnly[1];
+      params.monthYear = mYearOnly[1];
     } else if (mMonthOnly) {
       params.monthYear = `${mMonthOnly[1].padStart(2, "0")}/${currentYear}`;
     }
