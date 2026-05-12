@@ -97,7 +97,7 @@ export function InstallAppLinks() {
             type="button"
             onClick={handleAndroidInstall}
             
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card/80 backdrop-blur text-sm font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-60"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card/80 backdrop-blur text-sm font-medium text-foreground hover:bg-accent transition-colors"
             aria-label="Install app on Android"
           >
             <AndroidIcon className="w-4 h-4" />
