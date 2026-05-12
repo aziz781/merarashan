@@ -6,6 +6,11 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  define: {
+    __BUILD_VERSION__: JSON.stringify(
+      new Date().toISOString().replace(/[-:]/g, "").slice(0, 13)
+    ),
+  },
   server: {
     host: "::",
     port: 8080,
