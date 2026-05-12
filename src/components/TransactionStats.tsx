@@ -19,7 +19,10 @@ export function TransactionStats({
   onStatClick?: (status: string) => void;
 }) {
   const total = items.length;
-  const totalAmount = items.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  const totalAmount = items.reduce(
+    (s, i) => (i.code_status === "USED" ? s + (Number(i.amount) || 0) : s),
+    0,
+  );
   const delivered = items.filter((i) => i.things_status === "Delivered").length;
   const pending = total - delivered;
 
