@@ -20,6 +20,7 @@ import { TransactionFilters, type TxnFilters } from "@/components/TransactionFil
 import { StatementStats } from "@/components/StatementStats";
 import { PageFooter } from "@/components/PageFooter";
 import { MessageBox } from "@/components/MessageBox";
+import { InstallAppLinks } from "@/components/InstallAppLinks";
 
 const STORAGE_KEY = "mr_mobile";
 const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
