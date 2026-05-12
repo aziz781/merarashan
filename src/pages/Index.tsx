@@ -386,6 +386,7 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
               </div>
             </Card>
           </a>
+          <NotificationToggle mobile={mobile} />
         </>
       )}
       {!profileOnly && (
