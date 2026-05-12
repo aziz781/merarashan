@@ -9,18 +9,19 @@ function formatPKR(n: number) {
 
 export function TransactionStats({
   items,
+  totalAmount: totalAmountProp,
   activeStatus,
   onStatClick,
 }: {
   items: Txn[];
+  totalAmount?: number;
   activeStatus?: string;
   onStatClick?: (status: string) => void;
 }) {
   const total = items.length;
-  const totalAmount = items.reduce(
-    (s, i) => s + (Number(i.totalAmount) || 0),
-    0,
-  );
+  const totalAmount =
+    totalAmountProp ??
+    items.reduce((s, i) => s + (Number(i.totalAmount) || 0), 0);
   const delivered = items.filter((i) => i.things_status === "Delivered").length;
   const pending = total - delivered;
 
