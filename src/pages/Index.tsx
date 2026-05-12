@@ -722,6 +722,7 @@ function RashansView({ mobile }: { mobile: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statuses, setStatuses] = useState<string[]>([]);
+  const [totalTransactionAmount, setTotalTransactionAmount] = useState<number>(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -740,6 +741,12 @@ function RashansView({ mobile }: { mobile: string }) {
         if (cancelled) return;
         const list = (extractItems(d) ?? []) as Record<string, unknown>[];
         setItems(list);
+        const tta = Number(
+          (d as Record<string, unknown>)?.totalTransactionAmount ??
+            ((d as Record<string, unknown>)?.data as Record<string, unknown>)?.totalTransactionAmount ??
+            0,
+        );
+        setTotalTransactionAmount(isNaN(tta) ? 0 : tta);
         setStatuses((prev) => {
           const merged = new Set<string>(prev);
           for (const i of list) {
@@ -774,6 +781,7 @@ function RashansView({ mobile }: { mobile: string }) {
     <>
       <TransactionStats
         items={items}
+        totalAmount={totalTransactionAmount}
         activeStatus={filters.status}
         onStatClick={(status) => setFilters((f) => ({ ...f, status }))}
       />
