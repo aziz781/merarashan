@@ -731,9 +731,12 @@ function RashansView({ mobile }: { mobile: string }) {
 
     const params: Record<string, string> = {};
     const mFull = filters.validFrom.match(/^(\d{1,2})\/(\d{4})$/);
+    const mYearOnly = filters.validFrom.match(/^(\d{4})$/);
     const mMonthOnly = filters.validFrom.match(/^(\d{1,2})$/);
     if (mFull) {
       params.monthYear = `${mFull[1].padStart(2, "0")}/${mFull[2]}`;
+    } else if (mYearOnly) {
+      params.year = mYearOnly[1];
     } else if (mMonthOnly) {
       params.monthYear = `${mMonthOnly[1].padStart(2, "0")}/${currentYear}`;
     }
