@@ -834,7 +834,7 @@ function RashansView({ mobile }: { mobile: string }) {
               No transactions match the filters.
             </p>
           ) : (
-            filtered.map((item, i) => <TransactionCard key={i} item={item} />)
+            filtered.map((item, i) => <TransactionCard key={i} item={item} origin="rashans" />)
           )}
         </div>
       )}
