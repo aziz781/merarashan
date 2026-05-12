@@ -18,7 +18,7 @@ export function TransactionStats({
 }) {
   const total = items.length;
   const totalAmount = items.reduce(
-    (s, i) => s + (Number(i.totalTransactionAmount) || 0),
+    (s, i) => s + (Number(i.totalAmount) || 0),
     0,
   );
   const delivered = items.filter((i) => i.things_status === "Delivered").length;
