@@ -7,6 +7,7 @@ import Index from "./pages/Index.tsx";
 import CardDetails from "./pages/CardDetails.tsx";
 import RashanDetails from "./pages/RashanDetails.tsx";
 import DevTroubleshooting from "./pages/DevTroubleshooting.tsx";
+import AdminNotify from "./pages/AdminNotify.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/cards/:rcNum" element={<CardDetails />} />
           <Route path="/rashans/detail" element={<RashanDetails />} />
           <Route path="/dev/troubleshooting" element={<DevTroubleshooting />} />
+          <Route path="/admin/notify" element={<AdminNotify />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
