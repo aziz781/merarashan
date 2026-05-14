@@ -796,32 +796,50 @@ function CardGridTile({ item, index }: { item: Record<string, unknown>; index: n
   const amount = Number.isFinite(amountNum) && amountRaw != null && amountRaw !== ""
     ? `Rs. ${amountNum.toLocaleString("en-PK")}`
     : "—";
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const longPress = useLongPress(() => setDetailsOpen(true), 600);
   const open = () => {
     if (rcNum) navigate(`/cards/${encodeURIComponent(rcNum)}`, { state: { card: item } });
   };
+  const handleClick = () => {
+    if (longPress.isTriggered()) return;
+    open();
+  };
   return (
-    <Card
-      role="button"
-      tabIndex={0}
-      onClick={open}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
+    <>
+      <Card
+        role="button"
+        tabIndex={0}
+        onClick={handleClick}
+        onMouseDown={longPress.start}
+        onMouseUp={longPress.cancel}
+        onMouseLeave={longPress.cancel}
+        onTouchStart={longPress.start}
+        onTouchEnd={longPress.cancel}
+        onContextMenu={(e) => {
           e.preventDefault();
-          open();
-        }
-      }}
-      className="p-3 border-0 bg-primary text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
-    >
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-mono opacity-90">{String(index).padStart(2, "0")}</span>
-        <CreditCard className="w-4 h-4 opacity-90" />
-      </div>
-      <p className="text-base font-bold leading-tight break-words mb-1">{name}</p>
-      <p className="text-sm font-bold mb-2">{amount}</p>
-      {rcNum && (
-        <p className="text-[11px] opacity-75 break-all font-serif">{rcNum}</p>
-      )}
-    </Card>
+          setDetailsOpen(true);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            open();
+          }
+        }}
+        className="p-3 border-0 bg-primary text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] select-none"
+      >
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-mono opacity-90">{String(index).padStart(2, "0")}</span>
+          <CreditCard className="w-4 h-4 opacity-90" />
+        </div>
+        <p className="text-base font-bold leading-tight break-words mb-1">{name}</p>
+        <p className="text-sm font-bold mb-2">{amount}</p>
+        {rcNum && (
+          <p className="text-[11px] opacity-75 break-all font-serif">{rcNum}</p>
+        )}
+      </Card>
+      <CardDetailsPopup item={item} open={detailsOpen} onOpenChange={setDetailsOpen} />
+    </>
   );
 }
 
