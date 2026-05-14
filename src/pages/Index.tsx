@@ -1036,62 +1036,80 @@ function RecordCard({
       { key: "city", label: "City" },
       { key: "reg_date", label: "Registration Date" },
     ];
+    const [detailsOpen, setDetailsOpen] = useState(false);
+    const longPress = useLongPress(() => setDetailsOpen(true), 600);
     const open = () => {
       if (rcNum) navigate(`/cards/${encodeURIComponent(rcNum)}`, { state: { card: item } });
     };
+    const handleClick = () => {
+      if (longPress.isTriggered()) return;
+      open();
+    };
     return (
-      <Card
-        role="button"
-        tabIndex={0}
-        onClick={open}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
+      <>
+        <Card
+          role="button"
+          tabIndex={0}
+          onClick={handleClick}
+          onMouseDown={longPress.start}
+          onMouseUp={longPress.cancel}
+          onMouseLeave={longPress.cancel}
+          onTouchStart={longPress.start}
+          onTouchEnd={longPress.cancel}
+          onContextMenu={(e) => {
             e.preventDefault();
-            open();
-          }
-        }}
-        className="p-5 border-0 bg-primary text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
-      >
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            {index != null && (
-              <span className="text-sm font-mono opacity-90">{String(index).padStart(2, "0")}</span>
-            )}
-            <CreditCard className="w-5 h-5 opacity-90" />
-          </div>
-          <span className="text-xs uppercase tracking-wider opacity-75">میرا راشن کارڈ</span>
-        </div>
-        <div className="space-y-1">
-          {summaryFields.map(({ key, label }) => {
-            const raw = item[key];
-            const isEmpty = raw == null || raw === "";
-            let display: string;
-            if (isEmpty) {
-              display = "—";
-            } else if (key === "amount") {
-              const n = Number(raw);
-              display = Number.isFinite(n)
-                ? `Rs. ${n.toLocaleString("en-PK")}`
-                : String(raw);
-            } else {
-              display = String(raw);
+            setDetailsOpen(true);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              open();
             }
-            const isBold = key === "person_name" || key === "amount";
-            const hideLabel = key === "person_name" || key === "amount";
-            const isName = key === "person_name";
-            return (
-              <div key={key} className={`flex justify-between ${isName ? "" : "text-sm"}`}>
-                {!hideLabel && (
-                  <span className={`${isBold ? "font-bold" : "opacity-75"}`}>{label}</span>
-                )}
-                <span className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"} ${hideLabel ? "w-full text-left" : ""} ${isName ? "text-xl" : ""}`}>
-                  {display}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
+          }}
+          className="p-5 border-0 bg-primary text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99] select-none"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              {index != null && (
+                <span className="text-sm font-mono opacity-90">{String(index).padStart(2, "0")}</span>
+              )}
+              <CreditCard className="w-5 h-5 opacity-90" />
+            </div>
+            <span className="text-xs uppercase tracking-wider opacity-75">میرا راشن کارڈ</span>
+          </div>
+          <div className="space-y-1">
+            {summaryFields.map(({ key, label }) => {
+              const raw = item[key];
+              const isEmpty = raw == null || raw === "";
+              let display: string;
+              if (isEmpty) {
+                display = "—";
+              } else if (key === "amount") {
+                const n = Number(raw);
+                display = Number.isFinite(n)
+                  ? `Rs. ${n.toLocaleString("en-PK")}`
+                  : String(raw);
+              } else {
+                display = String(raw);
+              }
+              const isBold = key === "person_name" || key === "amount";
+              const hideLabel = key === "person_name" || key === "amount";
+              const isName = key === "person_name";
+              return (
+                <div key={key} className={`flex justify-between ${isName ? "" : "text-sm"}`}>
+                  {!hideLabel && (
+                    <span className={`${isBold ? "font-bold" : "opacity-75"}`}>{label}</span>
+                  )}
+                  <span className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"} ${hideLabel ? "w-full text-left" : ""} ${isName ? "text-xl" : ""}`}>
+                    {display}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+        <CardDetailsPopup item={item} open={detailsOpen} onOpenChange={setDetailsOpen} />
+      </>
     );
   }
 
