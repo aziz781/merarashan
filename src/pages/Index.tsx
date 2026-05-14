@@ -33,6 +33,97 @@ const mobileSchema = z
   .max(15, "Too long")
   .regex(/^\d+$/, "Digits only");
 
+function useLongPress(callback: () => void, duration = 600) {
+  const timerRef = useRef<number | null>(null);
+  const triggeredRef = useRef(false);
+
+  const start = useCallback(() => {
+    triggeredRef.current = false;
+    timerRef.current = window.setTimeout(() => {
+      triggeredRef.current = true;
+      callback();
+    }, duration);
+  }, [callback, duration]);
+
+  const cancel = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const isTriggered = useCallback(() => {
+    const t = triggeredRef.current;
+    triggeredRef.current = false;
+    return t;
+  }, []);
+
+  return { start, cancel, isTriggered };
+}
+
+function CardDetailsPopup({
+  item,
+  open,
+  onOpenChange,
+}: {
+  item: Record<string, unknown> | null;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  if (!item) return null;
+
+  const entries = Object.entries(item).filter(
+    ([, v]) => v !== null && v !== "" && typeof v !== "object",
+  );
+
+  const labelMap: Record<string, string> = {
+    person_name: "Name",
+    cm_card_number: "Card Number",
+    mobile_number: "Mobile",
+    city: "City",
+    reg_date: "Registration Date",
+    amount: "Amount",
+    card_name: "Card Type",
+    active_cards: "Active Cards",
+    status: "Status",
+    created_at: "Created At",
+    updated_at: "Updated At",
+  };
+
+  const formatValue = (key: string, raw: unknown): React.ReactNode => {
+    if (raw == null || raw === "") return "—";
+    if (key === "amount") {
+      const n = Number(raw);
+      return Number.isFinite(n) ? `Rs. ${n.toLocaleString("en-PK")}` : String(raw);
+    }
+    return String(raw);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5" />
+            Card Details
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 pt-2">
+          {entries.map(([key, value], i) => (
+            <div key={key}>
+              <div className="flex justify-between gap-3 text-sm items-start">
+                <span className="text-muted-foreground shrink-0">{labelMap[key] || key.replace(/_/g, " ")}</span>
+                <span className="font-medium text-foreground text-right break-all">{formatValue(key, value)}</span>
+              </div>
+              {i < entries.length - 1 && <Separator className="mt-3" />}
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function Login({ onLogin }: { onLogin: (m: string) => void }) {
   const [step, setStep] = useState<"mobile" | "otp">("mobile");
   const [mobile, setMobile] = useState("");
