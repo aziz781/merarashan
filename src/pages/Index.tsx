@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink, Info, CheckCircle2, X, MessageCircle, AlertTriangle, LayoutGrid, List } from "lucide-react";
@@ -10,6 +10,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { fetchResource, formatMobile, Resource } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +32,97 @@ const mobileSchema = z
   .min(6, "Enter a valid mobile number.")
   .max(15, "Too long")
   .regex(/^\d+$/, "Digits only");
+
+function useLongPress(callback: () => void, duration = 600) {
+  const timerRef = useRef<number | null>(null);
+  const triggeredRef = useRef(false);
+
+  const start = useCallback(() => {
+    triggeredRef.current = false;
+    timerRef.current = window.setTimeout(() => {
+      triggeredRef.current = true;
+      callback();
+    }, duration);
+  }, [callback, duration]);
+
+  const cancel = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const isTriggered = useCallback(() => {
+    const t = triggeredRef.current;
+    triggeredRef.current = false;
+    return t;
+  }, []);
+
+  return { start, cancel, isTriggered };
+}
+
+function CardDetailsPopup({
+  item,
+  open,
+  onOpenChange,
+}: {
+  item: Record<string, unknown> | null;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  if (!item) return null;
+
+  const entries = Object.entries(item).filter(
+    ([, v]) => v !== null && v !== "" && typeof v !== "object",
+  );
+
+  const labelMap: Record<string, string> = {
+    person_name: "Name",
+    cm_card_number: "Card Number",
+    mobile_number: "Mobile",
+    city: "City",
+    reg_date: "Registration Date",
+    amount: "Amount",
+    card_name: "Card Type",
+    active_cards: "Active Cards",
+    status: "Status",
+    created_at: "Created At",
+    updated_at: "Updated At",
+  };
+
+  const formatValue = (key: string, raw: unknown): React.ReactNode => {
+    if (raw == null || raw === "") return "—";
+    if (key === "amount") {
+      const n = Number(raw);
+      return Number.isFinite(n) ? `Rs. ${n.toLocaleString("en-PK")}` : String(raw);
+    }
+    return String(raw);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5" />
+            Card Details
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 pt-2">
+          {entries.map(([key, value], i) => (
+            <div key={key}>
+              <div className="flex justify-between gap-3 text-sm items-start">
+                <span className="text-muted-foreground shrink-0">{labelMap[key] || key.replace(/_/g, " ")}</span>
+                <span className="font-medium text-foreground text-right break-all">{formatValue(key, value)}</span>
+              </div>
+              {i < entries.length - 1 && <Separator className="mt-3" />}
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 function Login({ onLogin }: { onLogin: (m: string) => void }) {
   const [step, setStep] = useState<"mobile" | "otp">("mobile");
@@ -704,32 +796,50 @@ function CardGridTile({ item, index }: { item: Record<string, unknown>; index: n
   const amount = Number.isFinite(amountNum) && amountRaw != null && amountRaw !== ""
     ? `Rs. ${amountNum.toLocaleString("en-PK")}`
     : "—";
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const longPress = useLongPress(() => setDetailsOpen(true), 600);
   const open = () => {
     if (rcNum) navigate(`/cards/${encodeURIComponent(rcNum)}`, { state: { card: item } });
   };
+  const handleClick = () => {
+    if (longPress.isTriggered()) return;
+    open();
+  };
   return (
-    <Card
-      role="button"
-      tabIndex={0}
-      onClick={open}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
+    <>
+      <Card
+        role="button"
+        tabIndex={0}
+        onClick={handleClick}
+        onMouseDown={longPress.start}
+        onMouseUp={longPress.cancel}
+        onMouseLeave={longPress.cancel}
+        onTouchStart={longPress.start}
+        onTouchEnd={longPress.cancel}
+        onContextMenu={(e) => {
           e.preventDefault();
-          open();
-        }
-      }}
-      className="p-3 border-0 bg-primary text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
-    >
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-mono opacity-90">{String(index).padStart(2, "0")}</span>
-        <CreditCard className="w-4 h-4 opacity-90" />
-      </div>
-      <p className="text-base font-bold leading-tight break-words mb-1">{name}</p>
-      <p className="text-sm font-bold mb-2">{amount}</p>
-      {rcNum && (
-        <p className="text-[11px] opacity-75 break-all font-serif">{rcNum}</p>
-      )}
-    </Card>
+          setDetailsOpen(true);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            open();
+          }
+        }}
+        className="p-3 border-0 bg-primary text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] select-none"
+      >
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-mono opacity-90">{String(index).padStart(2, "0")}</span>
+          <CreditCard className="w-4 h-4 opacity-90" />
+        </div>
+        <p className="text-base font-bold leading-tight break-words mb-1">{name}</p>
+        <p className="text-sm font-bold mb-2">{amount}</p>
+        {rcNum && (
+          <p className="text-[11px] opacity-75 break-all font-serif">{rcNum}</p>
+        )}
+      </Card>
+      <CardDetailsPopup item={item} open={detailsOpen} onOpenChange={setDetailsOpen} />
+    </>
   );
 }
 
@@ -944,62 +1054,80 @@ function RecordCard({
       { key: "city", label: "City" },
       { key: "reg_date", label: "Registration Date" },
     ];
+    const [detailsOpen, setDetailsOpen] = useState(false);
+    const longPress = useLongPress(() => setDetailsOpen(true), 600);
     const open = () => {
       if (rcNum) navigate(`/cards/${encodeURIComponent(rcNum)}`, { state: { card: item } });
     };
+    const handleClick = () => {
+      if (longPress.isTriggered()) return;
+      open();
+    };
     return (
-      <Card
-        role="button"
-        tabIndex={0}
-        onClick={open}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
+      <>
+        <Card
+          role="button"
+          tabIndex={0}
+          onClick={handleClick}
+          onMouseDown={longPress.start}
+          onMouseUp={longPress.cancel}
+          onMouseLeave={longPress.cancel}
+          onTouchStart={longPress.start}
+          onTouchEnd={longPress.cancel}
+          onContextMenu={(e) => {
             e.preventDefault();
-            open();
-          }
-        }}
-        className="p-5 border-0 bg-primary text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
-      >
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            {index != null && (
-              <span className="text-sm font-mono opacity-90">{String(index).padStart(2, "0")}</span>
-            )}
-            <CreditCard className="w-5 h-5 opacity-90" />
-          </div>
-          <span className="text-xs uppercase tracking-wider opacity-75">میرا راشن کارڈ</span>
-        </div>
-        <div className="space-y-1">
-          {summaryFields.map(({ key, label }) => {
-            const raw = item[key];
-            const isEmpty = raw == null || raw === "";
-            let display: string;
-            if (isEmpty) {
-              display = "—";
-            } else if (key === "amount") {
-              const n = Number(raw);
-              display = Number.isFinite(n)
-                ? `Rs. ${n.toLocaleString("en-PK")}`
-                : String(raw);
-            } else {
-              display = String(raw);
+            setDetailsOpen(true);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              open();
             }
-            const isBold = key === "person_name" || key === "amount";
-            const hideLabel = key === "person_name" || key === "amount";
-            const isName = key === "person_name";
-            return (
-              <div key={key} className={`flex justify-between ${isName ? "" : "text-sm"}`}>
-                {!hideLabel && (
-                  <span className={`${isBold ? "font-bold" : "opacity-75"}`}>{label}</span>
-                )}
-                <span className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"} ${hideLabel ? "w-full text-left" : ""} ${isName ? "text-xl" : ""}`}>
-                  {display}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
+          }}
+          className="p-5 border-0 bg-primary text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99] select-none"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              {index != null && (
+                <span className="text-sm font-mono opacity-90">{String(index).padStart(2, "0")}</span>
+              )}
+              <CreditCard className="w-5 h-5 opacity-90" />
+            </div>
+            <span className="text-xs uppercase tracking-wider opacity-75">میرا راشن کارڈ</span>
+          </div>
+          <div className="space-y-1">
+            {summaryFields.map(({ key, label }) => {
+              const raw = item[key];
+              const isEmpty = raw == null || raw === "";
+              let display: string;
+              if (isEmpty) {
+                display = "—";
+              } else if (key === "amount") {
+                const n = Number(raw);
+                display = Number.isFinite(n)
+                  ? `Rs. ${n.toLocaleString("en-PK")}`
+                  : String(raw);
+              } else {
+                display = String(raw);
+              }
+              const isBold = key === "person_name" || key === "amount";
+              const hideLabel = key === "person_name" || key === "amount";
+              const isName = key === "person_name";
+              return (
+                <div key={key} className={`flex justify-between ${isName ? "" : "text-sm"}`}>
+                  {!hideLabel && (
+                    <span className={`${isBold ? "font-bold" : "opacity-75"}`}>{label}</span>
+                  )}
+                  <span className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"} ${hideLabel ? "w-full text-left" : ""} ${isName ? "text-xl" : ""}`}>
+                    {display}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+        <CardDetailsPopup item={item} open={detailsOpen} onOpenChange={setDetailsOpen} />
+      </>
     );
   }
 
