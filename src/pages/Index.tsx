@@ -1292,7 +1292,7 @@ const Index = () => {
     profileData?.is_active === "1";
 
   return (
-    <div className="min-h-screen pb-24">
+    <div className="min-h-screen pb-32">
       <header
         className="px-5 pt-10 pb-6 text-primary-foreground"
         style={{ background: "var(--gradient-primary)" }}
@@ -1334,23 +1334,10 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="px-5 -mt-3">
+      <main className="px-5 pt-5">
         <Tabs value={tab} onValueChange={(v) => setTab(v as Resource)} className="w-full">
-          <TabsList className="grid grid-cols-4 w-full h-14 bg-card shadow-[var(--shadow-soft)] rounded-2xl p-1">
-            {TABS.map(({ id, label, icon: Icon }) => (
-              <TabsTrigger
-                key={id}
-                value={id}
-                className="flex flex-col gap-0.5 h-full rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Icon className="w-4 h-4" />
-                <span className="text-[10px] font-medium">{label}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-
           {TABS.map(({ id }) => (
-            <TabsContent key={id} value={id} className="mt-5">
+            <TabsContent key={id} value={id} className="mt-0">
               <ResourceView resource={id} mobile={mobile} onNavigate={setTab} />
             </TabsContent>
           ))}
@@ -1358,6 +1345,40 @@ const Index = () => {
       </main>
 
       <PageFooter />
+
+      <nav
+        className="fixed bottom-0 inset-x-0 z-40 border-t border-border/60 bg-card/85 backdrop-blur-md shadow-[0_-4px_20px_-8px_hsl(var(--foreground)/0.15)]"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        aria-label="Primary"
+      >
+        <div className="mx-auto max-w-2xl grid grid-cols-4 h-16">
+          {TABS.map(({ id, label, icon: Icon }) => {
+            const active = tab === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setTab(id)}
+                aria-current={active ? "page" : undefined}
+                className={`flex flex-col items-center justify-center gap-0.5 transition-colors ${
+                  active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <span
+                  className={`flex items-center justify-center w-10 h-7 rounded-full transition-colors ${
+                    active ? "bg-primary/12" : ""
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                </span>
+                <span className={`text-[10px] font-medium ${active ? "font-semibold" : ""}`}>
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
 
       <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
         <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
