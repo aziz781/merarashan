@@ -330,9 +330,27 @@ function useTransactions(mobile: string) {
 }
 
 function getItemDate(item: Record<string, unknown>): Date {
-  return new Date(
-    String(item.created_at ?? item.date ?? item.txn_date ?? item.valid_from ?? 0),
-  );
+  const candidates = [
+    item.created_at,
+    item.date,
+    item.txn_date,
+    item.valid_from,
+    item.payment_datetime,
+    item.datetime_display,
+    item.month_year,
+  ];
+  for (const c of candidates) {
+    if (c == null || c === "") continue;
+    const d = new Date(String(c));
+    if (!isNaN(d.getTime())) return d;
+  }
+  return new Date(NaN);
+}
+
+function isThisMonth(d: Date): boolean {
+  if (isNaN(d.getTime())) return false;
+  const now = new Date();
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
 }
 
 function StatTile({
