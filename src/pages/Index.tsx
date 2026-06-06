@@ -405,11 +405,7 @@ function CardsStats({
   onNavigate?: (r: Resource) => void;
 }) {
   const { items, loading } = useTransactions(mobile);
-  const now = new Date();
-  const monthCount = items.filter((it) => {
-    const d = getItemDate(it);
-    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-  }).length;
+  const monthCount = items.filter(isItemThisMonth).length;
 
   return (
     <div className="grid grid-cols-2 gap-3">
