@@ -391,7 +391,7 @@ function StatTile({
 }: {
   label: string;
   value: React.ReactNode;
-  hint?: string;
+  hint?: React.ReactNode;
   onClick?: () => void;
   loading?: boolean;
 }) {
