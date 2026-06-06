@@ -304,16 +304,20 @@ function ResourceView({ resource, mobile, onNavigate }: { resource: Resource; mo
   return <GenericResourceView resource={resource} mobile={mobile} />;
 }
 
-function useTransactions(mobile: string) {
+function useTransactions(
+  mobile: string,
+  params?: Record<string, string | number | undefined>,
+) {
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const paramsKey = JSON.stringify(params ?? {});
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetchResource("transactions", mobile)
+    fetchResource("transactions", mobile, params)
       .then((d) => {
         if (cancelled) return;
         const list = (extractItems(d) ?? []) as Record<string, unknown>[];
@@ -324,9 +328,18 @@ function useTransactions(mobile: string) {
     return () => {
       cancelled = true;
     };
-  }, [mobile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mobile, paramsKey]);
 
   return { items, loading, error };
+}
+
+function currentMonthParams() {
+  const now = new Date();
+  return {
+    month: String(now.getMonth() + 1).padStart(2, "0"),
+    year: String(now.getFullYear()),
+  };
 }
 
 function getItemDate(item: Record<string, unknown>): Date {
