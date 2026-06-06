@@ -420,17 +420,18 @@ function CardsStats({
   onNavigate?: (r: Resource) => void;
 }) {
   const { raw, loading } = useTransactions(mobile, currentMonthParams());
-  const findTotal = (obj: unknown): number | null => {
+  const findKey = (obj: unknown, key: string): number | null => {
     if (!obj || typeof obj !== "object") return null;
     const o = obj as Record<string, unknown>;
-    if (o.totalTransactionAmount != null) return Number(o.totalTransactionAmount) || 0;
+    if (o[key] != null) return Number(o[key]) || 0;
     for (const v of Object.values(o)) {
-      const r = findTotal(v);
+      const r = findKey(v, key);
       if (r != null) return r;
     }
     return null;
   };
-  const total = findTotal(raw) ?? 0;
+  const total = findKey(raw, "totalTransactionAmount") ?? 0;
+  const cardsUsed = findKey(raw, "totalCardsUsed") ?? 0;
 
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -443,7 +444,7 @@ function CardsStats({
       <StatTile
         label="Recent Rashans"
         value={`Rs. ${total.toLocaleString("en-PK")}`}
-        hint="This month"
+        hint={`${cardsUsed} cards used · this month`}
         loading={loading}
         onClick={() => onNavigate?.("transactions")}
       />
