@@ -430,10 +430,7 @@ function RecentRashans({ mobile, onViewAll }: { mobile: string; onViewAll?: () =
   const { items, loading, error } = useTransactions(mobile);
 
   const now = new Date();
-  const monthItems = items.filter((it) => {
-    const d = getItemDate(it);
-    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-  });
+  const monthItems = items.filter(isItemThisMonth);
   const monthLabel = now.toLocaleString(undefined, { month: "long" });
 
   const latest = [...items]
