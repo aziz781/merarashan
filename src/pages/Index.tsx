@@ -452,11 +452,30 @@ function CardsStats({
   );
 }
 
-function RecentRashans({ mobile, onViewAll }: { mobile: string; onViewAll?: () => void }) {
-  const { items, loading, error } = useTransactions(mobile, currentMonthParams());
+function RecentRashans({
+  mobile,
+  onViewAll,
+  totalCards,
+}: {
+  mobile: string;
+  onViewAll?: () => void;
+  totalCards?: number;
+}) {
+  const { items, raw, loading, error } = useTransactions(mobile, currentMonthParams());
+
+  const findKey = (obj: unknown, key: string): number | null => {
+    if (!obj || typeof obj !== "object") return null;
+    const o = obj as Record<string, unknown>;
+    if (o[key] != null) return Number(o[key]) || 0;
+    for (const v of Object.values(o)) {
+      const r = findKey(v, key);
+      if (r != null) return r;
+    }
+    return null;
+  };
+  const cardsUsed = findKey(raw, "totalCardsUsed") ?? 0;
 
   const now = new Date();
-  const monthItems = items;
   const monthLabel = now.toLocaleString(undefined, { month: "long" });
 
   const latest = [...items]
@@ -472,7 +491,7 @@ function RecentRashans({ mobile, onViewAll }: { mobile: string; onViewAll?: () =
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <span className="inline-flex items-center rounded-full bg-primary/10 text-primary text-xs font-semibold px-2 py-0.5">
-            {monthItems.length} total
+            <span className="font-bold">{cardsUsed}</span>&nbsp;of {totalCards ?? 0} cards
           </span>
           <button
             type="button"
