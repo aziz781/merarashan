@@ -657,7 +657,11 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
               message={String(data.msg)}
             />
           )}
-          <RecentRashans mobile={mobile} onViewAll={() => onNavigate?.("transactions")} />
+          <RecentRashans
+            mobile={mobile}
+            totalCards={Number(data.active_cards) || 0}
+            onViewAll={() => onNavigate?.("transactions")}
+          />
         </>
       )}
     </div>
