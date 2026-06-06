@@ -440,10 +440,10 @@ function CardsStats({
 }
 
 function RecentRashans({ mobile, onViewAll }: { mobile: string; onViewAll?: () => void }) {
-  const { items, loading, error } = useTransactions(mobile);
+  const { items, loading, error } = useTransactions(mobile, currentMonthParams());
 
   const now = new Date();
-  const monthItems = items.filter(isItemThisMonth);
+  const monthItems = items;
   const monthLabel = now.toLocaleString(undefined, { month: "long" });
 
   const latest = [...items]
