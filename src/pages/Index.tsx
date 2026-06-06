@@ -353,6 +353,20 @@ function isThisMonth(d: Date): boolean {
   return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
 }
 
+function isItemThisMonth(item: Record<string, unknown>): boolean {
+  if (isThisMonth(getItemDate(item))) return true;
+  // Fallback: string match on month_year like "Jun 2026" / "June 2026" / "06/2026"
+  const now = new Date();
+  const yr = String(now.getFullYear());
+  const short = now.toLocaleString("en-US", { month: "short" }).toLowerCase();
+  const long = now.toLocaleString("en-US", { month: "long" }).toLowerCase();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const my = String(item.month_year ?? "").toLowerCase();
+  if (!my) return false;
+  if (!my.includes(yr)) return false;
+  return my.includes(short) || my.includes(long) || my.includes(`${mm}/`) || my.includes(`-${mm}-`) || my.includes(`/${mm}`);
+}
+
 function StatTile({
   label,
   value,
