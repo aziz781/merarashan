@@ -330,9 +330,41 @@ function useTransactions(mobile: string) {
 }
 
 function getItemDate(item: Record<string, unknown>): Date {
-  return new Date(
-    String(item.created_at ?? item.date ?? item.txn_date ?? item.valid_from ?? 0),
-  );
+  const candidates = [
+    item.created_at,
+    item.date,
+    item.txn_date,
+    item.valid_from,
+    item.payment_datetime,
+    item.datetime_display,
+    item.month_year,
+  ];
+  for (const c of candidates) {
+    if (c == null || c === "") continue;
+    const d = new Date(String(c));
+    if (!isNaN(d.getTime())) return d;
+  }
+  return new Date(NaN);
+}
+
+function isThisMonth(d: Date): boolean {
+  if (isNaN(d.getTime())) return false;
+  const now = new Date();
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+}
+
+function isItemThisMonth(item: Record<string, unknown>): boolean {
+  if (isThisMonth(getItemDate(item))) return true;
+  // Fallback: string match on month_year like "Jun 2026" / "June 2026" / "06/2026"
+  const now = new Date();
+  const yr = String(now.getFullYear());
+  const short = now.toLocaleString("en-US", { month: "short" }).toLowerCase();
+  const long = now.toLocaleString("en-US", { month: "long" }).toLowerCase();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const my = String(item.month_year ?? "").toLowerCase();
+  if (!my) return false;
+  if (!my.includes(yr)) return false;
+  return my.includes(short) || my.includes(long) || my.includes(`${mm}/`) || my.includes(`-${mm}-`) || my.includes(`/${mm}`);
 }
 
 function StatTile({
@@ -373,11 +405,7 @@ function CardsStats({
   onNavigate?: (r: Resource) => void;
 }) {
   const { items, loading } = useTransactions(mobile);
-  const now = new Date();
-  const monthCount = items.filter((it) => {
-    const d = getItemDate(it);
-    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-  }).length;
+  const monthCount = items.filter(isItemThisMonth).length;
 
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -402,10 +430,7 @@ function RecentRashans({ mobile, onViewAll }: { mobile: string; onViewAll?: () =
   const { items, loading, error } = useTransactions(mobile);
 
   const now = new Date();
-  const monthItems = items.filter((it) => {
-    const d = getItemDate(it);
-    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-  });
+  const monthItems = items.filter(isItemThisMonth);
   const monthLabel = now.toLocaleString(undefined, { month: "long" });
 
   const latest = [...items]
