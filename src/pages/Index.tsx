@@ -1297,36 +1297,54 @@ const Index = () => {
         className="px-5 pt-10 pb-6 text-primary-foreground"
         style={{ background: "var(--gradient-primary)" }}
       >
-        <div className="flex items-start justify-between">
-          <div>
-            <button
-              type="button"
-              onClick={() => setProfileOpen(true)}
-              className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-md"
-              aria-label="Open profile"
+        <div className="flex items-start justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setProfileOpen(true)}
+            className="flex items-center gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-full pr-2"
+            aria-label="Open profile"
+          >
+            <span
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground text-sm font-semibold ring-1 ring-white/25"
+              aria-hidden
             >
+              {String(displayName)
+                .replace(/^\+/, "")
+                .split(/\s+/)
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((s) => s[0])
+                .join("")
+                .toUpperCase() || "U"}
+            </span>
+            <div className="min-w-0">
               {profileData?.payer_id && (
-                <p className="text-xs opacity-75">{String(profileData.payer_id)}</p>
+                <p className="text-xs opacity-75 leading-tight">{String(profileData.payer_id)}</p>
               )}
-              <h1 className="text-2xl font-bold hover:underline underline-offset-4 flex items-center gap-2">
-                {String(displayName)}
-                {profileData && (
-                  <span title={isActive ? "Active" : "Inactive"}>
-                    {isActive ? (
-                      <CheckCircle2 className="w-5 h-5 text-green-400" />
-                    ) : (
-                      <X className="w-5 h-5 text-red-400" />
-                    )}
-                  </span>
-                )}
-              </h1>
-            </button>
-          </div>
+              <h1 className="text-xl font-bold leading-tight truncate">{String(displayName)}</h1>
+              {profileData && (
+                <span
+                  className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                    isActive
+                      ? "bg-green-400/20 text-green-50 ring-1 ring-green-300/40"
+                      : "bg-red-400/20 text-red-50 ring-1 ring-red-300/40"
+                  }`}
+                >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      isActive ? "bg-green-300" : "bg-red-300"
+                    }`}
+                  />
+                  {isActive ? "Active" : "Inactive"}
+                </span>
+              )}
+            </div>
+          </button>
           <Button
             variant="ghost"
             size="icon"
             onClick={handleLogout}
-            className="text-primary-foreground hover:bg-white/10"
+            className="text-primary-foreground hover:bg-white/10 shrink-0"
             aria-label="Log out"
           >
             <LogOut className="w-5 h-5" />
