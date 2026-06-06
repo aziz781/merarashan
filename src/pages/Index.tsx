@@ -306,7 +306,7 @@ function ResourceView({ resource, mobile, onNavigate }: { resource: Resource; mo
 
 function useTransactions(
   mobile: string,
-  params?: Record<string, string | number | undefined>,
+  params?: Record<string, string>,
 ) {
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
