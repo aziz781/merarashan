@@ -444,7 +444,7 @@ function CardsStats({
       <StatTile
         label="Recent Rashans"
         value={`Rs. ${total.toLocaleString("en-PK")}`}
-        hint={`${cardsUsed} cards used · this month`}
+        hint={<><span className="font-bold text-primary">{cardsUsed}</span> cards used · this month</>}
         loading={loading}
         onClick={() => onNavigate?.("transactions")}
       />
