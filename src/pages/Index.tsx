@@ -304,16 +304,20 @@ function ResourceView({ resource, mobile, onNavigate }: { resource: Resource; mo
   return <GenericResourceView resource={resource} mobile={mobile} />;
 }
 
-function useTransactions(mobile: string) {
+function useTransactions(
+  mobile: string,
+  params?: Record<string, string>,
+) {
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const paramsKey = JSON.stringify(params ?? {});
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetchResource("transactions", mobile)
+    fetchResource("transactions", mobile, params)
       .then((d) => {
         if (cancelled) return;
         const list = (extractItems(d) ?? []) as Record<string, unknown>[];
@@ -324,9 +328,18 @@ function useTransactions(mobile: string) {
     return () => {
       cancelled = true;
     };
-  }, [mobile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mobile, paramsKey]);
 
   return { items, loading, error };
+}
+
+function currentMonthParams() {
+  const now = new Date();
+  return {
+    month: String(now.getMonth() + 1).padStart(2, "0"),
+    year: String(now.getFullYear()),
+  };
 }
 
 function getItemDate(item: Record<string, unknown>): Date {
@@ -404,8 +417,8 @@ function CardsStats({
   mobile: string;
   onNavigate?: (r: Resource) => void;
 }) {
-  const { items, loading } = useTransactions(mobile);
-  const monthCount = items.filter(isItemThisMonth).length;
+  const { items, loading } = useTransactions(mobile, currentMonthParams());
+  const monthCount = items.length;
 
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -427,10 +440,10 @@ function CardsStats({
 }
 
 function RecentRashans({ mobile, onViewAll }: { mobile: string; onViewAll?: () => void }) {
-  const { items, loading, error } = useTransactions(mobile);
+  const { items, loading, error } = useTransactions(mobile, currentMonthParams());
 
   const now = new Date();
-  const monthItems = items.filter(isItemThisMonth);
+  const monthItems = items;
   const monthLabel = now.toLocaleString(undefined, { month: "long" });
 
   const latest = [...items]
