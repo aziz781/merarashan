@@ -309,6 +309,7 @@ function useTransactions(
   params?: Record<string, string>,
 ) {
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
+  const [raw, setRaw] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const paramsKey = JSON.stringify(params ?? {});
@@ -322,6 +323,7 @@ function useTransactions(
         if (cancelled) return;
         const list = (extractItems(d) ?? []) as Record<string, unknown>[];
         setItems(list);
+        setRaw((d as Record<string, unknown>) ?? null);
       })
       .catch((e) => !cancelled && setError(e.message))
       .finally(() => !cancelled && setLoading(false));
@@ -331,7 +333,7 @@ function useTransactions(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mobile, paramsKey]);
 
-  return { items, loading, error };
+  return { items, raw, loading, error };
 }
 
 function currentMonthParams() {
@@ -417,8 +419,18 @@ function CardsStats({
   mobile: string;
   onNavigate?: (r: Resource) => void;
 }) {
-  const { items, loading } = useTransactions(mobile, currentMonthParams());
-  const monthCount = items.length;
+  const { raw, loading } = useTransactions(mobile, currentMonthParams());
+  const findTotal = (obj: unknown): number | null => {
+    if (!obj || typeof obj !== "object") return null;
+    const o = obj as Record<string, unknown>;
+    if (o.totalTransactionAmount != null) return Number(o.totalTransactionAmount) || 0;
+    for (const v of Object.values(o)) {
+      const r = findTotal(v);
+      if (r != null) return r;
+    }
+    return null;
+  };
+  const total = findTotal(raw) ?? 0;
 
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -430,7 +442,7 @@ function CardsStats({
       />
       <StatTile
         label="Recent Rashans"
-        value={monthCount}
+        value={`Rs. ${total.toLocaleString("en-PK")}`}
         hint="This month"
         loading={loading}
         onClick={() => onNavigate?.("transactions")}
