@@ -417,8 +417,8 @@ function CardsStats({
   mobile: string;
   onNavigate?: (r: Resource) => void;
 }) {
-  const { items, loading } = useTransactions(mobile);
-  const monthCount = items.filter(isItemThisMonth).length;
+  const { items, loading } = useTransactions(mobile, currentMonthParams());
+  const monthCount = items.length;
 
   return (
     <div className="grid grid-cols-2 gap-3">
