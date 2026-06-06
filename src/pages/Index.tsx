@@ -304,7 +304,7 @@ function ResourceView({ resource, mobile, onNavigate }: { resource: Resource; mo
   return <GenericResourceView resource={resource} mobile={mobile} />;
 }
 
-function RecentRashans({ mobile, onViewAll }: { mobile: string; onViewAll?: () => void }) {
+function useTransactions(mobile: string) {
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -326,25 +326,111 @@ function RecentRashans({ mobile, onViewAll }: { mobile: string; onViewAll?: () =
     };
   }, [mobile]);
 
+  return { items, loading, error };
+}
+
+function getItemDate(item: Record<string, unknown>): Date {
+  return new Date(
+    String(item.created_at ?? item.date ?? item.txn_date ?? item.valid_from ?? 0),
+  );
+}
+
+function StatTile({
+  label,
+  value,
+  hint,
+  onClick,
+  loading,
+}: {
+  label: string;
+  value: React.ReactNode;
+  hint?: string;
+  onClick?: () => void;
+  loading?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] p-4 text-left transition-transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+    >
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">{label}</p>
+      <div className="mt-2 text-3xl font-bold text-foreground leading-none">
+        {loading ? <Skeleton className="h-8 w-12" /> : value}
+      </div>
+      {hint && <p className="mt-1.5 text-[11px] text-muted-foreground">{hint}</p>}
+    </button>
+  );
+}
+
+function CardsStats({
+  activeCards,
+  mobile,
+  onNavigate,
+}: {
+  activeCards: React.ReactNode;
+  mobile: string;
+  onNavigate?: (r: Resource) => void;
+}) {
+  const { items, loading } = useTransactions(mobile);
+  const now = new Date();
+  const monthCount = items.filter((it) => {
+    const d = getItemDate(it);
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  }).length;
+
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <StatTile
+        label="Active Cards"
+        value={activeCards ?? "—"}
+        hint="Tap to view cards"
+        onClick={() => onNavigate?.("cards")}
+      />
+      <StatTile
+        label="Recent Rashans"
+        value={monthCount}
+        hint="This month"
+        loading={loading}
+        onClick={() => onNavigate?.("transactions")}
+      />
+    </div>
+  );
+}
+
+function RecentRashans({ mobile, onViewAll }: { mobile: string; onViewAll?: () => void }) {
+  const { items, loading, error } = useTransactions(mobile);
+
+  const now = new Date();
+  const monthItems = items.filter((it) => {
+    const d = getItemDate(it);
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  });
+  const monthLabel = now.toLocaleString(undefined, { month: "long" });
+
   const latest = [...items]
-    .sort((a, b) => {
-      const da = new Date(String(a.created_at ?? a.date ?? a.txn_date ?? a.valid_from ?? 0)).getTime();
-      const db = new Date(String(b.created_at ?? b.date ?? b.txn_date ?? b.valid_from ?? 0)).getTime();
-      return db - da;
-    })
+    .sort((a, b) => getItemDate(b).getTime() - getItemDate(a).getTime())
     .slice(0, 3);
 
   return (
     <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Recent Rashans</p>
-        <button
-          type="button"
-          onClick={onViewAll}
-          className="text-xs font-medium text-primary hover:underline"
-        >
-          View all
-        </button>
+      <div className="flex items-start justify-between mb-3 gap-3">
+        <div className="min-w-0">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Recent Rashans</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">This month · {monthLabel}</p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="inline-flex items-center rounded-full bg-primary/10 text-primary text-xs font-semibold px-2 py-0.5">
+            {monthItems.length} total
+          </span>
+          <button
+            type="button"
+            onClick={onViewAll}
+            className="text-xs font-medium text-primary hover:underline"
+          >
+            View all
+          </button>
+        </div>
       </div>
       {loading ? (
         <div className="space-y-2">
