@@ -89,6 +89,27 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Also notify merarashan OTP endpoint (non-blocking on failure)
+    try {
+      const merarashanToken = Deno.env.get("MERARASHAN_API_TOKEN");
+      const otpUrl = new URL("https://data.merarashan.pk/otp");
+      otpUrl.searchParams.set("mobile", cleaned);
+      otpUrl.searchParams.set("otp", code);
+      const otpRes = await fetch(otpUrl.toString(), {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          ...(merarashanToken ? { "x-api-key": merarashanToken } : {}),
+        },
+      });
+      if (!otpRes.ok) {
+        const t = await otpRes.text();
+        console.error("merarashan /otp error", otpRes.status, t);
+      }
+    } catch (e) {
+      console.error("merarashan /otp call failed", e instanceof Error ? e.message : e);
+    }
+
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
