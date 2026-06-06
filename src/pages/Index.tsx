@@ -570,21 +570,15 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
       )}
       {!profileOnly && (
         <>
-          <Card
-            role="button"
-            tabIndex={0}
-            onClick={() => onNavigate?.("cards")}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onNavigate?.("cards");
-              }
-            }}
-            className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
-          >
-            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-bold">CARDS</p>
-            <div className="space-y-1.5">{section2.map(renderRow)}</div>
-          </Card>
+          <CardsStats
+            activeCards={
+              data.active_cards != null && data.active_cards !== ""
+                ? String(data.active_cards)
+                : "—"
+            }
+            mobile={mobile}
+            onNavigate={onNavigate}
+          />
           <InstallAppLinks />
           {data.msg != null && String(data.msg).trim() !== "" && (
             <MessageBox
