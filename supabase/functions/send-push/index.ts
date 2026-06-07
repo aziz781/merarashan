@@ -75,19 +75,18 @@ Deno.serve(async (req) => {
       )
     );
 
-    // Cleanup gone/expired (404/410) and VAPID-mismatch (403) subscriptions.
+    // Cleanup gone/expired (404/410) and VAPID-mismatch (403, or Apple's 400
+    // with VapidPkHashMismatch) subscriptions.
     const stale: string[] = [];
     results.forEach((r, i) => {
       if (r.status === "rejected") {
-        const reason = r.reason as { statusCode?: number; body?: string; message?: string };
-        console.log("push rejected", {
-          endpoint: subs[i].endpoint.slice(0, 60),
-          status: reason?.statusCode,
-          body: reason?.body,
-          message: reason?.message,
-        });
+        const reason = r.reason as { statusCode?: number; body?: string };
         const status = reason?.statusCode;
-        if (status === 404 || status === 410 || status === 403) stale.push(subs[i].endpoint);
+        const body = reason?.body || "";
+        const vapidMismatch = body.includes("VapidPkHashMismatch");
+        if (status === 404 || status === 410 || status === 403 || vapidMismatch) {
+          stale.push(subs[i].endpoint);
+        }
       }
     });
     if (stale.length > 0) {
