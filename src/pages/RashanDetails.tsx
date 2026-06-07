@@ -119,7 +119,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     timeKey: "",
     statusKey: "code_status",
     detailKey: "registered_business_number",
-    detailPrefix: "at Karyana Store",
+    detailPrefix: "Redeemed at Karyana Store",
   },
   {
     label: "Collected",
@@ -127,7 +127,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     timeKey: "",
     statusKey: "things_status",
     detailKey: "registered_business_number",
-    detailPrefix: "Karyana Store",
+    detailPrefix: "Collected at Karyana Store",
   },
   {
     label: "Payment",
@@ -135,7 +135,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     timeKey: "",
     statusKey: "payment_status",
     detailKey: "payment_method",
-    detailPrefix: "Karyana Store ({registered_business_number}) in",
+    detailPrefix: "Paid, Karyana Store ({registered_business_number}) in",
     detailSuffixKey: "payment_account",
     detailSuffixLabel: "account",
   },
