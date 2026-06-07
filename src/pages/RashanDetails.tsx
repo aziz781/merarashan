@@ -129,7 +129,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     detailSuffixLabel: "account",
   },
   {
-    label: "Delivered",
+    label: "Completed",
     dateKey: "",
     timeKey: "",
     statusKey: "payment_status",
