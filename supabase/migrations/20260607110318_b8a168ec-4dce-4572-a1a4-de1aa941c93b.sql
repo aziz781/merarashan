@@ -1,0 +1,1 @@
+CREATE POLICY "Service role full access" ON public.otp_codes FOR ALL TO service_role USING (true) WITH CHECK (true);
