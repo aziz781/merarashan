@@ -456,7 +456,7 @@ function CardsStats({
         value={cardsUsed ?? "—"}
         hint={
           <>
-            of {Number(activeCards) || 0} cards in {new Date().toLocaleString(undefined, { month: "long" })}
+            of {Number(activeCards) || 0} Rashan cards in {new Date().toLocaleString(undefined, { month: "long" })}
           </>
         }
         onClick={() => onNavigate?.("cards")}
