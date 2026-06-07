@@ -416,7 +416,7 @@ function StatTile({
     <button
       type="button"
       onClick={onClick}
-      className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] p-4 text-left transition-transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+      className="group relative w-full overflow-hidden rounded-2xl border border-border/50 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] p-4 text-left transition-transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
     >
       <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">{label}</p>
       <div className="mt-2 text-3xl font-bold text-foreground leading-none">
