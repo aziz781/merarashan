@@ -1,5 +1,15 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Receipt, CreditCard, Calendar, Tag, MessageSquare, TicketPercent, ShoppingBag, Check } from "lucide-react";
+import {
+  ArrowLeft,
+  Receipt,
+  CreditCard,
+  Calendar,
+  Tag,
+  MessageSquare,
+  TicketPercent,
+  ShoppingBag,
+  Check,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,13 +27,16 @@ const CATEGORIES: {
     id: "status",
     title: "RASHAN",
     icon: Tag,
-    match: (k) => k === "datetime_display" || (/(status|state|delivered|pending)/i.test(k) && !/(payment_status|code_status)/i.test(k)),
+    match: (k) =>
+      k === "datetime_display" ||
+      (/(status|state|delivered|pending)/i.test(k) && !/(payment_status|code_status)/i.test(k)),
   },
   {
     id: "card",
     title: "Card",
     icon: CreditCard,
-    match: (k) => /(rc_num|card|cm_|amount|price|gross|net|fee|discount|paid|balance)/i.test(k) && !/(charge|total)/i.test(k),
+    match: (k) =>
+      /(rc_num|card|cm_|amount|price|gross|net|fee|discount|paid|balance)/i.test(k) && !/(charge|total)/i.test(k),
   },
   {
     id: "dates",
@@ -73,9 +86,7 @@ function formatValue(key: string, raw: unknown): React.ReactNode {
 
 function humanizeKey(k: string) {
   if (k === "things_status") return "Status";
-  return k
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return k.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 type TimelineStep = {
@@ -116,7 +127,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     timeKey: "",
     statusKey: "things_status",
     detailKey: "registered_business_number",
-    detailPrefix: "at Karyana Store",
+    detailPrefix: "Karyana Store",
   },
   {
     label: "Payment",
@@ -124,7 +135,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     timeKey: "",
     statusKey: "payment_status",
     detailKey: "payment_method",
-    detailPrefix: "Karyana Store ({registered_business_number}) paid in",
+    detailPrefix: "Karyana Store ({registered_business_number}) in",
     detailSuffixKey: "payment_account",
     detailSuffixLabel: "account",
   },
@@ -164,7 +175,11 @@ function UpdatesTimeline({ item }: { item: Item }) {
         const isLast = idx === arr.length - 1;
         const lower = statusVal.toLowerCase();
         const variant: "default" | "destructive" | "outline" =
-          lower === "delivered" || lower === "paid" || lower === "completed" || lower === "accepted" || lower === "confirmed"
+          lower === "delivered" ||
+          lower === "paid" ||
+          lower === "completed" ||
+          lower === "accepted" ||
+          lower === "confirmed"
             ? "default"
             : lower === "not_paid" || lower === "not_delivered" || lower === "cancelled" || lower === "rejected"
               ? "destructive"
@@ -184,47 +199,60 @@ function UpdatesTimeline({ item }: { item: Item }) {
                 step.label === "Completed" && done
                   ? "border-emerald-700 bg-emerald-700"
                   : done
-                      ? "border-primary bg-primary"
-                      : "border-border bg-background"
+                    ? "border-primary bg-primary"
+                    : "border-border bg-background"
               }`}
             >
-            {step.label === "Completed" && done ? (
-              <Check className="h-3 w-3 text-white" />
-            ) : done ? (
-              <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
-            ) : null}
+              {step.label === "Completed" && done ? (
+                <Check className="h-3 w-3 text-white" />
+              ) : done ? (
+                <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
+              ) : null}
             </span>
             <div className="flex items-start justify-between gap-3">
               <p className={`text-sm font-medium ${done ? "text-foreground" : "text-muted-foreground"}`}>
                 {step.label}
               </p>
             </div>
-            {(date || time) && ((step.statusKey !== "things_status" && step.statusKey !== "code_status" && step.statusKey !== "payment_status") || (step.statusKey === "payment_status" ? statusVal.toUpperCase() === "PAID" : get("things_status").toLowerCase() === "delivered")) && (
-              <p className="mt-1 text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5">
-                {date && <span>📅 {date}</span>}
-                {time && <span>🕒 {time}</span>}
-              </p>
-            )}
-            {detail && step.detailPrefix && (step.statusKey === "things_status" ? statusVal.toLowerCase() === "delivered" : (date || time)) && (
-              <p className="mt-1 text-xs text-muted-foreground flex items-start gap-1.5">
-                {step.detailConnector?.toLowerCase().includes("sms") && (
-                  <MessageSquare className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
-                )}
-                {step.statusKey === "code_status" && (
-                  <TicketPercent className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
-                )}
-                {step.statusKey === "things_status" && (
-                  <ShoppingBag className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
-                )}
-                {step.statusKey === "payment_status" && (
-                  <Receipt className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
-                )}
-                <span>
-                  {step.detailPrefix.replace(/\{(\w+)\}/g, (_, key) => get(key))} {step.detailCodeKey && `(${get(step.detailCodeKey)})`} {step.detailConnector && `${step.detailConnector} `}{detail}
-                  {step.detailSuffixKey && step.detailSuffixLabel && ` ${step.detailSuffixLabel} (${get(step.detailSuffixKey)})`}
-                </span>
-              </p>
-            )}
+            {(date || time) &&
+              ((step.statusKey !== "things_status" &&
+                step.statusKey !== "code_status" &&
+                step.statusKey !== "payment_status") ||
+                (step.statusKey === "payment_status"
+                  ? statusVal.toUpperCase() === "PAID"
+                  : get("things_status").toLowerCase() === "delivered")) && (
+                <p className="mt-1 text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5">
+                  {date && <span>📅 {date}</span>}
+                  {time && <span>🕒 {time}</span>}
+                </p>
+              )}
+            {detail &&
+              step.detailPrefix &&
+              (step.statusKey === "things_status" ? statusVal.toLowerCase() === "delivered" : date || time) && (
+                <p className="mt-1 text-xs text-muted-foreground flex items-start gap-1.5">
+                  {step.detailConnector?.toLowerCase().includes("sms") && (
+                    <MessageSquare className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
+                  )}
+                  {step.statusKey === "code_status" && (
+                    <TicketPercent className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
+                  )}
+                  {step.statusKey === "things_status" && (
+                    <ShoppingBag className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
+                  )}
+                  {step.statusKey === "payment_status" && (
+                    <Receipt className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
+                  )}
+                  <span>
+                    {step.detailPrefix.replace(/\{(\w+)\}/g, (_, key) => get(key))}{" "}
+                    {step.detailCodeKey && `(${get(step.detailCodeKey)})`}{" "}
+                    {step.detailConnector && `${step.detailConnector} `}
+                    {detail}
+                    {step.detailSuffixKey &&
+                      step.detailSuffixLabel &&
+                      ` ${step.detailSuffixLabel} (${get(step.detailSuffixKey)})`}
+                  </span>
+                </p>
+              )}
           </li>
         );
       })}
@@ -240,7 +268,9 @@ const RashanDetails = () => {
   const goBack = () => {
     try {
       sessionStorage.setItem("activeTab", origin === "rashans" ? "transactions" : "customers");
-    } catch (_) { /* ignore */ }
+    } catch (_) {
+      /* ignore */
+    }
     navigate("/");
   };
 
@@ -251,17 +281,13 @@ const RashanDetails = () => {
           <ArrowLeft className="w-4 h-4 mr-1" /> Back
         </Button>
         <Card className="p-5">
-          <p className="text-sm text-muted-foreground">
-            No rashan data. Open this page from the rashans list.
-          </p>
+          <p className="text-sm text-muted-foreground">No rashan data. Open this page from the rashans list.</p>
         </Card>
       </div>
     );
   }
 
-  const entries = Object.entries(item).filter(
-    ([, v]) => v !== undefined && typeof v !== "object",
-  );
+  const entries = Object.entries(item).filter(([, v]) => v !== undefined && typeof v !== "object");
 
   const used = new Set<string>();
   const grouped = CATEGORIES.map((c) => {
@@ -288,21 +314,14 @@ const RashanDetails = () => {
     return { ...c, rows };
   }).filter((g) => g.rows.length > 0);
 
-
   const title =
-    (item.code_user_name as string) ||
-    (item.person_name as string) ||
-    (item.month_year as string) ||
-    "Rashan Details";
+    (item.code_user_name as string) || (item.person_name as string) || (item.month_year as string) || "Rashan Details";
 
   const subtitle = (item.month_year as string) || "";
 
   return (
     <div className="min-h-screen pb-16">
-      <header
-        className="px-5 pt-10 pb-6 text-primary-foreground"
-        style={{ background: "var(--gradient-primary)" }}
-      >
+      <header className="px-5 pt-10 pb-6 text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
         <Button
           variant="ghost"
           size="sm"
@@ -323,15 +342,10 @@ const RashanDetails = () => {
 
       <main className="px-5 -mt-3 space-y-4">
         {grouped.map(({ id, title, icon: Icon, rows }) => (
-          <Card
-            key={id}
-            className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50"
-          >
+          <Card key={id} className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
             <div className="flex items-center gap-2 mb-3">
               <Icon className="w-4 h-4 text-primary" />
-              <p className="text-xs uppercase tracking-wider text-muted-foreground font-bold">
-                {title}
-              </p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground font-bold">{title}</p>
             </div>
             {id === "dates" ? (
               <UpdatesTimeline item={item} />
@@ -342,15 +356,10 @@ const RashanDetails = () => {
                     key={k}
                     className="flex justify-between gap-3 text-sm items-center border-b border-border/40 py-1.5 last:border-0"
                   >
-                    {k === "rc_num" || k.toLowerCase() === "amount"
-                      ? null
-                      : k === "datetime_display"
-                        ? null
-                        : humanizeKey(k).toLowerCase() === "status"
-                          ? null
-                          : (
-                            <span className="text-muted-foreground">{humanizeKey(k)}</span>
-                          )}
+                    {k === "rc_num" || k.toLowerCase() === "amount" ? null : k ===
+                      "datetime_display" ? null : humanizeKey(k).toLowerCase() === "status" ? null : (
+                      <span className="text-muted-foreground">{humanizeKey(k)}</span>
+                    )}
                     {(() => {
                       const cd = item.confirm_datetime;
                       const empty = cd == null || String(cd).trim() === "" || String(cd).trim().toUpperCase() === "N/A";
@@ -368,9 +377,9 @@ const RashanDetails = () => {
                               : "text-foreground";
                       return (
                         <span className={`font-medium text-right break-all ml-auto ${colorCls}`}>
-                      {showExpired
-                        ? `Rashan code is expired as not used by ${item.valid_to || "—"}.`
-                        : showPlaceholder
+                          {showExpired
+                            ? `Rashan code is expired as not used by ${item.valid_to || "—"}.`
+                            : showPlaceholder
                               ? `Rashan code has not been used yet. Use by ${item.valid_to || "—"}`
                               : formatValue(k, v)}
                         </span>
