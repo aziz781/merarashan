@@ -452,7 +452,7 @@ function CardsStats({
   return (
     <div className="grid grid-cols-2 gap-3">
       <StatTile
-        label={`Used Cards`}
+        label={`Cards Used`}
         value={cardsUsed ?? "—"}
         hint={
           <>
