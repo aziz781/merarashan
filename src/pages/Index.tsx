@@ -489,7 +489,7 @@ function CurrentYearStat({
   onNavigate?: (r: Resource) => void;
 }) {
   const year = String(new Date().getFullYear());
-  const { raw, loading } = useTransactions(mobile, { year });
+  const { raw, loading } = useTransactions(mobile, { monthYear: year });
   const findKey = (obj: unknown, key: string): number | null => {
     if (!obj || typeof obj !== "object") return null;
     const o = obj as Record<string, unknown>;
