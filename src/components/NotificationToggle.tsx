@@ -3,7 +3,13 @@ import { Bell, BellOff } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { disablePush, enablePush, getCurrentSubscription, pushSupported } from "@/lib/push";
+import {
+  disablePush,
+  enablePush,
+  getCurrentSubscription,
+  pushSupported,
+  syncPushSubscription,
+} from "@/lib/push";
 
 export function NotificationToggle({ mobile }: { mobile: string }) {
   const [supported, setSupported] = useState(false);
@@ -13,10 +19,30 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
   useEffect(() => {
     setSupported(pushSupported());
     if (!pushSupported()) return;
-    getCurrentSubscription()
-      .then((s) => setEnabled(!!s && Notification.permission === "granted"))
-      .catch(() => setEnabled(false));
-  }, []);
+    let cancelled = false;
+    (async () => {
+      try {
+        const result = await syncPushSubscription(mobile);
+        if (cancelled) return;
+        if (result === "resubscribed") {
+          setEnabled(true);
+          toast.success("Notifications updated for this device");
+          return;
+        }
+      } catch (_) {
+        /* fall through to status check */
+      }
+      try {
+        const s = await getCurrentSubscription();
+        if (!cancelled) setEnabled(!!s && Notification.permission === "granted");
+      } catch {
+        if (!cancelled) setEnabled(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [mobile]);
 
   if (!supported) return null;
 
