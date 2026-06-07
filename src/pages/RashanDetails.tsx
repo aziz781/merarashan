@@ -103,7 +103,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     detailConnector: "sent in SMS at",
   },
   {
-    label: "Rashan Code Redeemed",
+    label: "Redeemed",
     dateKey: "accept_datetime",
     timeKey: "",
     statusKey: "code_status",
