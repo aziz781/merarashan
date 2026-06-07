@@ -79,7 +79,14 @@ Deno.serve(async (req) => {
     const stale: string[] = [];
     results.forEach((r, i) => {
       if (r.status === "rejected") {
-        const status = (r.reason as { statusCode?: number })?.statusCode;
+        const reason = r.reason as { statusCode?: number; body?: string; message?: string };
+        console.log("push rejected", {
+          endpoint: subs[i].endpoint.slice(0, 60),
+          status: reason?.statusCode,
+          body: reason?.body,
+          message: reason?.message,
+        });
+        const status = reason?.statusCode;
         if (status === 404 || status === 410 || status === 403) stale.push(subs[i].endpoint);
       }
     });
