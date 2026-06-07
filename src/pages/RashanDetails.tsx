@@ -94,7 +94,7 @@ type TimelineStep = {
 
 const TIMELINE_STEPS: TimelineStep[] = [
   {
-    label: "Rashan Code Issued",
+    label: "Rashan Code",
     dateKey: "created_date",
     timeKey: "created_time",
     detailKey: "userMobileNumber",
@@ -103,7 +103,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     detailConnector: "sent in SMS at",
   },
   {
-    label: "Rashan Code Redeemed",
+    label: "Redeemed",
     dateKey: "accept_datetime",
     timeKey: "",
     statusKey: "code_status",
@@ -111,7 +111,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     detailPrefix: "at Karyana Store",
   },
   {
-    label: "Rashan Delivered",
+    label: "Delivered",
     dateKey: "confirm_datetime",
     timeKey: "",
     statusKey: "things_status",
@@ -119,7 +119,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     detailPrefix: "at Karyana Store",
   },
   {
-    label: "Rashan Payment",
+    label: "Payment",
     dateKey: "payment_datetime",
     timeKey: "",
     statusKey: "payment_status",
@@ -129,7 +129,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     detailSuffixLabel: "account",
   },
   {
-    label: "Delivered",
+    label: "Completed",
     dateKey: "",
     timeKey: "",
     statusKey: "payment_status",
