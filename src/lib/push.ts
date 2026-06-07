@@ -21,6 +21,16 @@ function bufToBase64(buf: ArrayBuffer | null): string {
   return btoa(str);
 }
 
+function bufToBase64Url(buf: ArrayBuffer | null): string {
+  return bufToBase64(buf).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function subscriptionMatchesKey(sub: PushSubscription, vapidPublicKey: string): boolean {
+  const key = sub.options?.applicationServerKey;
+  if (!key) return false;
+  return bufToBase64Url(key) === vapidPublicKey.replace(/=+$/g, "");
+}
+
 export function pushSupported(): boolean {
   return (
     typeof window !== "undefined" &&
