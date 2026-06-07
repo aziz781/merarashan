@@ -1,7 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { Loader2, LogOut, CreditCard, ArrowLeftRight, User, FileText, Phone, FileDown, ExternalLink, Info, CheckCircle2, X, MessageCircle, AlertTriangle, LayoutGrid, List } from "lucide-react";
+import {
+  Loader2,
+  LogOut,
+  CreditCard,
+  ArrowLeftRight,
+  User,
+  FileText,
+  Phone,
+  FileDown,
+  ExternalLink,
+  Info,
+  CheckCircle2,
+  X,
+  MessageCircle,
+  AlertTriangle,
+  LayoutGrid,
+  List,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,9 +89,7 @@ function CardDetailsPopup({
 }) {
   if (!item) return null;
 
-  const entries = Object.entries(item).filter(
-    ([, v]) => v !== null && v !== "" && typeof v !== "object",
-  );
+  const entries = Object.entries(item).filter(([, v]) => v !== null && v !== "" && typeof v !== "object");
 
   const labelMap: Record<string, string> = {
     person_name: "Name",
@@ -135,18 +150,15 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-otp`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ mobile: m }),
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-      );
+        body: JSON.stringify({ mobile: m }),
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to send code");
       setStep("otp");
@@ -179,18 +191,15 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-otp`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ mobile, code }),
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-      );
+        body: JSON.stringify({ mobile, code }),
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Verification failed");
       if (!data?.token_hash) throw new Error("Missing session token");
@@ -210,11 +219,7 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
   return (
     <div className="min-h-screen flex items-center justify-center px-5">
       <Card className="w-full max-w-sm p-8 shadow-[var(--shadow-card)] border-0 bg-card/80 backdrop-blur">
-        <img
-          src={meraRashanLogo}
-          alt="Mera Rashan Card"
-          className="w-32 h-32 mx-auto mb-4 object-contain"
-        />
+        <img src={meraRashanLogo} alt="Mera Rashan Card" className="w-32 h-32 mx-auto mb-4 object-contain" />
         <h1 className="sr-only">Mera Rashan</h1>
         <p className="text-sm text-muted-foreground text-center mt-1 mb-6">
           {step === "mobile" ? "Sign in with your mobile number" : `Enter the code sent to ${mobile}`}
@@ -270,7 +275,11 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
               <button
                 type="button"
                 className="text-muted-foreground hover:text-foreground"
-                onClick={() => { setStep("mobile"); setCode(""); setError(null); }}
+                onClick={() => {
+                  setStep("mobile");
+                  setCode("");
+                  setError(null);
+                }}
                 disabled={loading}
               >
                 Change number
@@ -291,7 +300,15 @@ function Login({ onLogin }: { onLogin: (m: string) => void }) {
   );
 }
 
-function ResourceView({ resource, mobile, onNavigate }: { resource: Resource; mobile: string; onNavigate?: (r: Resource) => void }) {
+function ResourceView({
+  resource,
+  mobile,
+  onNavigate,
+}: {
+  resource: Resource;
+  mobile: string;
+  onNavigate?: (r: Resource) => void;
+}) {
   if (resource === "transactions") {
     return <RashansView mobile={mobile} />;
   }
@@ -304,10 +321,7 @@ function ResourceView({ resource, mobile, onNavigate }: { resource: Resource; mo
   return <GenericResourceView resource={resource} mobile={mobile} />;
 }
 
-function useTransactions(
-  mobile: string,
-  params?: Record<string, string>,
-) {
+function useTransactions(mobile: string, params?: Record<string, string>) {
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [raw, setRaw] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -379,7 +393,9 @@ function isItemThisMonth(item: Record<string, unknown>): boolean {
   const my = String(item.month_year ?? "").toLowerCase();
   if (!my) return false;
   if (!my.includes(yr)) return false;
-  return my.includes(short) || my.includes(long) || my.includes(`${mm}/`) || my.includes(`-${mm}-`) || my.includes(`/${mm}`);
+  return (
+    my.includes(short) || my.includes(long) || my.includes(`${mm}/`) || my.includes(`-${mm}-`) || my.includes(`/${mm}`)
+  );
 }
 
 function StatTile({
@@ -436,15 +452,24 @@ function CardsStats({
   return (
     <div className="grid grid-cols-2 gap-3">
       <StatTile
-        label={`Used Cards . ${new Date().toLocaleString(undefined, { month: "long" })}`}
+        label={`Used Cards`}
         value={cardsUsed ?? "—"}
-        hint={<>of {Number(activeCards) || 0} cards in {new Date().toLocaleString(undefined, { month: "long" })}</>}
+        hint={
+          <>
+            of {Number(activeCards) || 0} cards in {new Date().toLocaleString(undefined, { month: "long" })}
+          </>
+        }
         onClick={() => onNavigate?.("cards")}
       />
       <StatTile
         label="Current Month"
         value={`Rs. ${total.toLocaleString("en-PK")}`}
-        hint={<><span className="font-bold text-primary">{cardsUsed}</span> of {Number(activeCards) || 0} cards · amount · {new Date().toLocaleString(undefined, { month: "long" })}</>}
+        hint={
+          <>
+            <span className="font-bold text-primary">{cardsUsed}</span> of {Number(activeCards) || 0} cards · amount ·{" "}
+            {new Date().toLocaleString(undefined, { month: "long" })}
+          </>
+        }
         loading={loading}
         onClick={() => onNavigate?.("transactions")}
       />
@@ -478,9 +503,7 @@ function RecentRashans({
   const now = new Date();
   const monthLabel = now.toLocaleString(undefined, { month: "long" });
 
-  const latest = [...items]
-    .sort((a, b) => getItemDate(b).getTime() - getItemDate(a).getTime())
-    .slice(0, 3);
+  const latest = [...items].sort((a, b) => getItemDate(b).getTime() - getItemDate(a).getTime()).slice(0, 3);
 
   return (
     <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
@@ -493,11 +516,7 @@ function RecentRashans({
           <span className="inline-flex items-center rounded-full bg-primary/10 text-primary text-xs font-semibold px-2 py-0.5">
             <span className="font-bold">{cardsUsed}</span>&nbsp;of {totalCards ?? 0} cards used
           </span>
-          <button
-            type="button"
-            onClick={onViewAll}
-            className="text-xs font-medium text-primary hover:underline"
-          >
+          <button type="button" onClick={onViewAll} className="text-xs font-medium text-primary hover:underline">
             View all
           </button>
         </div>
@@ -523,7 +542,15 @@ function RecentRashans({
   );
 }
 
-function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: string; onNavigate?: (r: Resource) => void; profileOnly?: boolean }) {
+function ProfileView({
+  mobile,
+  onNavigate,
+  profileOnly = false,
+}: {
+  mobile: string;
+  onNavigate?: (r: Resource) => void;
+  profileOnly?: boolean;
+}) {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -598,7 +625,11 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
         </span>
       );
     } else if (key === "active_cards") {
-      display = <Badge variant="default" className="font-normal">{String(raw)}</Badge>;
+      display = (
+        <Badge variant="default" className="font-normal">
+          {String(raw)}
+        </Badge>
+      );
     } else {
       display = String(raw);
     }
@@ -617,12 +648,7 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
           <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
             <div className="space-y-1.5">{section1.map(renderRow)}</div>
           </Card>
-          <a
-            href="https://wa.me/923030812222"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block"
-          >
+          <a href="https://wa.me/923030812222" target="_blank" rel="noopener noreferrer" className="block">
             <Card className="p-4 bg-[#25D366]/10 border-[#25D366]/30 shadow-[var(--shadow-soft)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
@@ -641,11 +667,7 @@ function ProfileView({ mobile, onNavigate, profileOnly = false }: { mobile: stri
       {!profileOnly && (
         <>
           <CardsStats
-            activeCards={
-              data.active_cards != null && data.active_cards !== ""
-                ? String(data.active_cards)
-                : "—"
-            }
+            activeCards={data.active_cards != null && data.active_cards !== "" ? String(data.active_cards) : "—"}
             mobile={mobile}
             onNavigate={onNavigate}
           />
@@ -737,21 +759,33 @@ function StatementsView({ mobile }: { mobile: string }) {
     try {
       const v = sessionStorage.getItem("statementsYear");
       if (v) return v;
-    } catch (_) { /* ignore */ }
+    } catch (_) {
+      /* ignore */
+    }
     return String(currentYear);
   });
   const [statusFilter, setStatusFilter] = useState<string>(() => {
     try {
       const v = sessionStorage.getItem("statementsStatus");
       if (v) return v;
-    } catch (_) { /* ignore */ }
+    } catch (_) {
+      /* ignore */
+    }
     return "all";
   });
   useEffect(() => {
-    try { sessionStorage.setItem("statementsYear", selected); } catch (_) { /* ignore */ }
+    try {
+      sessionStorage.setItem("statementsYear", selected);
+    } catch (_) {
+      /* ignore */
+    }
   }, [selected]);
   useEffect(() => {
-    try { sessionStorage.setItem("statementsStatus", statusFilter); } catch (_) { /* ignore */ }
+    try {
+      sessionStorage.setItem("statementsStatus", statusFilter);
+    } catch (_) {
+      /* ignore */
+    }
   }, [statusFilter]);
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [stats, setStats] = useState<Record<string, unknown> | null>(null);
@@ -826,35 +860,31 @@ function StatementsView({ mobile }: { mobile: string }) {
           ))}
         </div>
       ) : filteredItems.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-6">
-          No statements found.
-        </p>
+        <p className="text-sm text-muted-foreground text-center py-6">No statements found.</p>
       ) : (
-        filteredItems.map((item, i) => (
-          <RecordCard key={i} resource="statements" mobile={mobile} item={item} />
-        ))
+        filteredItems.map((item, i) => <RecordCard key={i} resource="statements" mobile={mobile} item={item} />)
       )}
     </div>
   );
 }
 
-function CardsList({
-  items,
-  mobile,
-}: {
-  items: Record<string, unknown>[];
-  mobile: string;
-}) {
+function CardsList({ items, mobile }: { items: Record<string, unknown>[]; mobile: string }) {
   const VIEW_KEY = "mr_cards_view";
   const [selected, setSelected] = useState<string>(() => {
     try {
       const v = sessionStorage.getItem("cardsFilter");
       if (v) return v;
-    } catch (_) { /* ignore */ }
+    } catch (_) {
+      /* ignore */
+    }
     return "all";
   });
   useEffect(() => {
-    try { sessionStorage.setItem("cardsFilter", selected); } catch (_) { /* ignore */ }
+    try {
+      sessionStorage.setItem("cardsFilter", selected);
+    } catch (_) {
+      /* ignore */
+    }
   }, [selected]);
   const [view, setView] = useState<"list" | "grid">(() => {
     if (typeof window === "undefined") return "list";
@@ -870,16 +900,9 @@ function CardsList({
   }, [view]);
 
   const names = Array.from(
-    new Set(
-      items
-        .map((it) => String(it.person_name ?? "").trim())
-        .filter((n) => n.length > 0),
-    ),
+    new Set(items.map((it) => String(it.person_name ?? "").trim()).filter((n) => n.length > 0)),
   ).sort();
-  const filtered =
-    selected === "all"
-      ? items
-      : items.filter((it) => String(it.person_name ?? "") === selected);
+  const filtered = selected === "all" ? items : items.filter((it) => String(it.person_name ?? "") === selected);
 
   return (
     <div className="space-y-3">
@@ -923,9 +946,7 @@ function CardsList({
         </div>
       </div>
       {filtered.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-6">
-          No cards match the filter.
-        </p>
+        <p className="text-sm text-muted-foreground text-center py-6">No cards match the filter.</p>
       ) : view === "grid" ? (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
           {filtered.map((item, i) => (
@@ -933,9 +954,7 @@ function CardsList({
           ))}
         </div>
       ) : (
-        filtered.map((item, i) => (
-          <RecordCard key={i} resource="cards" mobile={mobile} item={item} index={i + 1} />
-        ))
+        filtered.map((item, i) => <RecordCard key={i} resource="cards" mobile={mobile} item={item} index={i + 1} />)
       )}
     </div>
   );
@@ -947,9 +966,10 @@ function CardGridTile({ item, index }: { item: Record<string, unknown>; index: n
   const name = String(item.person_name ?? "—");
   const amountRaw = item.amount;
   const amountNum = Number(amountRaw);
-  const amount = Number.isFinite(amountNum) && amountRaw != null && amountRaw !== ""
-    ? `Rs. ${amountNum.toLocaleString("en-PK")}`
-    : "—";
+  const amount =
+    Number.isFinite(amountNum) && amountRaw != null && amountRaw !== ""
+      ? `Rs. ${amountNum.toLocaleString("en-PK")}`
+      : "—";
   const [detailsOpen, setDetailsOpen] = useState(false);
   const longPress = useLongPress(() => setDetailsOpen(true), 600);
   const open = () => {
@@ -988,15 +1008,12 @@ function CardGridTile({ item, index }: { item: Record<string, unknown>; index: n
         </div>
         <p className="text-base font-bold leading-tight break-words mb-1">{name}</p>
         <p className="text-sm font-bold mb-2">{amount}</p>
-        {rcNum && (
-          <p className="text-[11px] opacity-75 break-all font-serif">{rcNum}</p>
-        )}
+        {rcNum && <p className="text-[11px] opacity-75 break-all font-serif">{rcNum}</p>}
       </Card>
       <CardDetailsPopup item={item} open={detailsOpen} onOpenChange={setDetailsOpen} />
     </>
   );
 }
-
 
 function extractItems(data: unknown): unknown[] | null {
   if (Array.isArray(data)) return data;
@@ -1014,14 +1031,18 @@ function RashansView({ mobile }: { mobile: string }) {
     try {
       const saved = sessionStorage.getItem("rashanFilters");
       if (saved) return JSON.parse(saved) as TxnFilters;
-    } catch (_) { /* ignore */ }
+    } catch (_) {
+      /* ignore */
+    }
     return { status: "all", validFrom: `${currentMonth}/${currentYear}` };
   });
 
   useEffect(() => {
     try {
       sessionStorage.setItem("rashanFilters", JSON.stringify(filters));
-    } catch (_) { /* ignore */ }
+    } catch (_) {
+      /* ignore */
+    }
   }, [filters]);
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1105,9 +1126,7 @@ function RashansView({ mobile }: { mobile: string }) {
       ) : (
         <div className="space-y-3">
           {filtered.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">
-              No transactions match the filters.
-            </p>
+            <p className="text-sm text-muted-foreground text-center py-6">No transactions match the filters.</p>
           ) : (
             filtered.map((item, i) => <TransactionCard key={i} item={item} origin="rashans" />)
           )}
@@ -1120,13 +1139,7 @@ function StatementPdfButton({ url, title }: { url: string; title: string }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="w-full mt-3"
-        onClick={() => setOpen(true)}
-      >
+      <Button type="button" variant="outline" size="sm" className="w-full mt-3" onClick={() => setOpen(true)}>
         <FileText className="w-4 h-4 mr-2" />
         View Statement
       </Button>
@@ -1158,12 +1171,7 @@ function StatementPdfButton({ url, title }: { url: string; title: string }) {
                   Open in new tab
                 </Button>
                 <Button asChild type="button" variant="default" size="sm">
-                  <a
-                    href={url}
-                    download={`${title}.pdf`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href={url} download={`${title}.pdf`} target="_blank" rel="noopener noreferrer">
                     <FileDown className="w-4 h-4 mr-2" />
                     Download PDF
                   </a>
@@ -1194,9 +1202,7 @@ function RecordCard({
   index?: number;
 }) {
   const navigate = useNavigate();
-  const entries = Object.entries(item).filter(
-    ([, v]) => v !== null && v !== "" && typeof v !== "object",
-  );
+  const entries = Object.entries(item).filter(([, v]) => v !== null && v !== "" && typeof v !== "object");
 
   if (resource === "cards") {
     const rcNum = (item.cm_card_number as string) || "";
@@ -1242,9 +1248,7 @@ function RecordCard({
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              {index != null && (
-                <span className="text-sm font-mono opacity-90">{String(index).padStart(2, "0")}</span>
-              )}
+              {index != null && <span className="text-sm font-mono opacity-90">{String(index).padStart(2, "0")}</span>}
               <CreditCard className="w-5 h-5 opacity-90" />
             </div>
             <span className="text-xs uppercase tracking-wider opacity-75">میرا راشن کارڈ</span>
@@ -1258,9 +1262,7 @@ function RecordCard({
                 display = "—";
               } else if (key === "amount") {
                 const n = Number(raw);
-                display = Number.isFinite(n)
-                  ? `Rs. ${n.toLocaleString("en-PK")}`
-                  : String(raw);
+                display = Number.isFinite(n) ? `Rs. ${n.toLocaleString("en-PK")}` : String(raw);
               } else {
                 display = String(raw);
               }
@@ -1269,10 +1271,10 @@ function RecordCard({
               const isName = key === "person_name";
               return (
                 <div key={key} className={`flex justify-between ${isName ? "" : "text-sm"}`}>
-                  {!hideLabel && (
-                    <span className={`${isBold ? "font-bold" : "opacity-75"}`}>{label}</span>
-                  )}
-                  <span className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"} ${hideLabel ? "w-full text-left" : ""} ${isName ? "text-xl" : ""}`}>
+                  {!hideLabel && <span className={`${isBold ? "font-bold" : "opacity-75"}`}>{label}</span>}
+                  <span
+                    className={`text-right break-all ${isBold ? "font-bold" : "opacity-75"} ${hideLabel ? "w-full text-left" : ""} ${isName ? "text-xl" : ""}`}
+                  >
                     {display}
                   </span>
                 </div>
@@ -1306,9 +1308,7 @@ function RecordCard({
               display = "—";
             } else if (key === "invoice_total") {
               const n = Number(raw);
-              display = Number.isFinite(n)
-                ? `Rs. ${n.toLocaleString("en-PK")}`
-                : String(raw);
+              display = Number.isFinite(n) ? `Rs. ${n.toLocaleString("en-PK")}` : String(raw);
             } else if (key === "payment_status") {
               display = (
                 <Badge variant={paid ? "default" : notPaid ? "destructive" : "outline"} className="font-normal">
@@ -1321,16 +1321,12 @@ function RecordCard({
             return (
               <div key={key} className="flex justify-between gap-3 text-sm items-center">
                 <span className="text-muted-foreground">{label}</span>
-                <span className="font-medium text-foreground text-right break-all">
-                  {display}
-                </span>
+                <span className="font-medium text-foreground text-right break-all">{display}</span>
               </div>
             );
           })}
         </div>
-        {fileUrl && (
-          <StatementPdfButton url={fileUrl} title={String(item.statement_period ?? "Statement")} />
-        )}
+        {fileUrl && <StatementPdfButton url={fileUrl} title={String(item.statement_period ?? "Statement")} />}
       </Card>
     );
   }
@@ -1341,9 +1337,7 @@ function RecordCard({
         {entries.map(([k, v]) => (
           <div key={k} className="flex justify-between gap-3 text-sm">
             <span className="text-muted-foreground capitalize">{k.replace(/_/g, " ")}</span>
-            <span className="font-medium text-foreground text-right break-all">
-              {String(v)}
-            </span>
+            <span className="font-medium text-foreground text-right break-all">{String(v)}</span>
           </div>
         ))}
       </div>
@@ -1364,11 +1358,17 @@ const Index = () => {
     try {
       const saved = sessionStorage.getItem("activeTab");
       if (saved) return saved as Resource;
-    } catch (_) { /* ignore */ }
+    } catch (_) {
+      /* ignore */
+    }
     return "customers";
   });
   useEffect(() => {
-    try { sessionStorage.setItem("activeTab", tab); } catch (_) { /* ignore */ }
+    try {
+      sessionStorage.setItem("activeTab", tab);
+    } catch (_) {
+      /* ignore */
+    }
   }, [tab]);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
@@ -1447,10 +1447,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen pb-32">
-      <header
-        className="px-5 pt-10 pb-6 text-primary-foreground"
-        style={{ background: "var(--gradient-primary)" }}
-      >
+      <header className="px-5 pt-10 pb-6 text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
         <div className="flex items-start justify-between gap-3">
           <button
             type="button"
@@ -1484,11 +1481,7 @@ const Index = () => {
                       : "bg-red-400/20 text-red-50 ring-1 ring-red-300/40"
                   }`}
                 >
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      isActive ? "bg-green-300" : "bg-red-300"
-                    }`}
-                  />
+                  <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-green-300" : "bg-red-300"}`} />
                   {isActive ? "Active" : "Inactive"}
                 </span>
               )}
@@ -1543,9 +1536,7 @@ const Index = () => {
                 >
                   <Icon className="w-5 h-5" />
                 </span>
-                <span className={`text-[10px] font-medium ${active ? "font-semibold" : ""}`}>
-                  {label}
-                </span>
+                <span className={`text-[10px] font-medium ${active ? "font-semibold" : ""}`}>{label}</span>
               </button>
             );
           })}
