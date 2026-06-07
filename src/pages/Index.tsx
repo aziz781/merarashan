@@ -436,7 +436,7 @@ function CardsStats({
   return (
     <div className="grid grid-cols-2 gap-3">
       <StatTile
-        label="Used Cards .  {new Date().toLocaleString(undefined, { month: "long" })}"
+        label={`Used Cards . ${new Date().toLocaleString(undefined, { month: "long" })}`}
         value={cardsUsed ?? "—"}
         hint={<>of {Number(activeCards) || 0} cards in {new Date().toLocaleString(undefined, { month: "long" })}</>}
         onClick={() => onNavigate?.("cards")}
