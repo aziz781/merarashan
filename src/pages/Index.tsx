@@ -15,6 +15,8 @@ import {
   CheckCircle2,
   X,
   MessageCircle,
+  Copy,
+
   AlertTriangle,
   LayoutGrid,
   List,
