@@ -4,7 +4,7 @@ import webpush from "npm:web-push@3.6.7";
 import { requireAdmin, unauthorizedResponse } from "../_shared/admin.ts";
 
 const VAPID_PUBLIC_KEY =
-  "BFOMGfHnkg6KuM_uPa6fNpz_C9XA9aUVf5ez1IGoJNr9ssEik2KtYg3Gc-t7DyzWfatqIaIPLxpiJCX_WbmMEWE";
+  "BOHJmS8q7TDf9zry73X6aK1B7IVRqB2NTqvZCPPgCGeFNMRPQlxxFEOcgXW-TQraAIws6tU0oDOWdVEzTqZQ0qc";
 
 function normalizeSubject(raw: string | undefined): string {
   const v = (raw || "").trim();
