@@ -648,19 +648,35 @@ function ProfileView({
           <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
             <div className="space-y-1.5">{section1.map(renderRow)}</div>
           </Card>
-          <a href="https://wa.me/923030812222" target="_blank" rel="noopener noreferrer" className="block">
-            <Card className="p-4 bg-[#25D366]/10 border-[#25D366]/30 shadow-[var(--shadow-soft)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
-                  <MessageCircle className="w-5 h-5 text-white" />
+          <div className="grid grid-cols-2 gap-3">
+            <a href="https://wa.me/923030812222" target="_blank" rel="noopener noreferrer" className="block">
+              <Card className="p-4 h-full bg-[#25D366]/10 border-[#25D366]/30 shadow-[var(--shadow-soft)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
+                    <MessageCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">Contact Support</p>
+                    <p className="text-xs text-muted-foreground truncate">Chat on WhatsApp</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Contact Support</p>
-                  <p className="text-xs text-muted-foreground">Chat on WhatsApp</p>
+              </Card>
+            </a>
+            <a href="https://wa.me/923091493053" target="_blank" rel="noopener noreferrer" className="block">
+              <Card className="p-4 h-full bg-[#25D366]/10 border-[#25D366]/30 shadow-[var(--shadow-soft)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
+                    <MessageCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">WhatsApp Chat Bot</p>
+                    <p className="text-xs text-muted-foreground truncate">Automated assistant</p>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          </a>
+              </Card>
+            </a>
+          </div>
+
           <NotificationToggle mobile={mobile} />
         </>
       )}
