@@ -474,7 +474,41 @@ function CardsStats({
         loading={loading}
         onClick={() => onNavigate?.("transactions")}
       />
+      <div className="col-span-2">
+        <CurrentYearStat mobile={mobile} onNavigate={onNavigate} />
+      </div>
     </div>
+  );
+}
+
+function CurrentYearStat({
+  mobile,
+  onNavigate,
+}: {
+  mobile: string;
+  onNavigate?: (r: Resource) => void;
+}) {
+  const year = String(new Date().getFullYear());
+  const { raw, loading } = useTransactions(mobile, { year });
+  const findKey = (obj: unknown, key: string): number | null => {
+    if (!obj || typeof obj !== "object") return null;
+    const o = obj as Record<string, unknown>;
+    if (o[key] != null) return Number(o[key]) || 0;
+    for (const v of Object.values(o)) {
+      const r = findKey(v, key);
+      if (r != null) return r;
+    }
+    return null;
+  };
+  const total = findKey(raw, "totalTransactionAmount") ?? 0;
+  return (
+    <StatTile
+      label="Current Year"
+      value={`Rs. ${total.toLocaleString("en-PK")}`}
+      hint={<>Total rashan amount in {year}</>}
+      loading={loading}
+      onClick={() => onNavigate?.("transactions")}
+    />
   );
 }
 
