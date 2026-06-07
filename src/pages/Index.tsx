@@ -521,8 +521,19 @@ function CurrentYearStat({
       value={`Rs. ${total.toLocaleString("en-PK")}`}
       hint={<>Total rashan amount in {year}</>}
       loading={loading}
-      onClick={() => onNavigate?.("transactions")}
+      onClick={() => {
+        try {
+          sessionStorage.setItem(
+            "rashanFilters",
+            JSON.stringify({ status: "all", validFrom: year }),
+          );
+        } catch (_) {
+          /* ignore */
+        }
+        onNavigate?.("transactions");
+      }}
     />
+
   );
 }
 
