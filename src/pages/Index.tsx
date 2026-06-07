@@ -650,7 +650,6 @@ function ProfileView({
           <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
             <div className="space-y-1.5">{section1.map(renderRow)}</div>
           </Card>
-          <a href="https://wa.me/923030812222" target="_blank" rel="noopener noreferrer" className="block">
           <WhatsAppTile
             href="https://wa.me/923030812222"
             number="923030812222"
@@ -663,6 +662,7 @@ function ProfileView({
             title="WhatsApp Chat Bot"
             subtitle="Automated assistant"
           />
+
 
 
 
