@@ -75,12 +75,12 @@ Deno.serve(async (req) => {
       )
     );
 
-    // Cleanup gone/expired subscriptions (404/410).
+    // Cleanup gone/expired (404/410) and VAPID-mismatch (403) subscriptions.
     const stale: string[] = [];
     results.forEach((r, i) => {
       if (r.status === "rejected") {
         const status = (r.reason as { statusCode?: number })?.statusCode;
-        if (status === 404 || status === 410) stale.push(subs[i].endpoint);
+        if (status === 404 || status === 410 || status === 403) stale.push(subs[i].endpoint);
       }
     });
     if (stale.length > 0) {
