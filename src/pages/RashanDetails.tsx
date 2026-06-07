@@ -119,7 +119,7 @@ const TIMELINE_STEPS: TimelineStep[] = [
     detailPrefix: "at Karyana Store",
   },
   {
-    label: "Rashan Payment",
+    label: "Payment",
     dateKey: "payment_datetime",
     timeKey: "",
     statusKey: "payment_status",
