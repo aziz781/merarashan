@@ -16,7 +16,6 @@ import {
   X,
   MessageCircle,
   Copy,
-
   AlertTriangle,
   LayoutGrid,
   List,
@@ -653,19 +652,15 @@ function ProfileView({
           <WhatsAppTile
             href="https://wa.me/923030812222"
             number="923030812222"
-            title="Contact Support"
+            title="Mera Rashan Support"
             subtitle="Chat on WhatsApp"
           />
           <WhatsAppTile
             href="https://wa.me/923091493053"
             number="923091493053"
-            title="WhatsApp Chat Bot"
+            title="Mera Rashan Chat Bot"
             subtitle="Automated assistant"
           />
-
-
-
-
 
           <NotificationToggle mobile={mobile} />
         </>
@@ -745,8 +740,6 @@ function WhatsAppTile({
     </a>
   );
 }
-
-
 
 function GenericResourceView({ resource, mobile }: { resource: Resource; mobile: string }) {
   const [data, setData] = useState<unknown>(null);
