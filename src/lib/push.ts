@@ -94,3 +94,43 @@ export async function disablePush(): Promise<void> {
   }
   await supabase.functions.invoke("push-unsubscribe", { body: { endpoint } });
 }
+
+/**
+ * Detect a VAPID public-key change and silently re-subscribe so the user keeps
+ * receiving notifications without manually toggling off/on.
+ *
+ * Safe to call on app load: it only acts when permission is already granted
+ * and an existing subscription is bound to a different applicationServerKey.
+ */
+export async function syncPushSubscription(mobile: string): Promise<"unchanged" | "resubscribed" | "skipped"> {
+  if (!pushSupported()) return "skipped";
+  if (Notification.permission !== "granted") return "skipped";
+  if (!mobile) return "skipped";
+
+  const reg =
+    (await navigator.serviceWorker.getRegistration()) ||
+    (await navigator.serviceWorker.ready);
+  if (!reg) return "skipped";
+
+  const existing = await reg.pushManager.getSubscription();
+  if (existing && subscriptionMatchesKey(existing, VAPID_PUBLIC_KEY)) {
+    return "unchanged";
+  }
+
+  if (existing) {
+    const oldEndpoint = existing.endpoint;
+    try {
+      await existing.unsubscribe();
+    } catch (_) {
+      /* ignore */
+    }
+    try {
+      await supabase.functions.invoke("push-unsubscribe", { body: { endpoint: oldEndpoint } });
+    } catch (_) {
+      /* ignore — old endpoint may already be gone */
+    }
+  }
+
+  await enablePush(mobile);
+  return "resubscribed";
+}
