@@ -472,8 +472,22 @@ function CardsStats({
           </>
         }
         loading={loading}
-        onClick={() => onNavigate?.("transactions")}
+        onClick={() => {
+          const now = new Date();
+          const mm = String(now.getMonth() + 1).padStart(2, "0");
+          const yyyy = String(now.getFullYear());
+          try {
+            sessionStorage.setItem(
+              "rashanFilters",
+              JSON.stringify({ status: "all", validFrom: `${mm}/${yyyy}` }),
+            );
+          } catch (_) {
+            /* ignore */
+          }
+          onNavigate?.("transactions");
+        }}
       />
+
       <div className="col-span-2">
         <CurrentYearStat mobile={mobile} onNavigate={onNavigate} />
       </div>
