@@ -94,7 +94,7 @@ type TimelineStep = {
 
 const TIMELINE_STEPS: TimelineStep[] = [
   {
-    label: "Rashan Code Issued",
+    label: "Rashan Code",
     dateKey: "created_date",
     timeKey: "created_time",
     detailKey: "userMobileNumber",
