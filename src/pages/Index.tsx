@@ -438,7 +438,7 @@ function CardsStats({
       <StatTile
         label="Active Cards"
         value={activeCards ?? "—"}
-        hint="Tap to view cards"
+        hint={<><span className="font-bold text-primary">{cardsUsed}</span> of {Number(activeCards) || 0} cards used in {new Date().toLocaleString(undefined, { month: "long" })}</>}
         onClick={() => onNavigate?.("cards")}
       />
       <StatTile
