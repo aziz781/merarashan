@@ -146,7 +146,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
     <ol className="relative">
       {TIMELINE_STEPS.filter((s) => {
         const status = get(s.statusKey!);
-        if (s.label === "Delivered") return status.toUpperCase() === "PAID";
+        if (s.label === "Completed") return status.toUpperCase() === "PAID";
         return true;
       }).map((step, idx, arr) => {
         const date = get(step.dateKey);
@@ -181,14 +181,14 @@ function UpdatesTimeline({ item }: { item: Item }) {
             <span
               aria-hidden
               className={`absolute left-0 top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 ${
-                step.label === "Delivered" && done
+                step.label === "Completed" && done
                   ? "border-emerald-700 bg-emerald-700"
                   : done
                       ? "border-primary bg-primary"
                       : "border-border bg-background"
               }`}
             >
-            {step.label === "Delivered" && done ? (
+            {step.label === "Completed" && done ? (
               <Check className="h-3 w-3 text-white" />
             ) : done ? (
               <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
