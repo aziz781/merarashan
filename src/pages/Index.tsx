@@ -702,7 +702,7 @@ function WhatsAppTile({
   title: string;
   subtitle: string;
 }) {
-  const formatted = `+${number.slice(0, 2)} ${number.slice(2, 5)} ${number.slice(5)}`;
+  const formatted = `+${number.slice(0, 2)} ${number.slice(2, 5)} ${number.slice(5, 8)} ${number.slice(8)}`;
   const handleCopy = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
