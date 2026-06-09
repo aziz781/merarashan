@@ -82,8 +82,8 @@ export function TransactionCard({
               variant={delivered ? "default" : notDelivered || notPaid ? "destructive" : "outline"}
               className="font-normal inline-flex items-center gap-1"
             >
-              {status}
               {paymentStatus === "PAID" && <Check className="w-3 h-3" />}
+              {status}
             </Badge>
           )}
           {showExtras && displayText && (
