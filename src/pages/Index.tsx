@@ -462,13 +462,43 @@ function CardsStats({
             {cardsUsed ?? "—"}
             {pending > 0 && (
               <span
-                className="inline-flex items-center gap-1 rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-xs font-semibold"
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  try {
+                    sessionStorage.setItem(
+                      "rashanFilters",
+                      JSON.stringify({ status: "NOT_DELIVERED", validFrom: "" }),
+                    );
+                  } catch (_) {
+                    /* ignore */
+                  }
+                  onNavigate?.("transactions");
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    try {
+                      sessionStorage.setItem(
+                        "rashanFilters",
+                        JSON.stringify({ status: "NOT_DELIVERED", validFrom: "" }),
+                      );
+                    } catch (_) {
+                      /* ignore */
+                    }
+                    onNavigate?.("transactions");
+                  }
+                }}
+                className="inline-flex items-center gap-1 rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-xs font-semibold cursor-pointer hover:bg-amber-200 transition-colors"
                 title={`${pending} pending card${pending === 1 ? "" : "s"}`}
               >
                 <AlertTriangle className="w-3.5 h-3.5" />
                 {pending}
               </span>
             )}
+
           </span>
         }
         hint={
