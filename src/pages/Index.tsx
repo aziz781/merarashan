@@ -1628,12 +1628,7 @@ const Index = () => {
     <div className="min-h-screen pb-32">
       <header className="px-5 pt-10 pb-6 text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
         <div className="flex items-start justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => setProfileOpen(true)}
-            className="flex items-center gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-full pr-2"
-            aria-label="Open profile"
-          >
+          <div className="flex items-center gap-3 min-w-0">
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground text-sm font-semibold ring-1 ring-white/25"
               aria-hidden
@@ -1665,18 +1660,50 @@ const Index = () => {
                 </span>
               )}
             </div>
-          </button>
+          </div>
           <Button
             variant="ghost"
             size="icon"
-            onClick={handleLogout}
+            onClick={() => setMenuOpen(true)}
             className="text-primary-foreground hover:bg-white/10 shrink-0"
-            aria-label="Log out"
+            aria-label="Open menu"
           >
-            <LogOut className="w-5 h-5" />
+            <Menu className="w-5 h-5" />
           </Button>
         </div>
       </header>
+
+      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+        <SheetContent side="right" className="w-72 flex flex-col">
+          <SheetHeader>
+            <SheetTitle>Menu</SheetTitle>
+          </SheetHeader>
+          <div className="flex flex-col gap-1 mt-4">
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                setProfileOpen(true);
+              }}
+              className="flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors"
+            >
+              <User className="w-4 h-4" />
+              <span>Profile</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                handleLogout();
+              }}
+              className="flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors text-destructive"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Log out</span>
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <main className="px-5 pt-5">
         <Tabs value={tab} onValueChange={(v) => setTab(v as Resource)} className="w-full">
