@@ -92,7 +92,7 @@ export function TransactionCard({
               }
               className={`font-normal inline-flex items-center gap-1 ${
                 notDelivered && paymentStatus !== "EXPIRED"
-                  ? "bg-orange-400 text-black border-orange-500 dark:bg-orange-500 dark:text-black dark:border-orange-600 hover:bg-orange-400"
+                  ? "bg-amber-100 text-foreground border-amber-300 dark:bg-amber-950/40 dark:border-amber-800 hover:bg-amber-100"
                   : ""
               }`}
             >
