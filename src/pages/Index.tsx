@@ -467,8 +467,7 @@ function CardsStats({
         value={`Rs. ${total.toLocaleString("en-PK")}`}
         hint={
           <>
-            <span className="font-bold text-primary">{cardsUsed}</span> of {Number(activeCards) || 0} cards · amount ·{" "}
-            {new Date().toLocaleString(undefined, { month: "long" })}
+            Total rashan amount in {new Date().toLocaleString(undefined, { month: "long" })}
           </>
         }
         loading={loading}
