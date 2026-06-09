@@ -22,6 +22,7 @@ import {
   Menu,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { HelpCircle, ChevronDown, Bot, LifeBuoy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
