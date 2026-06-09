@@ -1746,41 +1746,57 @@ const Index = () => {
         </div>
       </nav>
 
-      <Sheet open={profileOpen} onOpenChange={setProfileOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Mera Rashan</SheetTitle>
-          </SheetHeader>
-          <div className="pt-4">
-            <ProfileView mobile={mobile} profileOnly />
-          </div>
-        </SheetContent>
-      </Sheet>
+      <DialogPrimitive.Root open={profileOpen} onOpenChange={setProfileOpen} modal={false}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Content
+            onInteractOutside={(e) => e.preventDefault()}
+            className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
+          >
+            <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
+              Mera Rashan
+            </DialogPrimitive.Title>
+            <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+            <div className="pt-4">
+              <ProfileView mobile={mobile} profileOnly />
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
 
-      <Sheet open={helpOpen} onOpenChange={setHelpOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
+      <DialogPrimitive.Root open={helpOpen} onOpenChange={setHelpOpen} modal={false}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Content
+            onInteractOutside={(e) => e.preventDefault()}
+            className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
+          >
+            <DialogPrimitive.Title className="flex items-center gap-2 text-lg font-semibold text-foreground">
               <HelpCircle className="w-5 h-5" />
               Help &amp; Support
-            </SheetTitle>
-          </SheetHeader>
-          <div className="space-y-3 pt-4">
-            <WhatsAppTile
-              href="https://wa.me/923030812222"
-              number="923030812222"
-              title="Mera Rashan Support"
-              subtitle="Chat on WhatsApp"
-            />
-            <WhatsAppTile
-              href="https://wa.me/923091493053"
-              number="923091493053"
-              title="Mera Rashan Chat Bot"
-              subtitle="Automated assistant"
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
+            </DialogPrimitive.Title>
+            <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+            <div className="space-y-3 pt-4">
+              <WhatsAppTile
+                href="https://wa.me/923030812222"
+                number="923030812222"
+                title="Mera Rashan Support"
+                subtitle="Chat on WhatsApp"
+              />
+              <WhatsAppTile
+                href="https://wa.me/923091493053"
+                number="923091493053"
+                title="Mera Rashan Chat Bot"
+                subtitle="Automated assistant"
+              />
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
     </div>
   );
 };
