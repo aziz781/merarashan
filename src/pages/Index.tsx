@@ -450,18 +450,35 @@ function CardsStats({
   const total = findKey(raw, "totalTransactionAmount") ?? 0;
   const cardsUsed = findKey(raw, "totalCardsUsed") ?? 0;
 
+  const totalCards = Number(activeCards) || 0;
+  const pending = Math.max(0, totalCards - Number(cardsUsed || 0));
+
   return (
     <div className="grid grid-cols-2 gap-3">
       <StatTile
         label={`Cards Used`}
-        value={cardsUsed ?? "—"}
+        value={
+          <span className="inline-flex items-center gap-2">
+            {cardsUsed ?? "—"}
+            {pending > 0 && (
+              <span
+                className="inline-flex items-center gap-1 rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-xs font-semibold"
+                title={`${pending} pending card${pending === 1 ? "" : "s"}`}
+              >
+                <AlertTriangle className="w-3.5 h-3.5" />
+                {pending}
+              </span>
+            )}
+          </span>
+        }
         hint={
           <>
-            of {Number(activeCards) || 0} Rashan cards in {new Date().toLocaleString(undefined, { month: "long" })}
+            of {totalCards} Rashan cards in {new Date().toLocaleString(undefined, { month: "long" })}
           </>
         }
         onClick={() => onNavigate?.("cards")}
       />
+
       <StatTile
         label="Current Month"
         value={`Rs. ${total.toLocaleString("en-PK")}`}
