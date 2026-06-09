@@ -1665,7 +1665,7 @@ const Index = () => {
             <button
               type="button"
               onClick={() => {
-                setMenuOpen(false);
+                setHelpOpen(false);
                 setProfileOpen(true);
               }}
               className="flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors"
@@ -1677,7 +1677,7 @@ const Index = () => {
             <button
               type="button"
               onClick={() => {
-                setMenuOpen(false);
+                setProfileOpen(false);
                 setHelpOpen(true);
               }}
               className="flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors"
