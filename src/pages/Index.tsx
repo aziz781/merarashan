@@ -1745,14 +1745,16 @@ const Index = () => {
         </div>
       </nav>
 
-      <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Mera Rashan</DialogTitle>
-          </DialogHeader>
-          <ProfileView mobile={mobile} profileOnly />
-        </DialogContent>
-      </Dialog>
+      <Sheet open={profileOpen} onOpenChange={setProfileOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Mera Rashan</SheetTitle>
+          </SheetHeader>
+          <div className="pt-4">
+            <ProfileView mobile={mobile} profileOnly />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <Sheet open={helpOpen} onOpenChange={setHelpOpen}>
         <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
