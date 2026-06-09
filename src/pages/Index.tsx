@@ -1754,15 +1754,15 @@ const Index = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+      <Sheet open={helpOpen} onOpenChange={setHelpOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
               <HelpCircle className="w-5 h-5" />
               Help &amp; Support
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3 pt-2">
+            </SheetTitle>
+          </SheetHeader>
+          <div className="space-y-3 pt-4">
             <WhatsAppTile
               href="https://wa.me/923030812222"
               number="923030812222"
@@ -1776,8 +1776,8 @@ const Index = () => {
               subtitle="Automated assistant"
             />
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
