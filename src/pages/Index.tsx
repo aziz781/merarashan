@@ -466,10 +466,13 @@ function CardsStats({
                 tabIndex={0}
                 onClick={(e) => {
                   e.stopPropagation();
+                  const now = new Date();
+                  const mm = String(now.getMonth() + 1).padStart(2, "0");
+                  const yyyy = String(now.getFullYear());
                   try {
                     sessionStorage.setItem(
                       "rashanFilters",
-                      JSON.stringify({ status: "NOT_DELIVERED", validFrom: "" }),
+                      JSON.stringify({ status: "NOT_DELIVERED", validFrom: `${mm}/${yyyy}` }),
                     );
                   } catch (_) {
                     /* ignore */
@@ -480,10 +483,13 @@ function CardsStats({
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     e.stopPropagation();
+                    const now = new Date();
+                    const mm = String(now.getMonth() + 1).padStart(2, "0");
+                    const yyyy = String(now.getFullYear());
                     try {
                       sessionStorage.setItem(
                         "rashanFilters",
-                        JSON.stringify({ status: "NOT_DELIVERED", validFrom: "" }),
+                        JSON.stringify({ status: "NOT_DELIVERED", validFrom: `${mm}/${yyyy}` }),
                       );
                     } catch (_) {
                       /* ignore */
