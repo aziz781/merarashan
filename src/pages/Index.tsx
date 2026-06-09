@@ -506,7 +506,18 @@ function CardsStats({
             of {totalCards} Rashan cards in {new Date().toLocaleString(undefined, { month: "long" })}
           </>
         }
-        onClick={() => onNavigate?.("cards")}
+        onClick={() => {
+          try {
+            sessionStorage.setItem(
+              "rashanFilters",
+              JSON.stringify({ status: "Delivered", validFrom: "" }),
+            );
+          } catch (_) {
+            /* ignore */
+          }
+          onNavigate?.("transactions");
+        }}
+
       />
 
       <StatTile
