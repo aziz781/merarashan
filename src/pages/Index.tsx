@@ -513,10 +513,13 @@ function CardsStats({
           </>
         }
         onClick={() => {
+          const now = new Date();
+          const mm = String(now.getMonth() + 1).padStart(2, "0");
+          const yyyy = String(now.getFullYear());
           try {
             sessionStorage.setItem(
               "rashanFilters",
-              JSON.stringify({ status: "Delivered", validFrom: "" }),
+              JSON.stringify({ status: "Delivered", validFrom: `${mm}/${yyyy}` }),
             );
           } catch (_) {
             /* ignore */
