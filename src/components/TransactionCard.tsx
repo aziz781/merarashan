@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Check } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -79,9 +80,10 @@ export function TransactionCard({
           {status && (
             <Badge
               variant={delivered ? "default" : notDelivered || notPaid ? "destructive" : "outline"}
-              className="font-normal"
+              className="font-normal inline-flex items-center gap-1"
             >
               {status}
+              {paymentStatus === "PAID" && <Check className="w-3 h-3" />}
             </Badge>
           )}
           {showExtras && displayText && (
