@@ -1629,9 +1629,11 @@ const Index = () => {
       <header className="px-5 pt-10 pb-6 text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <span
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground text-sm font-semibold ring-1 ring-white/25"
-              aria-hidden
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground text-sm font-semibold ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors"
             >
               {String(displayName)
                 .replace(/^\+/, "")
@@ -1641,7 +1643,7 @@ const Index = () => {
                 .map((s) => s[0])
                 .join("")
                 .toUpperCase() || "U"}
-            </span>
+            </button>
             <div className="min-w-0">
               {profileData?.payer_id && (
                 <p className="text-xs opacity-75 leading-tight">{String(profileData.payer_id)}</p>
@@ -1661,20 +1663,11 @@ const Index = () => {
               )}
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setMenuOpen(true)}
-            className="text-primary-foreground hover:bg-white/10 shrink-0"
-            aria-label="Open menu"
-          >
-            <Menu className="w-5 h-5" />
-          </Button>
         </div>
       </header>
 
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-        <SheetContent side="right" className="w-72 flex flex-col">
+        <SheetContent side="left" className="w-72 flex flex-col">
           <SheetHeader>
             <SheetTitle>Menu</SheetTitle>
           </SheetHeader>
