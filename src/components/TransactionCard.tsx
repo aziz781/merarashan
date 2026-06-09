@@ -84,11 +84,17 @@ export function TransactionCard({
                   ? "destructive"
                   : delivered
                     ? "default"
-                    : notDelivered || notPaid
-                      ? "destructive"
-                      : "outline"
+                    : notDelivered
+                      ? "outline"
+                      : notPaid
+                        ? "destructive"
+                        : "outline"
               }
-              className="font-normal inline-flex items-center gap-1"
+              className={`font-normal inline-flex items-center gap-1 ${
+                notDelivered && paymentStatus !== "EXPIRED"
+                  ? "bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/40 dark:text-amber-200 dark:border-amber-800"
+                  : ""
+              }`}
             >
               {paymentStatus === "PAID" && <Check className="w-3 h-3" />}
               {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
