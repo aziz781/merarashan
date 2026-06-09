@@ -777,18 +777,6 @@ function ProfileView({
           <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
             <div className="space-y-1.5">{section1.map(renderRow)}</div>
           </Card>
-          <WhatsAppTile
-            href="https://wa.me/923030812222"
-            number="923030812222"
-            title="Mera Rashan Support"
-            subtitle="Chat on WhatsApp"
-          />
-          <WhatsAppTile
-            href="https://wa.me/923091493053"
-            number="923091493053"
-            title="Mera Rashan Chat Bot"
-            subtitle="Automated assistant"
-          />
 
           <NotificationToggle mobile={mobile} />
         </>
