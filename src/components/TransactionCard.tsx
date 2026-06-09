@@ -79,11 +79,19 @@ export function TransactionCard({
           </p>
           {status && (
             <Badge
-              variant={delivered ? "default" : notDelivered || notPaid ? "destructive" : "outline"}
+              variant={
+                paymentStatus === "EXPIRED"
+                  ? "destructive"
+                  : delivered
+                    ? "default"
+                    : notDelivered || notPaid
+                      ? "destructive"
+                      : "outline"
+              }
               className="font-normal inline-flex items-center gap-1"
             >
               {paymentStatus === "PAID" && <Check className="w-3 h-3" />}
-              {status}
+              {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
             </Badge>
           )}
           {showExtras && displayText && (
