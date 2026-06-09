@@ -1685,6 +1685,44 @@ const Index = () => {
               <User className="w-4 h-4" />
               <span>Profile</span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => setHelpOpen((v) => !v)}
+              aria-expanded={helpOpen}
+              className="flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="flex-1">Help</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${helpOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+            {helpOpen && (
+              <div className="ml-7 flex flex-col gap-1">
+                <a
+                  href="https://wa.me/923030812222"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 rounded-md px-3 py-2 text-left text-sm hover:bg-muted transition-colors"
+                >
+                  <LifeBuoy className="w-4 h-4 text-[#25D366]" />
+                  <span>Support</span>
+                </a>
+                <a
+                  href="https://wa.me/923091493053"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 rounded-md px-3 py-2 text-left text-sm hover:bg-muted transition-colors"
+                >
+                  <Bot className="w-4 h-4 text-[#25D366]" />
+                  <span>Chat Bot</span>
+                </a>
+              </div>
+            )}
+
             <button
               type="button"
               onClick={() => {
