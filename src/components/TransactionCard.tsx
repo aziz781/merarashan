@@ -74,7 +74,7 @@ export function TransactionCard({
           )}
         </div>
         <div className="flex flex-col items-end gap-1.5 shrink-0">
-          <p className={`font-bold ${notPaid && paymentStatus !== "EXPIRED" ? "text-destructive" : "text-foreground"}`}>
+          <p className={`font-bold ${paymentStatus !== "EXPIRED" && notPaid ? "text-destructive" : "text-foreground"}`}>
             Rs. {amount.toLocaleString("en-PK")}
           </p>
           {status && (
