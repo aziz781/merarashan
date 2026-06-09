@@ -1688,40 +1688,15 @@ const Index = () => {
 
             <button
               type="button"
-              onClick={() => setHelpOpen((v) => !v)}
-              aria-expanded={helpOpen}
+              onClick={() => {
+                setMenuOpen(false);
+                setHelpOpen(true);
+              }}
               className="flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors"
             >
               <HelpCircle className="w-4 h-4" />
               <span className="flex-1">Help</span>
-              <ChevronDown
-                className={`w-4 h-4 transition-transform ${helpOpen ? "rotate-180" : ""}`}
-              />
             </button>
-            {helpOpen && (
-              <div className="ml-7 flex flex-col gap-1">
-                <a
-                  href="https://wa.me/923030812222"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 rounded-md px-3 py-2 text-left text-sm hover:bg-muted transition-colors"
-                >
-                  <LifeBuoy className="w-4 h-4 text-[#25D366]" />
-                  <span>Support</span>
-                </a>
-                <a
-                  href="https://wa.me/923091493053"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 rounded-md px-3 py-2 text-left text-sm hover:bg-muted transition-colors"
-                >
-                  <Bot className="w-4 h-4 text-[#25D366]" />
-                  <span>Chat Bot</span>
-                </a>
-              </div>
-            )}
 
             <button
               type="button"
@@ -1788,6 +1763,31 @@ const Index = () => {
             <DialogTitle>Mera Rashan</DialogTitle>
           </DialogHeader>
           <ProfileView mobile={mobile} profileOnly />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
+        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <HelpCircle className="w-5 h-5" />
+              Help &amp; Support
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            <WhatsAppTile
+              href="https://wa.me/923030812222"
+              number="923030812222"
+              title="Mera Rashan Support"
+              subtitle="Chat on WhatsApp"
+            />
+            <WhatsAppTile
+              href="https://wa.me/923091493053"
+              number="923091493053"
+              title="Mera Rashan Chat Bot"
+              subtitle="Automated assistant"
+            />
+          </div>
         </DialogContent>
       </Dialog>
     </div>
