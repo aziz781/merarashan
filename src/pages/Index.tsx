@@ -1765,6 +1765,30 @@ const Index = () => {
           <ProfileView mobile={mobile} profileOnly />
         </DialogContent>
       </Dialog>
+
+      <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
+        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <HelpCircle className="w-5 h-5" />
+              Help &amp; Support
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            <WhatsAppTile
+              href="https://wa.me/923030812222"
+              number="923030812222"
+              title="Mera Rashan Support"
+              subtitle="Chat on WhatsApp"
+            />
+            <WhatsAppTile
+              href="https://wa.me/923091493053"
+              number="923091493053"
+              title="Mera Rashan Chat Bot"
+              subtitle="Automated assistant"
+            />
+          </div>
+        </DialogContent>
     </div>
   );
 };
