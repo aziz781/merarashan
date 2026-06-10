@@ -1813,7 +1813,8 @@ const Index = () => {
               >
                 <ArrowLeft className="h-5 w-5" />
               </DialogPrimitive.Close>
-              <DialogPrimitive.Title className="mt-2 flex items-center gap-2 text-lg font-semibold text-foreground">
+              <div className="h-6" aria-hidden />
+              <DialogPrimitive.Title className="flex items-center gap-2 text-lg font-semibold text-foreground">
                 <HelpCircle className="w-5 h-5" />
                 Help &amp; Support
               </DialogPrimitive.Title>
