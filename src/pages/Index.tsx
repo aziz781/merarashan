@@ -1665,9 +1665,29 @@ const Index = () => {
             <SheetTitle>Menu</SheetTitle>
           </SheetHeader>
           {profileData?.payer_id && (
-            <div className="mt-4 rounded-md border border-border/60 bg-muted/40 px-3 py-2">
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Customer number</p>
-              <p className="text-sm font-semibold text-foreground">{String(profileData.payer_id)}</p>
+            <div className="mt-4 flex items-center gap-2 rounded-md border border-border/60 bg-muted/40 px-3 py-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Customer number</p>
+                <p className="text-sm font-semibold text-foreground truncate">{String(profileData.payer_id)}</p>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0"
+                aria-label="Copy customer number"
+                onClick={async () => {
+                  const val = String(profileData.payer_id);
+                  try {
+                    await navigator.clipboard.writeText(val);
+                    toast({ title: "Copied", description: `${val} copied to clipboard` });
+                  } catch {
+                    toast({ title: "Copy failed", description: "Could not access clipboard", variant: "destructive" });
+                  }
+                }}
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
             </div>
           )}
           <div className="flex flex-col gap-1 mt-4">
