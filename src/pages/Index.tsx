@@ -1658,7 +1658,12 @@ const Index = () => {
       </header>
 
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-        <SheetContent side="left" className="w-72 flex flex-col">
+        <SheetContent
+          side="left"
+          className="w-72 flex flex-col"
+          onInteractOutside={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+        >
           <SheetHeader>
             <SheetTitle>Menu</SheetTitle>
           </SheetHeader>
