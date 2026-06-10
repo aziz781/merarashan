@@ -6,6 +6,7 @@ import {
   LogOut,
   CreditCard,
   ArrowLeftRight,
+  ArrowLeft,
   User,
   FileText,
   Phone,
@@ -1780,14 +1781,18 @@ const Index = () => {
             onInteractOutside={(e) => e.preventDefault()}
             className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
           >
-            <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
-              Mera Rashan
-            </DialogPrimitive.Title>
-            <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring">
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </DialogPrimitive.Close>
-            <div className="pt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <DialogPrimitive.Close
+                className="-ml-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
+                aria-label="Back"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </DialogPrimitive.Close>
+              <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
+                Mera Rashan
+              </DialogPrimitive.Title>
+            </div>
+            <div className="pt-2">
               <ProfileView mobile={mobile} profileOnly />
             </div>
           </DialogPrimitive.Content>
@@ -1800,14 +1805,18 @@ const Index = () => {
             onInteractOutside={(e) => e.preventDefault()}
             className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
           >
-            <DialogPrimitive.Title className="flex items-center gap-2 text-lg font-semibold text-foreground">
-              <HelpCircle className="w-5 h-5" />
-              Help &amp; Support
-            </DialogPrimitive.Title>
-            <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring">
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </DialogPrimitive.Close>
+            <div className="flex items-center gap-2 mb-2">
+              <DialogPrimitive.Close
+                className="-ml-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
+                aria-label="Back"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </DialogPrimitive.Close>
+              <DialogPrimitive.Title className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <HelpCircle className="w-5 h-5" />
+                Help &amp; Support
+              </DialogPrimitive.Title>
+            </div>
             <div className="space-y-3 pt-4">
               <WhatsAppTile
                 href="https://wa.me/923030812222"
