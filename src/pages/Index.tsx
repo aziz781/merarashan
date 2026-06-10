@@ -1664,6 +1664,12 @@ const Index = () => {
           <SheetHeader>
             <SheetTitle>Menu</SheetTitle>
           </SheetHeader>
+          {profileData?.payer_id && (
+            <div className="mt-4 rounded-md border border-border/60 bg-muted/40 px-3 py-2">
+              <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Customer number</p>
+              <p className="text-sm font-semibold text-foreground">{String(profileData.payer_id)}</p>
+            </div>
+          )}
           <div className="flex flex-col gap-1 mt-4">
             <button
               type="button"
