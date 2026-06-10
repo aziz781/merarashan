@@ -1781,14 +1781,14 @@ const Index = () => {
             onInteractOutside={(e) => e.preventDefault()}
             className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
           >
-            <div className="flex items-center gap-2 mb-2">
+            <div className="mb-2">
               <DialogPrimitive.Close
                 className="-ml-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
                 aria-label="Back"
               >
                 <ArrowLeft className="h-5 w-5" />
               </DialogPrimitive.Close>
-              <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
+              <DialogPrimitive.Title className="mt-2 text-lg font-semibold text-foreground">
                 Mera Rashan
               </DialogPrimitive.Title>
             </div>
@@ -1805,14 +1805,14 @@ const Index = () => {
             onInteractOutside={(e) => e.preventDefault()}
             className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
           >
-            <div className="flex items-center gap-2 mb-2">
+            <div className="mb-2">
               <DialogPrimitive.Close
                 className="-ml-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
                 aria-label="Back"
               >
                 <ArrowLeft className="h-5 w-5" />
               </DialogPrimitive.Close>
-              <DialogPrimitive.Title className="flex items-center gap-2 text-lg font-semibold text-foreground">
+              <DialogPrimitive.Title className="mt-2 flex items-center gap-2 text-lg font-semibold text-foreground">
                 <HelpCircle className="w-5 h-5" />
                 Help &amp; Support
               </DialogPrimitive.Title>
