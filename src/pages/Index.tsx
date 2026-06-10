@@ -1636,9 +1636,6 @@ const Index = () => {
                 .toUpperCase() || "U"}
             </button>
             <div className="min-w-0">
-              {profileData?.payer_id && (
-                <p className="text-xs opacity-75 leading-tight">{String(profileData.payer_id)}</p>
-              )}
               <h1 className="text-xl font-bold leading-tight truncate">{String(displayName)}</h1>
               {profileData && (
                 <span
