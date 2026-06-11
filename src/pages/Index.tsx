@@ -586,13 +586,13 @@ function CurrentMonthTile({
       value={`Rs. ${total.toLocaleString("en-PK")}`}
       hint={
         <span className="inline-flex items-center gap-1.5">
-          Total rashan amount in {monthLong}
           {isPaid && (
             <CheckCircle2 className="w-3.5 h-3.5 text-green-600" aria-label="Amount paid" />
           )}
           {isUnpaid && (
             <AlertTriangle className="w-3.5 h-3.5 text-amber-600" aria-label="Amount due" />
           )}
+          Total rashan amount in {monthLong}
         </span>
       }
       loading={loading}
