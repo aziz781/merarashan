@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetchResource } from "@/lib/api";
 import { TransactionCard } from "@/components/TransactionCard";
 import { PageFooter } from "@/components/PageFooter";
+import { BottomNav } from "@/components/BottomNav";
 
 const STORAGE_KEY = "mr_mobile";
 
@@ -65,7 +66,7 @@ const CardDetails = () => {
     "Card Details";
 
   return (
-    <div className="min-h-screen pb-16">
+    <div className="min-h-screen pb-32">
       <header
         className="px-5 pt-10 pb-6 text-primary-foreground"
         style={{ background: "var(--gradient-primary)" }}
@@ -152,6 +153,7 @@ const CardDetails = () => {
         </section>
       </main>
       <PageFooter />
+      <BottomNav activeTab="cards" />
     </div>
   );
 };
