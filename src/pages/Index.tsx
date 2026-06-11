@@ -1718,6 +1718,21 @@ const Index = () => {
             <button
               type="button"
               onClick={() => {
+                setProfileOpen(false);
+                setHelpOpen(false);
+                setSettingsOpen(true);
+              }}
+              className="flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+              <span className="flex-1">Settings</span>
+            </button>
+
+
+
+            <button
+              type="button"
+              onClick={() => {
                 setMenuOpen(false);
                 handleLogout();
               }}
