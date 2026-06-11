@@ -779,8 +779,6 @@ function ProfileView({
           <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
             <div className="space-y-1.5">{section1.map(renderRow)}</div>
           </Card>
-
-          <NotificationToggle mobile={mobile} />
         </>
       )}
       {!profileOnly && (
