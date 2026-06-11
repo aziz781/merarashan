@@ -509,7 +509,9 @@ function CardsStats({
                 {pending}
               </span>
             )}
-
+            {totalCards > 0 && pending === 0 && (
+              <CheckCircle2 className="w-5 h-5 text-green-600" aria-label="All cards used" />
+            )}
           </span>
         }
         hint={
