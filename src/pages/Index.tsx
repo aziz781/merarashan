@@ -1610,7 +1610,7 @@ const Index = () => {
 
   if (!mobile) return <Login onLogin={handleLogin} />;
 
-  const displayName = profileData?.contact_person || `+${mobile}`;
+  const displayName = profileData?.contact_person_eng || profileData?.contact_person || `+${mobile}`;
   const isActive =
     profileData?.is_active === true ||
     profileData?.is_active === "true" ||
