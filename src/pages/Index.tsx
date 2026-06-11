@@ -545,6 +545,73 @@ function CardsStats({
   );
 }
 
+function CurrentMonthTile({
+  mobile,
+  total,
+  loading,
+  onNavigate,
+}: {
+  mobile: string;
+  total: number;
+  loading: boolean;
+  onNavigate?: (r: Resource) => void;
+}) {
+  const now = new Date();
+  const monthLong = now.toLocaleString(undefined, { month: "long" });
+  const monthShort = now.toLocaleString("en-US", { month: "short" });
+  const year = String(now.getFullYear());
+  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchResource("statements", mobile, { year, month: monthShort })
+      .then((d) => {
+        if (cancelled) return;
+        const items = (extractItems(d) ?? []) as Record<string, unknown>[];
+        const s = items[0]?.payment_status;
+        setPaymentStatus(s ? String(s) : null);
+      })
+      .catch(() => !cancelled && setPaymentStatus(null));
+    return () => {
+      cancelled = true;
+    };
+  }, [mobile, year, monthShort]);
+
+  const isPaid = paymentStatus?.toUpperCase() === "PAID";
+  const isUnpaid = paymentStatus?.toUpperCase() === "NOT_PAID";
+
+  return (
+    <StatTile
+      label="Current Month"
+      value={`Rs. ${total.toLocaleString("en-PK")}`}
+      hint={
+        <span className="inline-flex items-center gap-1.5">
+          Total rashan amount in {monthLong}
+          {isPaid && (
+            <CheckCircle2 className="w-3.5 h-3.5 text-green-600" aria-label="Amount paid" />
+          )}
+          {isUnpaid && (
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-600" aria-label="Amount due" />
+          )}
+        </span>
+      }
+      loading={loading}
+      onClick={() => {
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        try {
+          sessionStorage.setItem(
+            "rashanFilters",
+            JSON.stringify({ status: "all", validFrom: `${mm}/${year}` }),
+          );
+        } catch (_) {
+          /* ignore */
+        }
+        onNavigate?.("transactions");
+      }}
+    />
+  );
+}
+
 function CurrentYearStat({
   mobile,
   onNavigate,
