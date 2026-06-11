@@ -1804,7 +1804,7 @@ const Index = () => {
               </DialogPrimitive.Close>
               <div className="h-6" aria-hidden />
               <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
-                Mera Rashan
+                Profile
               </DialogPrimitive.Title>
             </div>
             <div className="pt-2">
