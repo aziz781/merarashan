@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageFooter } from "@/components/PageFooter";
+import { SideMenu } from "@/components/SideMenu";
 
 type Item = Record<string, unknown>;
 
@@ -322,15 +323,18 @@ const RashanDetails = () => {
   return (
     <div className="min-h-screen pb-16">
       <header className="px-5 pt-10 pb-6 text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={goBack}
-          className="text-primary-foreground hover:bg-white/10 -ml-2 mb-3"
-        >
-          <ArrowLeft className="w-4 h-4 mr-1" />
-          Back
-        </Button>
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goBack}
+            className="text-primary-foreground hover:bg-white/10 -ml-2"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back
+          </Button>
+          <SideMenu />
+        </div>
         <div className="flex items-center gap-3">
           <Receipt className="w-6 h-6 opacity-90" />
           <div className="min-w-0">
