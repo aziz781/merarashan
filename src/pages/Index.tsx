@@ -1540,6 +1540,7 @@ const Index = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
