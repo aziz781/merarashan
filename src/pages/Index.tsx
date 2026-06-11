@@ -536,30 +536,7 @@ function CardsStats({
 
       />
 
-      <StatTile
-        label="Current Month"
-        value={`Rs. ${total.toLocaleString("en-PK")}`}
-        hint={
-          <>
-            Total rashan amount in {new Date().toLocaleString(undefined, { month: "long" })}
-          </>
-        }
-        loading={loading}
-        onClick={() => {
-          const now = new Date();
-          const mm = String(now.getMonth() + 1).padStart(2, "0");
-          const yyyy = String(now.getFullYear());
-          try {
-            sessionStorage.setItem(
-              "rashanFilters",
-              JSON.stringify({ status: "all", validFrom: `${mm}/${yyyy}` }),
-            );
-          } catch (_) {
-            /* ignore */
-          }
-          onNavigate?.("transactions");
-        }}
-      />
+      <CurrentMonthTile mobile={mobile} total={total} loading={loading} onNavigate={onNavigate} />
 
       <div className="col-span-2">
         <CurrentYearStat mobile={mobile} onNavigate={onNavigate} />
