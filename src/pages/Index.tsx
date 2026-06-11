@@ -1831,6 +1831,9 @@ const Index = () => {
               <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
                 Help &amp; Support
               </DialogPrimitive.Title>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Get instant help from our virtual agent 24/7. Live support: Mon-Sun 06:00-18:00 (UTC)
+              </p>
             </div>
             <div className="space-y-3 pt-4">
               <WhatsAppTile
