@@ -1851,13 +1851,13 @@ const Index = () => {
                 }`}
               >
                 <span
-                  className={`flex items-center justify-center w-10 h-7 rounded-full transition-colors ${
-                    active ? "bg-primary/12" : ""
+                  className={`flex items-center justify-center w-12 h-7 rounded-full transition-colors ${
+                    active ? "bg-primary/15 ring-1 ring-primary/30" : ""
                   }`}
                 >
                   <Icon className="w-5 h-5" />
                 </span>
-                <span className={`text-[10px] font-medium ${active ? "font-semibold" : ""}`}>{label}</span>
+                <span className={`text-[10px] ${active ? "font-semibold text-primary" : "font-medium"}`}>{label}</span>
               </button>
             );
           })}
