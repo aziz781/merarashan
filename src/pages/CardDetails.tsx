@@ -7,7 +7,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetchResource } from "@/lib/api";
 import { TransactionCard } from "@/components/TransactionCard";
 import { PageFooter } from "@/components/PageFooter";
-import { SideMenu } from "@/components/SideMenu";
 
 const STORAGE_KEY = "mr_mobile";
 
@@ -71,18 +70,15 @@ const CardDetails = () => {
         className="px-5 pt-10 pb-6 text-primary-foreground"
         style={{ background: "var(--gradient-primary)" }}
       >
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-            className="text-primary-foreground hover:bg-white/10 -ml-2"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back
-          </Button>
-          <SideMenu />
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="text-primary-foreground hover:bg-white/10 -ml-2 mb-3"
+        >
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Back
+        </Button>
         <div className="flex items-center gap-3">
           <CreditCard className="w-6 h-6 opacity-90" />
           <h1 className="text-xl font-bold truncate">میرا راشن کارڈ</h1>
