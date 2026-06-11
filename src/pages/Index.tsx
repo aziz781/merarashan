@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { HelpCircle, ChevronDown, Bot, LifeBuoy } from "lucide-react";
+import { HelpCircle, ChevronDown, Bot, LifeBuoy, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
