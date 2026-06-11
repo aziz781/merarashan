@@ -748,8 +748,8 @@ function ProfileView({
       const isActive = raw === true || raw === "true" || raw === 1 || raw === "1";
       display = isActive ? (
         <span className="inline-flex items-center gap-1.5 font-medium">
-          Active
           <CheckCircle2 className="w-4 h-4 text-green-500" />
+          Active
         </span>
       ) : (
         <span className="inline-flex items-center gap-1.5 font-medium">
