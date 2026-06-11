@@ -394,6 +394,7 @@ const RashanDetails = () => {
         ))}
       </main>
       <PageFooter />
+      <BottomNav activeTab={origin === "rashans" ? "transactions" : "customers"} />
     </div>
   );
 };
