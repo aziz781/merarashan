@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageFooter } from "@/components/PageFooter";
-import { BottomNav } from "@/components/BottomNav";
 
 type Item = Record<string, unknown>;
 
@@ -321,7 +320,7 @@ const RashanDetails = () => {
   const subtitle = (item.month_year as string) || "";
 
   return (
-    <div className="min-h-screen pb-32">
+    <div className="min-h-screen pb-16">
       <header className="px-5 pt-10 pb-6 text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
         <Button
           variant="ghost"
@@ -394,7 +393,6 @@ const RashanDetails = () => {
         ))}
       </main>
       <PageFooter />
-      <BottomNav activeTab={origin === "rashans" ? "transactions" : "customers"} />
     </div>
   );
 };
