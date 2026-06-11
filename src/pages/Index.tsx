@@ -586,11 +586,40 @@ function CurrentMonthTile({
       value={`Rs. ${total.toLocaleString("en-PK")}`}
       hint={
         <span className="inline-flex items-center gap-1.5">
-          {isPaid && (
-            <CheckCircle2 className="w-3.5 h-3.5 text-green-600" aria-label="Amount paid" />
-          )}
-          {isUnpaid && (
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-600" aria-label="Amount due" />
+          {(isPaid || isUnpaid) && (
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.stopPropagation();
+                try {
+                  sessionStorage.setItem("statementsYear", year);
+                } catch (_) {
+                  /* ignore */
+                }
+                onNavigate?.("statements");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  try {
+                    sessionStorage.setItem("statementsYear", year);
+                  } catch (_) {
+                    /* ignore */
+                  }
+                  onNavigate?.("statements");
+                }
+              }}
+              className="inline-flex cursor-pointer"
+              aria-label={isPaid ? "View paid statement" : "View unpaid statement"}
+            >
+              {isPaid ? (
+                <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+              ) : (
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+              )}
+            </span>
           )}
           Total rashan amount in {monthLong}
         </span>
