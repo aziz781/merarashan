@@ -66,7 +66,7 @@ const CardDetails = () => {
     "Card Details";
 
   return (
-    <div className="min-h-screen pb-16">
+    <div className="min-h-screen pb-32">
       <header
         className="px-5 pt-10 pb-6 text-primary-foreground"
         style={{ background: "var(--gradient-primary)" }}
