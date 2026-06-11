@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { HelpCircle, ChevronDown, Bot, LifeBuoy } from "lucide-react";
+import { HelpCircle, ChevronDown, Bot, LifeBuoy, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -779,8 +779,6 @@ function ProfileView({
           <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
             <div className="space-y-1.5">{section1.map(renderRow)}</div>
           </Card>
-
-          <NotificationToggle mobile={mobile} />
         </>
       )}
       {!profileOnly && (
@@ -1542,6 +1540,7 @@ const Index = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
@@ -1719,6 +1718,21 @@ const Index = () => {
             <button
               type="button"
               onClick={() => {
+                setProfileOpen(false);
+                setHelpOpen(false);
+                setSettingsOpen(true);
+              }}
+              className="flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+              <span className="flex-1">Settings</span>
+            </button>
+
+
+
+            <button
+              type="button"
+              onClick={() => {
                 setMenuOpen(false);
                 handleLogout();
               }}
@@ -1831,6 +1845,31 @@ const Index = () => {
                 title="Mera Rashan Chat Bot"
                 subtitle="Automated assistant"
               />
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+
+      <DialogPrimitive.Root open={settingsOpen} onOpenChange={setSettingsOpen} modal={false}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Content
+            onInteractOutside={(e) => e.preventDefault()}
+            className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
+          >
+            <div className="mb-2">
+              <DialogPrimitive.Close
+                className="-ml-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
+                aria-label="Back"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </DialogPrimitive.Close>
+              <div className="h-6" aria-hidden />
+              <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
+                Settings
+              </DialogPrimitive.Title>
+            </div>
+            <div className="space-y-3 pt-4">
+              <NotificationToggle mobile={mobile} />
             </div>
           </DialogPrimitive.Content>
         </DialogPrimitive.Portal>
