@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetchResource } from "@/lib/api";
 import { TransactionCard } from "@/components/TransactionCard";
 import { PageFooter } from "@/components/PageFooter";
+import { BottomNav } from "@/components/BottomNav";
 
 const STORAGE_KEY = "mr_mobile";
 
