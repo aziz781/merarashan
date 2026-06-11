@@ -153,6 +153,7 @@ const CardDetails = () => {
         </section>
       </main>
       <PageFooter />
+      <BottomNav activeTab="cards" />
     </div>
   );
 };
