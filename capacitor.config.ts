@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.6fdf31a43e344895b7822f7c14c350ba',
+  appId: 'pk.merarashan.app',
   appName: 'merarashan',
   webDir: 'dist',
   // server: {
