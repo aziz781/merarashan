@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -14,8 +15,27 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageFooter } from "@/components/PageFooter";
+import { fetchResource } from "@/lib/api";
 
 type Item = Record<string, unknown>;
+
+const MOBILE_STORAGE_KEY = "mr_mobile";
+
+function getRcNum(item?: Item) {
+  return item?.rc_num == null ? "" : String(item.rc_num);
+}
+
+function itemMatchesRcNum(item: Item | undefined, rcNum: string) {
+  return !rcNum || getRcNum(item) === rcNum;
+}
+
+function extractItems(data: unknown): unknown[] {
+  if (Array.isArray(data)) return data;
+  const d = data as { items?: unknown[]; data?: unknown[] };
+  if (Array.isArray(d?.items)) return d.items;
+  if (Array.isArray(d?.data)) return d.data;
+  return data && typeof data === "object" ? [data] : [];
+}
 
 const CATEGORIES: {
   id: string;
@@ -265,12 +285,27 @@ const RashanDetails = () => {
   const params = useParams<{ rcNum?: string }>();
   const rcNumParam = params.rcNum ? decodeURIComponent(params.rcNum) : "";
   const location = useLocation() as { state?: { item?: Item; origin?: "home" | "rashans" } };
-  let item = location.state?.item;
+  const stateItem = itemMatchesRcNum(location.state?.item, rcNumParam) ? location.state?.item : undefined;
+  const [fetchedItem, setFetchedItem] = useState<Item | undefined>();
+  const [loadingDetail, setLoadingDetail] = useState(Boolean(rcNumParam && !stateItem));
+  const [detailError, setDetailError] = useState<string | null>(null);
+  let item = stateItem;
   let origin = location.state?.origin ?? "home";
-  if (!item) {
+  if (!item && rcNumParam) {
     try {
-      const keyed = rcNumParam ? sessionStorage.getItem(`rashanDetailItem:${rcNumParam}`) : null;
-      const raw = keyed ?? sessionStorage.getItem("rashanDetailItem");
+      const raw = sessionStorage.getItem(`rashanDetailItem:${rcNumParam}`);
+      if (raw) {
+        const parsed = JSON.parse(raw) as { item?: Item; origin?: "home" | "rashans" };
+        if (itemMatchesRcNum(parsed.item, rcNumParam)) {
+          item = parsed.item;
+          origin = parsed.origin ?? origin;
+        }
+      }
+    } catch (_) { /* ignore */ }
+  }
+  if (!item && !rcNumParam) {
+    try {
+      const raw = sessionStorage.getItem("rashanDetailItem");
       if (raw) {
         const parsed = JSON.parse(raw) as { item?: Item; origin?: "home" | "rashans" };
         item = parsed.item;
@@ -278,6 +313,43 @@ const RashanDetails = () => {
       }
     } catch (_) { /* ignore */ }
   }
+  if (!item && itemMatchesRcNum(fetchedItem, rcNumParam)) item = fetchedItem;
+
+  useEffect(() => {
+    if (!rcNumParam || item) {
+      setLoadingDetail(false);
+      return;
+    }
+    let cancelled = false;
+    setLoadingDetail(true);
+    setDetailError(null);
+    try {
+      const mobile = localStorage.getItem(MOBILE_STORAGE_KEY);
+      if (!mobile) {
+        setLoadingDetail(false);
+        return;
+      }
+      fetchResource("transactions", mobile, { rcNum: rcNumParam })
+        .then((data) => {
+          if (cancelled) return;
+          const match = extractItems(data).find((entry) => itemMatchesRcNum(entry as Item, rcNumParam)) as Item | undefined;
+          if (match) {
+            setFetchedItem(match);
+            try {
+              sessionStorage.setItem(`rashanDetailItem:${rcNumParam}`, JSON.stringify({ item: match, origin: "rashans" }));
+            } catch (_) { /* ignore */ }
+          }
+        })
+        .catch((e) => !cancelled && setDetailError(e instanceof Error ? e.message : "Failed to load rashan"))
+        .finally(() => !cancelled && setLoadingDetail(false));
+    } catch (_) {
+      setLoadingDetail(false);
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [rcNumParam, item]);
+
   const goBack = () => {
     try {
       sessionStorage.setItem("activeTab", origin === "rashans" ? "transactions" : "customers");
@@ -294,7 +366,13 @@ const RashanDetails = () => {
           <ArrowLeft className="w-4 h-4 mr-1" /> Back
         </Button>
         <Card className="p-5">
-          <p className="text-sm text-muted-foreground">No rashan data. Open this page from the rashans list.</p>
+          <p className="text-sm text-muted-foreground">
+            {loadingDetail
+              ? "Loading rashan details..."
+              : detailError
+                ? "Unable to load this rashan. Please open it from the rashans list."
+                : "No rashan data. Open this page from the rashans list."}
+          </p>
         </Card>
       </div>
     );
