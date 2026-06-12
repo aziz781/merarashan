@@ -125,6 +125,11 @@ export async function fcmSend(opts: {
       notification: {
         // Do NOT set click_action — Capacitor's PushNotifications plugin
         // relies on the default launcher activity to deliver the tap event.
+        sound: "default",
+        default_vibrate_timings: true,
+        default_sound: true,
+        notification_priority: "PRIORITY_HIGH",
+        channel_id: "default",
         ...(opts.tag ? { tag: opts.tag } : {}),
       },
     },
