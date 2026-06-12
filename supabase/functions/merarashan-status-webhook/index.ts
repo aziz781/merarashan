@@ -76,20 +76,20 @@ Deno.serve(async (req) => {
       url?: string;
     };
 
-    if (!payload?.mobile || !payload?.status) {
-      return new Response(JSON.stringify({ error: "Missing required fields: mobile, status" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const title = (payload.title || "").trim();
+    const body = (payload.body || "").trim();
+    if (!payload?.mobile || !title || !body) {
+      return new Response(
+        JSON.stringify({ error: "Missing required fields: mobile, title, body" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const mobile = String(payload.mobile);
-    const status = String(payload.status);
+    const status = payload.status ? String(payload.status) : undefined;
     const prev = payload.previous_status ? String(payload.previous_status) : undefined;
     const rc = payload.rc_num ? String(payload.rc_num) : undefined;
 
-    const title = payload.title?.trim() || defaultTitle(status);
-    const body = payload.body?.trim() || defaultBody(rc, status, prev);
     const url = payload.url?.trim() || (rc ? `/rashans/detail?rc=${encodeURIComponent(rc)}` : "/");
     const tag = rc ? `rashan-${rc}` : undefined;
 
