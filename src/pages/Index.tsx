@@ -1743,9 +1743,8 @@ const Index = () => {
         <SheetContent
           side="left"
           className="w-72 flex flex-col"
-          onInteractOutside={(e) => e.preventDefault()}
-          onPointerDownOutside={(e) => e.preventDefault()}
         >
+
           <SheetHeader>
             <SheetTitle className="truncate">{String(displayName)}</SheetTitle>
           </SheetHeader>
