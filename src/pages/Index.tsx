@@ -868,13 +868,19 @@ function ProfileView({
             onNavigate={onNavigate}
           />
           <InstallAppLinks />
-          {data.msg != null && String(data.msg).trim() !== "" && (
+          {data.msg != null && String(data.msg).trim() !== "" && dismissedMsg !== String(data.msg) && (
             <MessageBox
               type={String(data.msg_type ?? "")}
               title={data.msg_title ? String(data.msg_title) : undefined}
               message={String(data.msg)}
+              onDismiss={() => {
+                const m = String(data.msg);
+                try { sessionStorage.setItem("dismissedHomeMsg", m); } catch {}
+                setDismissedMsg(m);
+              }}
             />
           )}
+
           <RecentRashans
             mobile={mobile}
             totalCards={Number(data.active_cards) || 0}
