@@ -263,8 +263,18 @@ function UpdatesTimeline({ item }: { item: Item }) {
 const RashanDetails = () => {
   const navigate = useNavigate();
   const location = useLocation() as { state?: { item?: Item; origin?: "home" | "rashans" } };
-  const item = location.state?.item;
-  const origin = location.state?.origin ?? "home";
+  let item = location.state?.item;
+  let origin = location.state?.origin ?? "home";
+  if (!item) {
+    try {
+      const raw = sessionStorage.getItem("rashanDetailItem");
+      if (raw) {
+        const parsed = JSON.parse(raw) as { item?: Item; origin?: "home" | "rashans" };
+        item = parsed.item;
+        origin = parsed.origin ?? origin;
+      }
+    } catch (_) { /* ignore */ }
+  }
   const goBack = () => {
     try {
       sessionStorage.setItem("activeTab", origin === "rashans" ? "transactions" : "customers");
