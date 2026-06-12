@@ -10,6 +10,7 @@ import {
   pushSupported,
   syncPushSubscription,
 } from "@/lib/push";
+import { disableNativePush, enableNativePush, isNativePlatform } from "@/lib/nativePush";
 
 type SyncStatus =
   | "checking"
@@ -19,13 +20,26 @@ type SyncStatus =
   | "not-enabled"
   | "unsupported";
 
+const NATIVE_ENABLED_KEY = "mr_native_push_enabled";
+
 export function NotificationToggle({ mobile }: { mobile: string }) {
+  const native = isNativePlatform();
   const [supported, setSupported] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [busy, setBusy] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("checking");
 
   useEffect(() => {
+    // --- Native (Capacitor/FCM) branch ---
+    if (native) {
+      setSupported(true);
+      const wasEnabled = localStorage.getItem(NATIVE_ENABLED_KEY) === "1";
+      setEnabled(wasEnabled);
+      setSyncStatus(wasEnabled ? "matched" : "not-enabled");
+      return;
+    }
+
+    // --- Web push branch ---
     if (!pushSupported()) {
       setSupported(false);
       setSyncStatus("unsupported");
@@ -51,7 +65,6 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
           setSyncStatus("matched");
           return;
         }
-        // result === "skipped" — permission not granted or no mobile yet.
         const s = await getCurrentSubscription();
         if (cancelled) return;
         setEnabled(!!s && Notification.permission === "granted");
@@ -74,23 +87,39 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
     return () => {
       cancelled = true;
     };
-  }, [mobile]);
+  }, [mobile, native]);
 
   if (!supported) return null;
 
   const onToggle = async () => {
     setBusy(true);
     try {
-      if (enabled) {
-        await disablePush();
-        setEnabled(false);
-        setSyncStatus("not-enabled");
-        toast.success("Notifications disabled");
+      if (native) {
+        if (enabled) {
+          await disableNativePush();
+          localStorage.removeItem(NATIVE_ENABLED_KEY);
+          setEnabled(false);
+          setSyncStatus("not-enabled");
+          toast.success("Notifications disabled");
+        } else {
+          await enableNativePush(mobile);
+          localStorage.setItem(NATIVE_ENABLED_KEY, "1");
+          setEnabled(true);
+          setSyncStatus("matched");
+          toast.success("Notifications enabled");
+        }
       } else {
-        await enablePush(mobile);
-        setEnabled(true);
-        setSyncStatus("matched");
-        toast.success("Notifications enabled");
+        if (enabled) {
+          await disablePush();
+          setEnabled(false);
+          setSyncStatus("not-enabled");
+          toast.success("Notifications disabled");
+        } else {
+          await enablePush(mobile);
+          setEnabled(true);
+          setSyncStatus("matched");
+          toast.success("Notifications enabled");
+        }
       }
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Something went wrong");
@@ -110,7 +139,7 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
     },
     matched: {
       icon: CheckCircle2,
-      text: "Subscription up to date",
+      text: native ? "Device registered for push" : "Subscription up to date",
       className: "text-emerald-600 dark:text-emerald-400",
     },
     resubscribed: {
