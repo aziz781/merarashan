@@ -1890,7 +1890,7 @@ const Index = () => {
         </div>
       </nav>
 
-      <DialogPrimitive.Root open={profileOpen} onOpenChange={setProfileOpen} modal={false}>
+      <DialogPrimitive.Root open={profileOpen} onOpenChange={handleSlideInOpenChange(setProfileOpen)} modal={false}>
         <DialogPrimitive.Portal>
           <DialogPrimitive.Content
             onInteractOutside={(e) => e.preventDefault()}
