@@ -1,10 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { toast } from "sonner";
 import Index from "./pages/Index.tsx";
 import CardDetails from "./pages/CardDetails.tsx";
 import RashanDetails from "./pages/RashanDetails.tsx";
@@ -12,22 +11,31 @@ import DevTroubleshooting from "./pages/DevTroubleshooting.tsx";
 import AdminNotify from "./pages/AdminNotify.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { initNativePushListeners, isNativePlatform } from "@/lib/nativePush";
+import {
+  PushNotificationDialog,
+  type PushNotificationPayload,
+} from "@/components/PushNotificationDialog";
 
 const queryClient = new QueryClient();
 
 function NativePushBridge() {
+  const [pending, setPending] = useState<PushNotificationPayload | null>(null);
+
   useEffect(() => {
     if (!isNativePlatform()) return;
     initNativePushListeners({
       onForeground: (n) => {
-        toast(n.title || "Notification", { description: n.body });
+        const data = (n.data || {}) as Record<string, unknown>;
+        const url = typeof data.url === "string" ? data.url : undefined;
+        setPending({ title: n.title, body: n.body, url });
       },
       onAction: (url) => {
         if (url) window.location.assign(url);
       },
     }).catch(() => { /* ignore */ });
   }, []);
-  return null;
+
+  return <PushNotificationDialog notification={pending} onClose={() => setPending(null)} />;
 }
 
 const App = () => (
