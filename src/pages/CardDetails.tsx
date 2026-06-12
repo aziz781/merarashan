@@ -46,7 +46,8 @@ const CardDetails = () => {
       .then((d) => {
         if (cancelled) return;
         const items = (extractItems(d) ?? []) as Record<string, unknown>[];
-        const found = items.find((c) => String(c.cm_card_number) === String(rcNum));
+        const norm = (v: unknown) => String(v ?? "").replace(/\s+/g, "").trim();
+        const found = items.find((c) => norm(c.cm_card_number) === rcNum);
         if (found) setCard(found);
         else setCardError("Card not found for this account.");
       })
