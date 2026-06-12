@@ -65,9 +65,6 @@ Deno.serve(async (req) => {
 
     const payload = (await req.json()) as {
       mobile?: string | number;
-      rc_num?: string;
-      status?: string;
-      previous_status?: string;
       title?: string;
       body?: string;
       url?: string;
@@ -83,12 +80,7 @@ Deno.serve(async (req) => {
     }
 
     const mobile = String(payload.mobile);
-    const status = payload.status ? String(payload.status) : undefined;
-    const prev = payload.previous_status ? String(payload.previous_status) : undefined;
-    const rc = payload.rc_num ? String(payload.rc_num) : undefined;
-
-    const url = payload.url?.trim() || (rc ? `/rashans/detail?rc=${encodeURIComponent(rc)}` : "/");
-    const tag = rc ? `rashan-${rc}` : undefined;
+    const url = payload.url?.trim() || "/";
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
