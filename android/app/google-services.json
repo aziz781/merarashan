@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "832163353382",
+    "project_id": "merarashanapp",
+    "storage_bucket": "merarashanapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:832163353382:android:743888312e016591ea27e7",
+        "android_client_info": {
+          "package_name": "pk.merarashan.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8o6KEoK74I0b18R2qfrIudeRcrDwd2-8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
