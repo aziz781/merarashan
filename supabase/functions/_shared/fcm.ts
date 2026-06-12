@@ -123,7 +123,8 @@ export async function fcmSend(opts: {
     android: {
       priority: "HIGH",
       notification: {
-        click_action: "FLUTTER_NOTIFICATION_CLICK",
+        // Do NOT set click_action — Capacitor's PushNotifications plugin
+        // relies on the default launcher activity to deliver the tap event.
         ...(opts.tag ? { tag: opts.tag } : {}),
       },
     },
