@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">merarashan</string>
-    <string name="title_activity_main">merarashan</string>
+    <string name="app_name">Mera Rashan App</string>
+    <string name="title_activity_main">Mera Rashan App</string>
     <string name="package_name">pk.merarashan.app</string>
     <string name="custom_url_scheme">pk.merarashan.app</string>
 </resources>
