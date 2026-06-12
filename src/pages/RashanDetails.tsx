@@ -432,8 +432,23 @@ const RashanDetails = () => {
       </header>
 
       <main className="px-5 -mt-3 space-y-4">
-        {grouped.map(({ id, title, icon: Icon, rows }) => (
-          <Card key={id} className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+        {grouped.map(({ id, title, icon: Icon, rows }) => {
+          const cardRcNum = getRcNum(item);
+          const isCardTile = id === "card" && cardRcNum;
+          return (
+          <Card
+            key={id}
+            role={isCardTile ? "button" : undefined}
+            tabIndex={isCardTile ? 0 : undefined}
+            onClick={isCardTile ? () => navigate(`/cards/${encodeURIComponent(cardRcNum)}`) : undefined}
+            onKeyDown={isCardTile ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                navigate(`/cards/${encodeURIComponent(cardRcNum)}`);
+              }
+            } : undefined}
+            className={`p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 ${isCardTile ? "cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]" : ""}`}
+          >
             <div className="flex items-center gap-2 mb-3">
               <Icon className="w-4 h-4 text-primary" />
               <p className="text-xs uppercase tracking-wider text-muted-foreground font-bold">{title}</p>
@@ -481,7 +496,7 @@ const RashanDetails = () => {
               </div>
             )}
           </Card>
-        ))}
+        );})}
       </main>
       <PageFooter />
     </div>
