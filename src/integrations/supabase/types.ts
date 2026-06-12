@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      native_push_subscriptions: {
+        Row: {
+          created_at: string
+          fcm_token: string
+          id: string
+          mobile: string
+          platform: string
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          fcm_token: string
+          id?: string
+          mobile: string
+          platform?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          fcm_token?: string
+          id?: string
+          mobile?: string
+          platform?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       otp_codes: {
         Row: {
           attempts: number
