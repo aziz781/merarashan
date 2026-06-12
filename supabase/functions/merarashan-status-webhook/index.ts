@@ -5,11 +5,8 @@
 // {
 //   "mobile": "447525776781",          // required — card owner's mobile
 //   "title": "Rashan Available",       // required — notification title
-//   "body":  "Your rashan ABC123 is now Available.",  // required — notification message
-//   "rc_num": "ABC123",                // optional — included in data + used for default deep link
-//   "status": "Available",             // optional — included in data payload
-//   "previous_status": "Pending",      // optional — included in data payload
-//   "url":   "/rashans/detail?rc=ABC123"               // optional deep link
+//   "body":  "Your rashan is ready.",  // required — notification message
+//   "url":   "/rashans/detail"         // optional deep link
 // }
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
