@@ -26,7 +26,11 @@ const CardDetails = () => {
   const [cardLoading, setCardLoading] = useState(false);
   const [cardError, setCardError] = useState<string | null>(null);
   const mobile = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
-  const rcNum = rcNumParam || (card?.cm_card_number as string) || "";
+  const rcNum = (rcNumParam || (card?.cm_card_number as string) || "")
+    .toString()
+    .replace(/^['"]|['"]$/g, "")
+    .replace(/\s+/g, "")
+    .trim();
 
   const [txns, setTxns] = useState<Record<string, unknown>[] | null>(null);
   const [loading, setLoading] = useState(true);
