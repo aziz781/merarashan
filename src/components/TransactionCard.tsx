@@ -41,7 +41,12 @@ export function TransactionCard({
   const notPaid = paymentStatus === "NOT_PAID";
   const showExtras = variant === "full";
 
-  const open = () => navigate("/rashans/detail", { state: { item, origin } });
+  const open = () => {
+    try {
+      sessionStorage.setItem("rashanDetailItem", JSON.stringify({ item, origin }));
+    } catch (_) { /* ignore */ }
+    navigate("/rashans/detail", { state: { item, origin } });
+  };
 
   return (
     <Card
