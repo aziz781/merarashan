@@ -760,6 +760,10 @@ function ProfileView({
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dismissedMsg, setDismissedMsg] = useState<string | null>(() => {
+    try { return sessionStorage.getItem("dismissedHomeMsg"); } catch { return null; }
+  });
+
 
   useEffect(() => {
     let cancelled = false;
