@@ -61,7 +61,9 @@ const CardDetails = () => {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetchResource<unknown>("transactions", mobile, { rcNum })
+    const digits = rcNum.replace(/\D/g, "");
+    const formattedRc = digits.replace(/(.{4})(?=.)/g, "$1 ");
+    fetchResource<unknown>("transactions", mobile, { rcNum: formattedRc })
       .then((d) => {
         if (cancelled) return;
         setTxns((extractItems(d) ?? []) as Record<string, unknown>[]);
