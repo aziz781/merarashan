@@ -1915,7 +1915,7 @@ const Index = () => {
         </DialogPrimitive.Portal>
       </DialogPrimitive.Root>
 
-      <DialogPrimitive.Root open={helpOpen} onOpenChange={setHelpOpen} modal={false}>
+      <DialogPrimitive.Root open={helpOpen} onOpenChange={handleSlideInOpenChange(setHelpOpen)} modal={false}>
         <DialogPrimitive.Portal>
           <DialogPrimitive.Content
             onInteractOutside={(e) => e.preventDefault()}
