@@ -1626,7 +1626,7 @@ const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const slideInClosingRef = React.useRef(false);
+  const slideInClosingRef = useRef(false);
   const handleSlideInOpenChange = (setter: (v: boolean) => void) => (open: boolean) => {
     if (!open) {
       slideInClosingRef.current = true;
