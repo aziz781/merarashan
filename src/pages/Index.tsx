@@ -1753,7 +1753,7 @@ const Index = () => {
         open={menuOpen}
         onOpenChange={(open) => {
           // Keep sidebar open while a slide-in panel (profile/help/settings) is showing
-          if (!open && (profileOpen || helpOpen || settingsOpen)) return;
+          if (!open && (profileOpen || helpOpen || settingsOpen || slideInClosingRef.current)) return;
           setMenuOpen(open);
         }}
       >
