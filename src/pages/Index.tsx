@@ -1739,7 +1739,14 @@ const Index = () => {
         </div>
       </header>
 
-      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+      <Sheet
+        open={menuOpen}
+        onOpenChange={(open) => {
+          // Keep sidebar open while a slide-in panel (profile/help/settings) is showing
+          if (!open && (profileOpen || helpOpen || settingsOpen)) return;
+          setMenuOpen(open);
+        }}
+      >
         <SheetContent
           side="left"
           className="w-72 flex flex-col"
