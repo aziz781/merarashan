@@ -42,10 +42,14 @@ export function TransactionCard({
   const showExtras = variant === "full";
 
   const open = () => {
+    const key = rcNum ? encodeURIComponent(rcNum) : "";
     try {
       sessionStorage.setItem("rashanDetailItem", JSON.stringify({ item, origin }));
+      if (key) {
+        sessionStorage.setItem(`rashanDetailItem:${rcNum}`, JSON.stringify({ item, origin }));
+      }
     } catch (_) { /* ignore */ }
-    navigate("/rashans/detail", { state: { item, origin } });
+    navigate(key ? `/rashans/detail/${key}` : "/rashans/detail", { state: { item, origin } });
   };
 
   return (

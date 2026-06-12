@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   Receipt,
@@ -262,12 +262,15 @@ function UpdatesTimeline({ item }: { item: Item }) {
 
 const RashanDetails = () => {
   const navigate = useNavigate();
+  const params = useParams<{ rcNum?: string }>();
+  const rcNumParam = params.rcNum ? decodeURIComponent(params.rcNum) : "";
   const location = useLocation() as { state?: { item?: Item; origin?: "home" | "rashans" } };
   let item = location.state?.item;
   let origin = location.state?.origin ?? "home";
   if (!item) {
     try {
-      const raw = sessionStorage.getItem("rashanDetailItem");
+      const keyed = rcNumParam ? sessionStorage.getItem(`rashanDetailItem:${rcNumParam}`) : null;
+      const raw = keyed ?? sessionStorage.getItem("rashanDetailItem");
       if (raw) {
         const parsed = JSON.parse(raw) as { item?: Item; origin?: "home" | "rashans" };
         item = parsed.item;
