@@ -93,6 +93,22 @@ export async function initNativePushListeners(opts: {
 }): Promise<void> {
   if (!isNativePlatform()) return;
 
+  // Ensure a high-importance channel with sound + vibration exists on Android.
+  if (Capacitor.getPlatform() === "android") {
+    try {
+      await PushNotifications.createChannel({
+        id: "default",
+        name: "Default",
+        description: "General notifications",
+        importance: 5, // IMPORTANCE_HIGH (heads-up + sound)
+        visibility: 1,
+        sound: "default",
+        vibration: true,
+        lights: true,
+      });
+    } catch { /* ignore */ }
+  }
+
   await PushNotifications.addListener("pushNotificationReceived", (notification) => {
     opts.onForeground?.({
       title: notification.title,
