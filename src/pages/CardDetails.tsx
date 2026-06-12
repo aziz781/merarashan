@@ -26,7 +26,11 @@ const CardDetails = () => {
   const [cardLoading, setCardLoading] = useState(false);
   const [cardError, setCardError] = useState<string | null>(null);
   const mobile = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
-  const rcNum = rcNumParam || (card?.cm_card_number as string) || "";
+  const rcNum = (rcNumParam || (card?.cm_card_number as string) || "")
+    .toString()
+    .replace(/^['"]|['"]$/g, "")
+    .replace(/\s+/g, "")
+    .trim();
 
   const [txns, setTxns] = useState<Record<string, unknown>[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,7 +46,8 @@ const CardDetails = () => {
       .then((d) => {
         if (cancelled) return;
         const items = (extractItems(d) ?? []) as Record<string, unknown>[];
-        const found = items.find((c) => String(c.cm_card_number) === String(rcNum));
+        const norm = (v: unknown) => String(v ?? "").replace(/\s+/g, "").trim();
+        const found = items.find((c) => norm(c.cm_card_number) === rcNum);
         if (found) setCard(found);
         else setCardError("Card not found for this account.");
       })
