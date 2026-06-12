@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -14,8 +15,27 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageFooter } from "@/components/PageFooter";
+import { fetchResource } from "@/lib/api";
 
 type Item = Record<string, unknown>;
+
+const MOBILE_STORAGE_KEY = "mr_mobile";
+
+function getRcNum(item?: Item) {
+  return item?.rc_num == null ? "" : String(item.rc_num);
+}
+
+function itemMatchesRcNum(item: Item | undefined, rcNum: string) {
+  return !rcNum || getRcNum(item) === rcNum;
+}
+
+function extractItems(data: unknown): unknown[] {
+  if (Array.isArray(data)) return data;
+  const d = data as { items?: unknown[]; data?: unknown[] };
+  if (Array.isArray(d?.items)) return d.items;
+  if (Array.isArray(d?.data)) return d.data;
+  return data && typeof data === "object" ? [data] : [];
+}
 
 const CATEGORIES: {
   id: string;
