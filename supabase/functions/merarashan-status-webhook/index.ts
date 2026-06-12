@@ -40,14 +40,6 @@ webpush.setVapidDetails(
 type WebSub = { endpoint: string; p256dh: string; auth: string };
 type NativeSub = { fcm_token: string };
 
-function defaultTitle(status: string): string {
-  return `Rashan status: ${status}`;
-}
-function defaultBody(rc: string | undefined, status: string, prev?: string): string {
-  const id = rc ? `Rashan ${rc}` : "Your rashan";
-  return prev ? `${id} changed from ${prev} to ${status}.` : `${id} is now ${status}.`;
-}
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") {
