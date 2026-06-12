@@ -140,10 +140,15 @@ const CardDetails = () => {
             </div>
           </Card>
         </>
+      ) : cardLoading ? (
+        <Card className="p-5">
+          <Skeleton className="h-6 w-2/3 mb-2" />
+          <Skeleton className="h-4 w-full" />
+        </Card>
       ) : (
         <Card className="p-5">
           <p className="text-sm text-muted-foreground">
-            No card data. Open this page from the cards list.
+            {cardError || (!mobile ? "Please sign in to view this card." : "No card data.")}
           </p>
         </Card>
       )}
