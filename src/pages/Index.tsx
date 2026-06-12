@@ -1626,6 +1626,16 @@ const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const slideInClosingRef = useRef(false);
+  const handleSlideInOpenChange = (setter: (v: boolean) => void) => (open: boolean) => {
+    if (!open) {
+      slideInClosingRef.current = true;
+      window.setTimeout(() => {
+        slideInClosingRef.current = false;
+      }, 400);
+    }
+    setter(open);
+  };
   const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
@@ -1743,7 +1753,7 @@ const Index = () => {
         open={menuOpen}
         onOpenChange={(open) => {
           // Keep sidebar open while a slide-in panel (profile/help/settings) is showing
-          if (!open && (profileOpen || helpOpen || settingsOpen)) return;
+          if (!open && (profileOpen || helpOpen || settingsOpen || slideInClosingRef.current)) return;
           setMenuOpen(open);
         }}
       >
@@ -1880,7 +1890,7 @@ const Index = () => {
         </div>
       </nav>
 
-      <DialogPrimitive.Root open={profileOpen} onOpenChange={setProfileOpen} modal={false}>
+      <DialogPrimitive.Root open={profileOpen} onOpenChange={handleSlideInOpenChange(setProfileOpen)} modal={false}>
         <DialogPrimitive.Portal>
           <DialogPrimitive.Content
             onInteractOutside={(e) => e.preventDefault()}
@@ -1905,7 +1915,7 @@ const Index = () => {
         </DialogPrimitive.Portal>
       </DialogPrimitive.Root>
 
-      <DialogPrimitive.Root open={helpOpen} onOpenChange={setHelpOpen} modal={false}>
+      <DialogPrimitive.Root open={helpOpen} onOpenChange={handleSlideInOpenChange(setHelpOpen)} modal={false}>
         <DialogPrimitive.Portal>
           <DialogPrimitive.Content
             onInteractOutside={(e) => e.preventDefault()}
@@ -1944,7 +1954,7 @@ const Index = () => {
         </DialogPrimitive.Portal>
       </DialogPrimitive.Root>
 
-      <DialogPrimitive.Root open={settingsOpen} onOpenChange={setSettingsOpen} modal={false}>
+      <DialogPrimitive.Root open={settingsOpen} onOpenChange={handleSlideInOpenChange(setSettingsOpen)} modal={false}>
         <DialogPrimitive.Portal>
           <DialogPrimitive.Content
             onInteractOutside={(e) => e.preventDefault()}
