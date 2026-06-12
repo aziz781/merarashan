@@ -4,11 +4,11 @@
 // Expected JSON body:
 // {
 //   "mobile": "447525776781",          // required — card owner's mobile
-//   "rc_num": "ABC123",                // optional — included in payload data
-//   "status": "Available",             // required — new status
-//   "previous_status": "Pending",      // optional
-//   "title": "Rashan Available",       // optional override
-//   "body":  "Your rashan ABC123 is now Available.",  // optional override
+//   "title": "Rashan Available",       // required — notification title
+//   "body":  "Your rashan ABC123 is now Available.",  // required — notification message
+//   "rc_num": "ABC123",                // optional — included in data + used for default deep link
+//   "status": "Available",             // optional — included in data payload
+//   "previous_status": "Pending",      // optional — included in data payload
 //   "url":   "/rashans/detail?rc=ABC123"               // optional deep link
 // }
 
@@ -39,14 +39,6 @@ webpush.setVapidDetails(
 
 type WebSub = { endpoint: string; p256dh: string; auth: string };
 type NativeSub = { fcm_token: string };
-
-function defaultTitle(status: string): string {
-  return `Rashan status: ${status}`;
-}
-function defaultBody(rc: string | undefined, status: string, prev?: string): string {
-  const id = rc ? `Rashan ${rc}` : "Your rashan";
-  return prev ? `${id} changed from ${prev} to ${status}.` : `${id} is now ${status}.`;
-}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -84,20 +76,20 @@ Deno.serve(async (req) => {
       url?: string;
     };
 
-    if (!payload?.mobile || !payload?.status) {
-      return new Response(JSON.stringify({ error: "Missing required fields: mobile, status" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const title = (payload.title || "").trim();
+    const body = (payload.body || "").trim();
+    if (!payload?.mobile || !title || !body) {
+      return new Response(
+        JSON.stringify({ error: "Missing required fields: mobile, title, body" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const mobile = String(payload.mobile);
-    const status = String(payload.status);
+    const status = payload.status ? String(payload.status) : undefined;
     const prev = payload.previous_status ? String(payload.previous_status) : undefined;
     const rc = payload.rc_num ? String(payload.rc_num) : undefined;
 
-    const title = payload.title?.trim() || defaultTitle(status);
-    const body = payload.body?.trim() || defaultBody(rc, status, prev);
     const url = payload.url?.trim() || (rc ? `/rashans/detail?rc=${encodeURIComponent(rc)}` : "/");
     const tag = rc ? `rashan-${rc}` : undefined;
 
@@ -142,7 +134,8 @@ Deno.serve(async (req) => {
     let nativeSent = 0;
     const staleFcm: string[] = [];
     if ((natSubs as NativeSub[]).length > 0) {
-      const data: Record<string, string> = { status };
+      const data: Record<string, string> = {};
+      if (status) data.status = status;
       if (prev) data.previous_status = prev;
       if (rc) data.rc_num = rc;
 
