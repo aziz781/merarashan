@@ -4,11 +4,11 @@
 // Expected JSON body:
 // {
 //   "mobile": "447525776781",          // required — card owner's mobile
-//   "rc_num": "ABC123",                // optional — included in payload data
-//   "status": "Available",             // required — new status
-//   "previous_status": "Pending",      // optional
-//   "title": "Rashan Available",       // optional override
-//   "body":  "Your rashan ABC123 is now Available.",  // optional override
+//   "title": "Rashan Available",       // required — notification title
+//   "body":  "Your rashan ABC123 is now Available.",  // required — notification message
+//   "rc_num": "ABC123",                // optional — included in data + used for default deep link
+//   "status": "Available",             // optional — included in data payload
+//   "previous_status": "Pending",      // optional — included in data payload
 //   "url":   "/rashans/detail?rc=ABC123"               // optional deep link
 // }
 
