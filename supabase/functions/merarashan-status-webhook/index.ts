@@ -5,11 +5,8 @@
 // {
 //   "mobile": "447525776781",          // required — card owner's mobile
 //   "title": "Rashan Available",       // required — notification title
-//   "body":  "Your rashan ABC123 is now Available.",  // required — notification message
-//   "rc_num": "ABC123",                // optional — included in data + used for default deep link
-//   "status": "Available",             // optional — included in data payload
-//   "previous_status": "Pending",      // optional — included in data payload
-//   "url":   "/rashans/detail?rc=ABC123"               // optional deep link
+//   "body":  "Your rashan is ready.",  // required — notification message
+//   "url":   "/rashans/detail"         // optional deep link
 // }
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
@@ -68,9 +65,6 @@ Deno.serve(async (req) => {
 
     const payload = (await req.json()) as {
       mobile?: string | number;
-      rc_num?: string;
-      status?: string;
-      previous_status?: string;
       title?: string;
       body?: string;
       url?: string;
@@ -86,12 +80,7 @@ Deno.serve(async (req) => {
     }
 
     const mobile = String(payload.mobile);
-    const status = payload.status ? String(payload.status) : undefined;
-    const prev = payload.previous_status ? String(payload.previous_status) : undefined;
-    const rc = payload.rc_num ? String(payload.rc_num) : undefined;
-
-    const url = payload.url?.trim() || (rc ? `/rashans/detail?rc=${encodeURIComponent(rc)}` : "/");
-    const tag = rc ? `rashan-${rc}` : undefined;
+    const url = payload.url?.trim() || "/";
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -106,7 +95,7 @@ Deno.serve(async (req) => {
     if (natErr) throw natErr;
 
     // --- web push ---
-    const webPayload = JSON.stringify({ title, body, url, tag });
+    const webPayload = JSON.stringify({ title, body, url });
     const webResults = await Promise.allSettled(
       (webSubs as WebSub[]).map((s) =>
         webpush.sendNotification(
@@ -134,14 +123,9 @@ Deno.serve(async (req) => {
     let nativeSent = 0;
     const staleFcm: string[] = [];
     if ((natSubs as NativeSub[]).length > 0) {
-      const data: Record<string, string> = {};
-      if (status) data.status = status;
-      if (prev) data.previous_status = prev;
-      if (rc) data.rc_num = rc;
-
       const fcmResults = await Promise.allSettled(
         (natSubs as NativeSub[]).map((s) =>
-          fcmSend({ token: s.fcm_token, title, body, url, tag, data })
+          fcmSend({ token: s.fcm_token, title, body, url })
         )
       );
       fcmResults.forEach((r, i) => {
