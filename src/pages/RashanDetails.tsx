@@ -496,7 +496,8 @@ const RashanDetails = () => {
               </div>
             )}
           </Card>
-        ))}
+          </Card>
+        );})}
       </main>
       <PageFooter />
     </div>
