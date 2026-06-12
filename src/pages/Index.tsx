@@ -760,6 +760,10 @@ function ProfileView({
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dismissedMsg, setDismissedMsg] = useState<string | null>(() => {
+    try { return sessionStorage.getItem("dismissedHomeMsg"); } catch { return null; }
+  });
+
 
   useEffect(() => {
     let cancelled = false;
@@ -864,13 +868,19 @@ function ProfileView({
             onNavigate={onNavigate}
           />
           <InstallAppLinks />
-          {data.msg != null && String(data.msg).trim() !== "" && (
+          {data.msg != null && String(data.msg).trim() !== "" && dismissedMsg !== String(data.msg) && (
             <MessageBox
               type={String(data.msg_type ?? "")}
               title={data.msg_title ? String(data.msg_title) : undefined}
               message={String(data.msg)}
+              onDismiss={() => {
+                const m = String(data.msg);
+                try { sessionStorage.setItem("dismissedHomeMsg", m); } catch {}
+                setDismissedMsg(m);
+              }}
             />
           )}
+
           <RecentRashans
             mobile={mobile}
             totalCards={Number(data.active_cards) || 0}
