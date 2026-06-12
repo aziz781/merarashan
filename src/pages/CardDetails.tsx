@@ -22,13 +22,34 @@ const CardDetails = () => {
   const navigate = useNavigate();
   const location = useLocation() as { state?: { card?: Record<string, unknown> } };
   const { rcNum: rcNumParam } = useParams();
-  const card = location.state?.card;
+  const [card, setCard] = useState<Record<string, unknown> | undefined>(location.state?.card);
+  const [cardLoading, setCardLoading] = useState(false);
+  const [cardError, setCardError] = useState<string | null>(null);
   const mobile = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
   const rcNum = rcNumParam || (card?.cm_card_number as string) || "";
 
   const [txns, setTxns] = useState<Record<string, unknown>[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Fetch card by rcNum when opened via direct link (no router state)
+  useEffect(() => {
+    if (card || !mobile || !rcNum) return;
+    let cancelled = false;
+    setCardLoading(true);
+    setCardError(null);
+    fetchResource<unknown>("cards", mobile)
+      .then((d) => {
+        if (cancelled) return;
+        const items = (extractItems(d) ?? []) as Record<string, unknown>[];
+        const found = items.find((c) => String(c.cm_card_number) === String(rcNum));
+        if (found) setCard(found);
+        else setCardError("Card not found for this account.");
+      })
+      .catch((e) => !cancelled && setCardError(e.message))
+      .finally(() => !cancelled && setCardLoading(false));
+    return () => { cancelled = true; };
+  }, [card, mobile, rcNum]);
 
   useEffect(() => {
     if (!mobile || !rcNum) {
@@ -119,10 +140,15 @@ const CardDetails = () => {
             </div>
           </Card>
         </>
+      ) : cardLoading ? (
+        <Card className="p-5">
+          <Skeleton className="h-6 w-2/3 mb-2" />
+          <Skeleton className="h-4 w-full" />
+        </Card>
       ) : (
         <Card className="p-5">
           <p className="text-sm text-muted-foreground">
-            No card data. Open this page from the cards list.
+            {cardError || (!mobile ? "Please sign in to view this card." : "No card data.")}
           </p>
         </Card>
       )}
