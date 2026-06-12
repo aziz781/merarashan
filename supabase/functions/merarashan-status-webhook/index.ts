@@ -134,7 +134,8 @@ Deno.serve(async (req) => {
     let nativeSent = 0;
     const staleFcm: string[] = [];
     if ((natSubs as NativeSub[]).length > 0) {
-      const data: Record<string, string> = { status };
+      const data: Record<string, string> = {};
+      if (status) data.status = status;
       if (prev) data.previous_status = prev;
       if (rc) data.rc_num = rc;
 
