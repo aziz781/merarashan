@@ -90,6 +90,7 @@ export async function disableNativePush(): Promise<void> {
 export async function initNativePushListeners(opts: {
   onForeground?: (n: { title?: string; body?: string; data?: Record<string, unknown> }) => void;
   onAction?: (url: string, n?: { title?: string; body?: string }) => void;
+  onDelivered?: (n: { id?: string; title?: string; body?: string; data?: Record<string, unknown> }) => void;
 }): Promise<void> {
   if (!isNativePlatform()) return;
 
@@ -130,4 +131,30 @@ export async function initNativePushListeners(opts: {
       body: action.notification.body || dBody,
     });
   });
+
+  // Sync currently-delivered (tray) notifications into the in-app list
+  // so background pushes show up even before the user taps them.
+  const syncDelivered = async () => {
+    try {
+      const { notifications } = await PushNotifications.getDeliveredNotifications();
+      for (const n of notifications || []) {
+        const data = (n.data || {}) as Record<string, unknown>;
+        const dTitle = typeof data.title === "string" ? data.title : undefined;
+        const dBody = typeof data.body === "string" ? data.body : undefined;
+        opts.onDelivered?.({
+          id: typeof (n as { id?: string }).id === "string" ? (n as { id?: string }).id : undefined,
+          title: n.title || dTitle,
+          body: n.body || dBody,
+          data,
+        });
+      }
+    } catch { /* ignore */ }
+  };
+  await syncDelivered();
+  try {
+    const { App } = await import("@capacitor/app");
+    App.addListener("appStateChange", (state) => {
+      if (state.isActive) void syncDelivered();
+    });
+  } catch { /* ignore */ }
 }

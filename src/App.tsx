@@ -48,6 +48,12 @@ function NativePushBridge() {
           if (n) addNotification({ title: n.title, body: n.body, url });
           if (url) window.location.assign(url);
         },
+        onDelivered: (n) => {
+          const data = (n.data || {}) as Record<string, unknown>;
+          const url = typeof data.url === "string" ? data.url : undefined;
+          const dedupeKey = n.id || `${n.title}|${n.body}|${url || ""}`;
+          addNotification({ title: n.title, body: n.body, url, dedupeKey });
+        },
       }).catch(() => { /* ignore */ });
     }
 
