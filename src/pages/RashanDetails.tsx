@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageFooter } from "@/components/PageFooter";
 import { fetchResource } from "@/lib/api";
+import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
 
 type Item = Record<string, unknown>;
 
