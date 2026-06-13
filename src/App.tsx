@@ -44,7 +44,8 @@ function NativePushBridge() {
           addNotification({ title: n.title, body: n.body, url });
           setPending({ title: n.title, body: n.body, url });
         },
-        onAction: (url) => {
+        onAction: (url, n) => {
+          if (n) addNotification({ title: n.title, body: n.body, url });
           if (url) window.location.assign(url);
         },
       }).catch(() => { /* ignore */ });

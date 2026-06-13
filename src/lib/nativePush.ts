@@ -89,7 +89,7 @@ export async function disableNativePush(): Promise<void> {
  */
 export async function initNativePushListeners(opts: {
   onForeground?: (n: { title?: string; body?: string; data?: Record<string, unknown> }) => void;
-  onAction?: (url: string) => void;
+  onAction?: (url: string, n?: { title?: string; body?: string }) => void;
 }): Promise<void> {
   if (!isNativePlatform()) return;
 
@@ -120,6 +120,6 @@ export async function initNativePushListeners(opts: {
   await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
     const data = (action.notification.data || {}) as Record<string, unknown>;
     const url = typeof data.url === "string" ? data.url : "/";
-    opts.onAction?.(url);
+    opts.onAction?.(url, { title: action.notification.title, body: action.notification.body });
   });
 }
