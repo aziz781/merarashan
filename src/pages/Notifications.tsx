@@ -150,7 +150,9 @@ export default function Notifications() {
                 </Button>
               </div>
             </Card>
-          ))
+            );
+          })
+
         )}
 
         {items.length > 0 && (
