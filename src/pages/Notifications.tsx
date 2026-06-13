@@ -11,11 +11,13 @@ import {
   clearAll,
   getNotifications,
   markAllRead,
+  markRead,
   removeNotification,
   subscribeNotifications,
   syncNotificationInbox,
   type StoredNotification,
 } from "@/lib/notificationsStore";
+import { SwipeableNotification } from "@/components/SwipeableNotification";
 
 function timeAgo(ts: number): string {
   const diff = Math.max(0, Date.now() - ts);
@@ -178,9 +180,13 @@ export default function Notifications() {
                 ? "bg-purple-100 border-purple-300 dark:bg-purple-500/15 dark:border-purple-500/40"
                 : "";
             return (
-            <Card
+            <SwipeableNotification
               key={n.id}
-              className={`p-4 ${highlight} ${n.url ? "cursor-pointer hover:bg-accent/40 transition-colors" : ""}`}
+              onDelete={() => removeNotification(n.id)}
+              onMarkRead={() => markRead(n.id)}
+            >
+            <Card
+              className={`p-4 ${highlight} ${!n.read ? "ring-1 ring-primary/40" : ""} ${n.url ? "cursor-pointer hover:bg-accent/40 transition-colors" : ""}`}
               onClick={() => openNotification(n)}
             >
               <div className="flex items-start gap-3">
@@ -214,6 +220,7 @@ export default function Notifications() {
                 </Button>
               </div>
             </Card>
+            </SwipeableNotification>
             );
           })
 
