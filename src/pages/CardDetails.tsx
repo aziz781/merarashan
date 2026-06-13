@@ -204,11 +204,49 @@ const CardDetails = () => {
       </header>
 
 
-      <main className="px-5 -mt-3 space-y-5">
+      <main
+        className="px-5 -mt-3 space-y-5 select-none"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        style={{ touchAction: "pan-y" }}
+      >
+      {allCards.length > 1 && (
+        <div className="flex items-center justify-between text-xs text-muted-foreground -mb-2">
+          <button
+            type="button"
+            onClick={() => prevCard && goToCard(prevCard)}
+            disabled={!prevCard}
+            className="inline-flex items-center gap-1 disabled:opacity-30"
+            aria-label="Previous card"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Prev
+          </button>
+          <span>
+            {currentIndex + 1} / {allCards.length}
+          </span>
+          <button
+            type="button"
+            onClick={() => nextCard && goToCard(nextCard)}
+            disabled={!nextCard}
+            className="inline-flex items-center gap-1 disabled:opacity-30"
+            aria-label="Next card"
+          >
+            Next
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+      <div
+        style={{
+          transform: `translateX(${swipeDx}px)`,
+          transition: animating ? "transform 180ms ease-out" : "none",
+        }}
+      >
       {card ? (
-        <>
-          
-          <Card className="p-5 bg-card/90 backdrop-blur shadow-[var(--shadow-card)] border-0">
+        <Card className="p-5 bg-card/90 backdrop-blur shadow-[var(--shadow-card)] border-0">
             <div className="space-y-1.5">
               {fields.map(({ key, label }) => {
                 const isName = key === "person_name";
@@ -237,7 +275,6 @@ const CardDetails = () => {
               })}
             </div>
           </Card>
-        </>
       ) : cardLoading ? (
         <Card className="p-5">
           <Skeleton className="h-6 w-2/3 mb-2" />
@@ -250,6 +287,8 @@ const CardDetails = () => {
           </p>
         </Card>
       )}
+      </div>
+
 
       <section>
         <h2 className="text-sm font-semibold text-foreground mb-3">Monthly Rashan</h2>
