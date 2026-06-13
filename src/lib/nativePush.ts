@@ -142,6 +142,7 @@ export async function initNativePushListeners(opts: {
         const dTitle = typeof data.title === "string" ? data.title : undefined;
         const dBody = typeof data.body === "string" ? data.body : undefined;
         opts.onDelivered?.({
+          id: typeof (n as { id?: string }).id === "string" ? (n as { id?: string }).id : undefined,
           title: n.title || dTitle,
           body: n.body || dBody,
           data,
