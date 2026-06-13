@@ -238,6 +238,7 @@ export default function Notifications() {
               variant="outline"
               size="sm"
               className="w-full"
+              disabled={items.every((n) => n.read)}
               onClick={() => {
                 markAllRead();
                 setItems(getNotifications());
