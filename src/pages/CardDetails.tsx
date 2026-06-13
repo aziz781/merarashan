@@ -251,55 +251,74 @@ const CardDetails = () => {
           </button>
         </div>
       )}
-      <div
-        style={{
-          transform: `translateX(${swipeDx}px)`,
-          transition: animating ? "transform 180ms ease-out" : "none",
-        }}
-      >
-      {card ? (
-        <Card className="p-5 bg-card/90 backdrop-blur shadow-[var(--shadow-card)] border-0">
-            <div className="space-y-1.5">
-              {fields.map(({ key, label }) => {
-                const isName = key === "person_name";
-                const raw = card[key];
-                let display: string;
-                if (raw == null || raw === "") {
-                  display = "—";
-                } else {
-                  display = String(raw);
-                }
-                return (
-                  <div
-                    key={key}
-                    className={`flex justify-between gap-3 border-b border-border/50 py-1.5 last:border-0 ${isName ? "" : "text-sm"}`}
-                  >
-                    {!isName && (
-                      <span className={isName ? "font-bold text-foreground" : "text-muted-foreground"}>
-                        {label}
+      <div className="relative">
+        {/* Stacked card hints behind the active one */}
+        {nextCard && (
+          <div
+            aria-hidden
+            className="absolute left-1/2 -translate-x-1/2 top-3 h-8 rounded-xl bg-card/60 border border-border/40 shadow-sm"
+            style={{ width: "92%" }}
+          />
+        )}
+        {prevCard && (
+          <div
+            aria-hidden
+            className="absolute left-1/2 -translate-x-1/2 top-1.5 h-8 rounded-xl bg-card/80 border border-border/50 shadow-sm"
+            style={{ width: "96%" }}
+          />
+        )}
+        <div
+          className="relative"
+          style={{
+            transform: `translateX(${swipeDx}px) rotate(${swipeDx * 0.02}deg)`,
+            transition: animating ? "transform 220ms ease-out" : "none",
+          }}
+        >
+        {card ? (
+          <Card className="p-5 bg-card/95 backdrop-blur shadow-[var(--shadow-card)] border-0">
+              <div className="space-y-1.5">
+                {fields.map(({ key, label }) => {
+                  const isName = key === "person_name";
+                  const raw = card[key];
+                  let display: string;
+                  if (raw == null || raw === "") {
+                    display = "—";
+                  } else {
+                    display = String(raw);
+                  }
+                  return (
+                    <div
+                      key={key}
+                      className={`flex justify-between gap-3 border-b border-border/50 py-1.5 last:border-0 ${isName ? "" : "text-sm"}`}
+                    >
+                      {!isName && (
+                        <span className={isName ? "font-bold text-foreground" : "text-muted-foreground"}>
+                          {label}
+                        </span>
+                      )}
+                      <span className={`break-all ${isName ? "font-bold text-foreground" : "text-muted-foreground"} ${isName ? "w-full text-right" : "text-right"} ${isName ? "text-xl" : ""}`}>
+                        {display}
                       </span>
-                    )}
-                    <span className={`break-all ${isName ? "font-bold text-foreground" : "text-muted-foreground"} ${isName ? "w-full text-right" : "text-right"} ${isName ? "text-xl" : ""}`}>
-                      {display}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+        ) : cardLoading ? (
+          <Card className="p-5">
+            <Skeleton className="h-6 w-2/3 mb-2" />
+            <Skeleton className="h-4 w-full" />
           </Card>
-      ) : cardLoading ? (
-        <Card className="p-5">
-          <Skeleton className="h-6 w-2/3 mb-2" />
-          <Skeleton className="h-4 w-full" />
-        </Card>
-      ) : (
-        <Card className="p-5">
-          <p className="text-sm text-muted-foreground">
-            {cardError || (!mobile ? "Please sign in to view this card." : "No card data.")}
-          </p>
-        </Card>
-      )}
+        ) : (
+          <Card className="p-5">
+            <p className="text-sm text-muted-foreground">
+              {cardError || (!mobile ? "Please sign in to view this card." : "No card data.")}
+            </p>
+          </Card>
+        )}
+        </div>
       </div>
+
 
 
       <section>
