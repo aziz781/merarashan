@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Bell, Trash2, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import appLogo from "@/assets/mera-rashan-logo.png";
 import {
   clearAll,
   getNotifications,
@@ -97,8 +98,8 @@ export default function Notifications() {
               onClick={() => openNotification(n)}
             >
               <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <Bell className="w-4 h-4 text-primary" />
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
+                  <img src={appLogo} alt="Mera Rashan" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
