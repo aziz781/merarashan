@@ -1798,7 +1798,7 @@ const Index = () => {
             aria-label="Notifications"
             className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors"
           >
-            <Bell className="h-5 w-5" />
+            {pushEnabled === false ? <BellOff className="h-5 w-5" /> : <Bell className="h-5 w-5" />}
             {notifUnread > 0 && (
               <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-[18px] text-center ring-2 ring-[hsl(var(--primary))]">
                 {notifUnread > 99 ? "99+" : notifUnread}
