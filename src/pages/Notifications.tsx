@@ -11,6 +11,7 @@ import {
   clearAll,
   getNotifications,
   markAllRead,
+  markRead,
   toggleRead,
   removeNotification,
   subscribeNotifications,
@@ -91,6 +92,7 @@ export default function Notifications() {
   }, []);
 
   const openNotification = (n: StoredNotification) => {
+    if (!n.read) markRead(n.id);
     if (!n.url) return;
     // If it's an absolute URL on the same origin, convert to an internal route
     // so React Router handles it and the browser back button returns here.
