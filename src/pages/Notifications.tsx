@@ -133,7 +133,7 @@ export default function Notifications() {
                 </span>
               )}
             </h1>
-            <p className="text-xs opacity-80">{items.length} total</p>
+            <p className="text-xs opacity-80">{items.length} total · {items.filter((n) => !n.read).length} unread</p>
           </div>
           {items.length > 0 && (
             <button
