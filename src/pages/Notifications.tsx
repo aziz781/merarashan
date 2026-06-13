@@ -126,7 +126,14 @@ export default function Notifications() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold leading-tight">Notifications</h1>
+            <h1 className="text-xl font-bold leading-tight flex items-center gap-2">
+              Notifications
+              {pushEnabled === false && (
+                <span className="relative inline-flex" aria-label="Push notifications disabled" title="Push notifications disabled">
+                  <BellOff className="h-4 w-4 opacity-90" />
+                </span>
+              )}
+            </h1>
             <p className="text-xs opacity-80">{items.length} total</p>
           </div>
           {items.length > 0 && (
