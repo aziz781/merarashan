@@ -291,6 +291,12 @@ const RashanDetails = () => {
   const [fetchedItem, setFetchedItem] = useState<Item | undefined>();
   const [loadingDetail, setLoadingDetail] = useState(Boolean(rcNumParam && !stateItem));
   const [detailError, setDetailError] = useState<string | null>(null);
+  const [notifUnread, setNotifUnread] = useState(0);
+
+  useEffect(() => {
+    setNotifUnread(unreadCount());
+    return subscribeNotifications(() => setNotifUnread(unreadCount()));
+  }, []);
   let item = stateItem;
   let origin = location.state?.origin ?? "home";
   if (!item && rcNumParam) {
