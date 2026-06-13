@@ -102,12 +102,6 @@ const CardDetails = () => {
         className="px-5 pt-10 pb-6 text-primary-foreground"
         style={{ background: "var(--gradient-primary)" }}
       >
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="text-primary-foreground hover:bg-white/10 -ml-2 mb-3"
-        >
         <div className="flex items-center justify-between mb-3">
           <Button
             variant="ghost"
