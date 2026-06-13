@@ -108,14 +108,36 @@ const CardDetails = () => {
           onClick={() => navigate(-1)}
           className="text-primary-foreground hover:bg-white/10 -ml-2 mb-3"
         >
-          <ArrowLeft className="w-4 h-4 mr-1" />
-          Back
-        </Button>
+        <div className="flex items-center justify-between mb-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="text-primary-foreground hover:bg-white/10 -ml-2"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back
+          </Button>
+          <button
+            type="button"
+            onClick={() => navigate("/notifications")}
+            aria-label="Notifications"
+            className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors"
+          >
+            <Bell className="h-5 w-5" />
+            {notifUnread > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-[18px] text-center ring-2 ring-[hsl(var(--primary))]">
+                {notifUnread > 99 ? "99+" : notifUnread}
+              </span>
+            )}
+          </button>
+        </div>
         <div className="flex items-center gap-3">
           <CreditCard className="w-6 h-6 opacity-90" />
           <h1 className="text-xl font-bold truncate">میرا راشن کارڈ</h1>
         </div>
       </header>
+
 
       <main className="px-5 -mt-3 space-y-5">
       {card ? (
