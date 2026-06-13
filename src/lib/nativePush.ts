@@ -90,7 +90,7 @@ export async function disableNativePush(): Promise<void> {
 export async function initNativePushListeners(opts: {
   onForeground?: (n: { title?: string; body?: string; data?: Record<string, unknown> }) => void;
   onAction?: (url: string, n?: { title?: string; body?: string }) => void;
-  onDelivered?: (n: { title?: string; body?: string; data?: Record<string, unknown> }) => void;
+  onDelivered?: (n: { id?: string; title?: string; body?: string; data?: Record<string, unknown> }) => void;
 }): Promise<void> {
   if (!isNativePlatform()) return;
 
