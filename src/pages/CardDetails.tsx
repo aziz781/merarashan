@@ -252,19 +252,17 @@ const CardDetails = () => {
         </div>
       )}
       <div className="relative">
-        {/* Stacked card hints behind the active one */}
-        {nextCard && (
-          <div
-            aria-hidden
-            className="absolute left-1/2 -translate-x-1/2 top-3 h-8 rounded-xl bg-card/60 border border-border/40 shadow-sm"
-            style={{ width: "92%" }}
-          />
-        )}
+        {/* Peek edges of sibling cards on left/right */}
         {prevCard && (
           <div
             aria-hidden
-            className="absolute left-1/2 -translate-x-1/2 top-1.5 h-8 rounded-xl bg-card/80 border border-border/50 shadow-sm"
-            style={{ width: "96%" }}
+            className="absolute top-2 bottom-2 -left-2 w-3 rounded-l-xl bg-card/70 border border-r-0 border-border/50 shadow-sm"
+          />
+        )}
+        {nextCard && (
+          <div
+            aria-hidden
+            className="absolute top-2 bottom-2 -right-2 w-3 rounded-r-xl bg-card/70 border border-l-0 border-border/50 shadow-sm"
           />
         )}
         <div
