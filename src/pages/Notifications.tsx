@@ -204,7 +204,9 @@ export default function Notifications() {
                   <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap break-words">
                     {n.body || <span className="italic opacity-60">No message body</span>}
                   </p>
+                </div>
               </div>
+
 
             </Card>
             </SwipeableNotification>
