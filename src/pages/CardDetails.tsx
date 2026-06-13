@@ -134,7 +134,7 @@ const CardDetails = () => {
   const locked = useRef<"h" | "v" | null>(null);
   const dxRef = useRef(0);
   const SWIPE_THRESHOLD = 70;
-  const SWIPE_MAX = typeof window !== "undefined" ? Math.round(window.innerWidth * 0.75) : 280;
+  const SWIPE_MAX = typeof window !== "undefined" ? Math.round(window.innerWidth * 0.5) : 200;
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (allCards.length <= 1) return;
