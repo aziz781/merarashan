@@ -114,6 +114,8 @@ export async function fcmSend(opts: {
   const dataPayload: Record<string, string> = {
     ...(opts.data || {}),
     url: opts.url || "/",
+    title: opts.title,
+    body: opts.body || "",
   };
 
   const message: Record<string, unknown> = {

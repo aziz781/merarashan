@@ -110,16 +110,24 @@ export async function initNativePushListeners(opts: {
   }
 
   await PushNotifications.addListener("pushNotificationReceived", (notification) => {
+    const data = (notification.data || {}) as Record<string, unknown>;
+    const dBody = typeof data.body === "string" ? data.body : undefined;
+    const dTitle = typeof data.title === "string" ? data.title : undefined;
     opts.onForeground?.({
-      title: notification.title,
-      body: notification.body,
-      data: notification.data as Record<string, unknown> | undefined,
+      title: notification.title || dTitle,
+      body: notification.body || dBody,
+      data,
     });
   });
 
   await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
     const data = (action.notification.data || {}) as Record<string, unknown>;
     const url = typeof data.url === "string" ? data.url : "/";
-    opts.onAction?.(url, { title: action.notification.title, body: action.notification.body });
+    const dBody = typeof data.body === "string" ? data.body : undefined;
+    const dTitle = typeof data.title === "string" ? data.title : undefined;
+    opts.onAction?.(url, {
+      title: action.notification.title || dTitle,
+      body: action.notification.body || dBody,
+    });
   });
 }

@@ -109,11 +109,9 @@ export default function Notifications() {
                       {timeAgo(n.receivedAt)}
                     </span>
                   </div>
-                  {n.body && (
-                    <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap break-words">
-                      {n.body}
-                    </p>
-                  )}
+                  <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap break-words">
+                    {n.body || <span className="italic opacity-60">No message body</span>}
+                  </p>
                 </div>
                 <Button
                   size="icon"
