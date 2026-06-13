@@ -30,11 +30,17 @@ function timeAgo(ts: number): string {
   return new Date(ts).toLocaleDateString();
 }
 
+const NATIVE_ENABLED_KEY = "mr_native_push_enabled";
+const MOBILE_KEY = "mr_mobile";
+
 export default function Notifications() {
   const navigate = useNavigate();
   const [items, setItems] = useState<StoredNotification[]>(() => getNotifications());
+  const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
+  const [mobile, setMobile] = useState<string>("");
 
   useEffect(() => {
+    setMobile(localStorage.getItem(MOBILE_KEY) || "");
     const unsub = subscribeNotifications(() => setItems(getNotifications()));
     void syncNotificationInbox().finally(() => {
       markAllRead();
@@ -43,7 +49,45 @@ export default function Notifications() {
     // mark all as read on visit
     markAllRead();
     setItems(getNotifications());
-    return unsub;
+
+    // Determine push enabled state
+    (async () => {
+      try {
+        if (isNativePlatform()) {
+          setPushEnabled(localStorage.getItem(NATIVE_ENABLED_KEY) === "1");
+          return;
+        }
+        if (!pushSupported()) {
+          setPushEnabled(false);
+          return;
+        }
+        const sub = await getCurrentSubscription();
+        setPushEnabled(!!sub && Notification.permission === "granted");
+      } catch {
+        setPushEnabled(false);
+      }
+    })();
+
+    const onVis = () => {
+      if (document.visibilityState === "visible") {
+        (async () => {
+          try {
+            if (isNativePlatform()) {
+              setPushEnabled(localStorage.getItem(NATIVE_ENABLED_KEY) === "1");
+              return;
+            }
+            if (!pushSupported()) return;
+            const sub = await getCurrentSubscription();
+            setPushEnabled(!!sub && Notification.permission === "granted");
+          } catch { /* ignore */ }
+        })();
+      }
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      unsub();
+      document.removeEventListener("visibilitychange", onVis);
+    };
   }, []);
 
   const openNotification = (n: StoredNotification) => {
