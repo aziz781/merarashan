@@ -251,71 +251,85 @@ const CardDetails = () => {
           </button>
         </div>
       )}
-      <div className="relative">
-        {/* Peek edges of sibling cards on left/right */}
-        {prevCard && (
-          <div
-            aria-hidden
-            className="absolute top-2 bottom-2 -left-2 w-3 rounded-l-xl bg-card/70 border border-r-0 border-border/50 shadow-sm"
-          />
-        )}
-        {nextCard && (
-          <div
-            aria-hidden
-            className="absolute top-2 bottom-2 -right-2 w-3 rounded-r-xl bg-card/70 border border-l-0 border-border/50 shadow-sm"
-          />
-        )}
-        <div
-          className="relative"
-          style={{
-            transform: `translateX(${swipeDx}px) rotate(${swipeDx * 0.02}deg)`,
-            transition: animating ? "transform 220ms ease-out" : "none",
-          }}
-        >
-        {card ? (
+      {(() => {
+        const renderCardBody = (c: Record<string, unknown>) => (
           <Card className="p-5 bg-card/95 backdrop-blur shadow-[var(--shadow-card)] border-0">
-              <div className="space-y-1.5">
-                {fields.map(({ key, label }) => {
-                  const isName = key === "person_name";
-                  const raw = card[key];
-                  let display: string;
-                  if (raw == null || raw === "") {
-                    display = "—";
-                  } else {
-                    display = String(raw);
-                  }
-                  return (
-                    <div
-                      key={key}
-                      className={`flex justify-between gap-3 border-b border-border/50 py-1.5 last:border-0 ${isName ? "" : "text-sm"}`}
+            <div className="space-y-1.5">
+              {fields.map(({ key, label }) => {
+                const isName = key === "person_name";
+                const raw = c[key];
+                const display = raw == null || raw === "" ? "—" : String(raw);
+                return (
+                  <div
+                    key={key}
+                    className={`flex justify-between gap-3 border-b border-border/50 py-1.5 last:border-0 ${isName ? "" : "text-sm"}`}
+                  >
+                    {!isName && (
+                      <span className="text-muted-foreground">{label}</span>
+                    )}
+                    <span
+                      className={`break-all ${isName ? "font-bold text-foreground w-full text-right text-xl" : "text-muted-foreground text-right"}`}
                     >
-                      {!isName && (
-                        <span className={isName ? "font-bold text-foreground" : "text-muted-foreground"}>
-                          {label}
-                        </span>
-                      )}
-                      <span className={`break-all ${isName ? "font-bold text-foreground" : "text-muted-foreground"} ${isName ? "w-full text-right" : "text-right"} ${isName ? "text-xl" : ""}`}>
-                        {display}
-                      </span>
-                    </div>
-                  );
-                })}
+                      {display}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        );
+        const transition = animating ? "transform 220ms ease-out" : "none";
+        return (
+          <div className="relative overflow-hidden">
+            <div
+              className="relative"
+              style={{
+                transform: `translateX(${swipeDx}px) rotate(${swipeDx * 0.02}deg)`,
+                transition,
+              }}
+            >
+              {card ? (
+                renderCardBody(card)
+              ) : cardLoading ? (
+                <Card className="p-5">
+                  <Skeleton className="h-6 w-2/3 mb-2" />
+                  <Skeleton className="h-4 w-full" />
+                </Card>
+              ) : (
+                <Card className="p-5">
+                  <p className="text-sm text-muted-foreground">
+                    {cardError || (!mobile ? "Please sign in to view this card." : "No card data.")}
+                  </p>
+                </Card>
+              )}
+            </div>
+            {prevCard && (
+              <div
+                aria-hidden
+                className="absolute inset-0"
+                style={{
+                  transform: `translateX(calc(-100% - 16px + ${swipeDx}px))`,
+                  transition,
+                }}
+              >
+                {renderCardBody(prevCard)}
               </div>
-            </Card>
-        ) : cardLoading ? (
-          <Card className="p-5">
-            <Skeleton className="h-6 w-2/3 mb-2" />
-            <Skeleton className="h-4 w-full" />
-          </Card>
-        ) : (
-          <Card className="p-5">
-            <p className="text-sm text-muted-foreground">
-              {cardError || (!mobile ? "Please sign in to view this card." : "No card data.")}
-            </p>
-          </Card>
-        )}
-        </div>
-      </div>
+            )}
+            {nextCard && (
+              <div
+                aria-hidden
+                className="absolute inset-0"
+                style={{
+                  transform: `translateX(calc(100% + 16px + ${swipeDx}px))`,
+                  transition,
+                }}
+              >
+                {renderCardBody(nextCard)}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
 
 
