@@ -141,11 +141,6 @@ export function clearAll() {
   write([]);
 }
 
-
-export function clearAll() {
-  write([]);
-}
-
 export function unreadCount(): number {
   return read().filter((n) => !n.read).length;
 }
