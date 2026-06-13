@@ -35,11 +35,22 @@ Deno.serve(async (req) => {
       if (v) upstreamUrl.searchParams.set(key, v);
     }
 
-    const upstream = await fetch(upstreamUrl.toString(), {
-      headers: { "x-api-key": token, Accept: "application/json" },
-    });
+    // Retry on upstream throttling (DynamoDB ProvisionedThroughputExceeded) with backoff
+    let upstream!: Response;
+    let text = "";
+    const delays = [200, 500, 1000];
+    for (let attempt = 0; attempt <= delays.length; attempt++) {
+      upstream = await fetch(upstreamUrl.toString(), {
+        headers: { "x-api-key": token, Accept: "application/json" },
+      });
+      text = await upstream.text();
+      const throttled =
+        upstream.status === 429 ||
+        (!upstream.ok && /provisioned throughput|throughput.*exceeded|throttl/i.test(text));
+      if (!throttled || attempt === delays.length) break;
+      await new Promise((r) => setTimeout(r, delays[attempt]));
+    }
 
-    const text = await upstream.text();
     return new Response(text, {
       status: upstream.status,
       headers: {
