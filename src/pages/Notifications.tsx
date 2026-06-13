@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Bell, Trash2, CheckCheck } from "lucide-react";
+import { ArrowLeft, Bell, BellOff, Trash2, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import appLogo from "@/assets/mera-rashan-logo.png";
+import { NotificationToggle } from "@/components/NotificationToggle";
+import { getCurrentSubscription, pushSupported } from "@/lib/push";
+import { isNativePlatform } from "@/lib/nativePush";
 import {
   clearAll,
   getNotifications,
@@ -27,11 +30,17 @@ function timeAgo(ts: number): string {
   return new Date(ts).toLocaleDateString();
 }
 
+const NATIVE_ENABLED_KEY = "mr_native_push_enabled";
+const MOBILE_KEY = "mr_mobile";
+
 export default function Notifications() {
   const navigate = useNavigate();
   const [items, setItems] = useState<StoredNotification[]>(() => getNotifications());
+  const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
+  const [mobile, setMobile] = useState<string>("");
 
   useEffect(() => {
+    setMobile(localStorage.getItem(MOBILE_KEY) || "");
     const unsub = subscribeNotifications(() => setItems(getNotifications()));
     void syncNotificationInbox().finally(() => {
       markAllRead();
@@ -40,7 +49,45 @@ export default function Notifications() {
     // mark all as read on visit
     markAllRead();
     setItems(getNotifications());
-    return unsub;
+
+    // Determine push enabled state
+    (async () => {
+      try {
+        if (isNativePlatform()) {
+          setPushEnabled(localStorage.getItem(NATIVE_ENABLED_KEY) === "1");
+          return;
+        }
+        if (!pushSupported()) {
+          setPushEnabled(false);
+          return;
+        }
+        const sub = await getCurrentSubscription();
+        setPushEnabled(!!sub && Notification.permission === "granted");
+      } catch {
+        setPushEnabled(false);
+      }
+    })();
+
+    const onVis = () => {
+      if (document.visibilityState === "visible") {
+        (async () => {
+          try {
+            if (isNativePlatform()) {
+              setPushEnabled(localStorage.getItem(NATIVE_ENABLED_KEY) === "1");
+              return;
+            }
+            if (!pushSupported()) return;
+            const sub = await getCurrentSubscription();
+            setPushEnabled(!!sub && Notification.permission === "granted");
+          } catch { /* ignore */ }
+        })();
+      }
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      unsub();
+      document.removeEventListener("visibilitychange", onVis);
+    };
   }, []);
 
   const openNotification = (n: StoredNotification) => {
@@ -79,7 +126,14 @@ export default function Notifications() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold leading-tight">Notifications</h1>
+            <h1 className="text-xl font-bold leading-tight flex items-center gap-2">
+              Notifications
+              {pushEnabled === false && (
+                <span className="relative inline-flex" aria-label="Push notifications disabled" title="Push notifications disabled">
+                  <BellOff className="h-4 w-4 opacity-90" />
+                </span>
+              )}
+            </h1>
             <p className="text-xs opacity-80">{items.length} total</p>
           </div>
           {items.length > 0 && (
@@ -99,6 +153,9 @@ export default function Notifications() {
       </header>
 
       <div className="p-4 space-y-3 max-w-2xl mx-auto">
+        {pushEnabled === false && mobile && (
+          <NotificationToggle mobile={mobile} />
+        )}
         {items.length === 0 ? (
           <Card className="p-8 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
