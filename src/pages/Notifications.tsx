@@ -91,14 +91,24 @@ export default function Notifications() {
     };
   }, []);
 
+  const resolveUrl = (n: StoredNotification): string | undefined => {
+    if (n.url) return n.url;
+    const t = n.title?.trim().toLowerCase() || "";
+    if (t === "monthly statement available") return "/statements";
+    if (t === "payment received" || t === "payment due" || t === "payment overdue") return "/?tab=transactions";
+    if (t === "rashan code issued") return "/?tab=customers";
+    return undefined;
+  };
+
   const openNotification = (n: StoredNotification) => {
     if (!n.read) markRead(n.id);
-    if (!n.url) return;
+    const url = resolveUrl(n);
+    if (!url) return;
     // If it's an absolute URL on the same origin, convert to an internal route
     // so React Router handles it and the browser back button returns here.
-    if (/^https?:\/\//i.test(n.url)) {
+    if (/^https?:\/\//i.test(url)) {
       try {
-        const u = new URL(n.url);
+        const u = new URL(url);
         if (u.origin === window.location.origin) {
           navigate(u.pathname + u.search + u.hash);
           return;
@@ -106,11 +116,12 @@ export default function Notifications() {
       } catch {
         /* ignore */
       }
-      window.location.assign(n.url);
+      window.location.assign(url);
       return;
     }
-    navigate(n.url);
+    navigate(url);
   };
+
 
   return (
     <div className="min-h-screen bg-background">
