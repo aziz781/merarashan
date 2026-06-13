@@ -45,11 +45,8 @@ export default function Notifications() {
     setMobile(localStorage.getItem(MOBILE_KEY) || "");
     const unsub = subscribeNotifications(() => setItems(getNotifications()));
     void syncNotificationInbox().finally(() => {
-      markAllRead();
       setItems(getNotifications());
     });
-    // mark all as read on visit
-    markAllRead();
     setItems(getNotifications());
 
     // Determine push enabled state
