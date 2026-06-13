@@ -88,14 +88,24 @@ export function addNotification(n: {
     receivedAt: n.receivedAt || Date.now(),
     read: false,
   };
-  // de-dupe identical notifications that arrive through both live push and inbox sync
+  // de-dupe identical notifications that arrive through both live push and inbox sync.
+  // Use a wide window because inbox sync can run much later than the live push.
   const recent = list.find(
     (x) =>
-      Math.abs(x.receivedAt - item.receivedAt) < 5000 &&
+      Math.abs(x.receivedAt - item.receivedAt) < 10 * 60 * 1000 &&
       x.title === item.title &&
       x.body === item.body,
   );
-  if (recent) return recent;
+  if (recent) {
+    // If this call carries a stable dedupeKey, adopt it on the existing entry
+    // so subsequent syncs match by id and never duplicate.
+    if (n.dedupeKey && recent.id !== id) {
+      const updated = list.map((x) => (x === recent ? { ...x, id } : x));
+      write(updated);
+      return { ...recent, id };
+    }
+    return recent;
+  }
   list.unshift(item);
   write(list);
   return item;
