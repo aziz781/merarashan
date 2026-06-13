@@ -15,6 +15,7 @@ import {
   PushNotificationDialog,
   type PushNotificationPayload,
 } from "@/components/PushNotificationDialog";
+import { InstallNativeAppBanner } from "@/components/InstallNativeAppBanner";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <InstallNativeAppBanner />
         <NativePushBridge />
         <Routes>
           <Route path="/" element={<Index />} />
