@@ -25,17 +25,36 @@ function NativePushBridge() {
   const [pending, setPending] = useState<PushNotificationPayload | null>(null);
 
   useEffect(() => {
-    if (!isNativePlatform()) return;
-    initNativePushListeners({
-      onForeground: (n) => {
-        const data = (n.data || {}) as Record<string, unknown>;
-        const url = typeof data.url === "string" ? data.url : undefined;
-        setPending({ title: n.title, body: n.body, url });
-      },
-      onAction: (url) => {
-        if (url) window.location.assign(url);
-      },
-    }).catch(() => { /* ignore */ });
+    // Listen for web push events broadcast from the service worker.
+    const onSwMessage = (event: MessageEvent) => {
+      const data = event.data as { type?: string; payload?: PushNotificationPayload } | undefined;
+      if (data?.type === "push-received" && data.payload) {
+        addNotification(data.payload);
+      }
+    };
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.addEventListener("message", onSwMessage);
+    }
+
+    if (isNativePlatform()) {
+      initNativePushListeners({
+        onForeground: (n) => {
+          const data = (n.data || {}) as Record<string, unknown>;
+          const url = typeof data.url === "string" ? data.url : undefined;
+          addNotification({ title: n.title, body: n.body, url });
+          setPending({ title: n.title, body: n.body, url });
+        },
+        onAction: (url) => {
+          if (url) window.location.assign(url);
+        },
+      }).catch(() => { /* ignore */ });
+    }
+
+    return () => {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.removeEventListener("message", onSwMessage);
+      }
+    };
   }, []);
 
   return <PushNotificationDialog notification={pending} onClose={() => setPending(null)} />;
