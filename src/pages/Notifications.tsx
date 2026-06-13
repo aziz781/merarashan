@@ -11,11 +11,13 @@ import {
   clearAll,
   getNotifications,
   markAllRead,
+  markRead,
   removeNotification,
   subscribeNotifications,
   syncNotificationInbox,
   type StoredNotification,
 } from "@/lib/notificationsStore";
+import { SwipeableNotification } from "@/components/SwipeableNotification";
 
 function timeAgo(ts: number): string {
   const diff = Math.max(0, Date.now() - ts);
