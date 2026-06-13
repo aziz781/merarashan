@@ -1607,6 +1607,7 @@ const TABS: { id: Resource; label: string; icon: typeof CreditCard }[] = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
   const [mobile, setMobile] = useState<string | null>(null);
   const [tab, setTab] = useState<Resource>(() => {
     try {
