@@ -22,6 +22,7 @@ import {
   List,
   Menu,
   Bell,
+  BellOff,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
@@ -48,6 +49,10 @@ import { MessageBox } from "@/components/MessageBox";
 
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
+import { getCurrentSubscription, pushSupported } from "@/lib/push";
+import { isNativePlatform } from "@/lib/nativePush";
+
+const NATIVE_PUSH_ENABLED_KEY = "mr_native_push_enabled";
 
 const STORAGE_KEY = "mr_mobile";
 const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
@@ -1638,6 +1643,35 @@ const Index = () => {
     update();
     return subscribeNotifications(update);
   }, []);
+
+  const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
+  useEffect(() => {
+    const check = async () => {
+      try {
+        if (isNativePlatform()) {
+          setPushEnabled(localStorage.getItem(NATIVE_PUSH_ENABLED_KEY) === "1");
+          return;
+        }
+        if (!pushSupported()) {
+          setPushEnabled(false);
+          return;
+        }
+        const sub = await getCurrentSubscription();
+        setPushEnabled(!!sub && Notification.permission === "granted");
+      } catch {
+        setPushEnabled(false);
+      }
+    };
+    void check();
+    const onVis = () => { if (document.visibilityState === "visible") void check(); };
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", check);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", check);
+    };
+  }, []);
+
   const slideInClosingRef = useRef(false);
   const handleSlideInOpenChange = (setter: (v: boolean) => void) => (open: boolean) => {
     if (!open) {
@@ -1764,7 +1798,7 @@ const Index = () => {
             aria-label="Notifications"
             className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors"
           >
-            <Bell className="h-5 w-5" />
+            {pushEnabled === false ? <BellOff className="h-5 w-5" /> : <Bell className="h-5 w-5" />}
             {notifUnread > 0 && (
               <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-[18px] text-center ring-2 ring-[hsl(var(--primary))]">
                 {notifUnread > 99 ? "99+" : notifUnread}
