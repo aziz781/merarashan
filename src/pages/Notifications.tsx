@@ -224,11 +224,11 @@ export default function Notifications() {
             </SwipeableNotification>
             );
           })
-
-        )}
+        );
+        })()}
 
         {items.length > 0 && (
-          <div className="pt-2">
+          <div className="pt-2 space-y-2">
             <Button
               variant="outline"
               size="sm"
@@ -241,8 +241,21 @@ export default function Notifications() {
               <CheckCheck className="w-4 h-4" />
               Mark all as read
             </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              className="w-full"
+              onClick={() => {
+                clearAll();
+                setItems([]);
+              }}
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete all
+            </Button>
           </div>
         )}
+
       </div>
     </div>
   );
