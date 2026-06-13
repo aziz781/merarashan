@@ -44,6 +44,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_inbox: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          mobile: string
+          tag: string | null
+          title: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          mobile: string
+          tag?: string | null
+          title: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          mobile?: string
+          tag?: string | null
+          title?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       otp_codes: {
         Row: {
           attempts: number

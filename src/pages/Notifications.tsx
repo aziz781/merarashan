@@ -10,6 +10,7 @@ import {
   markAllRead,
   removeNotification,
   subscribeNotifications,
+  syncNotificationInbox,
   type StoredNotification,
 } from "@/lib/notificationsStore";
 
@@ -32,6 +33,10 @@ export default function Notifications() {
 
   useEffect(() => {
     const unsub = subscribeNotifications(() => setItems(getNotifications()));
+    void syncNotificationInbox().finally(() => {
+      markAllRead();
+      setItems(getNotifications());
+    });
     // mark all as read on visit
     markAllRead();
     setItems(getNotifications());

@@ -1,3 +1,5 @@
+import { supabase } from "@/integrations/supabase/client";
+
 // Local store of received push notifications, persisted in localStorage.
 
 export type StoredNotification = {
@@ -42,6 +44,7 @@ export function addNotification(n: {
   body?: string;
   url?: string;
   dedupeKey?: string;
+  receivedAt?: number;
 }): StoredNotification {
   const list = read();
   // If a stable dedupe key is provided, never add the same one twice.
@@ -54,22 +57,38 @@ export function addNotification(n: {
     title: n.title || "Notification",
     body: n.body || "",
     url: n.url,
-    receivedAt: Date.now(),
+    receivedAt: n.receivedAt || Date.now(),
     read: false,
   };
-  // de-dupe identical notification arriving within 3s (for sources without a key)
-  if (!n.dedupeKey) {
-    const recent = list.find(
-      (x) =>
-        Math.abs(x.receivedAt - item.receivedAt) < 3000 &&
-        x.title === item.title &&
-        x.body === item.body,
-    );
-    if (recent) return recent;
-  }
+  // de-dupe identical notifications that arrive through both live push and inbox sync
+  const recent = list.find(
+    (x) =>
+      Math.abs(x.receivedAt - item.receivedAt) < 5000 &&
+      x.title === item.title &&
+      x.body === item.body,
+  );
+  if (recent) return recent;
   list.unshift(item);
   write(list);
   return item;
+}
+
+export async function syncNotificationInbox(): Promise<void> {
+  const { data, error } = await supabase
+    .from("notification_inbox")
+    .select("id, title, body, url, created_at")
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error || !data) return;
+  for (const n of data.slice().reverse()) {
+    addNotification({
+      title: n.title,
+      body: n.body || "",
+      url: n.url || undefined,
+      dedupeKey: `inbox:${n.id}`,
+      receivedAt: new Date(n.created_at).getTime(),
+    });
+  }
 }
 
 export function markAllRead() {
