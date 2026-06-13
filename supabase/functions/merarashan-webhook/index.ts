@@ -140,10 +140,20 @@ Deno.serve(async (req) => {
     }
 
     const webSent = webResults.filter((r) => r.status === "fulfilled").length;
+    if (webSent + nativeSent > 0) {
+      const { error: inboxErr } = await admin.from("notification_inbox").insert({
+        mobile,
+        title,
+        body,
+        url,
+      });
+      if (inboxErr) throw inboxErr;
+    }
     return new Response(
       JSON.stringify({
         ok: true,
         mobile,
+        stored: webSent + nativeSent > 0 ? 1 : 0,
         web: { sent: webSent, total: (webSubs as WebSub[]).length, removed: staleWeb.length },
         native: { sent: nativeSent, total: (natSubs as NativeSub[]).length, removed: staleFcm.length },
       }),
