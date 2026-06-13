@@ -102,6 +102,71 @@ const CardDetails = () => {
     (card?.cm_card_number as string) ||
     "Card Details";
 
+  const digitsOnly = (v: unknown) => String(v ?? "").replace(/\D/g, "");
+  const currentIndex = allCards.findIndex(
+    (c) => digitsOnly(c.cm_card_number) === digitsOnly(rcNum),
+  );
+  const prevCard = currentIndex > 0 ? allCards[currentIndex - 1] : null;
+  const nextCard =
+    currentIndex >= 0 && currentIndex < allCards.length - 1
+      ? allCards[currentIndex + 1]
+      : null;
+
+  const goToCard = (target: Record<string, unknown>) => {
+    const num = String(target.cm_card_number ?? "");
+    navigate(`/cards/${encodeURIComponent(num)}`, { state: { card: target } });
+  };
+
+  const startX = useRef<number | null>(null);
+  const startY = useRef<number | null>(null);
+  const locked = useRef<"h" | "v" | null>(null);
+  const dxRef = useRef(0);
+  const SWIPE_THRESHOLD = 70;
+  const SWIPE_MAX = 160;
+
+  const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (allCards.length <= 1) return;
+    startX.current = e.clientX;
+    startY.current = e.clientY;
+    locked.current = null;
+    setAnimating(false);
+  };
+  const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (startX.current === null || startY.current === null) return;
+    const dx = e.clientX - startX.current;
+    const dy = e.clientY - startY.current;
+    if (locked.current === null) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      locked.current = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+    }
+    if (locked.current !== "h") return;
+    let clamped = Math.max(-SWIPE_MAX, Math.min(SWIPE_MAX, dx));
+    // Resist when no neighbor in that direction
+    if (clamped < 0 && !nextCard) clamped = clamped / 4;
+    if (clamped > 0 && !prevCard) clamped = clamped / 4;
+    dxRef.current = clamped;
+    setSwipeDx(clamped);
+  };
+  const onPointerUp = () => {
+    const d = dxRef.current;
+    startX.current = null;
+    startY.current = null;
+    locked.current = null;
+    setAnimating(true);
+    if (d <= -SWIPE_THRESHOLD && nextCard) {
+      setSwipeDx(0);
+      dxRef.current = 0;
+      goToCard(nextCard);
+    } else if (d >= SWIPE_THRESHOLD && prevCard) {
+      setSwipeDx(0);
+      dxRef.current = 0;
+      goToCard(prevCard);
+    } else {
+      setSwipeDx(0);
+      dxRef.current = 0;
+    }
+  };
+
   return (
     <div className="min-h-screen pb-16">
       <header
