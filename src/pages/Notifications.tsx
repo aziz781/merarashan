@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Bell, Trash2, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import appLogo from "@/assets/mera-rashan-logo.png";
 import {
   clearAll,
   getNotifications,
