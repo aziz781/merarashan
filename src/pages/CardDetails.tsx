@@ -126,7 +126,7 @@ const CardDetails = () => {
 
   const goToCard = (target: Record<string, unknown>) => {
     const num = String(target.cm_card_number ?? "");
-    navigate(`/cards/${encodeURIComponent(num)}`, { state: { card: target } });
+    navigate(`/cards/${encodeURIComponent(num)}`, { state: { card: target }, replace: true });
   };
 
   const startX = useRef<number | null>(null);
