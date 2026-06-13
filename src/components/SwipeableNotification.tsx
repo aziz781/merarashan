@@ -24,6 +24,11 @@ export function SwipeableNotification({ children, onDelete, onMarkRead, disabled
     startY.current = e.clientY;
     locked.current = null;
     setAnimating(false);
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
   };
 
   const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
@@ -35,7 +40,6 @@ export function SwipeableNotification({ children, onDelete, onMarkRead, disabled
       locked.current = Math.abs(deltaX) > Math.abs(deltaY) ? "h" : "v";
     }
     if (locked.current !== "h") return;
-    e.preventDefault();
     const clamped = Math.max(-MAX, Math.min(MAX, deltaX));
     setDx(clamped);
   };
