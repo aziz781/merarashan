@@ -134,7 +134,7 @@ const CardDetails = () => {
   const locked = useRef<"h" | "v" | null>(null);
   const dxRef = useRef(0);
   const SWIPE_THRESHOLD = 70;
-  const SWIPE_MAX = 160;
+  const SWIPE_MAX = typeof window !== "undefined" ? window.innerWidth : 360;
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (allCards.length <= 1) return;
@@ -308,7 +308,7 @@ const CardDetails = () => {
                 aria-hidden
                 className="absolute inset-0"
                 style={{
-                  transform: `translateX(calc(-100% - 16px + ${swipeDx}px))`,
+                  transform: `translateX(calc(-100% - 24px + ${swipeDx}px))`,
                   transition,
                 }}
               >
@@ -320,7 +320,7 @@ const CardDetails = () => {
                 aria-hidden
                 className="absolute inset-0"
                 style={{
-                  transform: `translateX(calc(100% + 16px + ${swipeDx}px))`,
+                  transform: `translateX(calc(100% + 24px + ${swipeDx}px))`,
                   transition,
                 }}
               >
