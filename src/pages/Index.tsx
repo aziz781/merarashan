@@ -1778,7 +1778,7 @@ const Index = () => {
             </button>
             <div className="min-w-0">
               <h1 className="text-xl font-bold leading-tight truncate">{tab === "transactions" ? "Monthly Rashans" : tab === "cards" ? "Rashan Cards" : tab === "statements" ? "Monthly Statements" : String(displayName)}</h1>
-              {profileData && (
+              {profileData && tab === "customers" && (
                 <span
                   className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
                     isActive
