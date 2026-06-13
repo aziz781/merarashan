@@ -12,11 +12,17 @@ const THRESHOLD = 80;
 const MAX = 140;
 
 export function SwipeableNotification({ children, onDelete, onMarkRead, disabled }: Props) {
-  const [dx, setDx] = useState(0);
+  const [dx, setDxState] = useState(0);
   const [animating, setAnimating] = useState(false);
   const startX = useRef<number | null>(null);
   const startY = useRef<number | null>(null);
   const locked = useRef<"h" | "v" | null>(null);
+  const dxRef = useRef(0);
+
+  const setDx = (v: number) => {
+    dxRef.current = v;
+    setDxState(v);
+  };
 
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
     if (disabled) return;
@@ -24,6 +30,11 @@ export function SwipeableNotification({ children, onDelete, onMarkRead, disabled
     startY.current = e.clientY;
     locked.current = null;
     setAnimating(false);
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
   };
 
   const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
@@ -35,13 +46,12 @@ export function SwipeableNotification({ children, onDelete, onMarkRead, disabled
       locked.current = Math.abs(deltaX) > Math.abs(deltaY) ? "h" : "v";
     }
     if (locked.current !== "h") return;
-    e.preventDefault();
     const clamped = Math.max(-MAX, Math.min(MAX, deltaX));
     setDx(clamped);
   };
 
   const finish = () => {
-    const d = dx;
+    const d = dxRef.current;
     startX.current = null;
     startY.current = null;
     setAnimating(true);
