@@ -23,11 +23,23 @@ const CardDetails = () => {
   const navigate = useNavigate();
   const location = useLocation() as { state?: { card?: Record<string, unknown> } };
   const { rcNum: rcNumParam } = useParams();
+  const rcNum = rcNumParam || "";
   const [card, setCard] = useState<Record<string, unknown> | undefined>(location.state?.card);
   const [cardLoading, setCardLoading] = useState(false);
   const [cardError, setCardError] = useState<string | null>(null);
   const mobile = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
-  const rcNum = rcNumParam || (card?.cm_card_number as string) || "";
+
+  // Sync card when route or router-state changes (e.g., swipe to sibling card)
+  useEffect(() => {
+    const d = (v: unknown) => String(v ?? "").replace(/\D/g, "");
+    const stateCard = location.state?.card;
+    if (stateCard && d(stateCard.cm_card_number) === d(rcNum)) {
+      setCard(stateCard);
+    } else if (card && d(card.cm_card_number) !== d(rcNum)) {
+      setCard(undefined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rcNum, location.state]);
 
   const [txns, setTxns] = useState<Record<string, unknown>[] | null>(null);
   const [loading, setLoading] = useState(true);
