@@ -25,8 +25,8 @@ webpush.setVapidDetails(
   normalizeB64Url(Deno.env.get("VAPID_PRIVATE_KEY"))
 );
 
-type WebSub = { endpoint: string; p256dh: string; auth: string };
-type NativeSub = { fcm_token: string };
+type WebSub = { mobile: string; endpoint: string; p256dh: string; auth: string };
+type NativeSub = { mobile: string; fcm_token: string };
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -54,8 +54,8 @@ Deno.serve(async (req) => {
     );
 
     // --- Fetch both web and native subscriptions ---
-    let webQ = admin.from("push_subscriptions").select("endpoint, p256dh, auth");
-    let natQ = admin.from("native_push_subscriptions").select("fcm_token");
+    let webQ = admin.from("push_subscriptions").select("mobile, endpoint, p256dh, auth");
+    let natQ = admin.from("native_push_subscriptions").select("mobile, fcm_token");
     if (Array.isArray(mobiles) && mobiles.length > 0) {
       const list = mobiles.map(String);
       webQ = webQ.in("mobile", list);
@@ -80,13 +80,16 @@ Deno.serve(async (req) => {
       )
     );
     const staleWeb: string[] = [];
+    const storedMobiles = new Set<string>();
     webResults.forEach((r, i) => {
+      const sub = (webSubs as WebSub[])[i];
+      if (r.status === "fulfilled") storedMobiles.add(sub.mobile);
       if (r.status === "rejected") {
         const reason = r.reason as { statusCode?: number; body?: string };
         const status = reason?.statusCode;
         const b = reason?.body || "";
         if (status === 404 || status === 410 || status === 403 || b.includes("VapidPkHashMismatch")) {
-          staleWeb.push((webSubs as WebSub[])[i].endpoint);
+          staleWeb.push(sub.endpoint);
         }
       }
     });
@@ -104,9 +107,12 @@ Deno.serve(async (req) => {
         )
       );
       fcmResults.forEach((r, i) => {
+        const sub = (natSubs as NativeSub[])[i];
         if (r.status === "fulfilled") {
-          if (r.value.ok) nativeSent++;
-          else if (r.value.unregistered) staleFcm.push((natSubs as NativeSub[])[i].fcm_token);
+          if (r.value.ok) {
+            nativeSent++;
+            storedMobiles.add(sub.mobile);
+          } else if (r.value.unregistered) staleFcm.push(sub.fcm_token);
         }
       });
       if (staleFcm.length > 0) {
@@ -115,8 +121,23 @@ Deno.serve(async (req) => {
     }
 
     const webSent = webResults.filter((r) => r.status === "fulfilled").length;
+    if (storedMobiles.size > 0) {
+      const { error: inboxErr } = await admin.from("notification_inbox").insert(
+        Array.from(storedMobiles).map((m) => ({
+          mobile: m,
+          title: String(title),
+          body: msg ? String(msg) : "",
+          url: url ? String(url) : "/",
+          tag: tag ? String(tag) : null,
+        }))
+      );
+      if (inboxErr) throw inboxErr;
+    }
     return new Response(
       JSON.stringify({
+        sent: webSent + nativeSent,
+        total: webSubs.length + (natSubs as NativeSub[]).length,
+        stored: storedMobiles.size,
         web: { sent: webSent, total: webSubs.length, removed: staleWeb.length },
         native: { sent: nativeSent, total: (natSubs as NativeSub[]).length, removed: staleFcm.length },
       }),
