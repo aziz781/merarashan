@@ -136,20 +136,8 @@ export default function Notifications() {
             </h1>
             <p className="text-xs opacity-80">{items.length} total · {items.filter((n) => !n.read).length} unread</p>
           </div>
-          {items.length > 0 && (
-            <button
-              type="button"
-              onClick={() => {
-                clearAll();
-                setItems([]);
-              }}
-              aria-label="Clear all"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm ring-1 ring-white/25 hover:bg-white/25 transition-colors"
-            >
-              <Trash2 className="h-5 w-5" />
-            </button>
-          )}
         </div>
+
       </header>
 
       <div className="p-4 space-y-3 max-w-2xl mx-auto">
