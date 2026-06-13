@@ -144,7 +144,26 @@ export default function Notifications() {
         {pushEnabled === false && mobile && (
           <NotificationToggle mobile={mobile} />
         )}
-        {items.length === 0 ? (
+        {items.length > 0 && (
+          <div className="flex gap-2">
+            {(["all", "unread", "read"] as const).map((f) => (
+              <Button
+                key={f}
+                size="sm"
+                variant={filter === f ? "default" : "outline"}
+                className="flex-1 capitalize"
+                onClick={() => setFilter(f)}
+              >
+                {f}
+              </Button>
+            ))}
+          </div>
+        )}
+        {(() => {
+          const visible = items.filter((n) =>
+            filter === "all" ? true : filter === "unread" ? !n.read : n.read
+          );
+          return items.length === 0 ? (
           <Card className="p-8 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
               <Bell className="h-6 w-6 text-muted-foreground" />
@@ -154,8 +173,12 @@ export default function Notifications() {
               You'll see push notifications you receive here.
             </p>
           </Card>
+        ) : visible.length === 0 ? (
+          <Card className="p-8 text-center">
+            <p className="text-sm text-muted-foreground">No {filter} notifications</p>
+          </Card>
         ) : (
-          items.map((n) => {
+          visible.map((n) => {
             const t = n.title?.trim().toLowerCase();
             const highlight =
               t === "payment overdue"
