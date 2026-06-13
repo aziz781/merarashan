@@ -1806,9 +1806,6 @@ const Index = () => {
             )}
           </button>
         </div>
-        {tab === "transactions" && (
-          <p className="mt-3 text-sm font-semibold opacity-95">Monthly Rashans</p>
-        )}
       </header>
 
       <Sheet
