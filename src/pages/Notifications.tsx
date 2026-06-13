@@ -105,10 +105,18 @@ export default function Notifications() {
             </p>
           </Card>
         ) : (
-          items.map((n) => (
+          items.map((n) => {
+            const t = n.title?.trim().toLowerCase();
+            const highlight =
+              t === "payment due"
+                ? "bg-yellow-100 border-yellow-300 dark:bg-yellow-500/15 dark:border-yellow-500/40"
+                : t === "payment received"
+                ? "bg-green-100 border-green-300 dark:bg-green-500/15 dark:border-green-500/40"
+                : "";
+            return (
             <Card
               key={n.id}
-              className={`p-4 ${n.url ? "cursor-pointer hover:bg-accent/40 transition-colors" : ""}`}
+              className={`p-4 ${highlight} ${n.url ? "cursor-pointer hover:bg-accent/40 transition-colors" : ""}`}
               onClick={() => openNotification(n)}
             >
               <div className="flex items-start gap-3">
