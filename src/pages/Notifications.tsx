@@ -169,7 +169,9 @@ export default function Notifications() {
           items.map((n) => {
             const t = n.title?.trim().toLowerCase();
             const highlight =
-              t === "payment due"
+              t === "payment overdue"
+                ? "bg-red-100 border-red-300 dark:bg-red-500/15 dark:border-red-500/40"
+                : t === "payment due"
                 ? "bg-yellow-100 border-yellow-300 dark:bg-yellow-500/15 dark:border-yellow-500/40"
                 : t === "payment received"
                 ? "bg-green-100 border-green-300 dark:bg-green-500/15 dark:border-green-500/40"
