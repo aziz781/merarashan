@@ -75,6 +75,7 @@ const App = () => (
           <Route path="/rashans/detail/:rcNum" element={<RashanDetails />} />
           <Route path="/dev/troubleshooting" element={<DevTroubleshooting />} />
           <Route path="/admin/notify" element={<AdminNotify />} />
+          <Route path="/notifications" element={<Notifications />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
