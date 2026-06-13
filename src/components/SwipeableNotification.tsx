@@ -53,6 +53,7 @@ export function SwipeableNotification({ children, onDelete, onMarkRead, onTap, d
 
   const finish = () => {
     const d = dxRef.current;
+    const wasLocked = locked.current;
     startX.current = null;
     startY.current = null;
     setAnimating(true);
@@ -64,6 +65,8 @@ export function SwipeableNotification({ children, onDelete, onMarkRead, onTap, d
       onMarkRead();
     } else {
       setDx(0);
+      // Treat as a tap if no horizontal swipe lock occurred
+      if (wasLocked === null && onTap) onTap();
     }
     locked.current = null;
   };
