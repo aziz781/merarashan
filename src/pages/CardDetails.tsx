@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, CreditCard, Bell } from "lucide-react";
+import { ArrowLeft, CreditCard, Bell, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,32 +33,38 @@ const CardDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notifUnread, setNotifUnread] = useState(0);
+  const [allCards, setAllCards] = useState<Record<string, unknown>[]>([]);
+  const [swipeDx, setSwipeDx] = useState(0);
+  const [animating, setAnimating] = useState(false);
 
   useEffect(() => {
     setNotifUnread(unreadCount());
     return subscribeNotifications(() => setNotifUnread(unreadCount()));
   }, []);
 
-  // Fetch card by rcNum when opened via direct link (no router state)
+  // Always fetch cards list for swipe navigation (and as fallback when opened via direct link)
   useEffect(() => {
-    if (card || !mobile || !rcNum) return;
+    if (!mobile) return;
     let cancelled = false;
-    setCardLoading(true);
+    setCardLoading(!card);
     setCardError(null);
     fetchResource<unknown>("cards", mobile)
       .then((d) => {
         if (cancelled) return;
         const items = (extractItems(d) ?? []) as Record<string, unknown>[];
-        const digits = (v: unknown) => String(v ?? "").replace(/\D/g, "");
-        const target = digits(rcNum);
-        const found = items.find((c) => digits(c.cm_card_number) === target);
-        if (found) setCard(found);
-        else setCardError("Card not found for this account.");
+        setAllCards(items);
+        if (!card && rcNum) {
+          const digits = (v: unknown) => String(v ?? "").replace(/\D/g, "");
+          const target = digits(rcNum);
+          const found = items.find((c) => digits(c.cm_card_number) === target);
+          if (found) setCard(found);
+          else setCardError("Card not found for this account.");
+        }
       })
       .catch((e) => !cancelled && setCardError(e.message))
       .finally(() => !cancelled && setCardLoading(false));
     return () => { cancelled = true; };
-  }, [card, mobile, rcNum]);
+  }, [mobile, rcNum, card]);
 
   useEffect(() => {
     if (!mobile || !rcNum) {
@@ -95,6 +101,71 @@ const CardDetails = () => {
     (card?.card_name as string) ||
     (card?.cm_card_number as string) ||
     "Card Details";
+
+  const digitsOnly = (v: unknown) => String(v ?? "").replace(/\D/g, "");
+  const currentIndex = allCards.findIndex(
+    (c) => digitsOnly(c.cm_card_number) === digitsOnly(rcNum),
+  );
+  const prevCard = currentIndex > 0 ? allCards[currentIndex - 1] : null;
+  const nextCard =
+    currentIndex >= 0 && currentIndex < allCards.length - 1
+      ? allCards[currentIndex + 1]
+      : null;
+
+  const goToCard = (target: Record<string, unknown>) => {
+    const num = String(target.cm_card_number ?? "");
+    navigate(`/cards/${encodeURIComponent(num)}`, { state: { card: target } });
+  };
+
+  const startX = useRef<number | null>(null);
+  const startY = useRef<number | null>(null);
+  const locked = useRef<"h" | "v" | null>(null);
+  const dxRef = useRef(0);
+  const SWIPE_THRESHOLD = 70;
+  const SWIPE_MAX = 160;
+
+  const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (allCards.length <= 1) return;
+    startX.current = e.clientX;
+    startY.current = e.clientY;
+    locked.current = null;
+    setAnimating(false);
+  };
+  const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (startX.current === null || startY.current === null) return;
+    const dx = e.clientX - startX.current;
+    const dy = e.clientY - startY.current;
+    if (locked.current === null) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      locked.current = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+    }
+    if (locked.current !== "h") return;
+    let clamped = Math.max(-SWIPE_MAX, Math.min(SWIPE_MAX, dx));
+    // Resist when no neighbor in that direction
+    if (clamped < 0 && !nextCard) clamped = clamped / 4;
+    if (clamped > 0 && !prevCard) clamped = clamped / 4;
+    dxRef.current = clamped;
+    setSwipeDx(clamped);
+  };
+  const onPointerUp = () => {
+    const d = dxRef.current;
+    startX.current = null;
+    startY.current = null;
+    locked.current = null;
+    setAnimating(true);
+    if (d <= -SWIPE_THRESHOLD && nextCard) {
+      setSwipeDx(0);
+      dxRef.current = 0;
+      goToCard(nextCard);
+    } else if (d >= SWIPE_THRESHOLD && prevCard) {
+      setSwipeDx(0);
+      dxRef.current = 0;
+      goToCard(prevCard);
+    } else {
+      setSwipeDx(0);
+      dxRef.current = 0;
+    }
+  };
 
   return (
     <div className="min-h-screen pb-16">
@@ -133,11 +204,49 @@ const CardDetails = () => {
       </header>
 
 
-      <main className="px-5 -mt-3 space-y-5">
+      <main
+        className="px-5 -mt-3 space-y-5 select-none"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        style={{ touchAction: "pan-y" }}
+      >
+      {allCards.length > 1 && (
+        <div className="flex items-center justify-between text-xs text-muted-foreground -mb-2">
+          <button
+            type="button"
+            onClick={() => prevCard && goToCard(prevCard)}
+            disabled={!prevCard}
+            className="inline-flex items-center gap-1 disabled:opacity-30"
+            aria-label="Previous card"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Prev
+          </button>
+          <span>
+            {currentIndex + 1} / {allCards.length}
+          </span>
+          <button
+            type="button"
+            onClick={() => nextCard && goToCard(nextCard)}
+            disabled={!nextCard}
+            className="inline-flex items-center gap-1 disabled:opacity-30"
+            aria-label="Next card"
+          >
+            Next
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+      <div
+        style={{
+          transform: `translateX(${swipeDx}px)`,
+          transition: animating ? "transform 180ms ease-out" : "none",
+        }}
+      >
       {card ? (
-        <>
-          
-          <Card className="p-5 bg-card/90 backdrop-blur shadow-[var(--shadow-card)] border-0">
+        <Card className="p-5 bg-card/90 backdrop-blur shadow-[var(--shadow-card)] border-0">
             <div className="space-y-1.5">
               {fields.map(({ key, label }) => {
                 const isName = key === "person_name";
@@ -166,7 +275,6 @@ const CardDetails = () => {
               })}
             </div>
           </Card>
-        </>
       ) : cardLoading ? (
         <Card className="p-5">
           <Skeleton className="h-6 w-2/3 mb-2" />
@@ -179,6 +287,8 @@ const CardDetails = () => {
           </p>
         </Card>
       )}
+      </div>
+
 
       <section>
         <h2 className="text-sm font-semibold text-foreground mb-3">Monthly Rashan</h2>
