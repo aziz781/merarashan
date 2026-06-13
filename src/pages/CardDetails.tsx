@@ -32,6 +32,12 @@ const CardDetails = () => {
   const [txns, setTxns] = useState<Record<string, unknown>[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notifUnread, setNotifUnread] = useState(0);
+
+  useEffect(() => {
+    setNotifUnread(unreadCount());
+    return subscribeNotifications(() => setNotifUnread(unreadCount()));
+  }, []);
 
   // Fetch card by rcNum when opened via direct link (no router state)
   useEffect(() => {
