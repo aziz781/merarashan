@@ -17,7 +17,26 @@ self.addEventListener("push", (event) => {
     tag: data.tag,
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    (async () => {
+      await self.registration.showNotification(title, options);
+      // Broadcast to any open clients so they can persist it in the in-app list.
+      try {
+        const clients = await self.clients.matchAll({
+          type: "window",
+          includeUncontrolled: true,
+        });
+        for (const client of clients) {
+          client.postMessage({
+            type: "push-received",
+            payload: { title, body: options.body, url: options.data.url },
+          });
+        }
+      } catch (_) {
+        /* ignore */
+      }
+    })(),
+  );
 });
 
 self.addEventListener("notificationclick", (event) => {
@@ -43,6 +62,6 @@ self.addEventListener("notificationclick", (event) => {
         }
       }
       await self.clients.openWindow(targetUrl);
-    })()
+    })(),
   );
 });
