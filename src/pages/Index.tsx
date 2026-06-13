@@ -21,6 +21,7 @@ import {
   LayoutGrid,
   List,
   Menu,
+  Bell,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
@@ -46,6 +47,7 @@ import { PageFooter } from "@/components/PageFooter";
 import { MessageBox } from "@/components/MessageBox";
 
 import { NotificationToggle } from "@/components/NotificationToggle";
+import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
 
 const STORAGE_KEY = "mr_mobile";
 const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
@@ -1605,6 +1607,7 @@ const TABS: { id: Resource; label: string; icon: typeof CreditCard }[] = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
   const [mobile, setMobile] = useState<string | null>(null);
   const [tab, setTab] = useState<Resource>(() => {
     try {
@@ -1626,6 +1629,14 @@ const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [notifUnread, setNotifUnread] = useState<number>(() => {
+    try { return unreadCount(); } catch { return 0; }
+  });
+  useEffect(() => {
+    const update = () => setNotifUnread(unreadCount());
+    update();
+    return subscribeNotifications(update);
+  }, []);
   const slideInClosingRef = useRef(false);
   const handleSlideInOpenChange = (setter: (v: boolean) => void) => (open: boolean) => {
     if (!open) {
@@ -1746,6 +1757,19 @@ const Index = () => {
               )}
             </div>
           </div>
+          <button
+            type="button"
+            onClick={() => navigate("/notifications")}
+            aria-label="Notifications"
+            className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors"
+          >
+            <Bell className="h-5 w-5" />
+            {notifUnread > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-[18px] text-center ring-2 ring-[hsl(var(--primary))]">
+                {notifUnread > 99 ? "99+" : notifUnread}
+              </span>
+            )}
+          </button>
         </div>
       </header>
 
