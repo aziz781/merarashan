@@ -1,5 +1,19 @@
 // Push notification handlers — injected into the workbox-generated SW.
 
+async function broadcast(payload) {
+  try {
+    const clients = await self.clients.matchAll({
+      type: "window",
+      includeUncontrolled: true,
+    });
+    for (const client of clients) {
+      client.postMessage({ type: "push-received", payload });
+    }
+  } catch (_) {
+    /* ignore */
+  }
+}
+
 self.addEventListener("push", (event) => {
   let data = {};
   try {
@@ -13,19 +27,30 @@ self.addEventListener("push", (event) => {
     body: data.body || "",
     icon: data.icon || "/icon-192.png",
     badge: data.badge || "/icon-192.png",
-    data: { url: data.url || "/" },
+    data: { url: data.url || "/", title, body: data.body || "" },
     tag: data.tag,
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    (async () => {
+      await self.registration.showNotification(title, options);
+      await broadcast({ title, body: options.body, url: options.data.url });
+    })(),
+  );
 });
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const targetUrl = (event.notification.data && event.notification.data.url) || "/";
+  const d = event.notification.data || {};
+  const targetUrl = d.url || "/";
+  const title = d.title || event.notification.title || "Notification";
+  const body = d.body || event.notification.body || "";
 
   event.waitUntil(
     (async () => {
+      // Ensure it is in the in-app list as well.
+      await broadcast({ title, body, url: targetUrl });
+
       const allClients = await self.clients.matchAll({
         type: "window",
         includeUncontrolled: true,
@@ -43,6 +68,6 @@ self.addEventListener("notificationclick", (event) => {
         }
       }
       await self.clients.openWindow(targetUrl);
-    })()
+    })(),
   );
 });
