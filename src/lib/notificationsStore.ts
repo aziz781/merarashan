@@ -41,24 +41,32 @@ export function addNotification(n: {
   title?: string;
   body?: string;
   url?: string;
+  dedupeKey?: string;
 }): StoredNotification {
+  const list = read();
+  // If a stable dedupe key is provided, never add the same one twice.
+  if (n.dedupeKey) {
+    const existing = list.find((x) => x.id === `k:${n.dedupeKey}`);
+    if (existing) return existing;
+  }
   const item: StoredNotification = {
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id: n.dedupeKey ? `k:${n.dedupeKey}` : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     title: n.title || "Notification",
     body: n.body || "",
     url: n.url,
     receivedAt: Date.now(),
     read: false,
   };
-  const list = read();
-  // de-dupe identical notification arriving within 3s
-  const recent = list.find(
-    (x) =>
-      Math.abs(x.receivedAt - item.receivedAt) < 3000 &&
-      x.title === item.title &&
-      x.body === item.body,
-  );
-  if (recent) return recent;
+  // de-dupe identical notification arriving within 3s (for sources without a key)
+  if (!n.dedupeKey) {
+    const recent = list.find(
+      (x) =>
+        Math.abs(x.receivedAt - item.receivedAt) < 3000 &&
+        x.title === item.title &&
+        x.body === item.body,
+    );
+    if (recent) return recent;
+  }
   list.unshift(item);
   write(list);
   return item;
