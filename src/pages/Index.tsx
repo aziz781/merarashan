@@ -1777,7 +1777,7 @@ const Index = () => {
                 .toUpperCase() || "U"}
             </button>
             <div className="min-w-0">
-              <h1 className="text-xl font-bold leading-tight truncate">{tab === "rashans" ? "Monthly Rashans" : String(displayName)}</h1>
+              <h1 className="text-xl font-bold leading-tight truncate">{tab === "transactions" ? "Monthly Rashans" : String(displayName)}</h1>
               {profileData && (
                 <span
                   className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
