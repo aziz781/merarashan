@@ -205,19 +205,9 @@ export default function Notifications() {
                     {n.body || <span className="italic opacity-60">No message body</span>}
                   </p>
                 </div>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8 shrink-0"
-                  aria-label="Remove"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeNotification(n.id);
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
               </div>
+
+
             </Card>
             </SwipeableNotification>
             );
