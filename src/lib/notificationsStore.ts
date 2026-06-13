@@ -126,7 +126,21 @@ export function markAllRead() {
 
 export function removeNotification(id: string) {
   write(read().filter((n) => n.id !== id));
+  const deleted = readDeleted();
+  if (!deleted.includes(id)) {
+    deleted.push(id);
+    writeDeleted(deleted);
+  }
 }
+
+export function clearAll() {
+  const all = read();
+  const deleted = readDeleted();
+  for (const n of all) if (!deleted.includes(n.id)) deleted.push(n.id);
+  writeDeleted(deleted);
+  write([]);
+}
+
 
 export function clearAll() {
   write([]);
