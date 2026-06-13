@@ -185,7 +185,7 @@ export default function Notifications() {
               onMarkRead={() => markRead(n.id)}
             >
             <Card
-              className={`p-4 ${highlight} ${!n.read ? "ring-1 ring-primary/50 bg-primary/5 border-l-4 border-l-primary" : "opacity-80"} ${n.url ? "cursor-pointer hover:bg-accent/40 transition-colors" : ""}`}
+              className={`p-4 ${!n.read && !highlight ? "ring-1 ring-primary/50 bg-primary/5 border-l-4 border-l-primary" : ""} ${!n.read && highlight ? "ring-1 ring-primary/50 border-l-4 border-l-primary" : ""} ${highlight} ${n.read ? "opacity-80" : ""} ${n.url ? "cursor-pointer hover:bg-accent/40 transition-colors" : ""}`}
               onClick={() => openNotification(n)}
             >
               <div className="flex items-start gap-3">
