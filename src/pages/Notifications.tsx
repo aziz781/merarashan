@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Bell, Trash2, CheckCheck } from "lucide-react";
+import { ArrowLeft, Bell, BellOff, Trash2, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import appLogo from "@/assets/mera-rashan-logo.png";
+import { NotificationToggle } from "@/components/NotificationToggle";
+import { getCurrentSubscription, pushSupported } from "@/lib/push";
+import { isNativePlatform } from "@/lib/nativePush";
 import {
   clearAll,
   getNotifications,
