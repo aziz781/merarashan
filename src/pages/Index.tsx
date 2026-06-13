@@ -49,6 +49,10 @@ import { MessageBox } from "@/components/MessageBox";
 
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
+import { getCurrentSubscription, pushSupported } from "@/lib/push";
+import { isNativePlatform } from "@/lib/nativePush";
+
+const NATIVE_PUSH_ENABLED_KEY = "mr_native_push_enabled";
 
 const STORAGE_KEY = "mr_mobile";
 const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
