@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, CreditCard, Bell, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, CreditCard, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -224,33 +224,6 @@ const CardDetails = () => {
         onPointerCancel={onPointerUp}
         style={{ touchAction: "pan-y" }}
       >
-      {allCards.length > 1 && (
-        <div className="flex items-center justify-between text-xs text-muted-foreground -mb-2">
-          <button
-            type="button"
-            onClick={() => prevCard && goToCard(prevCard)}
-            disabled={!prevCard}
-            className="inline-flex items-center gap-1 disabled:opacity-30"
-            aria-label="Previous card"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Prev
-          </button>
-          <span>
-            {currentIndex + 1} / {allCards.length}
-          </span>
-          <button
-            type="button"
-            onClick={() => nextCard && goToCard(nextCard)}
-            disabled={!nextCard}
-            className="inline-flex items-center gap-1 disabled:opacity-30"
-            aria-label="Next card"
-          >
-            Next
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
       {(() => {
         const renderCardBody = (c: Record<string, unknown>) => (
           <Card className="p-5 bg-card/95 backdrop-blur shadow-[var(--shadow-card)] border-0">
@@ -330,6 +303,24 @@ const CardDetails = () => {
           </div>
         );
       })()}
+
+      {allCards.length > 1 && (
+        <div className="flex items-center justify-center gap-1.5 -mt-2">
+          {allCards.map((c, i) => {
+            const active = i === currentIndex;
+            return (
+              <button
+                key={String(c.cm_card_number ?? i)}
+                type="button"
+                onClick={() => goToCard(c)}
+                aria-label={`Go to card ${i + 1}`}
+                aria-current={active}
+                className={`h-1.5 rounded-full transition-all ${active ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/40 hover:bg-muted-foreground/60"}`}
+              />
+            );
+          })}
+        </div>
+      )}
 
 
 
