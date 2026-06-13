@@ -40,6 +40,7 @@ export default function Notifications() {
   const [items, setItems] = useState<StoredNotification[]>(() => getNotifications());
   const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
   const [mobile, setMobile] = useState<string>("");
+  const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
 
   useEffect(() => {
     setMobile(localStorage.getItem(MOBILE_KEY) || "");
