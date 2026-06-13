@@ -5,13 +5,14 @@ type Props = {
   children: ReactNode;
   onDelete: () => void;
   onMarkRead: () => void;
+  onTap?: () => void;
   disabled?: boolean;
 };
 
 const THRESHOLD = 80;
 const MAX = 140;
 
-export function SwipeableNotification({ children, onDelete, onMarkRead, disabled }: Props) {
+export function SwipeableNotification({ children, onDelete, onMarkRead, onTap, disabled }: Props) {
   const [dx, setDxState] = useState(0);
   const [animating, setAnimating] = useState(false);
   const startX = useRef<number | null>(null);
