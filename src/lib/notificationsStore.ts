@@ -139,6 +139,16 @@ export function markRead(id: string) {
   write(list);
 }
 
+export function markUnread(id: string) {
+  const list = read().map((n) => (n.id === id ? { ...n, read: false } : n));
+  write(list);
+}
+
+export function toggleRead(id: string) {
+  const list = read().map((n) => (n.id === id ? { ...n, read: !n.read } : n));
+  write(list);
+}
+
 export function removeNotification(id: string) {
   write(read().filter((n) => n.id !== id));
   const deleted = readDeleted();
