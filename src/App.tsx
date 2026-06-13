@@ -101,6 +101,10 @@ const App = () => (
           <Route path="/dev/troubleshooting" element={<DevTroubleshooting />} />
           <Route path="/admin/notify" element={<AdminNotify />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/statements" element={<Index />} />
+          <Route path="/cards" element={<Index />} />
+          <Route path="/transactions" element={<Index />} />
+          <Route path="/customers" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

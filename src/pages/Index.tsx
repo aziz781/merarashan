@@ -1616,9 +1616,11 @@ const Index = () => {
   const [mobile, setMobile] = useState<string | null>(null);
   const [tab, setTab] = useState<Resource>(() => {
     try {
+      const valid = ["customers", "cards", "transactions", "statements"];
+      const path = window.location.pathname.replace(/^\//, "").toLowerCase();
+      if (valid.includes(path)) return path as Resource;
       const params = new URLSearchParams(window.location.search);
       const fromUrl = params.get("tab");
-      const valid = ["customers", "cards", "transactions", "statements"];
       if (fromUrl && valid.includes(fromUrl)) return fromUrl as Resource;
       const saved = sessionStorage.getItem("activeTab");
       if (saved) return saved as Resource;
