@@ -33,32 +33,38 @@ const CardDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notifUnread, setNotifUnread] = useState(0);
+  const [allCards, setAllCards] = useState<Record<string, unknown>[]>([]);
+  const [swipeDx, setSwipeDx] = useState(0);
+  const [animating, setAnimating] = useState(false);
 
   useEffect(() => {
     setNotifUnread(unreadCount());
     return subscribeNotifications(() => setNotifUnread(unreadCount()));
   }, []);
 
-  // Fetch card by rcNum when opened via direct link (no router state)
+  // Always fetch cards list for swipe navigation (and as fallback when opened via direct link)
   useEffect(() => {
-    if (card || !mobile || !rcNum) return;
+    if (!mobile) return;
     let cancelled = false;
-    setCardLoading(true);
+    setCardLoading(!card);
     setCardError(null);
     fetchResource<unknown>("cards", mobile)
       .then((d) => {
         if (cancelled) return;
         const items = (extractItems(d) ?? []) as Record<string, unknown>[];
-        const digits = (v: unknown) => String(v ?? "").replace(/\D/g, "");
-        const target = digits(rcNum);
-        const found = items.find((c) => digits(c.cm_card_number) === target);
-        if (found) setCard(found);
-        else setCardError("Card not found for this account.");
+        setAllCards(items);
+        if (!card && rcNum) {
+          const digits = (v: unknown) => String(v ?? "").replace(/\D/g, "");
+          const target = digits(rcNum);
+          const found = items.find((c) => digits(c.cm_card_number) === target);
+          if (found) setCard(found);
+          else setCardError("Card not found for this account.");
+        }
       })
       .catch((e) => !cancelled && setCardError(e.message))
       .finally(() => !cancelled && setCardLoading(false));
     return () => { cancelled = true; };
-  }, [card, mobile, rcNum]);
+  }, [mobile, rcNum, card]);
 
   useEffect(() => {
     if (!mobile || !rcNum) {
