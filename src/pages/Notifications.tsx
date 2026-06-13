@@ -91,18 +91,9 @@ export default function Notifications() {
     };
   }, []);
 
-  const resolveUrl = (n: StoredNotification): string | undefined => {
-    if (n.url) return n.url;
-    const t = n.title?.trim().toLowerCase() || "";
-    if (t === "monthly statement available") return "/statements";
-    if (t === "payment received" || t === "payment due" || t === "payment overdue") return "/?tab=transactions";
-    if (t === "rashan code issued") return "/?tab=customers";
-    return undefined;
-  };
-
   const openNotification = (n: StoredNotification) => {
     if (!n.read) markRead(n.id);
-    const url = resolveUrl(n);
+    const url = n.url;
     if (!url) return;
     // If it's an absolute URL on the same origin, convert to an internal route
     // so React Router handles it and the browser back button returns here.
@@ -121,6 +112,7 @@ export default function Notifications() {
     }
     navigate(url);
   };
+
 
 
   return (
