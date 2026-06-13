@@ -40,8 +40,22 @@ export default function Notifications() {
 
   const openNotification = (n: StoredNotification) => {
     if (!n.url) return;
-    if (/^https?:\/\//i.test(n.url)) window.location.assign(n.url);
-    else navigate(n.url);
+    // If it's an absolute URL on the same origin, convert to an internal route
+    // so React Router handles it and the browser back button returns here.
+    if (/^https?:\/\//i.test(n.url)) {
+      try {
+        const u = new URL(n.url);
+        if (u.origin === window.location.origin) {
+          navigate(u.pathname + u.search + u.hash);
+          return;
+        }
+      } catch {
+        /* ignore */
+      }
+      window.location.assign(n.url);
+      return;
+    }
+    navigate(n.url);
   };
 
   return (
