@@ -9,6 +9,7 @@ import CardDetails from "./pages/CardDetails.tsx";
 import RashanDetails from "./pages/RashanDetails.tsx";
 import DevTroubleshooting from "./pages/DevTroubleshooting.tsx";
 import AdminNotify from "./pages/AdminNotify.tsx";
+import Notifications from "./pages/Notifications.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { initNativePushListeners, isNativePlatform } from "@/lib/nativePush";
 import {
@@ -16,6 +17,7 @@ import {
   type PushNotificationPayload,
 } from "@/components/PushNotificationDialog";
 import { InstallNativeAppBanner } from "@/components/InstallNativeAppBanner";
+import { addNotification } from "@/lib/notificationsStore";
 
 const queryClient = new QueryClient();
 
