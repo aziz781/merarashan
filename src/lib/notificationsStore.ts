@@ -60,16 +60,14 @@ export function addNotification(n: {
     receivedAt: n.receivedAt || Date.now(),
     read: false,
   };
-  // de-dupe identical notification arriving within 3s (for sources without a key)
-  if (!n.dedupeKey) {
-    const recent = list.find(
-      (x) =>
-        Math.abs(x.receivedAt - item.receivedAt) < 3000 &&
-        x.title === item.title &&
-        x.body === item.body,
-    );
-    if (recent) return recent;
-  }
+  // de-dupe identical notifications that arrive through both live push and inbox sync
+  const recent = list.find(
+    (x) =>
+      Math.abs(x.receivedAt - item.receivedAt) < 5000 &&
+      x.title === item.title &&
+      x.body === item.body,
+  );
+  if (recent) return recent;
   list.unshift(item);
   write(list);
   return item;
