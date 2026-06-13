@@ -151,10 +151,8 @@ export async function initNativePushListeners(opts: {
     } catch { /* ignore */ }
   };
   await syncDelivered();
-  try {
-    const { App } = await import("@capacitor/app");
-    App.addListener("appStateChange", (state) => {
-      if (state.isActive) void syncDelivered();
-    });
-  } catch { /* ignore */ }
+  window.addEventListener("focus", () => void syncDelivered());
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") void syncDelivered();
+  });
 }
