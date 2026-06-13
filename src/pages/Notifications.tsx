@@ -112,6 +112,8 @@ export default function Notifications() {
                 ? "bg-yellow-100 border-yellow-300 dark:bg-yellow-500/15 dark:border-yellow-500/40"
                 : t === "payment received"
                 ? "bg-green-100 border-green-300 dark:bg-green-500/15 dark:border-green-500/40"
+                : t === "rashan code issued"
+                ? "bg-purple-100 border-purple-300 dark:bg-purple-500/15 dark:border-purple-500/40"
                 : "";
             return (
             <Card
