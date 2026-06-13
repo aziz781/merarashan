@@ -224,33 +224,6 @@ const CardDetails = () => {
         onPointerCancel={onPointerUp}
         style={{ touchAction: "pan-y" }}
       >
-      {allCards.length > 1 && (
-        <div className="flex items-center justify-between text-xs text-muted-foreground -mb-2">
-          <button
-            type="button"
-            onClick={() => prevCard && goToCard(prevCard)}
-            disabled={!prevCard}
-            className="inline-flex items-center gap-1 disabled:opacity-30"
-            aria-label="Previous card"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Prev
-          </button>
-          <span>
-            {currentIndex + 1} / {allCards.length}
-          </span>
-          <button
-            type="button"
-            onClick={() => nextCard && goToCard(nextCard)}
-            disabled={!nextCard}
-            className="inline-flex items-center gap-1 disabled:opacity-30"
-            aria-label="Next card"
-          >
-            Next
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
       {(() => {
         const renderCardBody = (c: Record<string, unknown>) => (
           <Card className="p-5 bg-card/95 backdrop-blur shadow-[var(--shadow-card)] border-0">
