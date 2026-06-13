@@ -120,6 +120,6 @@ export async function initNativePushListeners(opts: {
   await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
     const data = (action.notification.data || {}) as Record<string, unknown>;
     const url = typeof data.url === "string" ? data.url : "/";
-    opts.onAction?.(url);
+    opts.onAction?.(url, { title: action.notification.title, body: action.notification.body });
   });
 }
