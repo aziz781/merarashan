@@ -1628,6 +1628,14 @@ const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [notifUnread, setNotifUnread] = useState<number>(() => {
+    try { return unreadCount(); } catch { return 0; }
+  });
+  useEffect(() => {
+    const update = () => setNotifUnread(unreadCount());
+    update();
+    return subscribeNotifications(update);
+  }, []);
   const slideInClosingRef = useRef(false);
   const handleSlideInOpenChange = (setter: (v: boolean) => void) => (open: boolean) => {
     if (!open) {
