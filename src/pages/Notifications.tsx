@@ -200,10 +200,10 @@ export default function Notifications() {
               key={n.id}
               onDelete={() => removeNotification(n.id)}
               onMarkRead={() => toggleRead(n.id)}
+              onTap={() => openNotification(n)}
             >
             <Card
               className={`p-4 ${!n.read && !highlight ? "ring-1 ring-primary/50 bg-primary/5 border-l-4 border-l-primary" : ""} ${!n.read && highlight ? "ring-1 ring-primary/50 border-l-4 border-l-primary" : ""} ${highlight} ${n.read ? "opacity-80" : ""} cursor-pointer hover:bg-accent/40 transition-colors`}
-              onClick={() => openNotification(n)}
             >
               <div className="flex items-start gap-3">
                 <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
