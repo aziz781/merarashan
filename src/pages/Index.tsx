@@ -47,6 +47,7 @@ import { PageFooter } from "@/components/PageFooter";
 import { MessageBox } from "@/components/MessageBox";
 
 import { NotificationToggle } from "@/components/NotificationToggle";
+import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
 
 const STORAGE_KEY = "mr_mobile";
 const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
