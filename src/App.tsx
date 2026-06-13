@@ -17,7 +17,7 @@ import {
   type PushNotificationPayload,
 } from "@/components/PushNotificationDialog";
 import { InstallNativeAppBanner } from "@/components/InstallNativeAppBanner";
-import { addNotification } from "@/lib/notificationsStore";
+import { addNotification, syncNotificationInbox } from "@/lib/notificationsStore";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +25,8 @@ function NativePushBridge() {
   const [pending, setPending] = useState<PushNotificationPayload | null>(null);
 
   useEffect(() => {
+    void syncNotificationInbox();
+
     // Listen for web push events broadcast from the service worker.
     const onSwMessage = (event: MessageEvent) => {
       const data = event.data as { type?: string; payload?: PushNotificationPayload } | undefined;
@@ -57,10 +59,19 @@ function NativePushBridge() {
       }).catch(() => { /* ignore */ });
     }
 
+    const onFocus = () => void syncNotificationInbox();
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") void syncNotificationInbox();
+    };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
     return () => {
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.removeEventListener("message", onSwMessage);
       }
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
 

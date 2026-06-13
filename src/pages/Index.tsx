@@ -47,7 +47,7 @@ import { PageFooter } from "@/components/PageFooter";
 import { MessageBox } from "@/components/MessageBox";
 
 import { NotificationToggle } from "@/components/NotificationToggle";
-import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
+import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
 
 const STORAGE_KEY = "mr_mobile";
 const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
@@ -1633,6 +1633,7 @@ const Index = () => {
     try { return unreadCount(); } catch { return 0; }
   });
   useEffect(() => {
+    void syncNotificationInbox();
     const update = () => setNotifUnread(unreadCount());
     update();
     return subscribeNotifications(update);
