@@ -1643,6 +1643,35 @@ const Index = () => {
     update();
     return subscribeNotifications(update);
   }, []);
+
+  const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
+  useEffect(() => {
+    const check = async () => {
+      try {
+        if (isNativePlatform()) {
+          setPushEnabled(localStorage.getItem(NATIVE_PUSH_ENABLED_KEY) === "1");
+          return;
+        }
+        if (!pushSupported()) {
+          setPushEnabled(false);
+          return;
+        }
+        const sub = await getCurrentSubscription();
+        setPushEnabled(!!sub && Notification.permission === "granted");
+      } catch {
+        setPushEnabled(false);
+      }
+    };
+    void check();
+    const onVis = () => { if (document.visibilityState === "visible") void check(); };
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", check);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", check);
+    };
+  }, []);
+
   const slideInClosingRef = useRef(false);
   const handleSlideInOpenChange = (setter: (v: boolean) => void) => (open: boolean) => {
     if (!open) {
