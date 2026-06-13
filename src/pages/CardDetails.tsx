@@ -304,6 +304,24 @@ const CardDetails = () => {
         );
       })()}
 
+      {allCards.length > 1 && (
+        <div className="flex items-center justify-center gap-1.5 -mt-2">
+          {allCards.map((c, i) => {
+            const active = i === currentIndex;
+            return (
+              <button
+                key={String(c.cm_card_number ?? i)}
+                type="button"
+                onClick={() => goToCard(c)}
+                aria-label={`Go to card ${i + 1}`}
+                aria-current={active}
+                className={`h-1.5 rounded-full transition-all ${active ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/40 hover:bg-muted-foreground/60"}`}
+              />
+            );
+          })}
+        </div>
+      )}
+
 
 
       <section>
