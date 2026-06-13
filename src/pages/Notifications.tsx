@@ -11,7 +11,7 @@ import {
   clearAll,
   getNotifications,
   markAllRead,
-  markRead,
+  toggleRead,
   removeNotification,
   subscribeNotifications,
   syncNotificationInbox,
@@ -182,7 +182,7 @@ export default function Notifications() {
             <SwipeableNotification
               key={n.id}
               onDelete={() => removeNotification(n.id)}
-              onMarkRead={() => markRead(n.id)}
+              onMarkRead={() => toggleRead(n.id)}
             >
             <Card
               className={`p-4 ${!n.read && !highlight ? "ring-1 ring-primary/50 bg-primary/5 border-l-4 border-l-primary" : ""} ${!n.read && highlight ? "ring-1 ring-primary/50 border-l-4 border-l-primary" : ""} ${highlight} ${n.read ? "opacity-80" : ""} ${n.url ? "cursor-pointer hover:bg-accent/40 transition-colors" : ""}`}
