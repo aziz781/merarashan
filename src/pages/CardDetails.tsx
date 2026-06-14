@@ -378,20 +378,6 @@ const CardDetails = () => {
                   {renderCardBody(nextNextCard)}
                 </div>
               )}
-              {nextCard && (
-                <div
-                  aria-hidden
-                  className="absolute inset-y-0"
-                  style={{
-                    width: "100%",
-                    left: 0,
-                    transform: `translateX(calc(100% + ${GAP}px + ${swipeDx}px))`,
-                    transition,
-                  }}
-                >
-                  {renderCardBody(nextCard)}
-                </div>
-              )}
             </div>
           </div>
         );
