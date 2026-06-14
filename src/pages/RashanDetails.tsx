@@ -662,6 +662,7 @@ const RashanDetails = () => {
           </Card>
         );})}
       </main>
+      <CardDetailsPopup card={cardData} open={cardPopupOpen} onOpenChange={setCardPopupOpen} />
       <PageFooter />
     </div>
   );
