@@ -162,40 +162,15 @@ function CardDetailsPopup({
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-3 pt-2">
-          {entries.map(([key, value], i) => {
-            const text = String(value ?? "");
-            return (
-              <div key={key}>
-                <div className="flex justify-between gap-3 text-sm items-start">
-                  <span className="text-muted-foreground shrink-0">{labelMap[key] || key.replace(/_/g, " ")}</span>
-                  <div className="flex items-start gap-2 min-w-0">
-                    <span className="font-medium text-foreground text-right break-all">{formatValue(key, value)}</span>
-                    <button
-                      type="button"
-                      aria-label={`Copy ${labelMap[key] || key}`}
-                      onClick={async () => {
-                        try {
-                          if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
-                          else {
-                            const ta = document.createElement("textarea");
-                            ta.value = text; document.body.appendChild(ta); ta.select();
-                            document.execCommand("copy"); document.body.removeChild(ta);
-                          }
-                          toast({ title: "Copied", description: text });
-                        } catch {
-                          toast({ title: "Copy failed", variant: "destructive" });
-                        }
-                      }}
-                      className="shrink-0 p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-                {i < entries.length - 1 && <Separator className="mt-3" />}
+          {entries.map(([key, value], i) => (
+            <div key={key}>
+              <div className="flex justify-between gap-3 text-sm items-start">
+                <span className="text-muted-foreground shrink-0">{labelMap[key] || key.replace(/_/g, " ")}</span>
+                <span className="font-medium text-foreground text-right break-all">{formatValue(key, value)}</span>
               </div>
-            );
-          })}
+              {i < entries.length - 1 && <Separator className="mt-3" />}
+            </div>
+          ))}
         </div>
       </DialogContent>
     </Dialog>
