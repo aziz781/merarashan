@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -24,6 +24,7 @@ const queryClient = new QueryClient();
 
 function NativePushBridge() {
   const [pending, setPending] = useState<PushNotificationPayload | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => {
@@ -54,7 +55,21 @@ function NativePushBridge() {
         },
         onAction: (url, n) => {
           if (n) addNotification({ title: n.title, body: n.body, url });
-          if (url) window.location.assign(url);
+          if (!url) return;
+          if (/^https?:\/\//i.test(url)) {
+            try {
+              const u = new URL(url);
+              if (u.origin === window.location.origin) {
+                navigate(u.pathname + u.search + u.hash);
+              } else {
+                window.location.assign(url);
+              }
+            } catch {
+              navigate("/");
+            }
+          } else {
+            navigate(url.startsWith("/") ? url : `/${url}`);
+          }
         },
         onDelivered: (n) => {
           const data = (n.data || {}) as Record<string, unknown>;
