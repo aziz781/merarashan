@@ -8,6 +8,41 @@ import { fetchResource } from "@/lib/api";
 import { TransactionCard } from "@/components/TransactionCard";
 import { PageFooter } from "@/components/PageFooter";
 import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
+import { toast } from "@/hooks/use-toast";
+
+function useCopyLongPress(duration = 500) {
+  const timerRef = useRef<number | null>(null);
+  const triggeredRef = useRef(false);
+  const copy = async (value: string) => {
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(value);
+      else {
+        const ta = document.createElement("textarea");
+        ta.value = value; document.body.appendChild(ta); ta.select();
+        document.execCommand("copy"); document.body.removeChild(ta);
+      }
+      toast({ title: "Copied", description: value });
+    } catch {
+      toast({ title: "Copy failed", variant: "destructive" });
+    }
+  };
+  const bind = (value: string) => ({
+    onPointerDown: (e: ReactPointerEvent<HTMLElement>) => {
+      e.stopPropagation();
+      triggeredRef.current = false;
+      timerRef.current = window.setTimeout(() => {
+        triggeredRef.current = true;
+        copy(value);
+      }, duration);
+    },
+    onPointerUp: () => { if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; } },
+    onPointerLeave: () => { if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; } },
+    onPointerCancel: () => { if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; } },
+    onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
+    style: { WebkitUserSelect: "none", userSelect: "none", WebkitTouchCallout: "none" } as React.CSSProperties,
+  });
+  return bind;
+}
 
 const STORAGE_KEY = "mr_mobile";
 
