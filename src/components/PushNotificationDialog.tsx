@@ -9,6 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { openAppLink } from "@/lib/openAppLink";
 
 export type PushNotificationPayload = {
   title?: string;
@@ -29,12 +30,7 @@ export function PushNotificationDialog({
   const handleOpen = () => {
     const url = notification?.url;
     onClose();
-    if (!url) return;
-    if (/^https?:\/\//i.test(url)) {
-      window.location.assign(url);
-    } else {
-      navigate(url);
-    }
+    openAppLink(url, navigate);
   };
 
   return (
