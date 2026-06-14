@@ -162,15 +162,20 @@ function CardDetailsPopup({
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-3 pt-2">
-          {entries.map(([key, value], i) => (
-            <div key={key}>
-              <div className="flex justify-between gap-3 text-sm items-start">
-                <span className="text-muted-foreground shrink-0">{labelMap[key] || key.replace(/_/g, " ")}</span>
-                <span className="font-medium text-foreground text-right break-all">{formatValue(key, value)}</span>
+          {entries.map(([key, value], i) => {
+            const hideLabel = key === "cm_card_number";
+            return (
+              <div key={key}>
+                <div className="flex justify-between gap-3 text-sm items-start">
+                  {!hideLabel && (
+                    <span className="text-muted-foreground shrink-0">{labelMap[key] || key.replace(/_/g, " ")}</span>
+                  )}
+                  <span className={`font-medium text-foreground text-right break-all ${hideLabel ? "w-full" : ""}`}>{formatValue(key, value)}</span>
+                </div>
+                {i < entries.length - 1 && <Separator className="mt-3" />}
               </div>
-              {i < entries.length - 1 && <Separator className="mt-3" />}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </DialogContent>
     </Dialog>
