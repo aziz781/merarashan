@@ -291,8 +291,8 @@ const CardDetails = () => {
           </Card>
         );
         const transition = animating ? "transform 220ms ease-out" : "none";
-        const PEEK = 44; // px of neighbor card edge visible on each side
-        const GAP = 8;
+        const PEEK = 25; // px of neighbor card edge visible on each side
+        const GAP = 12;
         return (
           <div className="relative -mx-5 overflow-hidden px-5">
             <div
