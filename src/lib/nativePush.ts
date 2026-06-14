@@ -1,4 +1,5 @@
 import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -91,8 +92,14 @@ export async function initNativePushListeners(opts: {
   onForeground?: (n: { title?: string; body?: string; data?: Record<string, unknown> }) => void;
   onAction?: (url: string, n?: { title?: string; body?: string }) => void;
   onDelivered?: (n: { id?: string; title?: string; body?: string; data?: Record<string, unknown> }) => void;
+  onAppUrlOpen?: (url: string) => void;
 }): Promise<void> {
   if (!isNativePlatform()) return;
+
+  const readUrl = (data: Record<string, unknown>) => {
+    const value = data.url ?? data.link ?? data.deepLink ?? data.deeplink ?? data.path;
+    return typeof value === "string" && value.trim() ? value : "/notifications";
+  };
 
   // Ensure a high-importance channel with sound + vibration exists on Android.
   if (Capacitor.getPlatform() === "android") {
@@ -123,7 +130,7 @@ export async function initNativePushListeners(opts: {
 
   await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
     const data = (action.notification.data || {}) as Record<string, unknown>;
-    const url = typeof data.url === "string" ? data.url : "/";
+    const url = readUrl(data);
     const dBody = typeof data.body === "string" ? data.body : undefined;
     const dTitle = typeof data.title === "string" ? data.title : undefined;
     opts.onAction?.(url, {
@@ -155,4 +162,13 @@ export async function initNativePushListeners(opts: {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") void syncDelivered();
   });
+
+  await App.addListener("appUrlOpen", ({ url }) => {
+    opts.onAppUrlOpen?.(url || "/notifications");
+  });
+
+  try {
+    const launch = await App.getLaunchUrl();
+    if (launch?.url) opts.onAppUrlOpen?.(launch.url);
+  } catch { /* ignore */ }
 }
