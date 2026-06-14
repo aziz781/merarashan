@@ -336,6 +336,48 @@ const CardDetails = () => {
                   {renderCardBody(prevCard)}
                 </div>
               )}
+              {prevPrevCard && (
+                <div
+                  aria-hidden
+                  className="absolute inset-y-0"
+                  style={{
+                    width: "100%",
+                    left: 0,
+                    transform: `translateX(calc(-200% - ${GAP * 2}px + ${swipeDx}px))`,
+                    transition,
+                  }}
+                >
+                  {renderCardBody(prevPrevCard)}
+                </div>
+              )}
+              {nextCard && (
+                <div
+                  aria-hidden
+                  className="absolute inset-y-0"
+                  style={{
+                    width: "100%",
+                    left: 0,
+                    transform: `translateX(calc(100% + ${GAP}px + ${swipeDx}px))`,
+                    transition,
+                  }}
+                >
+                  {renderCardBody(nextCard)}
+                </div>
+              )}
+              {nextNextCard && (
+                <div
+                  aria-hidden
+                  className="absolute inset-y-0"
+                  style={{
+                    width: "100%",
+                    left: 0,
+                    transform: `translateX(calc(200% + ${GAP * 2}px + ${swipeDx}px))`,
+                    transition,
+                  }}
+                >
+                  {renderCardBody(nextNextCard)}
+                </div>
+              )}
               {nextCard && (
                 <div
                   aria-hidden
