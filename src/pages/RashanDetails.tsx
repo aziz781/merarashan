@@ -587,18 +587,30 @@ const RashanDetails = () => {
         {grouped.map(({ id, title, icon: Icon, rows }) => {
           const cardRcNum = getRcNum(item);
           const isCardTile = id === "card" && cardRcNum;
+          const lpHandlers = isCardTile ? {
+            onPointerDown: () => cardLongPress.start(),
+            onPointerUp: () => cardLongPress.cancel(),
+            onPointerLeave: () => cardLongPress.cancel(),
+            onPointerCancel: () => cardLongPress.cancel(),
+            onContextMenu: (e: React.MouseEvent) => { e.preventDefault(); },
+          } : {};
           return (
           <Card
             key={id}
             role={isCardTile ? "button" : undefined}
             tabIndex={isCardTile ? 0 : undefined}
-            onClick={isCardTile ? () => navigate(`/cards/${encodeURIComponent(cardRcNum)}`) : undefined}
+            onClick={isCardTile ? () => {
+              if (cardLongPress.isTriggered()) return;
+              navigate(`/cards/${encodeURIComponent(cardRcNum)}`);
+            } : undefined}
             onKeyDown={isCardTile ? (e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 navigate(`/cards/${encodeURIComponent(cardRcNum)}`);
               }
             } : undefined}
+            {...lpHandlers}
+            style={isCardTile ? { WebkitUserSelect: "none", userSelect: "none", WebkitTouchCallout: "none" } : undefined}
             className={`p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 ${isCardTile ? "cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]" : ""}`}
           >
             <div className="flex items-center gap-2 mb-3">
