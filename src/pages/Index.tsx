@@ -1556,7 +1556,7 @@ function RecordCard({
                 display = String(raw);
               }
               const isBold = key === "person_name" || key === "amount";
-              const hideLabel = key === "person_name" || key === "amount";
+              const hideLabel = key === "person_name" || key === "amount" || key === "cm_card_number";
               const isName = key === "person_name";
               return (
                 <div key={key} className={`flex justify-between ${isName ? "" : "text-sm"}`}>
