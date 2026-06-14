@@ -63,6 +63,7 @@ const CardDetails = () => {
   const [cardLoading, setCardLoading] = useState(false);
   const [cardError, setCardError] = useState<string | null>(null);
   const mobile = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
+  const copyBind = useCopyLongPress();
 
   // Sync card when route or router-state changes (e.g., swipe to sibling card)
   useEffect(() => {
