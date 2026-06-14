@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -11,10 +11,14 @@ import {
   ShoppingBag,
   Check,
   Bell,
+  Copy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "@/hooks/use-toast";
 import { PageFooter } from "@/components/PageFooter";
 import { fetchResource } from "@/lib/api";
 import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
