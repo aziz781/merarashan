@@ -266,6 +266,8 @@ const CardDetails = () => {
             <div className="space-y-1.5">
               {fields.map(({ key, label }) => {
                 const isName = key === "person_name";
+                const isCardNumber = key === "cm_card_number";
+                const hideLabel = isName || isCardNumber;
                 const raw = c[key];
                 const display = raw == null || raw === "" ? "—" : String(raw);
                 return (
@@ -273,12 +275,12 @@ const CardDetails = () => {
                     key={key}
                     className={`flex justify-between gap-3 border-b border-border/50 py-1.5 last:border-0 ${isName ? "" : "text-sm"}`}
                   >
-                    {!isName && (
+                    {!hideLabel && (
                       <span className="text-muted-foreground">{label}</span>
                     )}
                     <span
                       {...(raw == null || raw === "" ? {} : copyBind(String(raw)))}
-                      className={`break-all cursor-pointer ${isName ? "font-bold text-foreground w-full text-right text-xl" : "text-muted-foreground text-right"}`}
+                      className={`break-all cursor-pointer ${isName ? "font-bold text-foreground w-full text-right text-xl" : isCardNumber ? "text-foreground w-full text-right font-medium" : "text-muted-foreground text-right"}`}
                     >
                       {display}
                     </span>
