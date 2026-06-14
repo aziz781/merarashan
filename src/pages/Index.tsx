@@ -104,6 +104,8 @@ function CardDetailsPopup({
 
   const allowedKeys: { key: string; label: string }[] = [
     { key: "cm_card_number", label: "Card Number" },
+    { key: "person_name", label: "Name" },
+    { key: "amount", label: "Amount" },
     { key: "mobile_number", label: "Mobile" },
     { key: "city", label: "City" },
     { key: "reg_date", label: "Registration Date" },
