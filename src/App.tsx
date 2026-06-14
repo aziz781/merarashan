@@ -24,6 +24,7 @@ const queryClient = new QueryClient();
 
 function NativePushBridge() {
   const [pending, setPending] = useState<PushNotificationPayload | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => {
