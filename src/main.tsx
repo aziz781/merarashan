@@ -19,8 +19,15 @@ const isPreviewHost =
   host.includes("preview--") ||
   host.includes("lovableproject.com") ||
   host.includes("lovableproject-dev.com");
+const isNativeCapacitor = (() => {
+  try {
+    return !!(window as Window & { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.();
+  } catch {
+    return false;
+  }
+})();
 
-if (isPreviewHost || isInIframe) {
+if (isPreviewHost || isInIframe || isNativeCapacitor) {
   // Clean up any previously-registered service workers in preview/iframe contexts.
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.getRegistrations().then((regs) => {
