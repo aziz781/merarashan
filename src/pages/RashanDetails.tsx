@@ -477,6 +477,31 @@ const RashanDetails = () => {
     navigate("/");
   };
 
+  const cardRcNumTop = item ? getRcNum(item) : "";
+  const openCardPopup = useCallback(async () => {
+    if (!item) return;
+    if (cardData) { setCardPopupOpen(true); return; }
+    const fallback: Record<string, unknown> = {
+      cm_card_number: item?.cm_card_number ?? item?.rc_num,
+      mobile_number: item?.mobile_number ?? item?.userMobileNumber,
+      city: item?.city,
+      reg_date: item?.reg_date,
+    };
+    setCardData(fallback);
+    setCardPopupOpen(true);
+    try {
+      const mobile = localStorage.getItem(MOBILE_STORAGE_KEY);
+      if (!mobile) return;
+      const d = await fetchResource<unknown>("cards", mobile);
+      const list = extractItems(d) as Record<string, unknown>[];
+      const digits = (v: unknown) => String(v ?? "").replace(/\D/g, "");
+      const target = digits(cardRcNumTop);
+      const found = list.find((c) => digits(c.cm_card_number) === target);
+      if (found) setCardData(found);
+    } catch { /* ignore */ }
+  }, [cardData, cardRcNumTop, item]);
+  const cardLongPress = useLongPress(openCardPopup, 500);
+
   if (!item) {
     return (
       <div className="min-h-screen px-5 pt-10">
@@ -528,30 +553,6 @@ const RashanDetails = () => {
 
   const subtitle = (item.month_year as string) || "";
 
-  const cardRcNumTop = getRcNum(item);
-  const openCardPopup = useCallback(async () => {
-    if (cardData) { setCardPopupOpen(true); return; }
-    // Try fields already on the item
-    const fallback: Record<string, unknown> = {
-      cm_card_number: item?.cm_card_number ?? item?.rc_num,
-      mobile_number: item?.mobile_number ?? item?.userMobileNumber,
-      city: item?.city,
-      reg_date: item?.reg_date,
-    };
-    setCardData(fallback);
-    setCardPopupOpen(true);
-    try {
-      const mobile = localStorage.getItem(MOBILE_STORAGE_KEY);
-      if (!mobile) return;
-      const d = await fetchResource<unknown>("cards", mobile);
-      const list = extractItems(d) as Record<string, unknown>[];
-      const digits = (v: unknown) => String(v ?? "").replace(/\D/g, "");
-      const target = digits(cardRcNumTop);
-      const found = list.find((c) => digits(c.cm_card_number) === target);
-      if (found) setCardData(found);
-    } catch { /* ignore */ }
-  }, [cardData, cardRcNumTop, item]);
-  const cardLongPress = useLongPress(openCardPopup, 500);
 
   return (
     <div className="min-h-screen pb-16">
