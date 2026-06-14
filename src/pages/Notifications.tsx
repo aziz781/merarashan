@@ -19,6 +19,7 @@ import {
   type StoredNotification,
 } from "@/lib/notificationsStore";
 import { SwipeableNotification } from "@/components/SwipeableNotification";
+import { openAppLink } from "@/lib/openAppLink";
 
 function timeAgo(ts: number): string {
   const diff = Math.max(0, Date.now() - ts);
@@ -94,23 +95,7 @@ export default function Notifications() {
   const openNotification = (n: StoredNotification) => {
     if (!n.read) markRead(n.id);
     const url = n.url;
-    if (!url) return;
-    // If it's an absolute URL on the same origin, convert to an internal route
-    // so React Router handles it and the browser back button returns here.
-    if (/^https?:\/\//i.test(url)) {
-      try {
-        const u = new URL(url);
-        if (u.origin === window.location.origin) {
-          navigate(u.pathname + u.search + u.hash);
-          return;
-        }
-      } catch {
-        /* ignore */
-      }
-      window.location.assign(url);
-      return;
-    }
-    navigate(url);
+    openAppLink(url, navigate);
   };
 
 

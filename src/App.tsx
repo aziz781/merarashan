@@ -19,6 +19,7 @@ import {
 import { InstallNativeAppBanner } from "@/components/InstallNativeAppBanner";
 import { addNotification, syncNotificationInbox } from "@/lib/notificationsStore";
 import { supabase } from "@/integrations/supabase/client";
+import { openAppLink } from "@/lib/openAppLink";
 
 const queryClient = new QueryClient();
 
@@ -55,21 +56,7 @@ function NativePushBridge() {
         },
         onAction: (url, n) => {
           if (n) addNotification({ title: n.title, body: n.body, url });
-          if (!url) return;
-          if (/^https?:\/\//i.test(url)) {
-            try {
-              const u = new URL(url);
-              if (u.origin === window.location.origin) {
-                navigate(u.pathname + u.search + u.hash);
-              } else {
-                window.location.assign(url);
-              }
-            } catch {
-              navigate("/");
-            }
-          } else {
-            navigate(url.startsWith("/") ? url : `/${url}`);
-          }
+          openAppLink(url, navigate);
         },
         onDelivered: (n) => {
           const data = (n.data || {}) as Record<string, unknown>;
