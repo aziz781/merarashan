@@ -102,21 +102,19 @@ function CardDetailsPopup({
 }) {
   if (!item) return null;
 
-  const entries = Object.entries(item).filter(([, v]) => v !== null && v !== "" && typeof v !== "object");
+  const allowedKeys: { key: string; label: string }[] = [
+    { key: "cm_card_number", label: "Card Number" },
+    { key: "mobile_number", label: "Mobile" },
+    { key: "city", label: "City" },
+    { key: "reg_date", label: "Registration Date" },
+  ];
+  const entries = allowedKeys
+    .map(({ key, label }) => [key, item[key], label] as const)
+    .filter(([, v]) => v !== null && v !== "" && v !== undefined);
 
-  const labelMap: Record<string, string> = {
-    person_name: "Name",
-    cm_card_number: "Card Number",
-    mobile_number: "Mobile",
-    city: "City",
-    reg_date: "Registration Date",
-    amount: "Amount",
-    card_name: "Card Type",
-    active_cards: "Active Cards",
-    status: "Status",
-    created_at: "Created At",
-    updated_at: "Updated At",
-  };
+  const labelMap: Record<string, string> = Object.fromEntries(
+    allowedKeys.map(({ key, label }) => [key, label]),
+  );
 
   const formatValue = (key: string, raw: unknown): React.ReactNode => {
     if (raw == null || raw === "") return "—";
