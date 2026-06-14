@@ -252,11 +252,14 @@ const CardDetails = () => {
           </Card>
         );
         const transition = animating ? "transform 220ms ease-out" : "none";
+        const PEEK = 28; // px of neighbor card edge visible on each side
+        const GAP = 12;
         return (
-          <div className="relative overflow-hidden">
+          <div className="relative -mx-5 overflow-hidden px-5">
             <div
-              className="relative"
+              className="relative mx-auto"
               style={{
+                width: `calc(100% - ${PEEK * 2}px)`,
                 transform: `translateX(${swipeDx}px) rotate(${swipeDx * 0.02}deg)`,
                 transition,
               }}
@@ -275,31 +278,35 @@ const CardDetails = () => {
                   </p>
                 </Card>
               )}
+              {prevCard && (
+                <div
+                  aria-hidden
+                  className="absolute inset-y-0"
+                  style={{
+                    width: "100%",
+                    left: 0,
+                    transform: `translateX(calc(-100% - ${GAP}px + ${swipeDx}px))`,
+                    transition,
+                  }}
+                >
+                  {renderCardBody(prevCard)}
+                </div>
+              )}
+              {nextCard && (
+                <div
+                  aria-hidden
+                  className="absolute inset-y-0"
+                  style={{
+                    width: "100%",
+                    left: 0,
+                    transform: `translateX(calc(100% + ${GAP}px + ${swipeDx}px))`,
+                    transition,
+                  }}
+                >
+                  {renderCardBody(nextCard)}
+                </div>
+              )}
             </div>
-            {prevCard && (
-              <div
-                aria-hidden
-                className="absolute inset-0"
-                style={{
-                  transform: `translateX(calc(-100% - 24px + ${swipeDx}px))`,
-                  transition,
-                }}
-              >
-                {renderCardBody(prevCard)}
-              </div>
-            )}
-            {nextCard && (
-              <div
-                aria-hidden
-                className="absolute inset-0"
-                style={{
-                  transform: `translateX(calc(100% + 24px + ${swipeDx}px))`,
-                  transition,
-                }}
-              >
-                {renderCardBody(nextCard)}
-              </div>
-            )}
           </div>
         );
       })()}
