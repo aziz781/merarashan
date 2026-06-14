@@ -129,9 +129,36 @@ function CardDetailsPopup({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
-            Card Details
+          <DialogTitle className="flex items-center justify-between gap-2 pr-6">
+            <span className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              Card Details
+            </span>
+            <button
+              type="button"
+              aria-label="Copy all details"
+              title="Copy all"
+              onClick={async () => {
+                const text = entries
+                  .map(([key, value]) => `${labelMap[key] || key}: ${value ?? ""}`)
+                  .join("\n");
+                try {
+                  if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+                  else {
+                    const ta = document.createElement("textarea");
+                    ta.value = text; document.body.appendChild(ta); ta.select();
+                    document.execCommand("copy"); document.body.removeChild(ta);
+                  }
+                  toast({ title: "Copied all details" });
+                } catch {
+                  toast({ title: "Copy failed", variant: "destructive" });
+                }
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Copy className="w-4 h-4" />
+              Copy all
+            </button>
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-3 pt-2">
