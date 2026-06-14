@@ -159,6 +159,11 @@ const CardDetails = () => {
     currentIndex >= 0 && currentIndex < allCards.length - 1
       ? allCards[currentIndex + 1]
       : null;
+  const prevPrevCard = currentIndex > 1 ? allCards[currentIndex - 2] : null;
+  const nextNextCard =
+    currentIndex >= 0 && currentIndex < allCards.length - 2
+      ? allCards[currentIndex + 2]
+      : null;
 
   const goToCard = (target: Record<string, unknown>) => {
     const num = String(target.cm_card_number ?? "");
@@ -331,6 +336,20 @@ const CardDetails = () => {
                   {renderCardBody(prevCard)}
                 </div>
               )}
+              {prevPrevCard && (
+                <div
+                  aria-hidden
+                  className="absolute inset-y-0"
+                  style={{
+                    width: "100%",
+                    left: 0,
+                    transform: `translateX(calc(-200% - ${GAP * 2}px + ${swipeDx}px))`,
+                    transition,
+                  }}
+                >
+                  {renderCardBody(prevPrevCard)}
+                </div>
+              )}
               {nextCard && (
                 <div
                   aria-hidden
@@ -343,6 +362,20 @@ const CardDetails = () => {
                   }}
                 >
                   {renderCardBody(nextCard)}
+                </div>
+              )}
+              {nextNextCard && (
+                <div
+                  aria-hidden
+                  className="absolute inset-y-0"
+                  style={{
+                    width: "100%",
+                    left: 0,
+                    transform: `translateX(calc(200% + ${GAP * 2}px + ${swipeDx}px))`,
+                    transition,
+                  }}
+                >
+                  {renderCardBody(nextNextCard)}
                 </div>
               )}
             </div>
