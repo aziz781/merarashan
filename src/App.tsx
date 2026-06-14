@@ -58,6 +58,9 @@ function NativePushBridge() {
           if (n) addNotification({ title: n.title, body: n.body, url });
           openAppLink(url, navigate);
         },
+        onAppUrlOpen: (url) => {
+          openAppLink(url, navigate);
+        },
         onDelivered: (n) => {
           const data = (n.data || {}) as Record<string, unknown>;
           const url = typeof data.url === "string" ? data.url : undefined;
