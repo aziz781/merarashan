@@ -277,7 +277,8 @@ const CardDetails = () => {
                       <span className="text-muted-foreground">{label}</span>
                     )}
                     <span
-                      className={`break-all ${isName ? "font-bold text-foreground w-full text-right text-xl" : "text-muted-foreground text-right"}`}
+                      {...(raw == null || raw === "" ? {} : copyBind(String(raw)))}
+                      className={`break-all cursor-pointer ${isName ? "font-bold text-foreground w-full text-right text-xl" : "text-muted-foreground text-right"}`}
                     >
                       {display}
                     </span>
