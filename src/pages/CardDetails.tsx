@@ -159,6 +159,11 @@ const CardDetails = () => {
     currentIndex >= 0 && currentIndex < allCards.length - 1
       ? allCards[currentIndex + 1]
       : null;
+  const prevPrevCard = currentIndex > 1 ? allCards[currentIndex - 2] : null;
+  const nextNextCard =
+    currentIndex >= 0 && currentIndex < allCards.length - 2
+      ? allCards[currentIndex + 2]
+      : null;
 
   const goToCard = (target: Record<string, unknown>) => {
     const num = String(target.cm_card_number ?? "");
