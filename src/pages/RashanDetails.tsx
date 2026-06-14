@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -11,10 +11,14 @@ import {
   ShoppingBag,
   Check,
   Bell,
+  Copy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "@/hooks/use-toast";
 import { PageFooter } from "@/components/PageFooter";
 import { fetchResource } from "@/lib/api";
 import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
@@ -282,6 +286,103 @@ function UpdatesTimeline({ item }: { item: Item }) {
   );
 }
 
+function useLongPress(callback: () => void, duration = 600) {
+  const timerRef = useRef<number | null>(null);
+  const triggeredRef = useRef(false);
+  const start = useCallback(() => {
+    triggeredRef.current = false;
+    timerRef.current = window.setTimeout(() => {
+      triggeredRef.current = true;
+      callback();
+    }, duration);
+  }, [callback, duration]);
+  const cancel = useCallback(() => {
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+  }, []);
+  const isTriggered = useCallback(() => {
+    const t = triggeredRef.current;
+    triggeredRef.current = false;
+    return t;
+  }, []);
+  return { start, cancel, isTriggered };
+}
+
+function CardDetailsPopup({
+  card,
+  open,
+  onOpenChange,
+}: {
+  card: Record<string, unknown> | null;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  const allowedKeys: { key: string; label: string }[] = [
+    { key: "cm_card_number", label: "Card Number" },
+    { key: "mobile_number", label: "Mobile" },
+    { key: "city", label: "City" },
+    { key: "reg_date", label: "Registration Date" },
+  ];
+  const entries = card
+    ? allowedKeys
+        .map(({ key }) => [key, card[key]] as const)
+        .filter(([, v]) => v !== null && v !== "" && v !== undefined)
+    : [];
+  const labelMap = Object.fromEntries(allowedKeys.map(({ key, label }) => [key, label]));
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center justify-between gap-2 pr-6">
+            <span className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              Card Details
+            </span>
+            <button
+              type="button"
+              aria-label="Copy all details"
+              title="Copy all"
+              onClick={async () => {
+                const text = entries.map(([k, v]) => `${labelMap[k] || k}: ${v ?? ""}`).join("\n");
+                try {
+                  if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+                  else {
+                    const ta = document.createElement("textarea");
+                    ta.value = text; document.body.appendChild(ta); ta.select();
+                    document.execCommand("copy"); document.body.removeChild(ta);
+                  }
+                  toast({ title: "Copied all details" });
+                } catch {
+                  toast({ title: "Copy failed", variant: "destructive" });
+                }
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Copy className="w-4 h-4" />
+              Copy all
+            </button>
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 pt-2">
+          {entries.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No card details available.</p>
+          ) : (
+            entries.map(([key, value], i) => (
+              <div key={key}>
+                <div className="flex justify-between gap-3 text-sm items-start">
+                  <span className="text-muted-foreground shrink-0">{labelMap[key] || key}</span>
+                  <span className="font-medium text-foreground text-right break-all">{String(value)}</span>
+                </div>
+                {i < entries.length - 1 && <Separator className="mt-3" />}
+              </div>
+            ))
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 const RashanDetails = () => {
   const navigate = useNavigate();
   const params = useParams<{ rcNum?: string }>();
@@ -292,6 +393,8 @@ const RashanDetails = () => {
   const [loadingDetail, setLoadingDetail] = useState(Boolean(rcNumParam && !stateItem));
   const [detailError, setDetailError] = useState<string | null>(null);
   const [notifUnread, setNotifUnread] = useState(0);
+  const [cardPopupOpen, setCardPopupOpen] = useState(false);
+  const [cardData, setCardData] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     setNotifUnread(unreadCount());
@@ -418,6 +521,31 @@ const RashanDetails = () => {
 
   const subtitle = (item.month_year as string) || "";
 
+  const cardRcNumTop = getRcNum(item);
+  const openCardPopup = useCallback(async () => {
+    if (cardData) { setCardPopupOpen(true); return; }
+    // Try fields already on the item
+    const fallback: Record<string, unknown> = {
+      cm_card_number: item?.cm_card_number ?? item?.rc_num,
+      mobile_number: item?.mobile_number ?? item?.userMobileNumber,
+      city: item?.city,
+      reg_date: item?.reg_date,
+    };
+    setCardData(fallback);
+    setCardPopupOpen(true);
+    try {
+      const mobile = localStorage.getItem(MOBILE_STORAGE_KEY);
+      if (!mobile) return;
+      const d = await fetchResource<unknown>("cards", mobile);
+      const list = extractItems(d) as Record<string, unknown>[];
+      const digits = (v: unknown) => String(v ?? "").replace(/\D/g, "");
+      const target = digits(cardRcNumTop);
+      const found = list.find((c) => digits(c.cm_card_number) === target);
+      if (found) setCardData(found);
+    } catch { /* ignore */ }
+  }, [cardData, cardRcNumTop, item]);
+  const cardLongPress = useLongPress(openCardPopup, 500);
+
   return (
     <div className="min-h-screen pb-16">
       <header className="px-5 pt-10 pb-6 text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
@@ -459,18 +587,30 @@ const RashanDetails = () => {
         {grouped.map(({ id, title, icon: Icon, rows }) => {
           const cardRcNum = getRcNum(item);
           const isCardTile = id === "card" && cardRcNum;
+          const lpHandlers = isCardTile ? {
+            onPointerDown: () => cardLongPress.start(),
+            onPointerUp: () => cardLongPress.cancel(),
+            onPointerLeave: () => cardLongPress.cancel(),
+            onPointerCancel: () => cardLongPress.cancel(),
+            onContextMenu: (e: React.MouseEvent) => { e.preventDefault(); },
+          } : {};
           return (
           <Card
             key={id}
             role={isCardTile ? "button" : undefined}
             tabIndex={isCardTile ? 0 : undefined}
-            onClick={isCardTile ? () => navigate(`/cards/${encodeURIComponent(cardRcNum)}`) : undefined}
+            onClick={isCardTile ? () => {
+              if (cardLongPress.isTriggered()) return;
+              navigate(`/cards/${encodeURIComponent(cardRcNum)}`);
+            } : undefined}
             onKeyDown={isCardTile ? (e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 navigate(`/cards/${encodeURIComponent(cardRcNum)}`);
               }
             } : undefined}
+            {...lpHandlers}
+            style={isCardTile ? { WebkitUserSelect: "none", userSelect: "none", WebkitTouchCallout: "none" } : undefined}
             className={`p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 ${isCardTile ? "cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]" : ""}`}
           >
             <div className="flex items-center gap-2 mb-3">
@@ -522,6 +662,7 @@ const RashanDetails = () => {
           </Card>
         );})}
       </main>
+      <CardDetailsPopup card={cardData} open={cardPopupOpen} onOpenChange={setCardPopupOpen} />
       <PageFooter />
     </div>
   );
