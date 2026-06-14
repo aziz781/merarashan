@@ -120,6 +120,7 @@ export async function fcmSend(opts: {
 
   const message: Record<string, unknown> = {
     token: opts.token,
+    notification: { title: opts.title, body: opts.body || "" },
     data: dataPayload,
     android: {
       priority: "HIGH",
