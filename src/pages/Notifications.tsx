@@ -163,7 +163,7 @@ export default function Notifications() {
           </Card>
         ) : visible.length === 0 ? (
           <Card className="p-8 text-center">
-            <p className="text-sm text-muted-foreground">No {filter} notifications</p>
+            <p className="text-sm text-muted-foreground">No unread notifications</p>
           </Card>
         ) : (
           visible.map((n) => {
