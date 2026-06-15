@@ -72,4 +72,47 @@ export default defineConfig(({ mode }) => ({
     },
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "@tanstack/react-query", "@tanstack/query-core"],
   },
+  build: {
+    // App code is well under 500KB after splitting vendor chunks below.
+    // Bump the warning slightly so the build log stays clean.
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        // Split heavy third-party libs into their own long-cacheable chunks
+        // so app updates don't bust the vendor cache on every deploy.
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (id.includes("/react-dom/") || id.match(/\/react\/(?!.*react-)/) || id.includes("/scheduler/")) {
+            return "react-vendor";
+          }
+          if (id.includes("react-router") || id.includes("@remix-run/router")) {
+            return "router";
+          }
+          if (id.includes("@supabase")) {
+            return "supabase";
+          }
+          if (id.includes("@radix-ui") || id.includes("@floating-ui")) {
+            return "radix";
+          }
+          if (id.includes("@tanstack")) {
+            return "tanstack";
+          }
+          if (
+            id.includes("react-markdown") ||
+            id.includes("remark-") ||
+            id.includes("micromark") ||
+            id.includes("mdast") ||
+            id.includes("hast") ||
+            id.includes("unified") ||
+            id.includes("vfile") ||
+            id.includes("property-information") ||
+            id.includes("markdown-table")
+          ) {
+            // Keep the markdown pipeline grouped with its lazy entry chunk.
+            return "markdown";
+          }
+        },
+      },
+    },
+  },
 }));
