@@ -99,7 +99,7 @@ export default function Notifications() {
     openAppLink(url, navigate);
   };
 
-
+  const visible = items.filter((n) => (unreadOnly ? !n.read : true));
 
   return (
     <div className="min-h-screen bg-background">
@@ -141,17 +141,13 @@ export default function Notifications() {
             </button>
           )}
         </div>
-
       </header>
 
       <div className="p-4 space-y-3 max-w-2xl mx-auto">
         {pushEnabled === false && mobile && (
           <NotificationToggle mobile={mobile} />
         )}
-        {(() => {
-
-          const visible = items.filter((n) => (unreadOnly ? !n.read : true));
-          return items.length === 0 ? (
+        {items.length === 0 ? (
           <Card className="p-8 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
               <Bell className="h-6 w-6 text-muted-foreground" />
@@ -166,63 +162,113 @@ export default function Notifications() {
             <p className="text-sm text-muted-foreground">No unread notifications</p>
           </Card>
         ) : (
-          visible.map((n) => {
-            const t = n.title?.trim().toLowerCase();
-            const highlight =
-              t === "payment overdue"
-                ? "bg-red-100 border-red-300 dark:bg-red-500/15 dark:border-red-500/40"
-                : t === "payment due"
-                ? "bg-yellow-100 border-yellow-300 dark:bg-yellow-500/15 dark:border-yellow-500/40"
-                : t === "payment received" || t === "monthly statement available"
-                ? "bg-green-100 border-green-300 dark:bg-green-500/15 dark:border-green-500/40"
-                : t === "rashan code issued"
-                ? "bg-purple-100 border-purple-300 dark:bg-purple-500/15 dark:border-purple-500/40"
-                : "";
-            return (
-            <SwipeableNotification
-              key={n.id}
-              onDelete={() => removeNotification(n.id)}
-              onMarkRead={() => toggleRead(n.id)}
-              onTap={() => openNotification(n)}
+          <NotificationList items={visible} onOpen={openNotification} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function NotificationRow({ n, onOpen }: { n: StoredNotification; onOpen: (n: StoredNotification) => void }) {
+  const t = n.title?.trim().toLowerCase();
+  const highlight =
+    t === "payment overdue"
+      ? "bg-red-100 border-red-300 dark:bg-red-500/15 dark:border-red-500/40"
+      : t === "payment due"
+      ? "bg-yellow-100 border-yellow-300 dark:bg-yellow-500/15 dark:border-yellow-500/40"
+      : t === "payment received" || t === "monthly statement available"
+      ? "bg-green-100 border-green-300 dark:bg-green-500/15 dark:border-green-500/40"
+      : t === "rashan code issued"
+      ? "bg-purple-100 border-purple-300 dark:bg-purple-500/15 dark:border-purple-500/40"
+      : "";
+  return (
+    <SwipeableNotification
+      onDelete={() => removeNotification(n.id)}
+      onMarkRead={() => toggleRead(n.id)}
+      onTap={() => onOpen(n)}
+    >
+      <Card
+        className={`p-4 ${!n.read && !highlight ? "ring-1 ring-primary/50 bg-primary/5 border-l-4 border-l-primary" : ""} ${!n.read && highlight ? "ring-1 ring-primary/50 border-l-4 border-l-primary" : ""} ${highlight} ${n.read ? "opacity-80" : ""} cursor-pointer hover:bg-accent/40 transition-colors`}
+      >
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
+            <img src={appLogo} alt="Mera Rashan" className="w-full h-full object-cover" loading="lazy" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-foreground truncate">{n.title}</p>
+              <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo(n.receivedAt)}</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap break-words">
+              {n.body || <span className="italic opacity-60">No message body</span>}
+            </p>
+            {(n.month || n.year) && (
+              <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 ring-1 ring-primary/20 px-2.5 py-1 text-xs font-semibold text-primary">
+                {n.month || ""}
+                {n.month && n.year ? " " : ""}
+                {n.year || ""}
+              </p>
+            )}
+          </div>
+        </div>
+      </Card>
+    </SwipeableNotification>
+  );
+}
+
+/** Renders the notification list. Virtualizes (window scroll) once the list
+ *  grows past a threshold; otherwise renders directly to keep the DOM simple. */
+const VIRTUALIZE_THRESHOLD = 30;
+
+function NotificationList({ items, onOpen }: { items: StoredNotification[]; onOpen: (n: StoredNotification) => void }) {
+  if (items.length <= VIRTUALIZE_THRESHOLD) {
+    return (
+      <div className="space-y-3">
+        {items.map((n) => (
+          <NotificationRow key={n.id} n={n} onOpen={onOpen} />
+        ))}
+      </div>
+    );
+  }
+  return <VirtualNotificationList items={items} onOpen={onOpen} />;
+}
+
+function VirtualNotificationList({ items, onOpen }: { items: StoredNotification[]; onOpen: (n: StoredNotification) => void }) {
+  const parentRef = useRef<HTMLDivElement | null>(null);
+  const virtualizer = useWindowVirtualizer({
+    count: items.length,
+    estimateSize: () => 132, // approx card + gap; dynamic measurement refines it
+    overscan: 6,
+    scrollMargin: parentRef.current?.offsetTop ?? 0,
+    getItemKey: (i) => items[i].id,
+  });
+  const virtualItems = virtualizer.getVirtualItems();
+  const totalSize = virtualizer.getTotalSize();
+  const offset = virtualItems[0]?.start ?? 0;
+
+  return (
+    <div ref={parentRef} style={{ position: "relative" }}>
+      <div style={{ height: totalSize, position: "relative" }}>
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            transform: `translateY(${offset - (virtualizer.options.scrollMargin ?? 0)}px)`,
+          }}
+        >
+          {virtualItems.map((v) => (
+            <div
+              key={v.key}
+              data-index={v.index}
+              ref={virtualizer.measureElement}
+              style={{ paddingBottom: 12 }}
             >
-            <Card
-              className={`p-4 ${!n.read && !highlight ? "ring-1 ring-primary/50 bg-primary/5 border-l-4 border-l-primary" : ""} ${!n.read && highlight ? "ring-1 ring-primary/50 border-l-4 border-l-primary" : ""} ${highlight} ${n.read ? "opacity-80" : ""} cursor-pointer hover:bg-accent/40 transition-colors`}
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
-                  <img src={appLogo} alt="Mera Rashan" className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-foreground truncate">
-                      {n.title}
-                    </p>
-                    <span className="text-[10px] text-muted-foreground shrink-0">
-                      {timeAgo(n.receivedAt)}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap break-words">
-                    {n.body || <span className="italic opacity-60">No message body</span>}
-                  </p>
-                  {(n.month || n.year) && (
-                    <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 ring-1 ring-primary/20 px-2.5 py-1 text-xs font-semibold text-primary">
-                      {n.month || ""}
-                      {n.month && n.year ? " " : ""}
-                      {n.year || ""}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-
-            </Card>
-            </SwipeableNotification>
-            );
-          })
-        );
-        })()}
-
-
+              <NotificationRow n={items[v.index]} onOpen={onOpen} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
