@@ -1886,7 +1886,8 @@ const Index = () => {
                     className="relative flex flex-col items-center justify-center gap-0.5 text-primary-foreground"
                   >
                     <span className="relative flex items-center justify-center w-12 h-12 -mt-6 rounded-full bg-primary shadow-[0_8px_20px_-6px_hsl(var(--primary)/0.6)] ring-4 ring-card overflow-hidden">
-                      <img src={meraRashanLogo} alt="Mera Rashan" className="w-8 h-8 object-contain" />
+                      <img src={meraRashanLogo} alt="Mera Rashan" className="w-full h-full object-cover" />
+
 
                       {notifUnread > 0 && (
                         <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
