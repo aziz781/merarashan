@@ -95,35 +95,10 @@ export function addNotification(n: {
     month: n.month ?? null,
     year: n.year ?? null,
   };
-  // de-dupe identical notifications that arrive through both live push and inbox sync.
-  // Match by title+body+month+year within a wide window so distinct events that happen
-  // to share a title (e.g. "Monthly Statement Available" for different months) stay separate.
-  const recent = list.find(
-    (x) =>
-      Math.abs(x.receivedAt - item.receivedAt) < 10 * 60 * 1000 &&
-      x.title === item.title &&
-      x.body === item.body &&
-      (x.month ?? null) === (item.month ?? null) &&
-      (x.year ?? null) === (item.year ?? null),
-  );
-  if (recent) {
-    // Backfill month/year from this call if the existing entry lacks them
-    // (live push may have arrived first without these fields).
-    const needsMonthYear = (!recent.month && item.month) || (!recent.year && item.year);
-    const needsIdSwap = !!(n.dedupeKey && recent.id !== id);
-    if (needsMonthYear || needsIdSwap) {
-      const merged: StoredNotification = {
-        ...recent,
-        id: needsIdSwap ? id : recent.id,
-        month: recent.month ?? item.month ?? null,
-        year: recent.year ?? item.year ?? null,
-      };
-      const updated = list.map((x) => (x === recent ? merged : x));
-      write(updated);
-      return merged;
-    }
-    return recent;
-  }
+  // Only de-dupe when a stable dedupeKey is provided (handled above).
+  // Do NOT collapse by title/body/month/year — multiple notifications may
+  // legitimately share the same month/year and should each appear.
+
   list.unshift(item);
   write(list);
   return item;
