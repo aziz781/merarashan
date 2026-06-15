@@ -1,16 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
-import CardDetails from "./pages/CardDetails.tsx";
-import RashanDetails from "./pages/RashanDetails.tsx";
-import DevTroubleshooting from "./pages/DevTroubleshooting.tsx";
-import AdminNotify from "./pages/AdminNotify.tsx";
-import Notifications from "./pages/Notifications.tsx";
-import NotFound from "./pages/NotFound.tsx";
 import { initNativePushListeners, isNativePlatform } from "@/lib/nativePush";
 import {
   PushNotificationDialog,
@@ -21,7 +15,23 @@ import { addNotification, syncNotificationInbox } from "@/lib/notificationsStore
 import { supabase } from "@/integrations/supabase/client";
 import { openAppLink } from "@/lib/openAppLink";
 
+// Lazy-load non-critical routes so they're not in the initial bundle.
+const CardDetails = lazy(() => import("./pages/CardDetails.tsx"));
+const RashanDetails = lazy(() => import("./pages/RashanDetails.tsx"));
+const DevTroubleshooting = lazy(() => import("./pages/DevTroubleshooting.tsx"));
+const AdminNotify = lazy(() => import("./pages/AdminNotify.tsx"));
+const Notifications = lazy(() => import("./pages/Notifications.tsx"));
+const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+
 const queryClient = new QueryClient();
+
+function RouteFallback() {
+  return (
+    <div className="flex min-h-[40vh] items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground" />
+    </div>
+  );
+}
 
 function NativePushBridge() {
   const [pending, setPending] = useState<PushNotificationPayload | null>(null);
@@ -107,21 +117,23 @@ const App = () => (
       <BrowserRouter>
         <InstallNativeAppBanner />
         <NativePushBridge />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/cards/:rcNum" element={<CardDetails />} />
-          <Route path="/rashans/detail" element={<RashanDetails />} />
-          <Route path="/rashans/detail/:rcNum" element={<RashanDetails />} />
-          <Route path="/dev/troubleshooting" element={<DevTroubleshooting />} />
-          <Route path="/admin/notify" element={<AdminNotify />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/statements" element={<Index />} />
-          <Route path="/cards" element={<Index />} />
-          <Route path="/transactions" element={<Index />} />
-          <Route path="/customers" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<RouteFallback />}>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/cards/:rcNum" element={<CardDetails />} />
+            <Route path="/rashans/detail" element={<RashanDetails />} />
+            <Route path="/rashans/detail/:rcNum" element={<RashanDetails />} />
+            <Route path="/dev/troubleshooting" element={<DevTroubleshooting />} />
+            <Route path="/admin/notify" element={<AdminNotify />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/statements" element={<Index />} />
+            <Route path="/cards" element={<Index />} />
+            <Route path="/transactions" element={<Index />} />
+            <Route path="/customers" element={<Index />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
