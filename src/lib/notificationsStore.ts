@@ -69,6 +69,8 @@ export function addNotification(n: {
   url?: string;
   dedupeKey?: string;
   receivedAt?: number;
+  month?: number | null;
+  year?: number | null;
 }): StoredNotification {
   const list = read();
   const deleted = readDeleted();
@@ -76,7 +78,7 @@ export function addNotification(n: {
   // If user has previously deleted this notification, do not re-add it.
   if (deleted.includes(id)) {
     const existing = list.find((x) => x.id === id);
-    return existing || ({ id, title: n.title || "", body: n.body || "", url: n.url, receivedAt: n.receivedAt || Date.now(), read: true } as StoredNotification);
+    return existing || ({ id, title: n.title || "", body: n.body || "", url: n.url, receivedAt: n.receivedAt || Date.now(), read: true, month: n.month ?? null, year: n.year ?? null } as StoredNotification);
   }
   // If a stable dedupe key is provided, never add the same one twice.
   if (n.dedupeKey) {
@@ -90,6 +92,8 @@ export function addNotification(n: {
     url: n.url,
     receivedAt: n.receivedAt || Date.now(),
     read: false,
+    month: n.month ?? null,
+    year: n.year ?? null,
   };
   // de-dupe identical notifications that arrive through both live push and inbox sync.
   // Use a wide window because inbox sync can run much later than the live push.
@@ -117,7 +121,7 @@ export function addNotification(n: {
 export async function syncNotificationInbox(): Promise<void> {
   const { data, error } = await supabase
     .from("notification_inbox")
-    .select("id, title, body, url, created_at")
+    .select("id, title, body, url, created_at, month, year")
     .order("created_at", { ascending: false })
     .limit(100);
   if (error || !data) return;
@@ -128,6 +132,8 @@ export async function syncNotificationInbox(): Promise<void> {
       url: n.url || undefined,
       dedupeKey: `inbox:${n.id}`,
       receivedAt: new Date(n.created_at).getTime(),
+      month: (n as { month?: number | null }).month ?? null,
+      year: (n as { year?: number | null }).year ?? null,
     });
   }
 }
