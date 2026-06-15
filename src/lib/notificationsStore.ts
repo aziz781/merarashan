@@ -9,7 +9,10 @@ export type StoredNotification = {
   url?: string;
   receivedAt: number; // epoch ms
   read: boolean;
+  month?: number | null;
+  year?: number | null;
 };
+// dummy line to keep count
 
 const KEY = "mr_notifications_v1";
 const DELETED_KEY = "mr_notifications_deleted_v1";
