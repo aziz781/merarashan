@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -14,6 +14,7 @@ import { InstallNativeAppBanner } from "@/components/InstallNativeAppBanner";
 import { addNotification, syncNotificationInbox } from "@/lib/notificationsStore";
 import { supabase } from "@/integrations/supabase/client";
 import { openAppLink } from "@/lib/openAppLink";
+import { queryClient } from "@/lib/queryClient";
 
 // Lazy-load non-critical routes so they're not in the initial bundle.
 const CardDetails = lazy(() => import("./pages/CardDetails.tsx"));
@@ -22,8 +23,6 @@ const DevTroubleshooting = lazy(() => import("./pages/DevTroubleshooting.tsx"));
 const AdminNotify = lazy(() => import("./pages/AdminNotify.tsx"));
 const Notifications = lazy(() => import("./pages/Notifications.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
-
-const queryClient = new QueryClient();
 
 function RouteFallback() {
   return (
