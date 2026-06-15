@@ -1,9 +1,11 @@
-import { ReactNode } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { lazy, ReactNode, Suspense } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Info, CheckCircle2, X, AlertTriangle } from "lucide-react";
+
+// Lazy-load the markdown renderer so react-markdown/remark-gfm/micromark
+// (~50KB gzip) stay out of the main bundle until a markdown message renders.
+const MessageMarkdown = lazy(() => import("./MessageMarkdown"));
 
 export type MessageType = "INFO" | "WARNING" | "SUCCESS" | "FAILURE";
 
@@ -65,9 +67,9 @@ export function MessageBox({ type = "INFO", title, message, actions, onDismiss }
           </p>
           <div className="text-sm text-foreground break-words [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_p]:mb-2 last:[&_p]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_strong]:font-semibold">
             {typeof message === "string" ? (
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ a: ({ node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" /> }}>
-                {message}
-              </ReactMarkdown>
+              <Suspense fallback={<p className="whitespace-pre-wrap break-words">{message}</p>}>
+                <MessageMarkdown>{message}</MessageMarkdown>
+              </Suspense>
             ) : (
               message
             )}
