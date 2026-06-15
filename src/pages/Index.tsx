@@ -1680,7 +1680,18 @@ const Index = () => {
     setProfileData(null);
   };
 
-  if (!mobile) return <Login onLogin={handleLogin} />;
+  if (!mobile)
+    return (
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground" />
+          </div>
+        }
+      >
+        <Login onLogin={handleLogin} />
+      </Suspense>
+    );
 
   const displayName = profileData?.contact_person_eng || profileData?.contact_person || `+${mobile}`;
   const isActive =
