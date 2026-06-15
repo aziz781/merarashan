@@ -191,27 +191,23 @@ export default function AdminNotify() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="month">Month (1-12)</Label>
+                  <Label htmlFor="month">Month</Label>
                   <Input
                     id="month"
-                    type="number"
-                    min={1}
-                    max={12}
+                    type="text"
                     value={month}
                     onChange={(e) => setMonth(e.target.value)}
-                    inputMode="numeric"
+                    placeholder="e.g. June"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="year">Year</Label>
                   <Input
                     id="year"
-                    type="number"
-                    min={1900}
-                    max={9999}
+                    type="text"
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
-                    inputMode="numeric"
+                    placeholder="e.g. 2026"
                   />
                 </div>
               </div>
