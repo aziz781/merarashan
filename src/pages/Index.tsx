@@ -1960,10 +1960,10 @@ const Index = () => {
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         aria-label="Primary"
       >
-        <div className="mx-auto max-w-2xl grid grid-cols-4 h-16">
-          {TABS.map(({ id, label, icon: Icon }) => {
+        <div className="mx-auto max-w-2xl grid grid-cols-5 h-16">
+          {TABS.map(({ id, label, icon: Icon }, idx) => {
             const active = tab === id;
-            return (
+            const tabButton = (
               <button
                 key={id}
                 type="button"
@@ -1983,6 +1983,30 @@ const Index = () => {
                 <span className={`text-[10px] ${active ? "font-semibold text-primary" : "font-medium"}`}>{label}</span>
               </button>
             );
+            if (idx === 2) {
+              return (
+                <span key={id} className="contents">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/notifications")}
+                    aria-label="Notifications"
+                    className="relative flex flex-col items-center justify-center gap-0.5 text-primary-foreground"
+                  >
+                    <span className="relative flex items-center justify-center w-12 h-12 -mt-6 rounded-full bg-primary shadow-[0_8px_20px_-6px_hsl(var(--primary)/0.6)] ring-4 ring-card">
+                      <Bell className="w-5 h-5" />
+                      {notifUnread > 0 && (
+                        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                          {notifUnread > 99 ? "99+" : notifUnread}
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-[10px] font-medium text-muted-foreground">Alerts</span>
+                  </button>
+                  {tabButton}
+                </span>
+              );
+            }
+            return tabButton;
           })}
         </div>
       </nav>
