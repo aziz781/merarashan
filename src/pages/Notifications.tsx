@@ -147,23 +147,8 @@ export default function Notifications() {
         {pushEnabled === false && mobile && (
           <NotificationToggle mobile={mobile} />
         )}
-
-        {items.length > 0 && (
-          <div className="flex justify-end">
-            <Button
-              size="sm"
-              variant={unreadOnly ? "default" : "outline"}
-              onClick={() => setUnreadOnly((v) => !v)}
-              aria-pressed={unreadOnly}
-              aria-label={unreadOnly ? "Showing unread only" : "Show unread only"}
-              title={unreadOnly ? "Showing unread only" : "Show unread only"}
-            >
-              <Filter className="w-4 h-4" />
-              {unreadOnly ? "Unread" : "All"}
-            </Button>
-          </div>
-        )}
         {(() => {
+
           const visible = items.filter((n) => (unreadOnly ? !n.read : true));
           return items.length === 0 ? (
           <Card className="p-8 text-center">
