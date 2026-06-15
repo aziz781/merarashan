@@ -25,6 +25,7 @@ import {
   BellOff,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { HelpCircle, ChevronDown, Bot, LifeBuoy, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -1419,11 +1420,66 @@ function RashansView({ mobile }: { mobile: string }) {
           {filtered.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-6">No transactions match the filters.</p>
           ) : (
-            filtered.map((item, i) => <TransactionCard key={i} item={item} origin="rashans" />)
+            <TransactionList items={filtered} />
           )}
         </div>
       )}
     </>
+  );
+}
+
+const TXN_VIRTUALIZE_THRESHOLD = 30;
+
+function TransactionList({ items }: { items: Record<string, unknown>[] }) {
+  if (items.length <= TXN_VIRTUALIZE_THRESHOLD) {
+    return (
+      <>
+        {items.map((item, i) => (
+          <TransactionCard key={i} item={item} origin="rashans" />
+        ))}
+      </>
+    );
+  }
+  return <VirtualTransactionList items={items} />;
+}
+
+function VirtualTransactionList({ items }: { items: Record<string, unknown>[] }) {
+  const parentRef = useRef<HTMLDivElement | null>(null);
+  const virtualizer = useWindowVirtualizer({
+    count: items.length,
+    estimateSize: () => 116, // approx card + gap; refined by dynamic measurement
+    overscan: 6,
+    scrollMargin: parentRef.current?.offsetTop ?? 0,
+  });
+  const virtualItems = virtualizer.getVirtualItems();
+  const totalSize = virtualizer.getTotalSize();
+  const offset = virtualItems[0]?.start ?? 0;
+
+  return (
+    <div ref={parentRef} style={{ position: "relative" }}>
+      <div style={{ height: totalSize, position: "relative" }}>
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            transform: `translateY(${offset - (virtualizer.options.scrollMargin ?? 0)}px)`,
+          }}
+        >
+          {virtualItems.map((v) => (
+            <div
+              key={v.key}
+              data-index={v.index}
+              ref={virtualizer.measureElement}
+              style={{ paddingBottom: 12 }}
+            >
+              <TransactionCard item={items[v.index]} origin="rashans" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 function StatementPdfButton({ url, title }: { url: string; title: string }) {
