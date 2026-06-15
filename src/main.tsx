@@ -9,6 +9,16 @@ void earlyInitNativePush();
 
 createRoot(document.getElementById("root")!).render(<App />);
 
+// Hide the inline splash once React has painted the first frame.
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    const splash = document.getElementById("app-splash");
+    if (!splash) return;
+    splash.classList.add("app-splash-hide");
+    setTimeout(() => splash.remove(), 300);
+  });
+});
+
 // Service worker registration — only on production hosts, never in Lovable preview/iframe.
 const isInIframe = (() => {
   try {
