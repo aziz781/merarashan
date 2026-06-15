@@ -1,6 +1,11 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import { earlyInitNativePush } from "@/lib/nativePush";
+
+// Register the cold-start push-tap listener before React mounts so taps
+// that launch the app from a killed state are not dropped.
+void earlyInitNativePush();
 
 createRoot(document.getElementById("root")!).render(<App />);
 
