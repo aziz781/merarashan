@@ -1,9 +1,11 @@
-import { ReactNode } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { lazy, ReactNode, Suspense } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Info, CheckCircle2, X, AlertTriangle } from "lucide-react";
+
+// Lazy-load the markdown renderer so react-markdown/remark-gfm/micromark
+// (~50KB gzip) stay out of the main bundle until a markdown message renders.
+const MessageMarkdown = lazy(() => import("./MessageMarkdown"));
 
 export type MessageType = "INFO" | "WARNING" | "SUCCESS" | "FAILURE";
 
