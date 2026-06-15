@@ -1985,9 +1985,8 @@ const Index = () => {
             );
             if (idx === 2) {
               return (
-                <>
+                <span key={id} className="contents">
                   <button
-                    key="notif-center"
                     type="button"
                     onClick={() => navigate("/notifications")}
                     aria-label="Notifications"
@@ -2004,7 +2003,7 @@ const Index = () => {
                     <span className="text-[10px] font-medium text-muted-foreground">Alerts</span>
                   </button>
                   {tabButton}
-                </>
+                </span>
               );
             }
             return tabButton;
