@@ -32,6 +32,9 @@ export default function AdminNotify() {
   const [title, setTitle] = useState("Test notification");
   const [body, setBody] = useState("Hello from Mera Rashan 👋");
   const [url, setUrl] = useState("/");
+  const now = new Date();
+  const [month, setMonth] = useState<string>(String(now.getMonth() + 1));
+  const [year, setYear] = useState<string>(String(now.getFullYear()));
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
 
@@ -71,6 +74,10 @@ export default function AdminNotify() {
     const t0 = performance.now();
     try {
       const payload: Record<string, unknown> = { title, body, url };
+      const m = month.trim() ? Number(month) : NaN;
+      const y = year.trim() ? Number(year) : NaN;
+      if (Number.isFinite(m) && m >= 1 && m <= 12) payload.month = m;
+      if (Number.isFinite(y) && y >= 1900 && y <= 9999) payload.year = y;
       if (!broadcast) payload.mobile = mobile.trim();
 
       const { data, error } = await supabase.functions.invoke("send-push", { body: payload });
@@ -183,6 +190,34 @@ export default function AdminNotify() {
                 <Label htmlFor="url">Open URL on click</Label>
                 <Input id="url" value={url} onChange={(e) => setUrl(e.target.value)} />
               </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="month">Month (1-12)</Label>
+                  <Input
+                    id="month"
+                    type="number"
+                    min={1}
+                    max={12}
+                    value={month}
+                    onChange={(e) => setMonth(e.target.value)}
+                    inputMode="numeric"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="year">Year</Label>
+                  <Input
+                    id="year"
+                    type="number"
+                    min={1900}
+                    max={9999}
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    inputMode="numeric"
+                  />
+                </div>
+              </div>
+
 
               <Button onClick={send} disabled={busy} className="w-full">
                 <Send className="w-4 h-4 mr-2" />
