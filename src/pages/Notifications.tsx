@@ -214,35 +214,6 @@ export default function Notifications() {
         );
         })()}
 
-        {items.length > 0 && (
-          <div className="pt-2 space-y-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              disabled={items.every((n) => n.read)}
-              onClick={() => {
-                markAllRead();
-                setItems(getNotifications());
-              }}
-            >
-              <CheckCheck className="w-4 h-4" />
-              Mark all as read
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              className="w-full"
-              onClick={() => {
-                clearAll();
-                setItems([]);
-              }}
-            >
-              <Trash2 className="w-4 h-4" />
-              Delete all
-            </Button>
-          </div>
-        )}
 
       </div>
     </div>
