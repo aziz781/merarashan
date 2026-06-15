@@ -203,13 +203,11 @@ export default function Notifications() {
                   <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap break-words">
                     {n.body || <span className="italic opacity-60">No message body</span>}
                   </p>
-                  {(n.month != null || n.year != null) && (
+                  {(n.month || n.year) && (
                     <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 ring-1 ring-primary/20 px-2.5 py-1 text-xs font-semibold text-primary">
-                      {n.month != null
-                        ? new Date(2000, Math.max(0, Math.min(11, Number(n.month) - 1)), 1).toLocaleString(undefined, { month: "long" })
-                        : ""}
-                      {n.month != null && n.year != null ? " " : ""}
-                      {n.year != null ? String(n.year) : ""}
+                      {n.month || ""}
+                      {n.month && n.year ? " " : ""}
+                      {n.year || ""}
                     </p>
                   )}
                 </div>

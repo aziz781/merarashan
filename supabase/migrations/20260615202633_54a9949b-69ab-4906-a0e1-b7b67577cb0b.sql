@@ -1,0 +1,1 @@
+ALTER TABLE public.notification_inbox ALTER COLUMN month TYPE text USING month::text, ALTER COLUMN year TYPE text USING year::text;
