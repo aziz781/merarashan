@@ -204,7 +204,7 @@ export default function Notifications() {
                     {n.body || <span className="italic opacity-60">No message body</span>}
                   </p>
                   {(n.month != null || n.year != null) && (
-                    <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                    <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 ring-1 ring-primary/20 px-2.5 py-1 text-xs font-semibold text-primary">
                       {n.month != null
                         ? new Date(2000, Math.max(0, Math.min(11, Number(n.month) - 1)), 1).toLocaleString(undefined, { month: "long" })
                         : ""}
