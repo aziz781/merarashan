@@ -67,9 +67,9 @@ export function MessageBox({ type = "INFO", title, message, actions, onDismiss }
           </p>
           <div className="text-sm text-foreground break-words [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_p]:mb-2 last:[&_p]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_strong]:font-semibold">
             {typeof message === "string" ? (
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ a: ({ node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" /> }}>
-                {message}
-              </ReactMarkdown>
+              <Suspense fallback={<p className="whitespace-pre-wrap break-words">{message}</p>}>
+                <MessageMarkdown>{message}</MessageMarkdown>
+              </Suspense>
             ) : (
               message
             )}
