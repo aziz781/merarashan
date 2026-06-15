@@ -139,8 +139,8 @@ Deno.serve(async (req) => {
           body: msg ? String(msg) : "",
           url: url ? String(url) : "/",
           tag: tag ? String(tag) : null,
-          month: month != null ? Number(month) : null,
-          year: year != null ? Number(year) : null,
+          month: month != null ? String(month) : null,
+          year: year != null ? String(year) : null,
         }))
       );
       if (inboxErr) throw inboxErr;

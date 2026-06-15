@@ -74,10 +74,8 @@ export default function AdminNotify() {
     const t0 = performance.now();
     try {
       const payload: Record<string, unknown> = { title, body, url };
-      const m = month.trim() ? Number(month) : NaN;
-      const y = year.trim() ? Number(year) : NaN;
-      if (Number.isFinite(m) && m >= 1 && m <= 12) payload.month = m;
-      if (Number.isFinite(y) && y >= 1900 && y <= 9999) payload.year = y;
+      if (month.trim()) payload.month = month.trim();
+      if (year.trim()) payload.year = year.trim();
       if (!broadcast) payload.mobile = mobile.trim();
 
       const { data, error } = await supabase.functions.invoke("send-push", { body: payload });
