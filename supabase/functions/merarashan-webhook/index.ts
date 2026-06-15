@@ -70,6 +70,8 @@ Deno.serve(async (req) => {
       title?: string;
       body?: string;
       url?: string;
+      month?: string | number | null;
+      year?: string | number | null;
     };
 
     const title = (payload.title || "").trim();
@@ -83,6 +85,8 @@ Deno.serve(async (req) => {
 
     const mobile = String(payload.mobile);
     const url = payload.url?.trim() || "/";
+    const month = payload.month != null && String(payload.month).trim() !== "" ? String(payload.month).trim() : null;
+    const year = payload.year != null && String(payload.year).trim() !== "" ? String(payload.year).trim() : null;
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
