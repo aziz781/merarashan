@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Bell, BellOff, Trash2, CheckCheck } from "lucide-react";
+import { ArrowLeft, Bell, BellOff, Trash2, CheckCheck, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import appLogo from "@/assets/mera-rashan-logo.png";
@@ -42,7 +42,7 @@ export default function Notifications() {
   const [items, setItems] = useState<StoredNotification[]>(() => getNotifications());
   const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
   const [mobile, setMobile] = useState<string>("");
-  const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
+  const [unreadOnly, setUnreadOnly] = useState<boolean>(false);
 
   useEffect(() => {
     setMobile(localStorage.getItem(MOBILE_KEY) || "");
@@ -135,24 +135,22 @@ export default function Notifications() {
           <NotificationToggle mobile={mobile} />
         )}
         {items.length > 0 && (
-          <div className="flex gap-2">
-            {(["all", "unread", "read"] as const).map((f) => (
-              <Button
-                key={f}
-                size="sm"
-                variant={filter === f ? "default" : "outline"}
-                className="flex-1 capitalize"
-                onClick={() => setFilter(f)}
-              >
-                {f}
-              </Button>
-            ))}
+          <div className="flex justify-end">
+            <Button
+              size="sm"
+              variant={unreadOnly ? "default" : "outline"}
+              onClick={() => setUnreadOnly((v) => !v)}
+              aria-pressed={unreadOnly}
+              aria-label={unreadOnly ? "Showing unread only" : "Show unread only"}
+              title={unreadOnly ? "Showing unread only" : "Show unread only"}
+            >
+              <Filter className="w-4 h-4" />
+              {unreadOnly ? "Unread" : "All"}
+            </Button>
           </div>
         )}
         {(() => {
-          const visible = items.filter((n) =>
-            filter === "all" ? true : filter === "unread" ? !n.read : n.read
-          );
+          const visible = items.filter((n) => (unreadOnly ? !n.read : true));
           return items.length === 0 ? (
           <Card className="p-8 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
@@ -165,7 +163,7 @@ export default function Notifications() {
           </Card>
         ) : visible.length === 0 ? (
           <Card className="p-8 text-center">
-            <p className="text-sm text-muted-foreground">No {filter} notifications</p>
+            <p className="text-sm text-muted-foreground">No unread notifications</p>
           </Card>
         ) : (
           visible.map((n) => {
