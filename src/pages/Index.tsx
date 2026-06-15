@@ -57,11 +57,11 @@ const NATIVE_PUSH_ENABLED_KEY = "mr_native_push_enabled";
 const STORAGE_KEY = "mr_mobile";
 const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
 
-const mobileSchema = z
-  .string()
-  .min(6, "Enter a valid mobile number.")
-  .max(15, "Too long")
-  .regex(/^\d+$/, "Digits only");
+// Lazy-load the login screen (and its zod schema) so unauthenticated-only
+// code stays out of the main bundle for already-signed-in users.
+const Login = lazy(() => import("./Login"));
+
+
 
 function useLongPress(callback: () => void, duration = 600) {
   const timerRef = useRef<number | null>(null);
