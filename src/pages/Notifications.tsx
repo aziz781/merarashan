@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Bell, BellOff, Trash2, CheckCheck } from "lucide-react";
+import { ArrowLeft, Bell, BellOff, Trash2, CheckCheck, Inbox, MailOpen, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import appLogo from "@/assets/mera-rashan-logo.png";
@@ -136,15 +136,20 @@ export default function Notifications() {
         )}
         {items.length > 0 && (
           <div className="flex gap-2">
-            {(["all", "unread", "read"] as const).map((f) => (
+            {([
+              { key: "all", label: "All", Icon: Inbox },
+              { key: "unread", label: "Unread", Icon: Mail },
+              { key: "read", label: "Read", Icon: MailOpen },
+            ] as const).map(({ key, label, Icon }) => (
               <Button
-                key={f}
+                key={key}
                 size="sm"
-                variant={filter === f ? "default" : "outline"}
-                className="flex-1 capitalize"
-                onClick={() => setFilter(f)}
+                variant={filter === key ? "default" : "outline"}
+                className="flex-1 gap-1.5"
+                onClick={() => setFilter(key)}
               >
-                {f}
+                <Icon className="w-4 h-4" />
+                {label}
               </Button>
             ))}
           </div>
