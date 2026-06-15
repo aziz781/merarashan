@@ -51,16 +51,16 @@ function NativePushBridge() {
         onForeground: (n) => {
           const data = (n.data || {}) as Record<string, unknown>;
           const url = typeof data.url === "string" ? data.url : undefined;
-          const month = data.month != null ? Number(data.month) : null;
-          const year = data.year != null ? Number(data.year) : null;
+          const month = data.month != null ? String(data.month) : null;
+          const year = data.year != null ? String(data.year) : null;
           addNotification({ title: n.title, body: n.body, url, month, year });
           setPending({ title: n.title, body: n.body, url });
         },
         onAction: (url, n) => {
           if (n) {
             const data = (n.data || {}) as Record<string, unknown>;
-            const month = data.month != null ? Number(data.month) : null;
-            const year = data.year != null ? Number(data.year) : null;
+            const month = data.month != null ? String(data.month) : null;
+            const year = data.year != null ? String(data.year) : null;
             addNotification({ title: n.title, body: n.body, url, month, year });
           }
           openAppLink(url, navigate);

@@ -69,8 +69,8 @@ export function addNotification(n: {
   url?: string;
   dedupeKey?: string;
   receivedAt?: number;
-  month?: number | null;
-  year?: number | null;
+  month?: string | null;
+  year?: string | null;
 }): StoredNotification {
   const list = read();
   const deleted = readDeleted();
@@ -132,8 +132,8 @@ export async function syncNotificationInbox(): Promise<void> {
       url: n.url || undefined,
       dedupeKey: `inbox:${n.id}`,
       receivedAt: new Date(n.created_at).getTime(),
-      month: (n as { month?: number | null }).month ?? null,
-      year: (n as { year?: number | null }).year ?? null,
+      month: (n as { month?: string | null }).month ?? null,
+      year: (n as { year?: string | null }).year ?? null,
     });
   }
 }
