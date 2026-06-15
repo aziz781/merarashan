@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { formatMobile } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
-import meraRashanLogo from "@/assets/mera-rashan-logo.png";
+import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 
 const mobileSchema = z
   .string()

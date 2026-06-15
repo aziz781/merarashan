@@ -4,7 +4,7 @@ import { ArrowLeft, Bell, BellOff, Trash2, CheckCheck, Filter } from "lucide-rea
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import appLogo from "@/assets/mera-rashan-logo.png";
+import appLogo from "@/assets/mera-rashan-logo.webp";
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { getCurrentSubscription, pushSupported } from "@/lib/push";
 import { isNativePlatform } from "@/lib/nativePush";

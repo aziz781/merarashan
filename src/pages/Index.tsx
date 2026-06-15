@@ -39,7 +39,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { fetchResource, formatMobile, Resource } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
-import meraRashanLogo from "@/assets/mera-rashan-logo.png";
+import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 import { TransactionStats } from "@/components/TransactionStats";
 import { TransactionCard } from "@/components/TransactionCard";
 import { TransactionFilters, type TxnFilters } from "@/components/TransactionFilters";
