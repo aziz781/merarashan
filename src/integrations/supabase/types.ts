@@ -50,30 +50,36 @@ export type Database = {
           created_at: string
           id: string
           mobile: string
+          month: number | null
           tag: string | null
           title: string
           updated_at: string
           url: string | null
+          year: number | null
         }
         Insert: {
           body?: string
           created_at?: string
           id?: string
           mobile: string
+          month?: number | null
           tag?: string | null
           title: string
           updated_at?: string
           url?: string | null
+          year?: number | null
         }
         Update: {
           body?: string
           created_at?: string
           id?: string
           mobile?: string
+          month?: number | null
           tag?: string | null
           title?: string
           updated_at?: string
           url?: string | null
+          year?: number | null
         }
         Relationships: []
       }

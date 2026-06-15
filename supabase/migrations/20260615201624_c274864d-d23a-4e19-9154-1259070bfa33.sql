@@ -1,0 +1,1 @@
+ALTER TABLE public.notification_inbox ADD COLUMN IF NOT EXISTS month smallint, ADD COLUMN IF NOT EXISTS year smallint;
