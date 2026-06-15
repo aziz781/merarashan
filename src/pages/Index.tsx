@@ -25,6 +25,7 @@ import {
   BellOff,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { HelpCircle, ChevronDown, Bot, LifeBuoy, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
