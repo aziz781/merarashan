@@ -83,6 +83,54 @@ export async function disableNativePush(): Promise<void> {
   registered = false;
 }
 
+type ActionPayload = {
+  url: string;
+  notification: { title?: string; body?: string; data?: Record<string, unknown> };
+};
+
+// Module-level state so cold-start taps that arrive before React mounts
+// are not lost. `earlyInitNativePush()` registers the tap listener as soon
+// as JS executes; `initNativePushListeners()` later drains the queue.
+let pendingActions: ActionPayload[] = [];
+let actionHandler: ((p: ActionPayload) => void) | null = null;
+let earlyInitDone = false;
+
+function readUrlFromData(data: Record<string, unknown>): string {
+  const value = data.url ?? data.link ?? data.deepLink ?? data.deeplink ?? data.path;
+  return typeof value === "string" && value.trim() ? value : "/notifications";
+}
+
+function deliverAction(p: ActionPayload) {
+  if (actionHandler) actionHandler(p);
+  else pendingActions.push(p);
+}
+
+/**
+ * Register the cold-start tap listener as early as possible (call from
+ * main.tsx, before React renders). Tap events are queued until
+ * `initNativePushListeners` provides an `onAction` handler.
+ */
+export async function earlyInitNativePush(): Promise<void> {
+  if (earlyInitDone || !isNativePlatform()) return;
+  earlyInitDone = true;
+  try {
+    await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
+      const data = (action.notification.data || {}) as Record<string, unknown>;
+      const url = readUrlFromData(data);
+      const dTitle = typeof data.title === "string" ? data.title : undefined;
+      const dBody = typeof data.body === "string" ? data.body : undefined;
+      deliverAction({
+        url,
+        notification: {
+          title: action.notification.title || dTitle,
+          body: action.notification.body || dBody,
+          data,
+        },
+      });
+    });
+  } catch { /* ignore */ }
+}
+
 /**
  * Attach foreground/click handlers once at app start.
  * Foreground notifications are shown as toasts via the optional onForeground callback;
@@ -95,11 +143,6 @@ export async function initNativePushListeners(opts: {
   onAppUrlOpen?: (url: string) => void;
 }): Promise<void> {
   if (!isNativePlatform()) return;
-
-  const readUrl = (data: Record<string, unknown>) => {
-    const value = data.url ?? data.link ?? data.deepLink ?? data.deeplink ?? data.path;
-    return typeof value === "string" && value.trim() ? value : "/notifications";
-  };
 
   // Ensure a high-importance channel with sound + vibration exists on Android.
   if (Capacitor.getPlatform() === "android") {
@@ -128,17 +171,19 @@ export async function initNativePushListeners(opts: {
     });
   });
 
-  await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
-    const data = (action.notification.data || {}) as Record<string, unknown>;
-    const url = readUrl(data);
-    const dBody = typeof data.body === "string" ? data.body : undefined;
-    const dTitle = typeof data.title === "string" ? data.title : undefined;
-    opts.onAction?.(url, {
-      title: action.notification.title || dTitle,
-      body: action.notification.body || dBody,
-      data,
-    });
-  });
+  // Wire the early-init tap queue to the caller's handler.
+  if (opts.onAction) {
+    actionHandler = (p) => opts.onAction!(p.url, p.notification);
+    if (pendingActions.length) {
+      const queued = pendingActions;
+      pendingActions = [];
+      // Defer to next tick so React Router has a chance to finish mounting.
+      setTimeout(() => queued.forEach((p) => actionHandler?.(p)), 0);
+    }
+  }
+
+  // Safety net: if earlyInitNativePush() was never called, register here too.
+  if (!earlyInitDone) await earlyInitNativePush();
 
   // Sync currently-delivered (tray) notifications into the in-app list
   // so background pushes show up even before the user taps them.
