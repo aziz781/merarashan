@@ -103,7 +103,17 @@ Deno.serve(async (req) => {
     if ((natSubs as NativeSub[]).length > 0) {
       const fcmResults = await Promise.allSettled(
         (natSubs as NativeSub[]).map((s) =>
-          fcmSend({ token: s.fcm_token, title, body: msg, url, tag })
+          fcmSend({
+            token: s.fcm_token,
+            title,
+            body: msg,
+            url,
+            tag,
+            data: {
+              ...(month != null ? { month: String(month) } : {}),
+              ...(year != null ? { year: String(year) } : {}),
+            },
+          })
         )
       );
       fcmResults.forEach((r, i) => {
