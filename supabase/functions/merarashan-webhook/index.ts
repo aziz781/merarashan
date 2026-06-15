@@ -6,7 +6,9 @@
 //   "mobile": "447525776781",          // required — card owner's mobile
 //   "title": "Rashan Available",       // required — notification title
 //   "body":  "Your rashan is ready.",  // required — notification message
-//   "url":   "/rashans/detail"         // optional deep link
+//   "url":   "/rashans/detail",        // optional deep link
+//   "month": "June",                   // optional free-form string
+//   "year":  "2026"                    // optional free-form string
 // }
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
