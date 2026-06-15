@@ -64,6 +64,7 @@ export default defineConfig(({ mode }) => ({
         ],
       },
     }),
+    mode === "analyze" && visualizer({ filename: "dist/stats.html", template: "treemap", gzipSize: true, brotliSize: true }),
   ].filter(Boolean),
   resolve: {
     alias: {
