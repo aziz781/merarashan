@@ -161,6 +161,8 @@ Deno.serve(async (req) => {
         title,
         body,
         url,
+        month,
+        year,
       });
       if (inboxErr) throw inboxErr;
     }
