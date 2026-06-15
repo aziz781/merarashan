@@ -1885,16 +1885,17 @@ const Index = () => {
                     aria-label="Notifications"
                     className="relative flex flex-col items-center justify-center gap-0.5 text-primary-foreground"
                   >
-                    <span className="relative flex items-center justify-center w-12 h-12 -mt-6 rounded-full bg-primary shadow-[0_8px_20px_-6px_hsl(var(--primary)/0.6)] ring-4 ring-card overflow-hidden">
-                      <img src={meraRashanLogo} alt="Mera Rashan" className="w-full h-full object-cover" />
-
-
+                    <span className="relative -mt-6">
+                      <span className="flex items-center justify-center w-12 h-12 rounded-full bg-primary shadow-[0_8px_20px_-6px_hsl(var(--primary)/0.6)] ring-4 ring-card overflow-hidden">
+                        <img src={meraRashanLogo} alt="Mera Rashan" className="w-full h-full object-cover" />
+                      </span>
                       {notifUnread > 0 && (
-                        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center ring-2 ring-card">
                           {notifUnread > 99 ? "99+" : notifUnread}
                         </span>
                       )}
                     </span>
+
                     <span className="text-[10px] font-medium text-muted-foreground">Alerts</span>
                   </button>
                   {tabButton}
