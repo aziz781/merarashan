@@ -90,7 +90,7 @@ export async function disableNativePush(): Promise<void> {
  */
 export async function initNativePushListeners(opts: {
   onForeground?: (n: { title?: string; body?: string; data?: Record<string, unknown> }) => void;
-  onAction?: (url: string, n?: { title?: string; body?: string }) => void;
+  onAction?: (url: string, n?: { title?: string; body?: string; data?: Record<string, unknown> }) => void;
   onDelivered?: (n: { id?: string; title?: string; body?: string; data?: Record<string, unknown> }) => void;
   onAppUrlOpen?: (url: string) => void;
 }): Promise<void> {
@@ -136,6 +136,7 @@ export async function initNativePushListeners(opts: {
     opts.onAction?.(url, {
       title: action.notification.title || dTitle,
       body: action.notification.body || dBody,
+      data,
     });
   });
 
