@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { mobile, mobiles, title, body: msg, url, icon, tag } = body || {};
+    const { mobile, mobiles, title, body: msg, url, icon, tag, month, year } = body || {};
 
     if (!title) {
       return new Response(JSON.stringify({ error: "Missing 'title'" }), {
@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
     if (natErr) throw natErr;
 
     // --- Web push ---
-    const payload = JSON.stringify({ title, body: msg || "", url: url || "/", icon, tag });
+    const payload = JSON.stringify({ title, body: msg || "", url: url || "/", icon, tag, month: month ?? null, year: year ?? null });
     const webResults = await Promise.allSettled(
       (webSubs as WebSub[]).map((s) =>
         webpush.sendNotification(
@@ -103,7 +103,17 @@ Deno.serve(async (req) => {
     if ((natSubs as NativeSub[]).length > 0) {
       const fcmResults = await Promise.allSettled(
         (natSubs as NativeSub[]).map((s) =>
-          fcmSend({ token: s.fcm_token, title, body: msg, url, tag })
+          fcmSend({
+            token: s.fcm_token,
+            title,
+            body: msg,
+            url,
+            tag,
+            data: {
+              ...(month != null ? { month: String(month) } : {}),
+              ...(year != null ? { year: String(year) } : {}),
+            },
+          })
         )
       );
       fcmResults.forEach((r, i) => {
@@ -129,6 +139,8 @@ Deno.serve(async (req) => {
           body: msg ? String(msg) : "",
           url: url ? String(url) : "/",
           tag: tag ? String(tag) : null,
+          month: month != null ? Number(month) : null,
+          year: year != null ? Number(year) : null,
         }))
       );
       if (inboxErr) throw inboxErr;
