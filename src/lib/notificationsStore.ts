@@ -9,8 +9,8 @@ export type StoredNotification = {
   url?: string;
   receivedAt: number; // epoch ms
   read: boolean;
-  month?: number | null;
-  year?: number | null;
+  month?: string | null;
+  year?: string | null;
 };
 
 
