@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
     if (natErr) throw natErr;
 
     // --- web push ---
-    const webPayload = JSON.stringify({ title, body, url });
+    const webPayload = JSON.stringify({ title, body, url, month, year });
     const webResults = await Promise.allSettled(
       (webSubs as WebSub[]).map((s) =>
         webpush.sendNotification(
@@ -131,7 +131,16 @@ Deno.serve(async (req) => {
     if ((natSubs as NativeSub[]).length > 0) {
       const fcmResults = await Promise.allSettled(
         (natSubs as NativeSub[]).map((s) =>
-          fcmSend({ token: s.fcm_token, title, body, url })
+          fcmSend({
+            token: s.fcm_token,
+            title,
+            body,
+            url,
+            data: {
+              ...(month != null ? { month } : {}),
+              ...(year != null ? { year } : {}),
+            },
+          })
         )
       );
       fcmResults.forEach((r, i) => {
