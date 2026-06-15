@@ -6,7 +6,9 @@
 //   "mobile": "447525776781",          // required — card owner's mobile
 //   "title": "Rashan Available",       // required — notification title
 //   "body":  "Your rashan is ready.",  // required — notification message
-//   "url":   "/rashans/detail"         // optional deep link
+//   "url":   "/rashans/detail",        // optional deep link
+//   "month": "June",                   // optional free-form string
+//   "year":  "2026"                    // optional free-form string
 // }
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
@@ -68,6 +70,8 @@ Deno.serve(async (req) => {
       title?: string;
       body?: string;
       url?: string;
+      month?: string | number | null;
+      year?: string | number | null;
     };
 
     const title = (payload.title || "").trim();
@@ -81,6 +85,8 @@ Deno.serve(async (req) => {
 
     const mobile = String(payload.mobile);
     const url = payload.url?.trim() || "/";
+    const month = payload.month != null && String(payload.month).trim() !== "" ? String(payload.month).trim() : null;
+    const year = payload.year != null && String(payload.year).trim() !== "" ? String(payload.year).trim() : null;
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -95,7 +101,7 @@ Deno.serve(async (req) => {
     if (natErr) throw natErr;
 
     // --- web push ---
-    const webPayload = JSON.stringify({ title, body, url });
+    const webPayload = JSON.stringify({ title, body, url, month, year });
     const webResults = await Promise.allSettled(
       (webSubs as WebSub[]).map((s) =>
         webpush.sendNotification(
@@ -125,7 +131,16 @@ Deno.serve(async (req) => {
     if ((natSubs as NativeSub[]).length > 0) {
       const fcmResults = await Promise.allSettled(
         (natSubs as NativeSub[]).map((s) =>
-          fcmSend({ token: s.fcm_token, title, body, url })
+          fcmSend({
+            token: s.fcm_token,
+            title,
+            body,
+            url,
+            data: {
+              ...(month != null ? { month } : {}),
+              ...(year != null ? { year } : {}),
+            },
+          })
         )
       );
       fcmResults.forEach((r, i) => {
@@ -146,6 +161,8 @@ Deno.serve(async (req) => {
         title,
         body,
         url,
+        month,
+        year,
       });
       if (inboxErr) throw inboxErr;
     }
