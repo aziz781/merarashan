@@ -56,3 +56,26 @@ export function isItemThisMonth(item: Record<string, unknown>): boolean {
     my.includes(`/${mm}`)
   );
 }
+
+export function formatPKR(n: number): string {
+  return `Rs. ${n.toLocaleString("en-PK")}`;
+}
+
+export function isTruthy(v: unknown): boolean {
+  return v === true || v === "true" || v === 1 || v === "1";
+}
+
+export function digitsOnly(v: unknown): string {
+  return String(v ?? "").replace(/\D/g, "");
+}
+
+export function findValue(obj: unknown, key: string): number | null {
+  if (!obj || typeof obj !== "object") return null;
+  const o = obj as Record<string, unknown>;
+  if (o[key] != null) return Number(o[key]) || 0;
+  for (const v of Object.values(o)) {
+    const r = findValue(v, key);
+    if (r != null) return r;
+  }
+  return null;
+}

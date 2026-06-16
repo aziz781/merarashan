@@ -181,9 +181,13 @@ export function unreadCount(): number {
 
 export function subscribeNotifications(cb: () => void): () => void {
   const handler = () => cb();
-  window.addEventListener(EVENT, handler);
-  window.addEventListener("storage", (e) => {
+  const storageHandler = (e: StorageEvent) => {
     if (e.key === KEY) handler();
-  });
-  return () => window.removeEventListener(EVENT, handler);
+  };
+  window.addEventListener(EVENT, handler);
+  window.addEventListener("storage", storageHandler);
+  return () => {
+    window.removeEventListener(EVENT, handler);
+    window.removeEventListener("storage", storageHandler);
+  };
 }
