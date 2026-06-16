@@ -330,7 +330,9 @@ const Index = () => {
         onOpenChange={handleProfilePanelChange}
         title="Profile"
       >
-        <ProfileView mobile={mobile} profileOnly />
+        <Suspense fallback={<LoadingState label="Loading…" />}>
+          <ProfileView mobile={mobile} profileOnly />
+        </Suspense>
       </SlideInPanel>
 
       <SlideInPanel
