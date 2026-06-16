@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowUp, Bell, BellOff, Trash2, CheckCheck, Filter } from "lucide-react";
+import { ArrowLeft, ArrowUp, Bell, BellOff, Home, Trash2, CheckCheck, Filter } from "lucide-react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -183,6 +183,18 @@ export default function Notifications() {
           style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           <ArrowUp className="h-5 w-5" />
+        </button>
+      )}
+
+      {visible.length > 8 && (
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          aria-label="Go to home"
+          className="fixed bottom-6 left-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-primary/30 hover:bg-primary/90 transition-all animate-in fade-in slide-in-from-bottom-2"
+          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        >
+          <Home className="h-5 w-5" />
         </button>
       )}
     </div>
