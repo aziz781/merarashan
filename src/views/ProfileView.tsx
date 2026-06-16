@@ -54,22 +54,12 @@ function CurrentMonthTile({
   const monthLong = now.toLocaleString(undefined, { month: "long" });
   const monthShort = now.toLocaleString("en-US", { month: "short" });
   const year = String(now.getFullYear());
-  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetchResource("statements", mobile, { year, month: monthShort })
-      .then((d) => {
-        if (cancelled) return;
-        const items = (extractItems(d) ?? []) as Record<string, unknown>[];
-        const s = items[0]?.payment_status;
-        setPaymentStatus(s ? String(s) : null);
-      })
-      .catch(() => !cancelled && setPaymentStatus(null));
-    return () => {
-      cancelled = true;
-    };
-  }, [mobile, year, monthShort]);
+  const { data: stmtData } = useResource<unknown>("statements", mobile, { year, month: monthShort });
+  const paymentStatus = (() => {
+    const items = (extractItems(stmtData) ?? []) as Record<string, unknown>[];
+    const s = items[0]?.payment_status;
+    return s ? String(s) : null;
+  })();
 
   const isPaid = paymentStatus?.toUpperCase() === "PAID";
   const isUnpaid = paymentStatus?.toUpperCase() === "NOT_PAID";
