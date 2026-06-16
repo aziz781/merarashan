@@ -662,6 +662,15 @@ const RashanDetails = () => {
         );})}
       </main>
       <CardDetailsPopup card={cardData} open={cardPopupOpen} onOpenChange={setCardPopupOpen} />
+      <button
+        type="button"
+        onClick={goBack}
+        aria-label="Back"
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-primary/30 hover:bg-primary/90 transition-colors animate-in fade-in slide-in-from-bottom-2"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </button>
       <PageFooter />
     </div>
   );
