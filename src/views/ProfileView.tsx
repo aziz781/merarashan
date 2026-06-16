@@ -37,12 +37,12 @@ function StatTile({
   );
 }
 
-function findKey(obj: unknown, key: string): number | null {
+function findValue(obj: unknown, key: string): number | null {
   if (!obj || typeof obj !== "object") return null;
   const o = obj as Record<string, unknown>;
   if (o[key] != null) return Number(o[key]) || 0;
   for (const v of Object.values(o)) {
-    const r = findKey(v, key);
+    const r = findValue(v, key);
     if (r != null) return r;
   }
   return null;
@@ -153,7 +153,7 @@ function CurrentYearStat({
 }) {
   const year = String(new Date().getFullYear());
   const { raw, loading } = useTransactions(mobile, { monthYear: year });
-  const total = findKey(raw, "totalTransactionAmount") ?? 0;
+  const total = findValue(raw, "totalTransactionAmount") ?? 0;
   return (
     <StatTile
       label="Current Year"
@@ -185,8 +185,8 @@ function CardsStats({
   onNavigate?: (r: Resource) => void;
 }) {
   const { raw, loading } = useTransactions(mobile, currentMonthParams());
-  const total = findKey(raw, "totalTransactionAmount") ?? 0;
-  const cardsUsed = findKey(raw, "totalCardsUsed") ?? 0;
+  const total = findValue(raw, "totalTransactionAmount") ?? 0;
+  const cardsUsed = findValue(raw, "totalCardsUsed") ?? 0;
 
   const totalCards = Number(activeCards) || 0;
   const pending = Math.max(0, totalCards - Number(cardsUsed || 0));
@@ -287,7 +287,7 @@ function RecentRashans({
   totalCards?: number;
 }) {
   const { items, raw, loading, error } = useTransactions(mobile, currentMonthParams());
-  const cardsUsed = findKey(raw, "totalCardsUsed") ?? 0;
+  const cardsUsed = findValue(raw, "totalCardsUsed") ?? 0;
 
   const now = new Date();
   const monthLabel = now.toLocaleString(undefined, { month: "long" });
