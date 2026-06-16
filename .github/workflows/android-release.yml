@@ -30,7 +30,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Compute versionCode / versionName
+        id: version
+        run: |
+          BASE=10
+          VCODE=$((BASE + GITHUB_RUN_NUMBER))
+          VNAME="1.0.${GITHUB_RUN_NUMBER}"
+          echo "vcode=$VCODE" >> "$GITHUB_OUTPUT"
+          echo "vname=$VNAME" >> "$GITHUB_OUTPUT"
+          echo "Building versionCode=$VCODE versionName=$VNAME"
+
       - name: Build web assets
+        env:
+          APP_VERSION_NAME: ${{ steps.version.outputs.vname }}
+          APP_VERSION_CODE: ${{ steps.version.outputs.vcode }}
         run: npm run build
 
       - name: Add Android platform (if missing)
@@ -64,17 +77,6 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
-
-      - name: Compute versionCode / versionName
-        id: version
-        run: |
-          # Base offset lets you reserve 1..N for manual uploads; bump if needed.
-          BASE=10
-          VCODE=$((BASE + GITHUB_RUN_NUMBER))
-          VNAME="1.0.${GITHUB_RUN_NUMBER}"
-          echo "vcode=$VCODE" >> "$GITHUB_OUTPUT"
-          echo "vname=$VNAME" >> "$GITHUB_OUTPUT"
-          echo "Building versionCode=$VCODE versionName=$VNAME"
 
       - name: Build signed release AAB
         working-directory: android

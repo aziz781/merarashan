@@ -23,6 +23,7 @@ const ProfileView = lazy(() => import("@/views/ProfileView").then((m) => ({ defa
 
 
 import { NotificationToggle } from "@/components/NotificationToggle";
+import { AppVersionInfo } from "@/components/AppVersionInfo";
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
 
 const STORAGE_KEY = "mr_mobile";
@@ -375,6 +376,7 @@ const Index = () => {
       >
         <div className="space-y-3 pt-2">
           <NotificationToggle mobile={mobile} />
+          <AppVersionInfo />
         </div>
       </SlideInPanel>
     </div>
