@@ -332,7 +332,7 @@ const Index = () => {
 
       <SlideInPanel
         open={profileOpen}
-        onOpenChange={handleSlideInOpenChange(setProfileOpen)}
+        onOpenChange={handleProfilePanelChange}
         title="Profile"
       >
         <ProfileView mobile={mobile} profileOnly />
@@ -340,7 +340,7 @@ const Index = () => {
 
       <SlideInPanel
         open={helpOpen}
-        onOpenChange={handleSlideInOpenChange(setHelpOpen)}
+        onOpenChange={handleHelpPanelChange}
         title="Help & Support"
         description="Get instant help from our virtual agent 24/7. Live support: Mon-Sun 06:00-18:00 (UTC)"
       >
@@ -362,7 +362,7 @@ const Index = () => {
 
       <SlideInPanel
         open={settingsOpen}
-        onOpenChange={handleSlideInOpenChange(setSettingsOpen)}
+        onOpenChange={handleSettingsPanelChange}
         title="Settings"
       >
         <div className="space-y-3 pt-2">
