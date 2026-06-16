@@ -4,8 +4,10 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RecordCard, CardGridTile } from "@/components/RecordCard";
 import { LoadingState } from "@/components/LoadingState";
-import { fetchResource, Resource } from "@/lib/api";
-import { extractItems, getItemKey } from "@/lib/itemUtils";
+import type { Resource } from "@/lib/api";
+import { getItemKey } from "@/lib/itemUtils";
+import { useResourceItems } from "@/hooks/use-resource-items";
+import type { Card as CardModel } from "@/types/domain";
 
 const VIEW_KEY = "mr_cards_view";
 
@@ -103,22 +105,7 @@ function CardsList({ items, mobile }: { items: Record<string, unknown>[]; mobile
 }
 
 export function CardsView({ resource, mobile }: { resource: Resource; mobile: string }) {
-  const [data, setData] = useState<unknown>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    fetchResource(resource, mobile)
-      .then((d) => !cancelled && setData(d))
-      .catch((e) => !cancelled && setError(e.message))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [resource, mobile]);
+  const { items, loading, error } = useResourceItems<CardModel>(resource, mobile);
 
   if (loading) {
     return <LoadingState label="Loading cards..." />;
@@ -133,26 +120,22 @@ export function CardsView({ resource, mobile }: { resource: Resource; mobile: st
     );
   }
 
-  const items = extractItems(data);
-
   if (!items || items.length === 0) {
     return (
       <Card className="p-5">
-        <pre className="text-xs whitespace-pre-wrap break-all text-muted-foreground">
-          {JSON.stringify(data, null, 2)}
-        </pre>
+        <p className="text-sm text-muted-foreground text-center">No records found.</p>
       </Card>
     );
   }
 
   if (resource === "cards") {
-    return <CardsList items={items as Record<string, unknown>[]} mobile={mobile} />;
+    return <CardsList items={items} mobile={mobile} />;
   }
 
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
-        <RecordCard key={getItemKey(item as Record<string, unknown>, i)} resource={resource} item={item as Record<string, unknown>} />
+        <RecordCard key={getItemKey(item, i)} resource={resource} item={item} />
       ))}
     </div>
   );
