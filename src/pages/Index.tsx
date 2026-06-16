@@ -256,7 +256,9 @@ const Index = () => {
         <Tabs value={tab} onValueChange={(v) => setTab(v as Resource)} className="w-full">
           {TABS.map(({ id }) => (
             <TabsContent key={id} value={id} className="mt-0">
-              <ResourceView resource={id} mobile={mobile} onNavigate={setTab} />
+              <Suspense fallback={<LoadingState label="Loading…" />}>
+                <ResourceView resource={id} mobile={mobile} onNavigate={setTab} />
+              </Suspense>
             </TabsContent>
           ))}
         </Tabs>
