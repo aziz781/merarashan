@@ -5,7 +5,7 @@ import { StatementsView } from "@/views/StatementsView";
 import { CardsView } from "@/views/CardsView";
 import { ProfileView } from "@/views/ProfileView";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
-import { extractItems } from "@/lib/itemUtils";
+import { extractItems, isTruthy } from "@/lib/itemUtils";
 import { CreditCard, ArrowLeftRight, User, FileText } from "lucide-react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { SideMenu } from "@/components/SideMenu";
@@ -18,10 +18,6 @@ import { PageFooter } from "@/components/PageFooter";
 
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
-import { getCurrentSubscription, pushSupported } from "@/lib/push";
-import { isNativePlatform } from "@/lib/nativePush";
-
-const NATIVE_PUSH_ENABLED_KEY = "mr_native_push_enabled";
 
 const STORAGE_KEY = "mr_mobile";
 const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
