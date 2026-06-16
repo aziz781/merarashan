@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RashansView } from "@/views/RashansView";
 import { StatementsView } from "@/views/StatementsView";
@@ -91,7 +91,7 @@ const Index = () => {
 
 
   const slideInClosingRef = useRef(false);
-  const handleSlideInOpenChange = (setter: (v: boolean) => void) => (open: boolean) => {
+  const closeWithGuard = useCallback((setter: (v: boolean) => void) => (open: boolean) => {
     if (!open) {
       slideInClosingRef.current = true;
       window.setTimeout(() => {
@@ -99,7 +99,10 @@ const Index = () => {
       }, 400);
     }
     setter(open);
-  };
+  }, []);
+  const handleProfilePanelChange = useCallback(closeWithGuard(setProfileOpen), [closeWithGuard]);
+  const handleHelpPanelChange = useCallback(closeWithGuard(setHelpOpen), [closeWithGuard]);
+  const handleSettingsPanelChange = useCallback(closeWithGuard(setSettingsOpen), [closeWithGuard]);
   const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
@@ -152,18 +155,43 @@ const Index = () => {
     };
   }, [mobile]);
 
-  const handleLogin = (m: string) => {
+  const handleLogin = useCallback((m: string) => {
     localStorage.setItem(STORAGE_KEY, m);
     setMobile(m);
     toast({ title: "Welcome", description: `Signed in as ${m}` });
-  };
+  }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await supabase.auth.signOut();
     localStorage.removeItem(STORAGE_KEY);
     setMobile(null);
     setProfileData(null);
-  };
+  }, []);
+
+  const handleMenuOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open && (profileOpen || helpOpen || settingsOpen || slideInClosingRef.current)) return;
+      setMenuOpen(open);
+    },
+    [profileOpen, helpOpen, settingsOpen],
+  );
+  const handleOpenProfile = useCallback(() => {
+    setHelpOpen(false);
+    setProfileOpen(true);
+  }, []);
+  const handleOpenHelp = useCallback(() => {
+    setProfileOpen(false);
+    setHelpOpen(true);
+  }, []);
+  const handleOpenSettings = useCallback(() => {
+    setProfileOpen(false);
+    setHelpOpen(false);
+    setSettingsOpen(true);
+  }, []);
+  const handleMenuLogout = useCallback(() => {
+    setMenuOpen(false);
+    handleLogout();
+  }, [handleLogout]);
 
   if (!mobile)
     return (
