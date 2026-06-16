@@ -1859,100 +1859,45 @@ const Index = () => {
         </div>
       </nav>
 
-      <DialogPrimitive.Root open={profileOpen} onOpenChange={handleSlideInOpenChange(setProfileOpen)} modal={false}>
-        <DialogPrimitive.Portal>
-          <DialogPrimitive.Content
-            onInteractOutside={(e) => e.preventDefault()}
-            {...profileSwipe}
-            className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
-          >
+      <SlideInPanel
+        open={profileOpen}
+        onOpenChange={handleSlideInOpenChange(setProfileOpen)}
+        title="Profile"
+      >
+        <ProfileView mobile={mobile} profileOnly />
+      </SlideInPanel>
 
-            <div className="mb-2">
-              <DialogPrimitive.Close
-                className="-ml-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
-                aria-label="Back"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </DialogPrimitive.Close>
-              <div className="h-6" aria-hidden />
-              <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
-                Profile
-              </DialogPrimitive.Title>
-            </div>
-            <div className="pt-2">
-              <ProfileView mobile={mobile} profileOnly />
-            </div>
-          </DialogPrimitive.Content>
-        </DialogPrimitive.Portal>
-      </DialogPrimitive.Root>
+      <SlideInPanel
+        open={helpOpen}
+        onOpenChange={handleSlideInOpenChange(setHelpOpen)}
+        title="Help & Support"
+        description="Get instant help from our virtual agent 24/7. Live support: Mon-Sun 06:00-18:00 (UTC)"
+      >
+        <div className="space-y-3 pt-2">
+          <WhatsAppTile
+            href="https://wa.me/923030812222"
+            number="923030812222"
+            title="Mera Rashan Support"
+            subtitle="Chat on WhatsApp"
+          />
+          <WhatsAppTile
+            href="https://wa.me/923091493053"
+            number="923091493053"
+            title="Mera Rashan Chat Bot"
+            subtitle="Automated assistant"
+          />
+        </div>
+      </SlideInPanel>
 
-      <DialogPrimitive.Root open={helpOpen} onOpenChange={handleSlideInOpenChange(setHelpOpen)} modal={false}>
-        <DialogPrimitive.Portal>
-          <DialogPrimitive.Content
-            onInteractOutside={(e) => e.preventDefault()}
-            {...helpSwipe}
-            className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
-          >
-
-            <div className="mb-2">
-              <DialogPrimitive.Close
-                className="-ml-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
-                aria-label="Back"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </DialogPrimitive.Close>
-              <div className="h-6" aria-hidden />
-              <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
-                Help &amp; Support
-              </DialogPrimitive.Title>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Get instant help from our virtual agent 24/7. Live support: Mon-Sun 06:00-18:00 (UTC)
-              </p>
-            </div>
-            <div className="space-y-3 pt-4">
-              <WhatsAppTile
-                href="https://wa.me/923030812222"
-                number="923030812222"
-                title="Mera Rashan Support"
-                subtitle="Chat on WhatsApp"
-              />
-              <WhatsAppTile
-                href="https://wa.me/923091493053"
-                number="923091493053"
-                title="Mera Rashan Chat Bot"
-                subtitle="Automated assistant"
-              />
-            </div>
-          </DialogPrimitive.Content>
-        </DialogPrimitive.Portal>
-      </DialogPrimitive.Root>
-
-      <DialogPrimitive.Root open={settingsOpen} onOpenChange={handleSlideInOpenChange(setSettingsOpen)} modal={false}>
-        <DialogPrimitive.Portal>
-          <DialogPrimitive.Content
-            onInteractOutside={(e) => e.preventDefault()}
-            {...settingsSwipe}
-            className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
-          >
-
-            <div className="mb-2">
-              <DialogPrimitive.Close
-                className="-ml-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
-                aria-label="Back"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </DialogPrimitive.Close>
-              <div className="h-6" aria-hidden />
-              <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
-                Settings
-              </DialogPrimitive.Title>
-            </div>
-            <div className="space-y-3 pt-4">
-              <NotificationToggle mobile={mobile} />
-            </div>
-          </DialogPrimitive.Content>
-        </DialogPrimitive.Portal>
-      </DialogPrimitive.Root>
+      <SlideInPanel
+        open={settingsOpen}
+        onOpenChange={handleSlideInOpenChange(setSettingsOpen)}
+        title="Settings"
+      >
+        <div className="space-y-3 pt-2">
+          <NotificationToggle mobile={mobile} />
+        </div>
+      </SlideInPanel>
     </div>
   );
 };
