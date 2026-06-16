@@ -158,7 +158,7 @@ const Index = () => {
     await supabase.auth.signOut();
     localStorage.removeItem(STORAGE_KEY);
     setMobile(null);
-    setProfileData(null);
+    // profileData clears automatically via useResource when mobile becomes null
   }, []);
 
   const handleMenuOpenChange = useCallback(
