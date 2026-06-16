@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingState } from "@/components/LoadingState";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatementStats } from "@/components/StatementStats";
 import { RecordCard } from "@/components/RecordCard";
@@ -109,11 +109,7 @@ export function StatementsView({ mobile }: { mobile: string }) {
           <p className="text-xs text-muted-foreground break-all">{error}</p>
         </Card>
       ) : loading ? (
-        <div className="space-y-3">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-2xl" />
-          ))}
-        </div>
+        <LoadingState label="Loading statements..." />
       ) : filteredItems.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-6">No statements found.</p>
       ) : (
