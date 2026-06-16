@@ -250,29 +250,13 @@ const Index = () => {
 
       <SideMenu
         open={menuOpen}
-        onOpenChange={(open) => {
-          if (!open && (profileOpen || helpOpen || settingsOpen || slideInClosingRef.current)) return;
-          setMenuOpen(open);
-        }}
+        onOpenChange={handleMenuOpenChange}
         displayName={String(displayName)}
         payerId={profileData?.payer_id as string | number | null | undefined}
-        onOpenProfile={() => {
-          setHelpOpen(false);
-          setProfileOpen(true);
-        }}
-        onOpenHelp={() => {
-          setProfileOpen(false);
-          setHelpOpen(true);
-        }}
-        onOpenSettings={() => {
-          setProfileOpen(false);
-          setHelpOpen(false);
-          setSettingsOpen(true);
-        }}
-        onLogout={() => {
-          setMenuOpen(false);
-          handleLogout();
-        }}
+        onOpenProfile={handleOpenProfile}
+        onOpenHelp={handleOpenHelp}
+        onOpenSettings={handleOpenSettings}
+        onLogout={handleMenuLogout}
       />
 
       <main className="px-5 pt-5">
