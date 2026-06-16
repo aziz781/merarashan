@@ -5,9 +5,10 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TransactionCard } from "@/components/TransactionCard";
 import { MessageBox } from "@/components/MessageBox";
-import { fetchResource, Resource } from "@/lib/api";
+import { useResource, type Resource } from "@/lib/api";
 import { extractItems, currentMonthParams, getItemDate, findValue, isTruthy, getItemKey } from "@/lib/itemUtils";
 import { useTransactions } from "@/hooks/use-transactions";
+import type { Customer } from "@/types/domain";
 
 function StatTile({
   label,
