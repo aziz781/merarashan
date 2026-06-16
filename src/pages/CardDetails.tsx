@@ -9,17 +9,9 @@ import { fetchResource } from "@/lib/api";
 import { TransactionCard } from "@/components/TransactionCard";
 import { PageFooter } from "@/components/PageFooter";
 import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
-
+import { extractItems, digitsOnly } from "@/lib/itemUtils";
 
 const STORAGE_KEY = "mr_mobile";
-
-function extractItems(data: unknown): unknown[] | null {
-  if (Array.isArray(data)) return data;
-  const d = data as { items?: unknown[]; data?: unknown[] };
-  if (Array.isArray(d?.items)) return d.items;
-  if (Array.isArray(d?.data)) return d.data;
-  return null;
-}
 
 const CardDetails = () => {
   const navigate = useNavigate();
@@ -31,14 +23,12 @@ const CardDetails = () => {
   const [cardError, setCardError] = useState<string | null>(null);
   const mobile = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
 
-
   // Sync card when route or router-state changes (e.g., swipe to sibling card)
   useEffect(() => {
-    const d = (v: unknown) => String(v ?? "").replace(/\D/g, "");
     const stateCard = location.state?.card;
-    if (stateCard && d(stateCard.cm_card_number) === d(rcNum)) {
+    if (stateCard && digitsOnly(stateCard.cm_card_number) === digitsOnly(rcNum)) {
       setCard(stateCard);
-    } else if (card && d(card.cm_card_number) !== d(rcNum)) {
+    } else if (card && digitsOnly(card.cm_card_number) !== digitsOnly(rcNum)) {
       setCard(undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,9 +59,8 @@ const CardDetails = () => {
         const items = (extractItems(d) ?? []) as Record<string, unknown>[];
         setAllCards(items);
         if (!card && rcNum) {
-          const digits = (v: unknown) => String(v ?? "").replace(/\D/g, "");
-          const target = digits(rcNum);
-          const found = items.find((c) => digits(c.cm_card_number) === target);
+          const target = digitsOnly(rcNum);
+          const found = items.find((c) => digitsOnly(c.cm_card_number) === target);
           if (found) setCard(found);
           else setCardError("Card not found for this account.");
         }
@@ -117,7 +106,6 @@ const CardDetails = () => {
     (card?.cm_card_number as string) ||
     "Card Details";
 
-  const digitsOnly = (v: unknown) => String(v ?? "").replace(/\D/g, "");
   const currentIndex = allCards.findIndex(
     (c) => digitsOnly(c.cm_card_number) === digitsOnly(rcNum),
   );
@@ -202,7 +190,7 @@ const CardDetails = () => {
           >
             <Bell className="h-5 w-5" />
             {notifUnread > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-[18px] text-center ring-2 ring-[hsl(var(--primary))]">
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold leading-[18px] text-center ring-2 ring-[hsl(var(--primary))]">
                 {notifUnread > 99 ? "99+" : notifUnread}
               </span>
             )}

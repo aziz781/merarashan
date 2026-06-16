@@ -1,11 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Receipt, Wallet, CheckCircle2, Clock } from "lucide-react";
+import { formatPKR } from "@/lib/itemUtils";
 
 type Txn = Record<string, unknown>;
-
-function formatPKR(n: number) {
-  return `Rs. ${n.toLocaleString("en-PK")}`;
-}
 
 export function TransactionStats({
   items,
