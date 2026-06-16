@@ -204,7 +204,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen pb-32">
-      <header className="px-5 pt-10 pb-6 text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
+      <header
+        className="px-5 pt-10 pb-6 text-primary-foreground"
+        style={{ background: "var(--gradient-primary)", minHeight: 132 }}
+      >
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
@@ -222,24 +225,32 @@ const Index = () => {
                 .join("")
                 .toUpperCase() || "U"}
             </button>
-            <div className="min-w-0">
+            <div className="min-w-0 min-h-[44px]">
               <h1 className="text-xl font-bold leading-tight truncate">{tab === "transactions" ? "Monthly Rashans" : tab === "cards" ? "Rashan Cards" : tab === "statements" ? "Monthly Statements" : String(displayName)}</h1>
-              {profileData && tab === "customers" && (
+              {tab === "customers" && (
                 <span
-                  className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                    isActive
+                  className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] ${
+                    !profileData
+                      ? "bg-white/10 text-white/0 ring-1 ring-white/10"
+                      : isActive
                       ? "bg-green-400/20 text-green-50 ring-1 ring-green-300/40"
                       : "bg-red-400/20 text-red-50 ring-1 ring-red-300/40"
                   }`}
+                  aria-hidden={!profileData}
                 >
-                  <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-green-300" : "bg-red-300"}`} />
-                  {isActive ? "Active" : "Inactive"}
+                  {profileData && (
+                    <>
+                      <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-green-300" : "bg-red-300"}`} />
+                      {isActive ? "Active" : "Inactive"}
+                    </>
+                  )}
                 </span>
               )}
             </div>
           </div>
         </div>
       </header>
+
 
       <SideMenu
         open={menuOpen}
