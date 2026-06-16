@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, CreditCard, Bell } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LoadingState } from "@/components/LoadingState";
-import { fetchResource } from "@/lib/api";
+import { useResource } from "@/lib/api";
 import { TransactionCard } from "@/components/TransactionCard";
 import { PageFooter } from "@/components/PageFooter";
 import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
 import { extractItems, digitsOnly, getItemKey } from "@/lib/itemUtils";
+import type { Card as CardModel, Transaction } from "@/types/domain";
 
 const STORAGE_KEY = "mr_mobile";
 
@@ -18,14 +18,12 @@ const CardDetails = () => {
   const location = useLocation() as { state?: { card?: Record<string, unknown> } };
   const { rcNum: rcNumParam } = useParams();
   const rcNum = rcNumParam || "";
-  const [card, setCard] = useState<Record<string, unknown> | undefined>(location.state?.card);
-  const [cardLoading, setCardLoading] = useState(false);
-  const [cardError, setCardError] = useState<string | null>(null);
+  const [card, setCard] = useState<CardModel | undefined>(location.state?.card as CardModel | undefined);
   const mobile = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
 
   // Sync card when route or router-state changes (e.g., swipe to sibling card)
   useEffect(() => {
-    const stateCard = location.state?.card;
+    const stateCard = location.state?.card as CardModel | undefined;
     if (stateCard && digitsOnly(stateCard.cm_card_number) === digitsOnly(rcNum)) {
       setCard(stateCard);
     } else if (card && digitsOnly(card.cm_card_number) !== digitsOnly(rcNum)) {
@@ -34,11 +32,7 @@ const CardDetails = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rcNum, location.state]);
 
-  const [txns, setTxns] = useState<Record<string, unknown>[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [notifUnread, setNotifUnread] = useState(0);
-  const [allCards, setAllCards] = useState<Record<string, unknown>[]>([]);
   const [swipeDx, setSwipeDx] = useState(0);
   const [animating, setAnimating] = useState(false);
 
@@ -48,49 +42,54 @@ const CardDetails = () => {
   }, []);
 
   // Always fetch cards list for swipe navigation (and as fallback when opened via direct link)
-  useEffect(() => {
-    if (!mobile) return;
-    let cancelled = false;
-    setCardLoading(!card);
-    setCardError(null);
-    fetchResource<unknown>("cards", mobile)
-      .then((d) => {
-        if (cancelled) return;
-        const items = (extractItems(d) ?? []) as Record<string, unknown>[];
-        setAllCards(items);
-        if (!card && rcNum) {
-          const target = digitsOnly(rcNum);
-          const found = items.find((c) => digitsOnly(c.cm_card_number) === target);
-          if (found) setCard(found);
-          else setCardError("Card not found for this account.");
-        }
-      })
-      .catch((e) => !cancelled && setCardError(e.message))
-      .finally(() => !cancelled && setCardLoading(false));
-    return () => { cancelled = true; };
-  }, [mobile, rcNum, card]);
-
-  useEffect(() => {
-    if (!mobile || !rcNum) {
-      setLoading(false);
-      return;
+  const {
+    data: cardsRaw,
+    isPending: cardsPending,
+    fetchStatus: cardsFetchStatus,
+    error: cardsQueryError,
+  } = useResource<unknown>("cards", mobile ?? undefined);
+  const allCards = useMemo<CardModel[]>(
+    () => (extractItems(cardsRaw) ?? []) as CardModel[],
+    [cardsRaw],
+  );
+  const cardLoading = !card && cardsPending && cardsFetchStatus !== "idle";
+  const cardError = (() => {
+    if (cardsQueryError) return cardsQueryError.message;
+    if (!card && !cardsPending && rcNum && allCards.length > 0) {
+      const target = digitsOnly(rcNum);
+      if (!allCards.find((c) => digitsOnly(c.cm_card_number) === target)) {
+        return "Card not found for this account.";
+      }
     }
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
+    return null;
+  })();
+
+  // If card not provided via router state, hydrate from the cards list.
+  useEffect(() => {
+    if (card || !rcNum || allCards.length === 0) return;
+    const target = digitsOnly(rcNum);
+    const found = allCards.find((c) => digitsOnly(c.cm_card_number) === target);
+    if (found) setCard(found);
+  }, [allCards, card, rcNum]);
+
+  const txnParams = useMemo(() => {
+    if (!rcNum) return undefined;
     const digits = rcNum.replace(/\D/g, "");
     const formattedRc = digits.replace(/(.{4})(?=.)/g, "$1 ");
-    fetchResource<unknown>("transactions", mobile, { rcNum: formattedRc })
-      .then((d) => {
-        if (cancelled) return;
-        setTxns((extractItems(d) ?? []) as Record<string, unknown>[]);
-      })
-      .catch((e) => !cancelled && setError(e.message))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [mobile, rcNum]);
+    return { rcNum: formattedRc };
+  }, [rcNum]);
+
+  const {
+    data: txnsRaw,
+    isPending: txnsPending,
+    fetchStatus: txnsFetchStatus,
+    error: txnsError,
+  } = useResource<unknown>("transactions", mobile && rcNum ? mobile : undefined, txnParams);
+  const txns: Transaction[] | null = txnsRaw
+    ? ((extractItems(txnsRaw) ?? []) as Transaction[])
+    : null;
+  const loading = txnsPending && txnsFetchStatus !== "idle";
+  const error = txnsError ? txnsError.message : null;
 
   const fields: { key: string; label: string }[] = [
     { key: "person_name", label: "Name" },
