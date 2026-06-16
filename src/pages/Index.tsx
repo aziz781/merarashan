@@ -1,17 +1,12 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Loader2,
-  LogOut,
   CreditCard,
   ArrowLeftRight,
-  ArrowLeft,
   User,
   FileText,
-  Phone,
   FileDown,
   ExternalLink,
-  Info,
   CheckCircle2,
   X,
   MessageCircle,
@@ -19,23 +14,19 @@ import {
   AlertTriangle,
   LayoutGrid,
   List,
-  Menu,
-  Bell,
-  BellOff,
   ArrowUp,
+  Bot,
 } from "lucide-react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { HelpCircle, ChevronDown, Bot, LifeBuoy, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
 import { LoadingState } from "@/components/LoadingState";
+import { SideMenu } from "@/components/SideMenu";
+import { SlideInPanel } from "@/components/SlideInPanel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
@@ -1585,10 +1576,6 @@ const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const menuSwipe = useSwipeToClose({ direction: "left", onClose: () => setMenuOpen(false) });
-  const profileSwipe = useSwipeToClose({ direction: "right", onClose: () => setProfileOpen(false) });
-  const helpSwipe = useSwipeToClose({ direction: "right", onClose: () => setHelpOpen(false) });
-  const settingsSwipe = useSwipeToClose({ direction: "right", onClose: () => setSettingsOpen(false) });
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
   });
@@ -1761,103 +1748,32 @@ const Index = () => {
         </div>
       </header>
 
-      <Sheet
+      <SideMenu
         open={menuOpen}
         onOpenChange={(open) => {
-          // Keep sidebar open while a slide-in panel (profile/help/settings) is showing
           if (!open && (profileOpen || helpOpen || settingsOpen || slideInClosingRef.current)) return;
           setMenuOpen(open);
         }}
-      >
-        <SheetContent
-          side="left"
-          className="w-72 flex flex-col"
-          {...menuSwipe}
-        >
-
-          <SheetHeader>
-            <SheetTitle className="truncate">{String(displayName)}</SheetTitle>
-          </SheetHeader>
-          {profileData?.payer_id && (
-            <div className="mt-4 flex items-center gap-2 rounded-md border border-border/60 bg-muted/40 px-3 py-2">
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Customer number</p>
-                <p className="text-sm font-semibold text-foreground truncate">{String(profileData.payer_id)}</p>
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 shrink-0"
-                aria-label="Copy customer number"
-                onClick={async () => {
-                  const val = String(profileData.payer_id);
-                  try {
-                    await navigator.clipboard.writeText(val);
-                    toast({ title: "Copied", description: `${val} copied to clipboard` });
-                  } catch {
-                    toast({ title: "Copy failed", description: "Could not access clipboard", variant: "destructive" });
-                  }
-                }}
-              >
-                <Copy className="w-4 h-4" />
-              </Button>
-            </div>
-          )}
-          <div className="flex flex-col gap-1 mt-4">
-            <button
-              type="button"
-              onClick={() => {
-                setHelpOpen(false);
-                setProfileOpen(true);
-              }}
-              className="flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors"
-            >
-              <User className="w-4 h-4" />
-              <span>Profile</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setProfileOpen(false);
-                setHelpOpen(true);
-              }}
-              className="flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors"
-            >
-              <HelpCircle className="w-4 h-4" />
-              <span className="flex-1">Help</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setProfileOpen(false);
-                setHelpOpen(false);
-                setSettingsOpen(true);
-              }}
-              className="flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors"
-            >
-              <Settings className="w-4 h-4" />
-              <span className="flex-1">Settings</span>
-            </button>
-
-
-
-            <button
-              type="button"
-              onClick={() => {
-                setMenuOpen(false);
-                handleLogout();
-              }}
-              className="flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors text-destructive"
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Log out</span>
-            </button>
-          </div>
-        </SheetContent>
-      </Sheet>
+        displayName={String(displayName)}
+        payerId={profileData?.payer_id as string | number | null | undefined}
+        onOpenProfile={() => {
+          setHelpOpen(false);
+          setProfileOpen(true);
+        }}
+        onOpenHelp={() => {
+          setProfileOpen(false);
+          setHelpOpen(true);
+        }}
+        onOpenSettings={() => {
+          setProfileOpen(false);
+          setHelpOpen(false);
+          setSettingsOpen(true);
+        }}
+        onLogout={() => {
+          setMenuOpen(false);
+          handleLogout();
+        }}
+      />
 
       <main className="px-5 pt-5">
         <Tabs value={tab} onValueChange={(v) => setTab(v as Resource)} className="w-full">
@@ -1930,100 +1846,45 @@ const Index = () => {
         </div>
       </nav>
 
-      <DialogPrimitive.Root open={profileOpen} onOpenChange={handleSlideInOpenChange(setProfileOpen)} modal={false}>
-        <DialogPrimitive.Portal>
-          <DialogPrimitive.Content
-            onInteractOutside={(e) => e.preventDefault()}
-            {...profileSwipe}
-            className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
-          >
+      <SlideInPanel
+        open={profileOpen}
+        onOpenChange={handleSlideInOpenChange(setProfileOpen)}
+        title="Profile"
+      >
+        <ProfileView mobile={mobile} profileOnly />
+      </SlideInPanel>
 
-            <div className="mb-2">
-              <DialogPrimitive.Close
-                className="-ml-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
-                aria-label="Back"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </DialogPrimitive.Close>
-              <div className="h-6" aria-hidden />
-              <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
-                Profile
-              </DialogPrimitive.Title>
-            </div>
-            <div className="pt-2">
-              <ProfileView mobile={mobile} profileOnly />
-            </div>
-          </DialogPrimitive.Content>
-        </DialogPrimitive.Portal>
-      </DialogPrimitive.Root>
+      <SlideInPanel
+        open={helpOpen}
+        onOpenChange={handleSlideInOpenChange(setHelpOpen)}
+        title="Help & Support"
+        description="Get instant help from our virtual agent 24/7. Live support: Mon-Sun 06:00-18:00 (UTC)"
+      >
+        <div className="space-y-3 pt-2">
+          <WhatsAppTile
+            href="https://wa.me/923030812222"
+            number="923030812222"
+            title="Mera Rashan Support"
+            subtitle="Chat on WhatsApp"
+          />
+          <WhatsAppTile
+            href="https://wa.me/923091493053"
+            number="923091493053"
+            title="Mera Rashan Chat Bot"
+            subtitle="Automated assistant"
+          />
+        </div>
+      </SlideInPanel>
 
-      <DialogPrimitive.Root open={helpOpen} onOpenChange={handleSlideInOpenChange(setHelpOpen)} modal={false}>
-        <DialogPrimitive.Portal>
-          <DialogPrimitive.Content
-            onInteractOutside={(e) => e.preventDefault()}
-            {...helpSwipe}
-            className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
-          >
-
-            <div className="mb-2">
-              <DialogPrimitive.Close
-                className="-ml-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
-                aria-label="Back"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </DialogPrimitive.Close>
-              <div className="h-6" aria-hidden />
-              <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
-                Help &amp; Support
-              </DialogPrimitive.Title>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Get instant help from our virtual agent 24/7. Live support: Mon-Sun 06:00-18:00 (UTC)
-              </p>
-            </div>
-            <div className="space-y-3 pt-4">
-              <WhatsAppTile
-                href="https://wa.me/923030812222"
-                number="923030812222"
-                title="Mera Rashan Support"
-                subtitle="Chat on WhatsApp"
-              />
-              <WhatsAppTile
-                href="https://wa.me/923091493053"
-                number="923091493053"
-                title="Mera Rashan Chat Bot"
-                subtitle="Automated assistant"
-              />
-            </div>
-          </DialogPrimitive.Content>
-        </DialogPrimitive.Portal>
-      </DialogPrimitive.Root>
-
-      <DialogPrimitive.Root open={settingsOpen} onOpenChange={handleSlideInOpenChange(setSettingsOpen)} modal={false}>
-        <DialogPrimitive.Portal>
-          <DialogPrimitive.Content
-            onInteractOutside={(e) => e.preventDefault()}
-            {...settingsSwipe}
-            className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
-          >
-
-            <div className="mb-2">
-              <DialogPrimitive.Close
-                className="-ml-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
-                aria-label="Back"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </DialogPrimitive.Close>
-              <div className="h-6" aria-hidden />
-              <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
-                Settings
-              </DialogPrimitive.Title>
-            </div>
-            <div className="space-y-3 pt-4">
-              <NotificationToggle mobile={mobile} />
-            </div>
-          </DialogPrimitive.Content>
-        </DialogPrimitive.Portal>
-      </DialogPrimitive.Root>
+      <SlideInPanel
+        open={settingsOpen}
+        onOpenChange={handleSlideInOpenChange(setSettingsOpen)}
+        title="Settings"
+      >
+        <div className="space-y-3 pt-2">
+          <NotificationToggle mobile={mobile} />
+        </div>
+      </SlideInPanel>
     </div>
   );
 };
