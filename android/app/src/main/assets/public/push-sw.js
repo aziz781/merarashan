@@ -27,14 +27,14 @@ self.addEventListener("push", (event) => {
     body: data.body || "",
     icon: data.icon || "/icon-192.png",
     badge: data.badge || "/icon-192.png",
-    data: { url: data.url || "/", title, body: data.body || "" },
+    data: { url: data.url || "/", title, body: data.body || "", month: data.month ?? null, year: data.year ?? null },
     tag: data.tag,
   };
 
   event.waitUntil(
     (async () => {
       await self.registration.showNotification(title, options);
-      await broadcast({ title, body: options.body, url: options.data.url });
+      await broadcast({ title, body: options.body, url: options.data.url, month: options.data.month, year: options.data.year });
     })(),
   );
 });
