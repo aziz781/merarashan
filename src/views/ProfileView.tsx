@@ -321,30 +321,19 @@ export function ProfileView({
   onNavigate?: (r: Resource) => void;
   profileOnly?: boolean;
 }) {
-  const [data, setData] = useState<Record<string, unknown> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: rawData, isPending, fetchStatus, error: queryError } =
+    useResource<unknown>("customers", mobile);
+  const loading = isPending && fetchStatus !== "idle";
+  const error = queryError ? queryError.message : null;
+  const data: Customer | null = (() => {
+    if (!rawData) return null;
+    const items = extractItems(rawData);
+    const first = (items && items[0]) || rawData;
+    return first as Customer;
+  })();
   const [dismissedMsg, setDismissedMsg] = useState<string | null>(() => {
     try { return sessionStorage.getItem("dismissedHomeMsg"); } catch { return null; }
   });
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    fetchResource("customers", mobile)
-      .then((d) => {
-        if (cancelled) return;
-        const items = extractItems(d);
-        const first = (items && items[0]) || d;
-        setData(first as Record<string, unknown>);
-      })
-      .catch((e) => !cancelled && setError(e.message))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [mobile]);
 
   if (loading) {
     return (
