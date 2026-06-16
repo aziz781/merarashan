@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUp } from "lucide-react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Card } from "@/components/ui/card";
@@ -6,8 +6,9 @@ import { LoadingState } from "@/components/LoadingState";
 import { TransactionStats } from "@/components/TransactionStats";
 import { TransactionCard } from "@/components/TransactionCard";
 import { TransactionFilters, type TxnFilters } from "@/components/TransactionFilters";
-import { fetchResource } from "@/lib/api";
-import { extractItems, getItemKey } from "@/lib/itemUtils";
+import { getItemKey } from "@/lib/itemUtils";
+import { useResourceItems } from "@/hooks/use-resource-items";
+import type { Transaction } from "@/types/domain";
 
 const TXN_VIRTUALIZE_THRESHOLD = 30;
 
