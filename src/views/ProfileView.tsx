@@ -5,9 +5,10 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TransactionCard } from "@/components/TransactionCard";
 import { MessageBox } from "@/components/MessageBox";
-import { fetchResource, Resource } from "@/lib/api";
+import { useResource, type Resource } from "@/lib/api";
 import { extractItems, currentMonthParams, getItemDate, findValue, isTruthy, getItemKey } from "@/lib/itemUtils";
 import { useTransactions } from "@/hooks/use-transactions";
+import type { Customer } from "@/types/domain";
 
 function StatTile({
   label,
@@ -53,22 +54,12 @@ function CurrentMonthTile({
   const monthLong = now.toLocaleString(undefined, { month: "long" });
   const monthShort = now.toLocaleString("en-US", { month: "short" });
   const year = String(now.getFullYear());
-  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetchResource("statements", mobile, { year, month: monthShort })
-      .then((d) => {
-        if (cancelled) return;
-        const items = (extractItems(d) ?? []) as Record<string, unknown>[];
-        const s = items[0]?.payment_status;
-        setPaymentStatus(s ? String(s) : null);
-      })
-      .catch(() => !cancelled && setPaymentStatus(null));
-    return () => {
-      cancelled = true;
-    };
-  }, [mobile, year, monthShort]);
+  const { data: stmtData } = useResource<unknown>("statements", mobile, { year, month: monthShort });
+  const paymentStatus = (() => {
+    const items = (extractItems(stmtData) ?? []) as Record<string, unknown>[];
+    const s = items[0]?.payment_status;
+    return s ? String(s) : null;
+  })();
 
   const isPaid = paymentStatus?.toUpperCase() === "PAID";
   const isUnpaid = paymentStatus?.toUpperCase() === "NOT_PAID";
@@ -330,30 +321,19 @@ export function ProfileView({
   onNavigate?: (r: Resource) => void;
   profileOnly?: boolean;
 }) {
-  const [data, setData] = useState<Record<string, unknown> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: rawData, isPending, fetchStatus, error: queryError } =
+    useResource<unknown>("customers", mobile);
+  const loading = isPending && fetchStatus !== "idle";
+  const error = queryError ? queryError.message : null;
+  const data: Customer | null = (() => {
+    if (!rawData) return null;
+    const items = extractItems(rawData);
+    const first = (items && items[0]) || rawData;
+    return first as Customer;
+  })();
   const [dismissedMsg, setDismissedMsg] = useState<string | null>(() => {
     try { return sessionStorage.getItem("dismissedHomeMsg"); } catch { return null; }
   });
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    fetchResource("customers", mobile)
-      .then((d) => {
-        if (cancelled) return;
-        const items = extractItems(d);
-        const first = (items && items[0]) || d;
-        setData(first as Record<string, unknown>);
-      })
-      .catch((e) => !cancelled && setError(e.message))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [mobile]);
 
   if (loading) {
     return (

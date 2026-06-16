@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUp } from "lucide-react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Card } from "@/components/ui/card";
@@ -6,12 +6,13 @@ import { LoadingState } from "@/components/LoadingState";
 import { TransactionStats } from "@/components/TransactionStats";
 import { TransactionCard } from "@/components/TransactionCard";
 import { TransactionFilters, type TxnFilters } from "@/components/TransactionFilters";
-import { fetchResource } from "@/lib/api";
-import { extractItems, getItemKey } from "@/lib/itemUtils";
+import { getItemKey } from "@/lib/itemUtils";
+import { useResourceItems } from "@/hooks/use-resource-items";
+import type { Transaction } from "@/types/domain";
 
 const TXN_VIRTUALIZE_THRESHOLD = 30;
 
-function VirtualTransactionList({ items }: { items: Record<string, unknown>[] }) {
+function VirtualTransactionList({ items }: { items: Transaction[] }) {
   const parentRef = useRef<HTMLDivElement | null>(null);
   const virtualizer = useWindowVirtualizer({
     count: items.length,
@@ -51,7 +52,7 @@ function VirtualTransactionList({ items }: { items: Record<string, unknown>[] })
   );
 }
 
-function TransactionList({ items }: { items: Record<string, unknown>[] }) {
+function TransactionList({ items }: { items: Transaction[] }) {
   if (items.length <= TXN_VIRTUALIZE_THRESHOLD) {
     return (
       <>
@@ -65,9 +66,13 @@ function TransactionList({ items }: { items: Record<string, unknown>[] }) {
 }
 
 export function RashansView({ mobile }: { mobile: string }) {
-  const now = new Date();
-  const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
-  const currentYear = String(now.getFullYear());
+  const { currentMonth, currentYear } = useMemo(() => {
+    const now = new Date();
+    return {
+      currentMonth: String(now.getMonth() + 1).padStart(2, "0"),
+      currentYear: String(now.getFullYear()),
+    };
+  }, []);
   const [filters, setFilters] = useState<TxnFilters>(() => {
     try {
       const saved = sessionStorage.getItem("rashanFilters");
@@ -85,11 +90,8 @@ export function RashansView({ mobile }: { mobile: string }) {
       /* ignore */
     }
   }, [filters]);
-  const [items, setItems] = useState<Record<string, unknown>[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
   const [statuses, setStatuses] = useState<string[]>([]);
-  const [totalTransactionAmount, setTotalTransactionAmount] = useState<number>(0);
   const [showBackToTop, setShowBackToTop] = useState<boolean>(false);
 
   useEffect(() => {
@@ -99,49 +101,52 @@ export function RashansView({ mobile }: { mobile: string }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-
-    const params: Record<string, string> = {};
+  const params = useMemo<Record<string, string>>(() => {
+    const p: Record<string, string> = {};
     const mFull = filters.validFrom.match(/^(\d{1,2})\/(\d{4})$/);
     const mYearOnly = filters.validFrom.match(/^(\d{4})$/);
     const mMonthOnly = filters.validFrom.match(/^(\d{1,2})$/);
     if (mFull) {
-      params.monthYear = `${mFull[1].padStart(2, "0")}/${mFull[2]}`;
+      p.monthYear = `${mFull[1].padStart(2, "0")}/${mFull[2]}`;
     } else if (mYearOnly) {
-      params.monthYear = mYearOnly[1];
+      p.monthYear = mYearOnly[1];
     } else if (mMonthOnly) {
-      params.monthYear = `${mMonthOnly[1].padStart(2, "0")}/${currentYear}`;
+      p.monthYear = `${mMonthOnly[1].padStart(2, "0")}/${currentYear}`;
     }
+    return p;
+  }, [filters.validFrom, currentYear]);
 
-    fetchResource("transactions", mobile, params)
-      .then((d) => {
-        if (cancelled) return;
-        const list = (extractItems(d) ?? []) as Record<string, unknown>[];
-        setItems(list);
-        const tta = Number(
-          (d as Record<string, unknown>)?.totalTransactionAmount ??
-            ((d as Record<string, unknown>)?.data as Record<string, unknown>)?.totalTransactionAmount ??
-            0,
-        );
-        setTotalTransactionAmount(isNaN(tta) ? 0 : tta);
-        setStatuses((prev) => {
-          const merged = new Set<string>(prev);
-          for (const i of list) {
-            const s = i.things_status as string;
-            if (s) merged.add(s);
-          }
-          return Array.from(merged).sort();
-        });
-      })
-      .catch((e) => !cancelled && setError(e.message))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [mobile, filters.validFrom, currentYear]);
+  const { items, raw, loading, error } = useResourceItems<Transaction>(
+    "transactions",
+    mobile,
+    params,
+  );
+
+  const totalTransactionAmount = useMemo(() => {
+    const tta = Number(
+      (raw as Record<string, unknown>)?.totalTransactionAmount ??
+        ((raw as Record<string, unknown>)?.data as Record<string, unknown>)?.totalTransactionAmount ??
+        0,
+    );
+    return isNaN(tta) ? 0 : tta;
+  }, [raw]);
+
+  // Accumulate known statuses across fetches so the filter dropdown stays stable.
+  useEffect(() => {
+    if (items.length === 0) return;
+    setStatuses((prev) => {
+      const merged = new Set<string>(prev);
+      for (const i of items) {
+        const s = i.things_status as string;
+        if (s) merged.add(s);
+      }
+      const next = Array.from(merged).sort();
+      if (next.length === prev.length && next.every((s, idx) => s === prev[idx])) {
+        return prev;
+      }
+      return next;
+    });
+  }, [items]);
 
   const filtered = items.filter((i) => {
     if (filters.status !== "all" && i.things_status !== filters.status) return false;

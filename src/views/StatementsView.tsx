@@ -4,8 +4,9 @@ import { LoadingState } from "@/components/LoadingState";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatementStats } from "@/components/StatementStats";
 import { RecordCard } from "@/components/RecordCard";
-import { fetchResource } from "@/lib/api";
-import { extractItems, getItemKey } from "@/lib/itemUtils";
+import { getItemKey } from "@/lib/itemUtils";
+import { useResourceItems } from "@/hooks/use-resource-items";
+import type { Statement } from "@/types/domain";
 
 export function StatementsView({ mobile }: { mobile: string }) {
   const currentYear = new Date().getFullYear();
@@ -42,30 +43,14 @@ export function StatementsView({ mobile }: { mobile: string }) {
       /* ignore */
     }
   }, [statusFilter]);
-  const [items, setItems] = useState<Record<string, unknown>[]>([]);
-  const [stats, setStats] = useState<Record<string, unknown> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    const params: Record<string, string> = {};
-    if (selected !== "all") params.year = selected;
-    fetchResource("statements", mobile, params)
-      .then((d) => {
-        if (cancelled) return;
-        setItems((extractItems(d) ?? []) as Record<string, unknown>[]);
-        const s = (d as { stats?: Record<string, unknown> })?.stats ?? null;
-        setStats(s);
-      })
-      .catch((e) => !cancelled && setError(e.message))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [mobile, selected]);
+  const params: Record<string, string> = {};
+  if (selected !== "all") params.year = selected;
+  const { items, raw, loading, error } = useResourceItems<Statement>(
+    "statements",
+    mobile,
+    params,
+  );
+  const stats = (raw as { stats?: Record<string, unknown> } | null)?.stats ?? null;
 
   const filteredItems =
     statusFilter === "all"
