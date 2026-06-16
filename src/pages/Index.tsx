@@ -91,33 +91,8 @@ const Index = () => {
     return subscribeNotifications(update);
   }, []);
 
-  const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
-  useEffect(() => {
-    const check = async () => {
-      try {
-        if (isNativePlatform()) {
-          setPushEnabled(localStorage.getItem(NATIVE_PUSH_ENABLED_KEY) === "1");
-          return;
-        }
-        if (!pushSupported()) {
-          setPushEnabled(false);
-          return;
-        }
-        const sub = await getCurrentSubscription();
-        setPushEnabled(!!sub && Notification.permission === "granted");
-      } catch {
-        setPushEnabled(false);
-      }
-    };
-    void check();
-    const onVis = () => { if (document.visibilityState === "visible") void check(); };
-    document.addEventListener("visibilitychange", onVis);
-    window.addEventListener("focus", check);
-    return () => {
-      document.removeEventListener("visibilitychange", onVis);
-      window.removeEventListener("focus", check);
-    };
-  }, []);
+
+
 
   const slideInClosingRef = useRef(false);
   const handleSlideInOpenChange = (setter: (v: boolean) => void) => (open: boolean) => {
@@ -208,11 +183,7 @@ const Index = () => {
     );
 
   const displayName = profileData?.contact_person_eng || profileData?.contact_person || `+${mobile}`;
-  const isActive =
-    profileData?.is_active === true ||
-    profileData?.is_active === "true" ||
-    profileData?.is_active === 1 ||
-    profileData?.is_active === "1";
+  const isActive = isTruthy(profileData?.is_active);
 
   return (
     <div className="min-h-screen pb-32">
