@@ -34,6 +34,8 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
+import { LoadingState } from "@/components/LoadingState";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
@@ -1258,10 +1260,7 @@ function RashansView({ mobile }: { mobile: string }) {
       />
       <TransactionFilters statuses={statuses} value={filters} onChange={setFilters} />
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-12 gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Loading rashans...</p>
-        </div>
+        <LoadingState label="Loading rashans..." />
       ) : (
         <div className="space-y-3">
           {filtered.length === 0 ? (
@@ -1586,6 +1585,10 @@ const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const menuSwipe = useSwipeToClose({ direction: "left", onClose: () => setMenuOpen(false) });
+  const profileSwipe = useSwipeToClose({ direction: "right", onClose: () => setProfileOpen(false) });
+  const helpSwipe = useSwipeToClose({ direction: "right", onClose: () => setHelpOpen(false) });
+  const settingsSwipe = useSwipeToClose({ direction: "right", onClose: () => setSettingsOpen(false) });
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
   });
@@ -1769,24 +1772,7 @@ const Index = () => {
         <SheetContent
           side="left"
           className="w-72 flex flex-col"
-          onTouchStart={(e) => {
-            const t = e.touches[0];
-            (e.currentTarget as any)._swipeStartX = t.clientX;
-            (e.currentTarget as any)._swipeStartY = t.clientY;
-          }}
-          onTouchMove={(e) => {
-            const el = e.currentTarget as any;
-            if (el._swipeStartX == null) return;
-            const dx = e.touches[0].clientX - el._swipeStartX;
-            const dy = e.touches[0].clientY - el._swipeStartY;
-            if (dx < -60 && Math.abs(dx) > Math.abs(dy)) {
-              el._swipeStartX = null;
-              setMenuOpen(false);
-            }
-          }}
-          onTouchEnd={(e) => {
-            (e.currentTarget as any)._swipeStartX = null;
-          }}
+          {...menuSwipe}
         >
 
           <SheetHeader>
@@ -1948,25 +1934,7 @@ const Index = () => {
         <DialogPrimitive.Portal>
           <DialogPrimitive.Content
             onInteractOutside={(e) => e.preventDefault()}
-            onTouchStart={(e) => {
-              const t = e.touches[0];
-              (e.currentTarget as unknown as { _sx?: number; _sy?: number })._sx = t.clientX;
-              (e.currentTarget as unknown as { _sx?: number; _sy?: number })._sy = t.clientY;
-            }}
-            onTouchMove={(e) => {
-              const el = e.currentTarget as unknown as { _sx?: number; _sy?: number };
-              if (el._sx == null) return;
-              const t = e.touches[0];
-              const dx = t.clientX - (el._sx ?? 0);
-              const dy = t.clientY - (el._sy ?? 0);
-              if (dx > 60 && Math.abs(dx) > Math.abs(dy)) {
-                el._sx = undefined;
-                setProfileOpen(false);
-              }
-            }}
-            onTouchEnd={(e) => {
-              (e.currentTarget as unknown as { _sx?: number })._sx = undefined;
-            }}
+            {...profileSwipe}
             className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
           >
 
@@ -1993,25 +1961,7 @@ const Index = () => {
         <DialogPrimitive.Portal>
           <DialogPrimitive.Content
             onInteractOutside={(e) => e.preventDefault()}
-            onTouchStart={(e) => {
-              const t = e.touches[0];
-              (e.currentTarget as unknown as { _sx?: number; _sy?: number })._sx = t.clientX;
-              (e.currentTarget as unknown as { _sx?: number; _sy?: number })._sy = t.clientY;
-            }}
-            onTouchMove={(e) => {
-              const el = e.currentTarget as unknown as { _sx?: number; _sy?: number };
-              if (el._sx == null) return;
-              const t = e.touches[0];
-              const dx = t.clientX - (el._sx ?? 0);
-              const dy = t.clientY - (el._sy ?? 0);
-              if (dx > 60 && Math.abs(dx) > Math.abs(dy)) {
-                el._sx = undefined;
-                setHelpOpen(false);
-              }
-            }}
-            onTouchEnd={(e) => {
-              (e.currentTarget as unknown as { _sx?: number })._sx = undefined;
-            }}
+            {...helpSwipe}
             className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
           >
 
@@ -2052,25 +2002,7 @@ const Index = () => {
         <DialogPrimitive.Portal>
           <DialogPrimitive.Content
             onInteractOutside={(e) => e.preventDefault()}
-            onTouchStart={(e) => {
-              const t = e.touches[0];
-              (e.currentTarget as unknown as { _sx?: number; _sy?: number })._sx = t.clientX;
-              (e.currentTarget as unknown as { _sx?: number; _sy?: number })._sy = t.clientY;
-            }}
-            onTouchMove={(e) => {
-              const el = e.currentTarget as unknown as { _sx?: number; _sy?: number };
-              if (el._sx == null) return;
-              const t = e.touches[0];
-              const dx = t.clientX - (el._sx ?? 0);
-              const dy = t.clientY - (el._sy ?? 0);
-              if (dx > 60 && Math.abs(dx) > Math.abs(dy)) {
-                el._sx = undefined;
-                setSettingsOpen(false);
-              }
-            }}
-            onTouchEnd={(e) => {
-              (e.currentTarget as unknown as { _sx?: number })._sx = undefined;
-            }}
+            {...settingsSwipe}
             className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
           >
 
