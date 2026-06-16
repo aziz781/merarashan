@@ -44,6 +44,14 @@ export default function Notifications() {
   const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
   const [mobile, setMobile] = useState<string>("");
   const [unreadOnly, setUnreadOnly] = useState<boolean>(false);
+  const [showBackToTop, setShowBackToTop] = useState<boolean>(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowBackToTop(window.scrollY > 400);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     setMobile(localStorage.getItem(MOBILE_KEY) || "");
