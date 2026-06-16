@@ -375,7 +375,11 @@ const Index = () => {
       >
         <div className="space-y-3 pt-2">
           <NotificationToggle mobile={mobile} />
+          <p className="text-[10px] text-muted-foreground/60 text-center pt-4">
+            Build {__BUILD_VERSION__}
+          </p>
         </div>
+
       </SlideInPanel>
     </div>
   );
