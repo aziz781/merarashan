@@ -14,6 +14,8 @@ import type { Customer } from "@/types/domain";
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 import { PageFooter } from "@/components/PageFooter";
 
+declare const __BUILD_VERSION__: string;
+
 // Lazy-load the four primary tab views so each tab's code (and its
 // dependencies — virtualizer, stat components, etc.) ships in its own chunk.
 const RashansView = lazy(() => import("@/views/RashansView").then((m) => ({ default: m.RashansView })));
@@ -375,7 +377,11 @@ const Index = () => {
       >
         <div className="space-y-3 pt-2">
           <NotificationToggle mobile={mobile} />
+          <p className="text-[10px] text-muted-foreground/60 text-center pt-4">
+            Build {__BUILD_VERSION__}
+          </p>
         </div>
+
       </SlideInPanel>
     </div>
   );
