@@ -22,6 +22,7 @@ import {
   Menu,
   Bell,
   BellOff,
+  ArrowUp,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
