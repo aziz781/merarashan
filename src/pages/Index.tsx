@@ -1587,10 +1587,6 @@ const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const menuSwipe = useSwipeToClose({ direction: "left", onClose: () => setMenuOpen(false) });
-  const profileSwipe = useSwipeToClose({ direction: "right", onClose: () => setProfileOpen(false) });
-  const helpSwipe = useSwipeToClose({ direction: "right", onClose: () => setHelpOpen(false) });
-  const settingsSwipe = useSwipeToClose({ direction: "right", onClose: () => setSettingsOpen(false) });
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
   });
