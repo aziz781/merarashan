@@ -11,6 +11,8 @@ export default defineConfig(({ mode }) => ({
     __BUILD_VERSION__: JSON.stringify(
       new Date().toISOString().replace(/[-:]/g, "").slice(0, 13)
     ),
+    __APP_VERSION_CODE__: JSON.stringify(process.env.APP_VERSION_CODE ?? "dev"),
+    __APP_VERSION_NAME__: JSON.stringify(process.env.APP_VERSION_NAME ?? "0.0.0"),
   },
   server: {
     host: "::",
