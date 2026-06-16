@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RecordCard, CardGridTile } from "@/components/RecordCard";
 import { LoadingState } from "@/components/LoadingState";
 import { fetchResource, Resource } from "@/lib/api";
-import { extractItems } from "@/lib/itemUtils";
+import { extractItems, getItemKey } from "@/lib/itemUtils";
 
 const VIEW_KEY = "mr_cards_view";
 
@@ -90,11 +90,13 @@ function CardsList({ items, mobile }: { items: Record<string, unknown>[]; mobile
       ) : view === "grid" ? (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
           {filtered.map((item, i) => (
-            <CardGridTile key={i} item={item} index={i + 1} />
+            <CardGridTile key={getItemKey(item, i)} item={item} index={i + 1} />
           ))}
         </div>
       ) : (
-        filtered.map((item, i) => <RecordCard key={i} resource="cards" mobile={mobile} item={item} index={i + 1} />)
+        filtered.map((item, i) => (
+          <RecordCard key={getItemKey(item, i)} resource="cards" item={item} index={i + 1} />
+        ))
       )}
     </div>
   );
@@ -150,7 +152,7 @@ export function CardsView({ resource, mobile }: { resource: Resource; mobile: st
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
-        <RecordCard key={i} resource={resource} mobile={mobile} item={item as Record<string, unknown>} />
+        <RecordCard key={getItemKey(item as Record<string, unknown>, i)} resource={resource} item={item as Record<string, unknown>} />
       ))}
     </div>
   );
