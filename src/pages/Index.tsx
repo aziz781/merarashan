@@ -1181,6 +1181,14 @@ function RashansView({ mobile }: { mobile: string }) {
   const [error, setError] = useState<string | null>(null);
   const [statuses, setStatuses] = useState<string[]>([]);
   const [totalTransactionAmount, setTotalTransactionAmount] = useState<number>(0);
+  const [showBackToTop, setShowBackToTop] = useState<boolean>(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowBackToTop(window.scrollY > 400);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
