@@ -1,20 +1,26 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { RashansView } from "@/views/RashansView";
-import { StatementsView } from "@/views/StatementsView";
-import { CardsView } from "@/views/CardsView";
-import { ProfileView } from "@/views/ProfileView";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
 import { CreditCard, ArrowLeftRight, User, FileText } from "lucide-react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
+import { LoadingState } from "@/components/LoadingState";
 import { toast } from "@/hooks/use-toast";
-import { fetchResource, Resource } from "@/lib/api";
+import { useResource, type Resource } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
+import type { Customer } from "@/types/domain";
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 import { PageFooter } from "@/components/PageFooter";
+
+// Lazy-load the four primary tab views so each tab's code (and its
+// dependencies — virtualizer, stat components, etc.) ships in its own chunk.
+const RashansView = lazy(() => import("@/views/RashansView").then((m) => ({ default: m.RashansView })));
+const StatementsView = lazy(() => import("@/views/StatementsView").then((m) => ({ default: m.StatementsView })));
+const CardsView = lazy(() => import("@/views/CardsView").then((m) => ({ default: m.CardsView })));
+const ProfileView = lazy(() => import("@/views/ProfileView").then((m) => ({ default: m.ProfileView })));
+
 
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
@@ -103,7 +109,13 @@ const Index = () => {
   const handleProfilePanelChange = useCallback(closeWithGuard(setProfileOpen), [closeWithGuard]);
   const handleHelpPanelChange = useCallback(closeWithGuard(setHelpOpen), [closeWithGuard]);
   const handleSettingsPanelChange = useCallback(closeWithGuard(setSettingsOpen), [closeWithGuard]);
-  const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
+  const { data: customerRaw } = useResource<unknown>("customers", mobile ?? undefined);
+  const profileData: Customer | null = (() => {
+    if (!customerRaw) return null;
+    const items = extractItems(customerRaw);
+    const first = (items && items[0]) || customerRaw;
+    return first as Customer;
+  })();
 
   useEffect(() => {
     const extract = (email?: string | null, meta?: Record<string, unknown> | null) => {
@@ -128,7 +140,6 @@ const Index = () => {
         setMobile(m);
         localStorage.setItem(STORAGE_KEY, m);
       } else {
-        // fall back to legacy local storage value during migration
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) setMobile(saved);
       }
@@ -136,24 +147,6 @@ const Index = () => {
 
     return () => sub.subscription.unsubscribe();
   }, []);
-
-  useEffect(() => {
-    if (!mobile) return;
-    let cancelled = false;
-    fetchResource("customers", mobile)
-      .then((d) => {
-        if (cancelled) return;
-        const items = extractItems(d);
-        const first = (items && items[0]) || d;
-        setProfileData(first as Record<string, unknown>);
-      })
-      .catch(() => {
-        // silently fail; header falls back to mobile number
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [mobile]);
 
   const handleLogin = useCallback((m: string) => {
     localStorage.setItem(STORAGE_KEY, m);
