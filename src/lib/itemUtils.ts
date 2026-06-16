@@ -79,3 +79,23 @@ export function findValue(obj: unknown, key: string): number | null {
   }
   return null;
 }
+
+/**
+ * Returns a stable React key from common identifier fields,
+ * falling back to a deterministic composite or the supplied index.
+ */
+export function getItemKey(item: Record<string, unknown>, fallbackIndex: number): string {
+  const candidates = [
+    item.id,
+    item.cm_card_number,
+    item.statement_period,
+    item.payer_id,
+    item.txn_id,
+    item.transaction_id,
+  ];
+  for (const c of candidates) {
+    if (c != null && c !== "") return String(c);
+  }
+  const composite = String(item.month_year ?? "") + "|" + String(item.amount ?? "") + "|" + String(item.code_status ?? "");
+  return composite.length > 2 ? `${composite}#${fallbackIndex}` : `idx-${fallbackIndex}`;
+}

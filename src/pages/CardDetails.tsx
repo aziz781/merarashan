@@ -9,7 +9,7 @@ import { fetchResource } from "@/lib/api";
 import { TransactionCard } from "@/components/TransactionCard";
 import { PageFooter } from "@/components/PageFooter";
 import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
-import { extractItems, digitsOnly } from "@/lib/itemUtils";
+import { extractItems, digitsOnly, getItemKey } from "@/lib/itemUtils";
 
 const STORAGE_KEY = "mr_mobile";
 
@@ -363,7 +363,7 @@ const CardDetails = () => {
           ) : (
             <div className="space-y-3">
               {txns.map((t, i) => (
-                <TransactionCard key={i} item={t} variant="compact" />
+                <TransactionCard key={getItemKey(t, i)} item={t} variant="compact" />
               ))}
             </div>
           )}

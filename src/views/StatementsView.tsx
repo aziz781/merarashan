@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { StatementStats } from "@/components/StatementStats";
 import { RecordCard } from "@/components/RecordCard";
 import { fetchResource } from "@/lib/api";
-import { extractItems } from "@/lib/itemUtils";
+import { extractItems, getItemKey } from "@/lib/itemUtils";
 
 export function StatementsView({ mobile }: { mobile: string }) {
   const currentYear = new Date().getFullYear();
@@ -113,7 +113,7 @@ export function StatementsView({ mobile }: { mobile: string }) {
       ) : filteredItems.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-6">No statements found.</p>
       ) : (
-        filteredItems.map((item, i) => <RecordCard key={i} resource="statements" mobile={mobile} item={item} />)
+        filteredItems.map((item, i) => <RecordCard key={getItemKey(item, i)} resource="statements" item={item} />)
       )}
     </div>
   );
