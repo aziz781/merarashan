@@ -36,6 +36,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
 import { LoadingState } from "@/components/LoadingState";
+import { SideMenu } from "@/components/SideMenu";
+import { SlideInPanel } from "@/components/SlideInPanel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
