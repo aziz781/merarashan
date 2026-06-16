@@ -4,6 +4,7 @@ import { ArrowLeft, CreditCard, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingState } from "@/components/LoadingState";
 import { fetchResource } from "@/lib/api";
 import { TransactionCard } from "@/components/TransactionCard";
 import { PageFooter } from "@/components/PageFooter";
@@ -363,11 +364,7 @@ const CardDetails = () => {
       <section>
         <h2 className="text-sm font-semibold text-foreground mb-3">Monthly Rashan</h2>
           {loading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-20 w-full rounded-2xl" />
-              ))}
-            </div>
+            <LoadingState label="Loading rashans..." />
           ) : error ? (
             <Card className="p-5 border-destructive/30 bg-destructive/5">
               <p className="text-sm font-medium text-destructive mb-1">Failed to load</p>
