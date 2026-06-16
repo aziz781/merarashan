@@ -1,6 +1,8 @@
 import { ShieldCheck } from "lucide-react";
 
 declare const __BUILD_VERSION__: string;
+declare const __APP_VERSION_CODE__: string;
+declare const __APP_VERSION_NAME__: string;
 
 export function PageFooter() {
   return (
@@ -8,7 +10,9 @@ export function PageFooter() {
       <ShieldCheck className="w-5 h-5 text-muted-foreground mb-1" />
       <p className="text-sm font-semibold text-muted-foreground">MeraRashan.pk</p>
       <p className="text-xs text-muted-foreground">Safe and transparent service in every step of the way.</p>
-      <p className="text-[10px] text-muted-foreground/60 mt-2">Build {__BUILD_VERSION__}</p>
+      <p className="text-[10px] text-muted-foreground/60 mt-2">
+        v{__APP_VERSION_NAME__} ({__APP_VERSION_CODE__}) · Build {__BUILD_VERSION__}
+      </p>
     </div>
   );
 }
