@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { LayoutGrid, List } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RecordCard, CardGridTile } from "@/components/RecordCard";
+import { LoadingState } from "@/components/LoadingState";
 import { fetchResource, Resource } from "@/lib/api";
 import { extractItems } from "@/lib/itemUtils";
 
