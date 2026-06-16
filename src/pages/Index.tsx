@@ -1259,10 +1259,7 @@ function RashansView({ mobile }: { mobile: string }) {
       />
       <TransactionFilters statuses={statuses} value={filters} onChange={setFilters} />
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-12 gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Loading rashans...</p>
-        </div>
+        <LoadingState label="Loading rashans..." />
       ) : (
         <div className="space-y-3">
           {filtered.length === 0 ? (
