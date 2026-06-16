@@ -1,17 +1,12 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Loader2,
-  LogOut,
   CreditCard,
   ArrowLeftRight,
-  ArrowLeft,
   User,
   FileText,
-  Phone,
   FileDown,
   ExternalLink,
-  Info,
   CheckCircle2,
   X,
   MessageCircle,
@@ -19,22 +14,16 @@ import {
   AlertTriangle,
   LayoutGrid,
   List,
-  Menu,
-  Bell,
-  BellOff,
   ArrowUp,
+  Bot,
 } from "lucide-react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { HelpCircle, ChevronDown, Bot, LifeBuoy, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
 import { LoadingState } from "@/components/LoadingState";
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
