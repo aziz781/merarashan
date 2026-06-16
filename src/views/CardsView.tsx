@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { LayoutGrid, List } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RecordCard, CardGridTile } from "@/components/RecordCard";
+import { LoadingState } from "@/components/LoadingState";
 import { fetchResource, Resource } from "@/lib/api";
 import { extractItems } from "@/lib/itemUtils";
 
@@ -119,13 +119,7 @@ export function CardsView({ resource, mobile }: { resource: Resource; mobile: st
   }, [resource, mobile]);
 
   if (loading) {
-    return (
-      <div className="space-y-3">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-20 w-full rounded-2xl" />
-        ))}
-      </div>
-    );
+    return <LoadingState label="Loading cards..." />;
   }
 
   if (error) {
