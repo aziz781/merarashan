@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TransactionCard } from "@/components/TransactionCard";
 import { MessageBox } from "@/components/MessageBox";
 import { fetchResource, Resource } from "@/lib/api";
-import { extractItems, currentMonthParams, getItemDate, findValue, isTruthy } from "@/lib/itemUtils";
+import { extractItems, currentMonthParams, getItemDate, findValue, isTruthy, getItemKey } from "@/lib/itemUtils";
 import { useTransactions } from "@/hooks/use-transactions";
 
 function StatTile({
@@ -313,7 +313,7 @@ function RecentRashans({
       ) : (
         <div className="space-y-2">
           {latest.map((item, i) => (
-            <TransactionCard key={i} item={item} />
+            <TransactionCard key={getItemKey(item, i)} item={item} />
           ))}
         </div>
       )}
