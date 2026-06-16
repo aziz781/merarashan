@@ -7,7 +7,7 @@ import { TransactionStats } from "@/components/TransactionStats";
 import { TransactionCard } from "@/components/TransactionCard";
 import { TransactionFilters, type TxnFilters } from "@/components/TransactionFilters";
 import { fetchResource } from "@/lib/api";
-import { extractItems } from "@/lib/itemUtils";
+import { extractItems, getItemKey } from "@/lib/itemUtils";
 
 const TXN_VIRTUALIZE_THRESHOLD = 30;
 
@@ -56,7 +56,7 @@ function TransactionList({ items }: { items: Record<string, unknown>[] }) {
     return (
       <>
         {items.map((item, i) => (
-          <TransactionCard key={i} item={item} origin="rashans" />
+          <TransactionCard key={getItemKey(item, i)} item={item} origin="rashans" />
         ))}
       </>
     );
