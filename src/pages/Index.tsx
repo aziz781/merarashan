@@ -1770,6 +1770,24 @@ const Index = () => {
         <SheetContent
           side="left"
           className="w-72 flex flex-col"
+          onTouchStart={(e) => {
+            const t = e.touches[0];
+            (e.currentTarget as any)._swipeStartX = t.clientX;
+            (e.currentTarget as any)._swipeStartY = t.clientY;
+          }}
+          onTouchMove={(e) => {
+            const el = e.currentTarget as any;
+            if (el._swipeStartX == null) return;
+            const dx = e.touches[0].clientX - el._swipeStartX;
+            const dy = e.touches[0].clientY - el._swipeStartY;
+            if (dx < -60 && Math.abs(dx) > Math.abs(dy)) {
+              el._swipeStartX = null;
+              setMenuOpen(false);
+            }
+          }}
+          onTouchEnd={(e) => {
+            (e.currentTarget as any)._swipeStartX = null;
+          }}
         >
 
           <SheetHeader>
