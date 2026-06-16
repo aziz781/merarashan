@@ -1936,25 +1936,7 @@ const Index = () => {
         <DialogPrimitive.Portal>
           <DialogPrimitive.Content
             onInteractOutside={(e) => e.preventDefault()}
-            onTouchStart={(e) => {
-              const t = e.touches[0];
-              (e.currentTarget as unknown as { _sx?: number; _sy?: number })._sx = t.clientX;
-              (e.currentTarget as unknown as { _sx?: number; _sy?: number })._sy = t.clientY;
-            }}
-            onTouchMove={(e) => {
-              const el = e.currentTarget as unknown as { _sx?: number; _sy?: number };
-              if (el._sx == null) return;
-              const t = e.touches[0];
-              const dx = t.clientX - (el._sx ?? 0);
-              const dy = t.clientY - (el._sy ?? 0);
-              if (dx > 60 && Math.abs(dx) > Math.abs(dy)) {
-                el._sx = undefined;
-                setProfileOpen(false);
-              }
-            }}
-            onTouchEnd={(e) => {
-              (e.currentTarget as unknown as { _sx?: number })._sx = undefined;
-            }}
+            {...profileSwipe}
             className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
           >
 
