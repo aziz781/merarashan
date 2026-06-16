@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { RashansView } from "@/views/RashansView";
 import { useLongPress } from "@/hooks/use-long-press";
 import { useTransactions } from "@/hooks/use-transactions";
-import { extractItems, currentMonthParams, getItemDate, isItemThisMonth } from "@/lib/itemUtils";
+import { extractItems, currentMonthParams, getItemDate } from "@/lib/itemUtils";
 import {
   CreditCard,
   ArrowLeftRight,
