@@ -11,8 +11,8 @@ export default defineConfig(({ mode }) => ({
     __BUILD_VERSION__: JSON.stringify(
       new Date().toISOString().replace(/[-:]/g, "").slice(0, 13)
     ),
-    __APP_VERSION_NAME__: JSON.stringify(process.env.APP_VERSION_NAME || "dev"),
-    __APP_VERSION_CODE__: JSON.stringify(process.env.APP_VERSION_CODE || "0"),
+    __APP_VERSION_NAME__: JSON.stringify(process.env.APP_VERSION_NAME || "prod"),
+    __APP_VERSION_CODE__: JSON.stringify(process.env.APP_VERSION_CODE || "1.0.0"),
     __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
   },
   server: {
