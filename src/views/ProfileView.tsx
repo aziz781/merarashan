@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TransactionCard } from "@/components/TransactionCard";
 import { MessageBox } from "@/components/MessageBox";
 import { fetchResource, Resource } from "@/lib/api";
-import { extractItems, currentMonthParams, getItemDate } from "@/lib/itemUtils";
+import { extractItems, currentMonthParams, getItemDate, findValue, isTruthy } from "@/lib/itemUtils";
 import { useTransactions } from "@/hooks/use-transactions";
 
 function StatTile({
@@ -37,16 +37,6 @@ function StatTile({
   );
 }
 
-function findValue(obj: unknown, key: string): number | null {
-  if (!obj || typeof obj !== "object") return null;
-  const o = obj as Record<string, unknown>;
-  if (o[key] != null) return Number(o[key]) || 0;
-  for (const v of Object.values(o)) {
-    const r = findValue(v, key);
-    if (r != null) return r;
-  }
-  return null;
-}
 
 function CurrentMonthTile({
   mobile,
@@ -400,7 +390,7 @@ export function ProfileView({
     if (raw == null || raw === "") {
       display = "—";
     } else if (key === "is_active") {
-      const isActive = raw === true || raw === "true" || raw === 1 || raw === "1";
+      const isActive = isTruthy(raw);
       display = isActive ? (
         <span className="inline-flex items-center gap-1.5 font-medium">
           <CheckCircle2 className="w-4 h-4 text-green-500" />
