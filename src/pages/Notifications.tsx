@@ -186,7 +186,7 @@ export default function Notifications() {
         </button>
       )}
 
-      {visible.length > 8 && (
+      {true && (
         <button
           type="button"
           onClick={() => navigate("/")}
