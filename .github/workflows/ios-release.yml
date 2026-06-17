@@ -1,0 +1,182 @@
+name: iOS Release Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compute versionCode / versionName
+        id: version
+        run: |
+          BASE=10
+          VCODE=$((BASE + GITHUB_RUN_NUMBER))
+          VNAME="1.0.${GITHUB_RUN_NUMBER}"
+          echo "vcode=$VCODE" >> "$GITHUB_OUTPUT"
+          echo "vname=$VNAME" >> "$GITHUB_OUTPUT"
+          echo "Building versionCode=$VCODE versionName=$VNAME"
+
+      - name: Build web assets
+        env:
+          APP_VERSION_NAME: ${{ steps.version.outputs.vname }}
+          APP_VERSION_CODE: ${{ steps.version.outputs.vcode }}
+        run: npm run build
+
+      - name: Add iOS platform (if missing)
+        run: |
+          if [ ! -d "ios" ]; then
+            npx cap add ios
+          fi
+
+      - name: Capacitor sync
+        run: npx cap sync ios
+
+      - name: Install CocoaPods
+        working-directory: ios/App
+        run: |
+          if [ -f Podfile ]; then
+            pod install --repo-update
+          fi
+
+      - name: Bump marketing & build versions
+        working-directory: ios/App
+        env:
+          VNAME: ${{ steps.version.outputs.vname }}
+          VCODE: ${{ steps.version.outputs.vcode }}
+        run: |
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VNAME" App/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VCODE" App/Info.plist || true
+          xcrun agvtool new-marketing-version "$VNAME" || true
+          xcrun agvtool new-version -all "$VCODE" || true
+
+      - name: Detect signing secrets
+        id: signing
+        env:
+          P12_BASE64: ${{ secrets.IOS_P12_BASE64 }}
+          PROVISION_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          if [ -n "$P12_BASE64" ] && [ -n "$PROVISION_BASE64" ]; then
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::iOS signing secrets not set — building unsigned archive. Add IOS_P12_BASE64, IOS_P12_PASSWORD, IOS_PROVISIONING_PROFILE_BASE64, IOS_TEAM_ID, IOS_CODE_SIGN_IDENTITY to produce a signed .ipa."
+          fi
+
+      - name: Import signing certificate & provisioning profile
+        if: steps.signing.outputs.signed == 'true'
+        env:
+          P12_BASE64: ${{ secrets.IOS_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
+          PROVISION_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: temp-ci-keychain-pass
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          echo "$P12_BASE64" | base64 -d > $RUNNER_TEMP/cert.p12
+          security import $RUNNER_TEMP/cert.p12 -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | xargs)
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$PROVISION_BASE64" | base64 -d > ~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision
+
+      - name: Build signed archive & export IPA
+        if: steps.signing.outputs.signed == 'true'
+        working-directory: ios/App
+        env:
+          TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+          CODE_SIGN_IDENTITY: ${{ secrets.IOS_CODE_SIGN_IDENTITY }}
+          PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
+          EXPORT_METHOD: ${{ secrets.IOS_EXPORT_METHOD }}
+        run: |
+          WORKSPACE="App.xcworkspace"
+          [ -d "$WORKSPACE" ] || WORKSPACE="App.xcodeproj"
+          FLAG="-workspace"; [ "$WORKSPACE" = "App.xcodeproj" ] && FLAG="-project"
+          METHOD="${EXPORT_METHOD:-app-store}"
+
+          xcodebuild $FLAG "$WORKSPACE" \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath $RUNNER_TEMP/App.xcarchive \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="$CODE_SIGN_IDENTITY" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_NAME" \
+            archive
+
+          cat > $RUNNER_TEMP/ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>${METHOD}</string>
+            <key>teamID</key><string>${TEAM_ID}</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>stripSwiftSymbols</key><true/>
+            <key>uploadBitcode</key><false/>
+            <key>uploadSymbols</key><true/>
+          </dict>
+          </plist>
+          EOF
+
+          xcodebuild -exportArchive \
+            -archivePath $RUNNER_TEMP/App.xcarchive \
+            -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
+            -exportPath $RUNNER_TEMP/export
+
+      - name: Build unsigned archive (no signing secrets)
+        if: steps.signing.outputs.signed != 'true'
+        working-directory: ios/App
+        run: |
+          WORKSPACE="App.xcworkspace"
+          [ -d "$WORKSPACE" ] || WORKSPACE="App.xcodeproj"
+          FLAG="-workspace"; [ "$WORKSPACE" = "App.xcodeproj" ] && FLAG="-project"
+
+          xcodebuild $FLAG "$WORKSPACE" \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath $RUNNER_TEMP/App.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            archive
+
+      - name: Upload IPA artifact
+        if: steps.signing.outputs.signed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-ipa
+          path: ${{ runner.temp }}/export/*.ipa
+          if-no-files-found: error
+
+      - name: Upload xcarchive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-xcarchive
+          path: ${{ runner.temp }}/App.xcarchive
+          if-no-files-found: error
