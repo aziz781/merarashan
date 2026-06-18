@@ -133,6 +133,7 @@ jobs:
             PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_NAME" \
             archive
 
+          BUNDLE_ID="${IOS_BUNDLE_ID:-pk.merarashan.app}"
           cat > $RUNNER_TEMP/ExportOptions.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -144,6 +145,11 @@ jobs:
             <key>stripSwiftSymbols</key><true/>
             <key>uploadBitcode</key><false/>
             <key>uploadSymbols</key><true/>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>${BUNDLE_ID}</key>
+              <string>${PROVISIONING_PROFILE_NAME}</string>
+            </dict>
           </dict>
           </plist>
           EOF
