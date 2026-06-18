@@ -115,6 +115,7 @@ jobs:
           CODE_SIGN_IDENTITY: ${{ secrets.IOS_CODE_SIGN_IDENTITY }}
           PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
           EXPORT_METHOD: ${{ secrets.IOS_EXPORT_METHOD }}
+          IOS_BUNDLE_ID: ${{ secrets.IOS_BUNDLE_ID }}
         run: |
           WORKSPACE="App.xcworkspace"
           [ -d "$WORKSPACE" ] || WORKSPACE="App.xcodeproj"
