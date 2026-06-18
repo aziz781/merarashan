@@ -1,0 +1,7 @@
+• Initial public release of MeraRashan
+• Browse ration cards and view card details
+• View transaction history and statements
+• Download statement PDFs
+• Push notifications for new transactions
+• Light/dark theme support
+• Performance and stability improvements
