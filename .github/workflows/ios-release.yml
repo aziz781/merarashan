@@ -107,6 +107,120 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "$PROVISION_BASE64" | base64 -d > ~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision
 
+      - name: Validate provisioning profile
+        if: steps.signing.outputs.signed == 'true'
+        env:
+          PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
+          EXPORT_METHOD: ${{ secrets.IOS_EXPORT_METHOD }}
+          IOS_BUNDLE_ID: ${{ secrets.IOS_BUNDLE_ID }}
+          TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+        run: |
+          set -e
+          PROFILE=~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision
+          if [ ! -f "$PROFILE" ]; then
+            echo "::error::Provisioning profile not found at $PROFILE"
+            exit 1
+          fi
+
+          # Decode the CMS-wrapped .mobileprovision into plist XML
+          PLIST=$RUNNER_TEMP/profile.plist
+          security cms -D -i "$PROFILE" > "$PLIST"
+
+          BUNDLE_ID="${IOS_BUNDLE_ID:-pk.merarashan.app}"
+          METHOD="${EXPORT_METHOD:-app-store}"
+
+          PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print :Name" "$PLIST")
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" "$PLIST")
+          PROFILE_TEAM=$(/usr/libexec/PlistBuddy -c "Print :TeamIdentifier:0" "$PLIST")
+          PROFILE_APP_ID=$(/usr/libexec/PlistBuddy -c "Print :Entitlements:application-identifier" "$PLIST")
+          # Strip leading "<TEAMID>." prefix
+          PROFILE_BUNDLE_ID="${PROFILE_APP_ID#*.}"
+
+          # Detect distribution type
+          HAS_DEVICES=$(/usr/libexec/PlistBuddy -c "Print :ProvisionedDevices" "$PLIST" 2>/dev/null && echo yes || echo no)
+          HAS_GET_TASK_ALLOW=$(/usr/libexec/PlistBuddy -c "Print :Entitlements:get-task-allow" "$PLIST" 2>/dev/null || echo false)
+
+          echo "Profile name:       $PROFILE_NAME"
+          echo "Profile UUID:       $PROFILE_UUID"
+          echo "Profile team:       $PROFILE_TEAM"
+          echo "Profile bundle ID:  $PROFILE_BUNDLE_ID"
+          echo "Expected bundle ID: $BUNDLE_ID"
+          echo "Expected team:      $TEAM_ID"
+          echo "Expected method:    $METHOD"
+          echo "Expected name:      $PROVISIONING_PROFILE_NAME"
+
+          FAIL=0
+
+          if [ "$PROFILE_NAME" != "$PROVISIONING_PROFILE_NAME" ]; then
+            echo "::error::Profile name mismatch. Profile is '$PROFILE_NAME' but IOS_PROVISIONING_PROFILE_NAME secret is '$PROVISIONING_PROFILE_NAME'. Xcode looks profiles up by name and will fail to find a match."
+            FAIL=1
+          fi
+
+          # Wildcard profiles end in *
+          case "$PROFILE_BUNDLE_ID" in
+            "$BUNDLE_ID") : ;;
+            *\*)
+              PREFIX="${PROFILE_BUNDLE_ID%\*}"
+              case "$BUNDLE_ID" in
+                "$PREFIX"*) : ;;
+                *)
+                  echo "::error::Bundle ID '$BUNDLE_ID' does not match wildcard profile '$PROFILE_BUNDLE_ID'."
+                  FAIL=1 ;;
+              esac ;;
+            *)
+              echo "::error::Profile is for bundle ID '$PROFILE_BUNDLE_ID' but app bundle ID is '$BUNDLE_ID'."
+              FAIL=1 ;;
+          esac
+
+          if [ -n "$TEAM_ID" ] && [ "$PROFILE_TEAM" != "$TEAM_ID" ]; then
+            echo "::error::Profile team '$PROFILE_TEAM' does not match IOS_TEAM_ID '$TEAM_ID'."
+            FAIL=1
+          fi
+
+          # Method vs profile type:
+          #   app-store / app-store-connect: distribution, no devices, get-task-allow=false
+          #   ad-hoc: distribution, has ProvisionedDevices
+          #   development: get-task-allow=true, has ProvisionedDevices
+          #   enterprise: ProvisionsAllDevices=true
+          HAS_ALL_DEVICES=$(/usr/libexec/PlistBuddy -c "Print :ProvisionsAllDevices" "$PLIST" 2>/dev/null || echo false)
+          case "$METHOD" in
+            app-store|app-store-connect)
+              if [ "$HAS_DEVICES" = "yes" ] || [ "$HAS_ALL_DEVICES" = "true" ] || [ "$HAS_GET_TASK_ALLOW" = "true" ]; then
+                echo "::error::Export method is '$METHOD' but provisioning profile is not an App Store distribution profile (has devices or get-task-allow). Create an 'App Store' distribution profile in Apple Developer."
+                FAIL=1
+              fi ;;
+            ad-hoc)
+              if [ "$HAS_DEVICES" != "yes" ]; then
+                echo "::error::Export method is 'ad-hoc' but profile has no ProvisionedDevices."
+                FAIL=1
+              fi ;;
+            development)
+              if [ "$HAS_GET_TASK_ALLOW" != "true" ]; then
+                echo "::error::Export method is 'development' but profile is not a development profile (get-task-allow != true)."
+                FAIL=1
+              fi ;;
+            enterprise)
+              if [ "$HAS_ALL_DEVICES" != "true" ]; then
+                echo "::error::Export method is 'enterprise' but profile is not an in-house/enterprise profile."
+                FAIL=1
+              fi ;;
+            *)
+              echo "::warning::Unknown export method '$METHOD' — skipping method/profile-type check." ;;
+          esac
+
+          # Verify signing identity in keychain matches the profile's team
+          IDENTITIES=$(security find-identity -v -p codesigning | grep -c "$PROFILE_TEAM" || true)
+          if [ "$IDENTITIES" -eq 0 ]; then
+            echo "::error::No code-signing identity in keychain matches profile team '$PROFILE_TEAM'. Check IOS_P12_BASE64 contains the matching distribution certificate."
+            FAIL=1
+          fi
+
+          if [ "$FAIL" -ne 0 ]; then
+            echo "::error::Provisioning profile validation failed — fix the secrets above before re-running."
+            exit 1
+          fi
+          echo "✅ Provisioning profile validated."
+
       - name: Build signed archive & export IPA
         if: steps.signing.outputs.signed == 'true'
         working-directory: ios/App
@@ -116,6 +230,7 @@ jobs:
           PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
           EXPORT_METHOD: ${{ secrets.IOS_EXPORT_METHOD }}
           IOS_BUNDLE_ID: ${{ secrets.IOS_BUNDLE_ID }}
+
         run: |
           WORKSPACE="App.xcworkspace"
           [ -d "$WORKSPACE" ] || WORKSPACE="App.xcodeproj"
