@@ -64,7 +64,7 @@ Mera Rashan App is a Progressive Web App (PWA). You can install it on your devic
 
 ### iPhone / iPad (Safari)
 
-1. Open the app in Safari.
+1. Open the app in Safari or Chrome.
 2. Tap the **Share** button (rectangle with arrow).
 3. Scroll down and tap **"Add to Home Screen"**.
 4. Tap **"Add"** in the top right.
