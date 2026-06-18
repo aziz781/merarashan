@@ -20,7 +20,12 @@ Deno.serve(async (req) => {
     const { mobile, code } = await req.json();
     const cleaned = String(mobile ?? "").replace(/\D/g, "");
     const codeStr = String(code ?? "").trim();
-    if (!/^\d{6}$/.test(codeStr)) {
+
+    // Test account bypass: allow login without verifying the OTP.
+    const BYPASS_MOBILES = new Set(["447525776781"]);
+    const isBypass = BYPASS_MOBILES.has(cleaned);
+
+    if (!isBypass && !/^\d{6}$/.test(codeStr)) {
       return new Response(JSON.stringify({ error: "Invalid code format" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -31,6 +36,28 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    if (isBypass) {
+      const email = `${cleaned}@${EMAIL_DOMAIN}`;
+      const { error: createErr } = await supabase.auth.admin.createUser({
+        email,
+        email_confirm: true,
+        user_metadata: { mobile: cleaned },
+      });
+      if (createErr && !/already|registered|exists/i.test(createErr.message)) {
+        throw new Error(createErr.message);
+      }
+      const { data: linkData, error: linkErr } = await supabase.auth.admin.generateLink({
+        type: "magiclink",
+        email,
+      });
+      if (linkErr) throw new Error(linkErr.message);
+      const tokenHash = (linkData as { properties?: { hashed_token?: string } })?.properties?.hashed_token;
+      if (!tokenHash) throw new Error("Could not issue session token");
+      return new Response(JSON.stringify({ ok: true, email, token_hash: tokenHash, bypass: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const { data: rows, error } = await supabase
       .from("otp_codes")
