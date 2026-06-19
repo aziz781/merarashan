@@ -249,6 +249,32 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
           <span className="truncate">{status.text}</span>
         </div>
       )}
+
+      <AlertDialog open={rationaleOpen} onOpenChange={setRationaleOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Allow notifications?</AlertDialogTitle>
+            <AlertDialogDescription>
+              MeraRashan will send you alerts when your monthly rashan is issued,
+              when a new statement is available, and for important account updates.
+              You can change this any time in iOS Settings.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy}>Not now</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={busy}
+              onClick={async (e) => {
+                e.preventDefault();
+                setRationaleOpen(false);
+                await doEnableNative();
+              }}
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }
