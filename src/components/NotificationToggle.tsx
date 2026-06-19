@@ -10,7 +10,23 @@ import {
   pushSupported,
   syncPushSubscription,
 } from "@/lib/push";
-import { disableNativePush, enableNativePush, isNativePlatform } from "@/lib/nativePush";
+import {
+  disableNativePush,
+  enableNativePush,
+  isNativePlatform,
+  isIOSNative,
+  getIOSNotificationPermission,
+} from "@/lib/nativePush";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type SyncStatus =
   | "checking"
