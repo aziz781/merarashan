@@ -15,7 +15,9 @@ import {
   enableNativePush,
   isNativePlatform,
   isIOSNative,
+  isAndroidNative,
   getIOSNotificationPermission,
+  getAndroidNotificationPermission,
 } from "@/lib/nativePush";
 import {
   AlertDialog,
