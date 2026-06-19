@@ -122,7 +122,9 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
       const msg = e instanceof Error ? e.message : "Something went wrong";
       if (/denied/i.test(msg)) {
         toast.error("Notifications are blocked", {
-          description: "Open iOS Settings → MeraRashan → Notifications to allow alerts.",
+          description: isIOSNative()
+            ? "Open iOS Settings → MeraRashan → Notifications to allow alerts."
+            : "Open Android Settings → Apps → MeraRashan → Notifications to allow alerts.",
         });
       } else {
         toast.error(msg);
