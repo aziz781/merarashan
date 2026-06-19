@@ -1,5 +1,8 @@
 import UIKit
 import Capacitor
+#if canImport(FirebaseCore)
+import FirebaseCore
+#endif
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -7,6 +10,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Configure Firebase only if GoogleService-Info.plist is bundled.
+        // Without this guard, missing config causes an immediate launch crash.
+        #if canImport(FirebaseCore)
+        if let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
+           let options = FirebaseOptions(contentsOfFile: path) {
+            if FirebaseApp.app() == nil {
+                FirebaseApp.configure(options: options)
+            }
+        } else {
+            NSLog("⚠️ GoogleService-Info.plist not found — Firebase Messaging disabled.")
+        }
+        #endif
         return true
     }
 
