@@ -222,16 +222,30 @@ export async function initNativePushListeners(opts: {
     } catch { /* ignore */ }
   }
 
-  await PushNotifications.addListener("pushNotificationReceived", (notification) => {
-    const data = (notification.data || {}) as Record<string, unknown>;
-    const dBody = typeof data.body === "string" ? data.body : undefined;
-    const dTitle = typeof data.title === "string" ? data.title : undefined;
-    opts.onForeground?.({
-      title: notification.title || dTitle,
-      body: notification.body || dBody,
-      data,
+  if (isIOS()) {
+    await FirebaseMessaging.addListener("notificationReceived", (event) => {
+      const n = (event as { notification?: { title?: string; body?: string; data?: Record<string, unknown> } }).notification || {};
+      const data = (n.data || {}) as Record<string, unknown>;
+      const dBody = typeof data.body === "string" ? data.body : undefined;
+      const dTitle = typeof data.title === "string" ? data.title : undefined;
+      opts.onForeground?.({
+        title: n.title || dTitle,
+        body: n.body || dBody,
+        data,
+      });
     });
-  });
+  } else {
+    await PushNotifications.addListener("pushNotificationReceived", (notification) => {
+      const data = (notification.data || {}) as Record<string, unknown>;
+      const dBody = typeof data.body === "string" ? data.body : undefined;
+      const dTitle = typeof data.title === "string" ? data.title : undefined;
+      opts.onForeground?.({
+        title: notification.title || dTitle,
+        body: notification.body || dBody,
+        data,
+      });
+    });
+  }
 
   // Wire the early-init tap queue to the caller's handler.
   if (opts.onAction) {
