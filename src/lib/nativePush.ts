@@ -62,6 +62,30 @@ export async function getIOSNotificationPermission(): Promise<PermStatus | "unkn
 let registered = false;
 let currentToken: string | null = null;
 
+export function isAndroidNative(): boolean {
+  try {
+    return isNativePlatform() && Capacitor.getPlatform() === "android";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Returns the current OS notification permission on Android. UI uses this to
+ * decide between showing a rationale before prompting (POST_NOTIFICATIONS on
+ * Android 13+), registering immediately when already granted, or directing
+ * the user to system Settings when denied.
+ */
+export async function getAndroidNotificationPermission(): Promise<PermStatus | "unknown"> {
+  if (!isAndroidNative()) return "unknown";
+  try {
+    const { receive } = await PushNotifications.checkPermissions();
+    return receive as PermStatus;
+  } catch {
+    return "unknown";
+  }
+}
+
 /**
  * Request permission and register with FCM/APNs.
  * - Android: uses @capacitor/push-notifications (returns FCM token directly).

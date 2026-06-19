@@ -15,7 +15,9 @@ import {
   enableNativePush,
   isNativePlatform,
   isIOSNative,
+  isAndroidNative,
   getIOSNotificationPermission,
+  getAndroidNotificationPermission,
 } from "@/lib/nativePush";
 import {
   AlertDialog,
@@ -120,7 +122,9 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
       const msg = e instanceof Error ? e.message : "Something went wrong";
       if (/denied/i.test(msg)) {
         toast.error("Notifications are blocked", {
-          description: "Open iOS Settings → MeraRashan → Notifications to allow alerts.",
+          description: isIOSNative()
+            ? "Open iOS Settings → MeraRashan → Notifications to allow alerts."
+            : "Open Android Settings → Apps → MeraRashan → Notifications to allow alerts.",
         });
       } else {
         toast.error(msg);
@@ -147,12 +151,24 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
         }
         return;
       }
-      // iOS: show rationale first the very first time (status === prompt).
+      // iOS / Android: show rationale the first time (status === prompt).
       if (isIOSNative()) {
         const status = await getIOSNotificationPermission();
         if (status === "denied") {
           toast.error("Notifications are blocked", {
             description: "Open iOS Settings → MeraRashan → Notifications to allow alerts.",
+          });
+          return;
+        }
+        if (status === "prompt" || status === "prompt-with-rationale") {
+          setRationaleOpen(true);
+          return;
+        }
+      } else if (isAndroidNative()) {
+        const status = await getAndroidNotificationPermission();
+        if (status === "denied") {
+          toast.error("Notifications are blocked", {
+            description: "Open Android Settings → Apps → MeraRashan → Notifications to allow alerts.",
           });
           return;
         }
@@ -257,7 +273,7 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
             <AlertDialogDescription>
               MeraRashan will send you alerts when your monthly rashan is issued,
               when a new statement is available, and for important account updates.
-              You can change this any time in iOS Settings.
+              You can change this any time in your device Settings.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
