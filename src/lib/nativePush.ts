@@ -265,15 +265,17 @@ export async function initNativePushListeners(opts: {
   // so background pushes show up even before the user taps them.
   const syncDelivered = async () => {
     try {
-      const { notifications } = await PushNotifications.getDeliveredNotifications();
-      for (const n of notifications || []) {
-        const data = (n.data || {}) as Record<string, unknown>;
+      const list = isIOS()
+        ? (await FirebaseMessaging.getDeliveredNotifications()).notifications
+        : (await PushNotifications.getDeliveredNotifications()).notifications;
+      for (const n of list || []) {
+        const data = ((n as { data?: Record<string, unknown> }).data || {}) as Record<string, unknown>;
         const dTitle = typeof data.title === "string" ? data.title : undefined;
         const dBody = typeof data.body === "string" ? data.body : undefined;
         opts.onDelivered?.({
           id: typeof (n as { id?: string }).id === "string" ? (n as { id?: string }).id : undefined,
-          title: n.title || dTitle,
-          body: n.body || dBody,
+          title: (n as { title?: string }).title || dTitle,
+          body: (n as { body?: string }).body || dBody,
           data,
         });
       }
