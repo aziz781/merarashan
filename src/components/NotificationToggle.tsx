@@ -149,12 +149,24 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
         }
         return;
       }
-      // iOS: show rationale first the very first time (status === prompt).
+      // iOS / Android: show rationale the first time (status === prompt).
       if (isIOSNative()) {
         const status = await getIOSNotificationPermission();
         if (status === "denied") {
           toast.error("Notifications are blocked", {
             description: "Open iOS Settings → MeraRashan → Notifications to allow alerts.",
+          });
+          return;
+        }
+        if (status === "prompt" || status === "prompt-with-rationale") {
+          setRationaleOpen(true);
+          return;
+        }
+      } else if (isAndroidNative()) {
+        const status = await getAndroidNotificationPermission();
+        if (status === "denied") {
+          toast.error("Notifications are blocked", {
+            description: "Open Android Settings → Apps → MeraRashan → Notifications to allow alerts.",
           });
           return;
         }
