@@ -44,6 +44,7 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
   const [enabled, setEnabled] = useState(false);
   const [busy, setBusy] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("checking");
+  const [rationaleOpen, setRationaleOpen] = useState(false);
 
   useEffect(() => {
     // --- Native (Capacitor/FCM) branch ---
