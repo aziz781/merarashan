@@ -1,8 +1,28 @@
-import { Capacitor } from "@capacitor/core";
+import { Capacitor, registerPlugin, type PluginListenerHandle } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { PushNotifications } from "@capacitor/push-notifications";
-import { FirebaseMessaging } from "@capacitor-firebase/messaging";
 import { supabase } from "@/integrations/supabase/client";
+
+// Use registerPlugin directly to avoid pulling the @capacitor-firebase/messaging
+// web entry (which depends on `firebase`) into the web bundle. On native iOS the
+// real plugin is provided by the installed Pod; on web these calls would throw,
+// but we only ever invoke them after `isIOS()` returns true.
+type PermStatus = "prompt" | "prompt-with-rationale" | "granted" | "denied";
+interface FirebaseMessagingPlugin {
+  checkPermissions(): Promise<{ receive: PermStatus }>;
+  requestPermissions(): Promise<{ receive: PermStatus }>;
+  getToken(): Promise<{ token: string }>;
+  deleteToken(): Promise<void>;
+  getDeliveredNotifications(): Promise<{
+    notifications: Array<{ id?: string; title?: string; body?: string; data?: Record<string, unknown> }>;
+  }>;
+  removeAllListeners(): Promise<void>;
+  addListener(
+    event: "notificationReceived" | "notificationActionPerformed",
+    cb: (event: { notification: { title?: string; body?: string; data?: Record<string, unknown> } }) => void,
+  ): Promise<PluginListenerHandle>;
+}
+const FirebaseMessaging = registerPlugin<FirebaseMessagingPlugin>("FirebaseMessaging");
 
 export function isNativePlatform(): boolean {
   try {
