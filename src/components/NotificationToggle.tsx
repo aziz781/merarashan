@@ -108,41 +108,82 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
 
   if (!supported) return null;
 
-  const onToggle = async () => {
+  const doEnableNative = async () => {
     setBusy(true);
     try {
-      if (native) {
-        if (enabled) {
+      await enableNativePush(mobile);
+      localStorage.setItem(NATIVE_ENABLED_KEY, "1");
+      setEnabled(true);
+      setSyncStatus("matched");
+      toast.success("Notifications enabled");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Something went wrong";
+      if (/denied/i.test(msg)) {
+        toast.error("Notifications are blocked", {
+          description: "Open iOS Settings → MeraRashan → Notifications to allow alerts.",
+        });
+      } else {
+        toast.error(msg);
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onToggle = async () => {
+    if (native) {
+      if (enabled) {
+        setBusy(true);
+        try {
           await disableNativePush();
           localStorage.removeItem(NATIVE_ENABLED_KEY);
           setEnabled(false);
           setSyncStatus("not-enabled");
           toast.success("Notifications disabled");
-        } else {
-          await enableNativePush(mobile);
-          localStorage.setItem(NATIVE_ENABLED_KEY, "1");
-          setEnabled(true);
-          setSyncStatus("matched");
-          toast.success("Notifications enabled");
+        } catch (e: unknown) {
+          toast.error(e instanceof Error ? e.message : "Something went wrong");
+        } finally {
+          setBusy(false);
         }
+        return;
+      }
+      // iOS: show rationale first the very first time (status === prompt).
+      if (isIOSNative()) {
+        const status = await getIOSNotificationPermission();
+        if (status === "denied") {
+          toast.error("Notifications are blocked", {
+            description: "Open iOS Settings → MeraRashan → Notifications to allow alerts.",
+          });
+          return;
+        }
+        if (status === "prompt" || status === "prompt-with-rationale") {
+          setRationaleOpen(true);
+          return;
+        }
+      }
+      await doEnableNative();
+      return;
+    }
+
+    setBusy(true);
+    try {
+      if (enabled) {
+        await disablePush();
+        setEnabled(false);
+        setSyncStatus("not-enabled");
+        toast.success("Notifications disabled");
       } else {
-        if (enabled) {
-          await disablePush();
-          setEnabled(false);
-          setSyncStatus("not-enabled");
-          toast.success("Notifications disabled");
-        } else {
-          await enablePush(mobile);
-          setEnabled(true);
-          setSyncStatus("matched");
-          toast.success("Notifications enabled");
-        }
+        await enablePush(mobile);
+        setEnabled(true);
+        setSyncStatus("matched");
+        toast.success("Notifications enabled");
       }
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Something went wrong");
     } finally {
       setBusy(false);
     }
+  };
   };
 
   const statusMeta: Record<
