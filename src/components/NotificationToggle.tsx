@@ -184,7 +184,6 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
       setBusy(false);
     }
   };
-  };
 
   const statusMeta: Record<
     SyncStatus,
