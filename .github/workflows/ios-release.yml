@@ -221,12 +221,45 @@ jobs:
           fi
           echo "✅ Provisioning profile validated."
 
-      - name: Build signed archive & export IPA
+      - name: Apply signing settings to App target only
         if: steps.signing.outputs.signed == 'true'
         working-directory: ios/App
         env:
           TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
           CODE_SIGN_IDENTITY: ${{ secrets.IOS_CODE_SIGN_IDENTITY }}
+          PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
+        run: |
+          # Firebase SPM products (Firebase_FirebaseCore etc.) are resource
+          # bundles / library targets that cannot accept a provisioning
+          # profile. Passing PROVISIONING_PROFILE_SPECIFIER on the xcodebuild
+          # command line applies it to ALL targets and triggers:
+          #   "Firebase_FirebaseCore does not support provisioning profiles"
+          # Instead, bake the signing config into the App target's Release
+          # configuration only, then archive without command-line overrides.
+          sudo gem install xcodeproj --no-document
+          ruby <<'RUBY'
+          require 'xcodeproj'
+          project = Xcodeproj::Project.open('App.xcodeproj')
+          target = project.targets.find { |t| t.name == 'App' } or abort "App target not found"
+          target.build_configurations.each do |config|
+            next unless config.name == 'Release'
+            bs = config.build_settings
+            bs['CODE_SIGN_STYLE'] = 'Manual'
+            bs['DEVELOPMENT_TEAM'] = ENV['TEAM_ID']
+            bs['PROVISIONING_PROFILE_SPECIFIER'] = ENV['PROVISIONING_PROFILE_NAME']
+            bs['CODE_SIGN_IDENTITY'] = ENV['CODE_SIGN_IDENTITY']
+            bs['CODE_SIGN_IDENTITY[sdk=iphoneos*]'] = ENV['CODE_SIGN_IDENTITY']
+            bs['PROVISIONING_PROFILE'] = ''
+          end
+          project.save
+          puts "✅ Wrote signing settings into App target (Release) only."
+          RUBY
+
+      - name: Build signed archive & export IPA
+        if: steps.signing.outputs.signed == 'true'
+        working-directory: ios/App
+        env:
+          TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
           PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
           EXPORT_METHOD: ${{ secrets.IOS_EXPORT_METHOD }}
           IOS_BUNDLE_ID: ${{ secrets.IOS_BUNDLE_ID }}
@@ -237,16 +270,17 @@ jobs:
           FLAG="-workspace"; [ "$WORKSPACE" = "App.xcodeproj" ] && FLAG="-project"
           METHOD="${EXPORT_METHOD:-app-store}"
 
+          # NOTE: do NOT pass CODE_SIGN_IDENTITY / PROVISIONING_PROFILE_SPECIFIER
+          # here — those settings are now baked into the App target only.
+          # Passing them on the command line would re-apply them to Firebase
+          # SPM targets and break the archive.
           xcodebuild $FLAG "$WORKSPACE" \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             -archivePath $RUNNER_TEMP/App.xcarchive \
-            DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="$CODE_SIGN_IDENTITY" \
-            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_NAME" \
+            -skipPackagePluginValidation \
             archive
 
           BUNDLE_ID="${IOS_BUNDLE_ID:-pk.merarashan.app}"
@@ -274,6 +308,7 @@ jobs:
             -archivePath $RUNNER_TEMP/App.xcarchive \
             -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
             -exportPath $RUNNER_TEMP/export
+
 
       - name: Build unsigned archive (no signing secrets)
         if: steps.signing.outputs.signed != 'true'
