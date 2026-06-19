@@ -40,6 +40,25 @@ function isIOS(): boolean {
   }
 }
 
+export function isIOSNative(): boolean {
+  return isNativePlatform() && isIOS();
+}
+
+/**
+ * Returns the current OS notification permission on iOS. UI uses this to
+ * decide between (a) showing a rationale before prompting, (b) registering
+ * straight away when already granted, or (c) directing the user to Settings.
+ */
+export async function getIOSNotificationPermission(): Promise<PermStatus | "unknown"> {
+  if (!isIOSNative()) return "unknown";
+  try {
+    const { receive } = await FirebaseMessaging.checkPermissions();
+    return receive;
+  } catch {
+    return "unknown";
+  }
+}
+
 let registered = false;
 let currentToken: string | null = null;
 
