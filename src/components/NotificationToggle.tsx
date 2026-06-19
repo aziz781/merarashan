@@ -10,7 +10,23 @@ import {
   pushSupported,
   syncPushSubscription,
 } from "@/lib/push";
-import { disableNativePush, enableNativePush, isNativePlatform } from "@/lib/nativePush";
+import {
+  disableNativePush,
+  enableNativePush,
+  isNativePlatform,
+  isIOSNative,
+  getIOSNotificationPermission,
+} from "@/lib/nativePush";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type SyncStatus =
   | "checking"
@@ -28,6 +44,7 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
   const [enabled, setEnabled] = useState(false);
   const [busy, setBusy] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("checking");
+  const [rationaleOpen, setRationaleOpen] = useState(false);
 
   useEffect(() => {
     // --- Native (Capacitor/FCM) branch ---
@@ -91,35 +108,75 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
 
   if (!supported) return null;
 
-  const onToggle = async () => {
+  const doEnableNative = async () => {
     setBusy(true);
     try {
-      if (native) {
-        if (enabled) {
+      await enableNativePush(mobile);
+      localStorage.setItem(NATIVE_ENABLED_KEY, "1");
+      setEnabled(true);
+      setSyncStatus("matched");
+      toast.success("Notifications enabled");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Something went wrong";
+      if (/denied/i.test(msg)) {
+        toast.error("Notifications are blocked", {
+          description: "Open iOS Settings → MeraRashan → Notifications to allow alerts.",
+        });
+      } else {
+        toast.error(msg);
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onToggle = async () => {
+    if (native) {
+      if (enabled) {
+        setBusy(true);
+        try {
           await disableNativePush();
           localStorage.removeItem(NATIVE_ENABLED_KEY);
           setEnabled(false);
           setSyncStatus("not-enabled");
           toast.success("Notifications disabled");
-        } else {
-          await enableNativePush(mobile);
-          localStorage.setItem(NATIVE_ENABLED_KEY, "1");
-          setEnabled(true);
-          setSyncStatus("matched");
-          toast.success("Notifications enabled");
+        } catch (e: unknown) {
+          toast.error(e instanceof Error ? e.message : "Something went wrong");
+        } finally {
+          setBusy(false);
         }
+        return;
+      }
+      // iOS: show rationale first the very first time (status === prompt).
+      if (isIOSNative()) {
+        const status = await getIOSNotificationPermission();
+        if (status === "denied") {
+          toast.error("Notifications are blocked", {
+            description: "Open iOS Settings → MeraRashan → Notifications to allow alerts.",
+          });
+          return;
+        }
+        if (status === "prompt" || status === "prompt-with-rationale") {
+          setRationaleOpen(true);
+          return;
+        }
+      }
+      await doEnableNative();
+      return;
+    }
+
+    setBusy(true);
+    try {
+      if (enabled) {
+        await disablePush();
+        setEnabled(false);
+        setSyncStatus("not-enabled");
+        toast.success("Notifications disabled");
       } else {
-        if (enabled) {
-          await disablePush();
-          setEnabled(false);
-          setSyncStatus("not-enabled");
-          toast.success("Notifications disabled");
-        } else {
-          await enablePush(mobile);
-          setEnabled(true);
-          setSyncStatus("matched");
-          toast.success("Notifications enabled");
-        }
+        await enablePush(mobile);
+        setEnabled(true);
+        setSyncStatus("matched");
+        toast.success("Notifications enabled");
       }
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Something went wrong");
@@ -192,6 +249,32 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
           <span className="truncate">{status.text}</span>
         </div>
       )}
+
+      <AlertDialog open={rationaleOpen} onOpenChange={setRationaleOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Allow notifications?</AlertDialogTitle>
+            <AlertDialogDescription>
+              MeraRashan will send you alerts when your monthly rashan is issued,
+              when a new statement is available, and for important account updates.
+              You can change this any time in iOS Settings.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy}>Not now</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={busy}
+              onClick={async (e) => {
+                e.preventDefault();
+                setRationaleOpen(false);
+                await doEnableNative();
+              }}
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }
