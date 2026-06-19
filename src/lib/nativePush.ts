@@ -156,20 +156,40 @@ export async function earlyInitNativePush(): Promise<void> {
   if (earlyInitDone || !isNativePlatform()) return;
   earlyInitDone = true;
   try {
-    await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
-      const data = (action.notification.data || {}) as Record<string, unknown>;
-      const url = readUrlFromData(data);
-      const dTitle = typeof data.title === "string" ? data.title : undefined;
-      const dBody = typeof data.body === "string" ? data.body : undefined;
-      deliverAction({
-        url,
-        notification: {
-          title: action.notification.title || dTitle,
-          body: action.notification.body || dBody,
-          data,
-        },
+    if (isIOS()) {
+      // iOS: Firebase Messaging emits the tap event; PushNotifications APNs
+      // listener would not include FCM data payload mapping reliably.
+      await FirebaseMessaging.addListener("notificationActionPerformed", (action) => {
+        const n = action.notification || {};
+        const data = ((n as { data?: Record<string, unknown> }).data || {}) as Record<string, unknown>;
+        const url = readUrlFromData(data);
+        const dTitle = typeof data.title === "string" ? data.title : undefined;
+        const dBody = typeof data.body === "string" ? data.body : undefined;
+        deliverAction({
+          url,
+          notification: {
+            title: (n as { title?: string }).title || dTitle,
+            body: (n as { body?: string }).body || dBody,
+            data,
+          },
+        });
       });
-    });
+    } else {
+      await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
+        const data = (action.notification.data || {}) as Record<string, unknown>;
+        const url = readUrlFromData(data);
+        const dTitle = typeof data.title === "string" ? data.title : undefined;
+        const dBody = typeof data.body === "string" ? data.body : undefined;
+        deliverAction({
+          url,
+          notification: {
+            title: action.notification.title || dTitle,
+            body: action.notification.body || dBody,
+            data,
+          },
+        });
+      });
+    }
   } catch { /* ignore */ }
 }
 
