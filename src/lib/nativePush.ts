@@ -1,6 +1,7 @@
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { PushNotifications } from "@capacitor/push-notifications";
+import { FirebaseMessaging } from "@capacitor-firebase/messaging";
 import { supabase } from "@/integrations/supabase/client";
 
 export function isNativePlatform(): boolean {
@@ -11,19 +12,55 @@ export function isNativePlatform(): boolean {
   }
 }
 
+function isIOS(): boolean {
+  try {
+    return Capacitor.getPlatform() === "ios";
+  } catch {
+    return false;
+  }
+}
+
 let registered = false;
 let currentToken: string | null = null;
 
 /**
  * Request permission and register with FCM/APNs.
- * On success, the device's FCM token is upserted to the backend via
- * the `native-push-subscribe` edge function.
+ * - Android: uses @capacitor/push-notifications (returns FCM token directly).
+ * - iOS: uses @capacitor-firebase/messaging (Firebase iOS SDK swaps the APNs
+ *   token for a real FCM token; @capacitor/push-notifications would only
+ *   return the raw APNs token, which our FCM-based backend cannot use).
  */
 export async function enableNativePush(mobile: string): Promise<string> {
   if (!isNativePlatform()) {
     throw new Error("Native push only available on Android/iOS app.");
   }
   if (!mobile) throw new Error("Missing mobile number");
+
+  if (isIOS()) {
+    const perm = await FirebaseMessaging.checkPermissions();
+    let status = perm.receive;
+    if (status === "prompt" || status === "prompt-with-rationale") {
+      const req = await FirebaseMessaging.requestPermissions();
+      status = req.receive;
+    }
+    if (status !== "granted") {
+      throw new Error("Notification permission denied.");
+    }
+    const { token } = await FirebaseMessaging.getToken();
+    if (!token) throw new Error("Failed to obtain FCM token on iOS");
+    currentToken = token;
+    const { error } = await supabase.functions.invoke("native-push-subscribe", {
+      body: {
+        mobile,
+        fcm_token: token,
+        platform: "ios",
+        user_agent: navigator.userAgent,
+      },
+    });
+    if (error) throw new Error(error.message || "Failed to save token");
+    registered = true;
+    return token;
+  }
 
   const perm = await PushNotifications.checkPermissions();
   let status = perm.receive;
@@ -70,7 +107,12 @@ export async function disableNativePush(): Promise<void> {
   if (!isNativePlatform()) return;
   const token = currentToken;
   try {
-    await PushNotifications.removeAllListeners();
+    if (isIOS()) {
+      await FirebaseMessaging.removeAllListeners();
+      try { await FirebaseMessaging.deleteToken(); } catch { /* ignore */ }
+    } else {
+      await PushNotifications.removeAllListeners();
+    }
   } catch { /* ignore */ }
   if (token) {
     try {
@@ -114,20 +156,40 @@ export async function earlyInitNativePush(): Promise<void> {
   if (earlyInitDone || !isNativePlatform()) return;
   earlyInitDone = true;
   try {
-    await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
-      const data = (action.notification.data || {}) as Record<string, unknown>;
-      const url = readUrlFromData(data);
-      const dTitle = typeof data.title === "string" ? data.title : undefined;
-      const dBody = typeof data.body === "string" ? data.body : undefined;
-      deliverAction({
-        url,
-        notification: {
-          title: action.notification.title || dTitle,
-          body: action.notification.body || dBody,
-          data,
-        },
+    if (isIOS()) {
+      // iOS: Firebase Messaging emits the tap event; PushNotifications APNs
+      // listener would not include FCM data payload mapping reliably.
+      await FirebaseMessaging.addListener("notificationActionPerformed", (action) => {
+        const n = action.notification || {};
+        const data = ((n as { data?: Record<string, unknown> }).data || {}) as Record<string, unknown>;
+        const url = readUrlFromData(data);
+        const dTitle = typeof data.title === "string" ? data.title : undefined;
+        const dBody = typeof data.body === "string" ? data.body : undefined;
+        deliverAction({
+          url,
+          notification: {
+            title: (n as { title?: string }).title || dTitle,
+            body: (n as { body?: string }).body || dBody,
+            data,
+          },
+        });
       });
-    });
+    } else {
+      await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
+        const data = (action.notification.data || {}) as Record<string, unknown>;
+        const url = readUrlFromData(data);
+        const dTitle = typeof data.title === "string" ? data.title : undefined;
+        const dBody = typeof data.body === "string" ? data.body : undefined;
+        deliverAction({
+          url,
+          notification: {
+            title: action.notification.title || dTitle,
+            body: action.notification.body || dBody,
+            data,
+          },
+        });
+      });
+    }
   } catch { /* ignore */ }
 }
 
@@ -160,16 +222,30 @@ export async function initNativePushListeners(opts: {
     } catch { /* ignore */ }
   }
 
-  await PushNotifications.addListener("pushNotificationReceived", (notification) => {
-    const data = (notification.data || {}) as Record<string, unknown>;
-    const dBody = typeof data.body === "string" ? data.body : undefined;
-    const dTitle = typeof data.title === "string" ? data.title : undefined;
-    opts.onForeground?.({
-      title: notification.title || dTitle,
-      body: notification.body || dBody,
-      data,
+  if (isIOS()) {
+    await FirebaseMessaging.addListener("notificationReceived", (event) => {
+      const n = (event as { notification?: { title?: string; body?: string; data?: Record<string, unknown> } }).notification || {};
+      const data = (n.data || {}) as Record<string, unknown>;
+      const dBody = typeof data.body === "string" ? data.body : undefined;
+      const dTitle = typeof data.title === "string" ? data.title : undefined;
+      opts.onForeground?.({
+        title: n.title || dTitle,
+        body: n.body || dBody,
+        data,
+      });
     });
-  });
+  } else {
+    await PushNotifications.addListener("pushNotificationReceived", (notification) => {
+      const data = (notification.data || {}) as Record<string, unknown>;
+      const dBody = typeof data.body === "string" ? data.body : undefined;
+      const dTitle = typeof data.title === "string" ? data.title : undefined;
+      opts.onForeground?.({
+        title: notification.title || dTitle,
+        body: notification.body || dBody,
+        data,
+      });
+    });
+  }
 
   // Wire the early-init tap queue to the caller's handler.
   if (opts.onAction) {
@@ -189,15 +265,17 @@ export async function initNativePushListeners(opts: {
   // so background pushes show up even before the user taps them.
   const syncDelivered = async () => {
     try {
-      const { notifications } = await PushNotifications.getDeliveredNotifications();
-      for (const n of notifications || []) {
-        const data = (n.data || {}) as Record<string, unknown>;
+      const list = isIOS()
+        ? (await FirebaseMessaging.getDeliveredNotifications()).notifications
+        : (await PushNotifications.getDeliveredNotifications()).notifications;
+      for (const n of list || []) {
+        const data = ((n as { data?: Record<string, unknown> }).data || {}) as Record<string, unknown>;
         const dTitle = typeof data.title === "string" ? data.title : undefined;
         const dBody = typeof data.body === "string" ? data.body : undefined;
         opts.onDelivered?.({
           id: typeof (n as { id?: string }).id === "string" ? (n as { id?: string }).id : undefined,
-          title: n.title || dTitle,
-          body: n.body || dBody,
+          title: (n as { title?: string }).title || dTitle,
+          body: (n as { body?: string }).body || dBody,
           data,
         });
       }
