@@ -273,7 +273,7 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
             <AlertDialogDescription>
               MeraRashan will send you alerts when your monthly rashan is issued,
               when a new statement is available, and for important account updates.
-              You can change this any time in iOS Settings.
+              You can change this any time in your device Settings.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
