@@ -1,6 +1,7 @@
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { PushNotifications } from "@capacitor/push-notifications";
+import { FirebaseMessaging } from "@capacitor-firebase/messaging";
 import { supabase } from "@/integrations/supabase/client";
 
 export function isNativePlatform(): boolean {
@@ -11,19 +12,55 @@ export function isNativePlatform(): boolean {
   }
 }
 
+function isIOS(): boolean {
+  try {
+    return Capacitor.getPlatform() === "ios";
+  } catch {
+    return false;
+  }
+}
+
 let registered = false;
 let currentToken: string | null = null;
 
 /**
  * Request permission and register with FCM/APNs.
- * On success, the device's FCM token is upserted to the backend via
- * the `native-push-subscribe` edge function.
+ * - Android: uses @capacitor/push-notifications (returns FCM token directly).
+ * - iOS: uses @capacitor-firebase/messaging (Firebase iOS SDK swaps the APNs
+ *   token for a real FCM token; @capacitor/push-notifications would only
+ *   return the raw APNs token, which our FCM-based backend cannot use).
  */
 export async function enableNativePush(mobile: string): Promise<string> {
   if (!isNativePlatform()) {
     throw new Error("Native push only available on Android/iOS app.");
   }
   if (!mobile) throw new Error("Missing mobile number");
+
+  if (isIOS()) {
+    const perm = await FirebaseMessaging.checkPermissions();
+    let status = perm.receive;
+    if (status === "prompt" || status === "prompt-with-rationale") {
+      const req = await FirebaseMessaging.requestPermissions();
+      status = req.receive;
+    }
+    if (status !== "granted") {
+      throw new Error("Notification permission denied.");
+    }
+    const { token } = await FirebaseMessaging.getToken();
+    if (!token) throw new Error("Failed to obtain FCM token on iOS");
+    currentToken = token;
+    const { error } = await supabase.functions.invoke("native-push-subscribe", {
+      body: {
+        mobile,
+        fcm_token: token,
+        platform: "ios",
+        user_agent: navigator.userAgent,
+      },
+    });
+    if (error) throw new Error(error.message || "Failed to save token");
+    registered = true;
+    return token;
+  }
 
   const perm = await PushNotifications.checkPermissions();
   let status = perm.receive;
@@ -70,7 +107,12 @@ export async function disableNativePush(): Promise<void> {
   if (!isNativePlatform()) return;
   const token = currentToken;
   try {
-    await PushNotifications.removeAllListeners();
+    if (isIOS()) {
+      await FirebaseMessaging.removeAllListeners();
+      try { await FirebaseMessaging.deleteToken(); } catch { /* ignore */ }
+    } else {
+      await PushNotifications.removeAllListeners();
+    }
   } catch { /* ignore */ }
   if (token) {
     try {
