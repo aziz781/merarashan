@@ -16,6 +16,7 @@ type Result = {
   sent?: number;
   total?: number;
   removed?: number;
+  native?: { sent?: number; total?: number; failed?: number; errors?: Array<{ status?: number; error?: string }> };
   error?: string;
   startedAt: string;
   ms: number;
@@ -81,7 +82,7 @@ export default function AdminNotify() {
       const { data, error } = await supabase.functions.invoke("send-push", { body: payload });
       const ms = Math.round(performance.now() - t0);
       if (error) throw error;
-      const d = (data || {}) as { sent?: number; total?: number; removed?: number };
+      const d = (data || {}) as { sent?: number; total?: number; removed?: number; native?: Result["native"] };
       setResult({ ok: true, ...d, startedAt, ms });
       toast.success(`Sent to ${d.sent ?? 0} / ${d.total ?? 0} device(s)`);
     } catch (e: unknown) {
@@ -236,6 +237,11 @@ export default function AdminNotify() {
                     {result.removed ? (
                       <li className="text-muted-foreground">
                         Removed {result.removed} expired subscription(s)
+                      </li>
+                    ) : null}
+                    {result.native?.failed ? (
+                      <li className="text-destructive break-all">
+                        iOS/Android failures: {result.native.failed} · {result.native.errors?.[0]?.error || "Check push credentials"}
                       </li>
                     ) : null}
                     <li className="text-xs text-muted-foreground">
