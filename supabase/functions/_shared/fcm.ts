@@ -145,8 +145,6 @@ export async function fcmSend(opts: {
         aps: {
           alert: { title: opts.title, body: opts.body || "" },
           sound: "default",
-          "mutable-content": 1,
-          "content-available": 1,
         },
       },
     },
