@@ -1,0 +1,12 @@
+What to test in this build:
+• Login with OTP (send, verify, resend, expiry)
+• View cards, family members, entitlements
+• Browse transactions, filter by month/year
+• Download & share monthly statement PDF
+• Push notifications: banner, lock screen, Notification Center, sound, app icon
+• Tap notification opens the right screen
+• In-app Notifications inbox (swipe to dismiss)
+• Toggle notifications from Profile
+• Light/dark theme
+• Logout & re-login
+• Check version & build time in Profile
