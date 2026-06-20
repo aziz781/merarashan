@@ -10,7 +10,26 @@ fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt
 - One file per locale (e.g. `en-US`, `ur`).
 - File name = `versionCode` of the build (e.g. `22.txt`). `default.txt` is used when no matching versionCode file exists.
 
-## Current release — v1.0.0 (versionCode 22)
+## Current release — v1.0.1 (versionCode 23)
+
+**What testers should verify**
+- Login with OTP (send, verify, resend, expiry, rate limit)
+- Browse cards → open card details (holder, family, entitlements)
+- Transactions list + month/year filters + summary stats
+- Download and share monthly statement PDF
+- Push notifications on Android & iOS:
+  - Banner, lock screen, Notification Center, sound
+  - Correct Mera Rashan logo on iOS notifications
+  - Tap notification → opens the relevant screen
+- In-app Notifications inbox (history, swipe to dismiss, tap to open)
+- Toggle notifications on/off from Profile
+- Light / dark theme (system + manual)
+- Logout and re-login
+- Profile shows correct version name + build timestamp
+- PWA install on iOS Safari, Android Chrome, Desktop Chrome/Edge
+- WhatsApp support tile opens chat
+
+## Previous release — v1.0.0 (versionCode 22)
 
 **What's new**
 - Initial public release of MeraRashan
@@ -20,6 +39,7 @@ fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt
 - Push notifications for new transactions
 - Light/dark theme support
 - Performance and stability improvements
+
 
 ## How to add notes for a new build
 
