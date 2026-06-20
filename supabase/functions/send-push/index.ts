@@ -100,6 +100,7 @@ Deno.serve(async (req) => {
     // --- Native (FCM) push ---
     let nativeSent = 0;
     const staleFcm: string[] = [];
+    const nativeErrors: Array<{ status: number; error: string }> = [];
     if ((natSubs as NativeSub[]).length > 0) {
       const fcmResults = await Promise.allSettled(
         (natSubs as NativeSub[]).map((s) =>
@@ -122,7 +123,12 @@ Deno.serve(async (req) => {
           if (r.value.ok) {
             nativeSent++;
             storedMobiles.add(sub.mobile);
-          } else if (r.value.unregistered) staleFcm.push(sub.fcm_token);
+          } else {
+            if (r.value.unregistered) staleFcm.push(sub.fcm_token);
+            nativeErrors.push({ status: r.value.status, error: r.value.error.slice(0, 500) });
+          }
+        } else {
+          nativeErrors.push({ status: 500, error: r.reason instanceof Error ? r.reason.message : "Native push failed" });
         }
       });
       if (staleFcm.length > 0) {
@@ -151,7 +157,13 @@ Deno.serve(async (req) => {
         total: webSubs.length + (natSubs as NativeSub[]).length,
         stored: storedMobiles.size,
         web: { sent: webSent, total: webSubs.length, removed: staleWeb.length },
-        native: { sent: nativeSent, total: (natSubs as NativeSub[]).length, removed: staleFcm.length },
+        native: {
+          sent: nativeSent,
+          total: (natSubs as NativeSub[]).length,
+          removed: staleFcm.length,
+          failed: nativeErrors.length,
+          errors: nativeErrors.slice(0, 3),
+        },
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

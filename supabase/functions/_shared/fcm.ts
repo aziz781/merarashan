@@ -110,6 +110,8 @@ export async function fcmSend(opts: {
 }): Promise<FcmSendResult> {
   const { token, projectId } = await getAccessToken();
   const url = `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
+  const apnsTopic = (Deno.env.get("FCM_APNS_TOPIC") || "pk.merarashan.app").trim();
+  const tokenPrefix = opts.token.slice(0, 12);
 
   const dataPayload: Record<string, string> = {
     ...(opts.data || {}),
@@ -139,16 +141,27 @@ export async function fcmSend(opts: {
       headers: {
         "apns-priority": "10",
         "apns-push-type": "alert",
+        "apns-topic": apnsTopic,
         ...(opts.tag ? { "apns-collapse-id": opts.tag } : {}),
       },
       payload: {
         aps: {
           alert: { title: opts.title, body: opts.body || "" },
           sound: "default",
+          badge: 1,
+          "interruption-level": "active",
         },
       },
     },
   };
+
+  console.log("FCM send request", {
+    projectId,
+    tokenPrefix,
+    apnsTopic,
+    hasBody: Boolean(opts.body),
+    dataKeys: Object.keys(dataPayload),
+  });
 
   const res = await fetch(url, {
     method: "POST",
@@ -161,6 +174,7 @@ export async function fcmSend(opts: {
 
   if (res.ok) {
     const body = (await res.json()) as { name: string };
+    console.log("FCM send accepted", { name: body.name, tokenPrefix });
     return { ok: true, name: body.name };
   }
 
@@ -173,5 +187,6 @@ export async function fcmSend(opts: {
     res.status === 404 ||
     errBody.includes("UNREGISTERED") ||
     errBody.includes("registration-token-not-registered");
+  console.error("FCM send failed", { status: res.status, tokenPrefix, error: errBody.slice(0, 1000) });
   return { ok: false, status: res.status, error: errBody, unregistered };
 }

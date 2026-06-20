@@ -3,6 +3,9 @@ import Capacitor
 #if canImport(FirebaseCore)
 import FirebaseCore
 #endif
+#if canImport(FirebaseMessaging)
+import FirebaseMessaging
+#endif
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -42,6 +45,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Push Notifications (required for @capacitor/push-notifications on iOS)
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        #if canImport(FirebaseMessaging)
+        Messaging.messaging().apnsToken = deviceToken
+        #endif
         NotificationCenter.default.post(
             name: .capacitorDidRegisterForRemoteNotifications,
             object: deviceToken
@@ -52,6 +58,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NotificationCenter.default.post(
             name: .capacitorDidFailToRegisterForRemoteNotifications,
             object: error
+        )
+    }
+
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        NotificationCenter.default.post(
+            name: Notification.Name.init("didReceiveRemoteNotification"),
+            object: completionHandler,
+            userInfo: userInfo
         )
     }
 }

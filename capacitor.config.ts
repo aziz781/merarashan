@@ -1,3 +1,5 @@
+/// <reference types="@capacitor-firebase/messaging" />
+
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
@@ -8,6 +10,25 @@ const config: CapacitorConfig = {
   //   url: 'https://6fdf31a4-3e34-4895-b782-2f7c14c350ba.lovableproject.com?forceHideBadge=true',
   //   cleartext: true,
   // },
+  plugins: {
+    FirebaseMessaging: {
+      presentationOptions: ['alert', 'badge', 'sound'],
+    },
+    PushNotifications: {
+      presentationOptions: ['alert', 'badge', 'sound'],
+    },
+  },
+  experimental: {
+    ios: {
+      spm: {
+        packageOptions: {
+          '@capacitor-firebase/messaging': {
+            symlink: true,
+          },
+        },
+      },
+    },
+  },
 };
 
 export default config;
