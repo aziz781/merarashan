@@ -135,6 +135,21 @@ export async function fcmSend(opts: {
         ...(opts.tag ? { tag: opts.tag } : {}),
       },
     },
+    apns: {
+      headers: {
+        "apns-priority": "10",
+        "apns-push-type": "alert",
+        ...(opts.tag ? { "apns-collapse-id": opts.tag } : {}),
+      },
+      payload: {
+        aps: {
+          alert: { title: opts.title, body: opts.body || "" },
+          sound: "default",
+          "mutable-content": 1,
+          "content-available": 1,
+        },
+      },
+    },
   };
 
   const res = await fetch(url, {
