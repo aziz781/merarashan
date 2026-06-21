@@ -101,6 +101,30 @@ jobs:
           path: android/app/build/outputs/bundle/release/*.aab
           if-no-files-found: error
 
+      - name: Verify Google Play secrets
+        id: play_secrets
+        env:
+          PLAY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -z "$PLAY_JSON" ]; then
+            echo "::warning::GOOGLE_PLAY_SERVICE_ACCOUNT_JSON not set — skipping Play Store upload."
+            echo "have_play=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "have_play=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload AAB to Google Play (internal track)
+        if: steps.play_secrets.outputs.have_play == 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: pk.merarashan.app
+          releaseFiles: android/app/build/outputs/bundle/release/*.aab
+          track: internal
+          status: completed
+          whatsNewDirectory: fastlane/metadata/android
+          mappingFile: android/app/build/outputs/mapping/release/mapping.txt
+
       - name: Upload APK artifact (debug build for testing)
         if: always()
         run: |
@@ -111,3 +135,4 @@ jobs:
           name: app-debug-apk
           path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: ignore
+
