@@ -423,6 +423,32 @@ const Index = () => {
           </a>
         </div>
       </SlideInPanel>
+
+      <SlideInPanel
+        open={socialOpen}
+        onOpenChange={handleSocialPanelChange}
+        title="Social media"
+      >
+        <div className="space-y-3 pt-2">
+          {[
+            { label: "X", href: "https://x.com/merarashancard" },
+            { label: "Instagram", href: "https://www.instagram.com/mera.rashan.card" },
+            { label: "Facebook", href: "https://www.facebook.com/MeraRashanCard" },
+            { label: "Youtube", href: "https://www.youtube.com/@MeraRashanCard" },
+          ].map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between rounded-md border border-border/60 bg-card px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
+            >
+              {item.label}
+              <span aria-hidden className="text-muted-foreground">↗</span>
+            </a>
+          ))}
+        </div>
+      </SlideInPanel>
     </div>
   );
 };
