@@ -64,59 +64,90 @@ export function TransactionCard({
       }}
       className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
     >
-      {showExtras && (
-        <div className="mb-3 space-y-1">
-          {userName && (
-            <p className="font-semibold text-foreground break-words w-full">{userName}</p>
-          )}
+      {showExtras ? (
+        <>
+          <div className="flex items-center justify-between gap-3 w-full">
+            {userName && (
+              <p className="font-semibold text-foreground truncate flex-1 min-w-0">{userName}</p>
+            )}
+            <div className="flex items-center gap-2 shrink-0">
+              <p className={`font-bold ${paymentStatus !== "EXPIRED" && !notDelivered && notPaid ? "text-destructive" : "text-foreground"}`}>
+                Rs. {amount.toLocaleString("en-PK")}
+              </p>
+              {status && (
+                <Badge
+                  variant={
+                    paymentStatus === "EXPIRED"
+                      ? "destructive"
+                      : delivered
+                        ? "default"
+                        : notDelivered
+                          ? "outline"
+                          : notPaid
+                            ? "destructive"
+                            : "outline"
+                  }
+                  className={`font-normal inline-flex items-center gap-1 ${
+                    notDelivered && paymentStatus !== "EXPIRED"
+                      ? "bg-yellow-300 text-red-600 border-yellow-400 hover:bg-yellow-300"
+                      : ""
+                  }`}
+                >
+                  {paymentStatus === "PAID" && <Check className="w-3 h-3" />}
+                  {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
+                </Badge>
+              )}
+            </div>
+          </div>
           {rcNum && (
-            <p className="text-[11px] text-muted-foreground font-mono break-all w-full">
+            <p className="text-[11px] text-muted-foreground font-mono break-all w-full mt-1">
               {rcNum}
             </p>
           )}
-        </div>
-      )}
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          {!showExtras && monthYear && (
-            <p className="text-xs font-bold text-foreground">{monthYear}</p>
-          )}
-          {!showExtras && displayText && (
+          {displayText && (
             <p className={`text-xs mt-1 ${textClass}`}>{displayText}</p>
           )}
+        </>
+      ) : (
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            {monthYear && (
+              <p className="text-xs font-bold text-foreground">{monthYear}</p>
+            )}
+            {displayText && (
+              <p className={`text-xs mt-1 ${textClass}`}>{displayText}</p>
+            )}
+          </div>
+          <div className="flex flex-col items-end gap-1.5 shrink-0">
+            <p className={`font-bold ${paymentStatus !== "EXPIRED" && !notDelivered && notPaid ? "text-destructive" : "text-foreground"}`}>
+              Rs. {amount.toLocaleString("en-PK")}
+            </p>
+            {status && (
+              <Badge
+                variant={
+                  paymentStatus === "EXPIRED"
+                    ? "destructive"
+                    : delivered
+                      ? "default"
+                      : notDelivered
+                        ? "outline"
+                        : notPaid
+                          ? "destructive"
+                          : "outline"
+                }
+                className={`font-normal inline-flex items-center gap-1 ${
+                  notDelivered && paymentStatus !== "EXPIRED"
+                    ? "bg-yellow-300 text-red-600 border-yellow-400 hover:bg-yellow-300"
+                    : ""
+                }`}
+              >
+                {paymentStatus === "PAID" && <Check className="w-3 h-3" />}
+                {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
+              </Badge>
+            )}
+          </div>
         </div>
-        <div className="flex flex-col items-end gap-1.5 shrink-0">
-          <p className={`font-bold ${paymentStatus !== "EXPIRED" && !notDelivered && notPaid ? "text-destructive" : "text-foreground"}`}>
-            Rs. {amount.toLocaleString("en-PK")}
-          </p>
-          {status && (
-            <Badge
-              variant={
-                paymentStatus === "EXPIRED"
-                  ? "destructive"
-                  : delivered
-                    ? "default"
-                    : notDelivered
-                      ? "outline"
-                      : notPaid
-                        ? "destructive"
-                        : "outline"
-              }
-              className={`font-normal inline-flex items-center gap-1 ${
-                notDelivered && paymentStatus !== "EXPIRED"
-                  ? "bg-yellow-300 text-red-600 border-yellow-400 hover:bg-yellow-300"
-                  : ""
-              }`}
-            >
-              {paymentStatus === "PAID" && <Check className="w-3 h-3" />}
-              {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
-            </Badge>
-          )}
-          {showExtras && displayText && (
-            <p className={`text-xs ${textClass}`}>{displayText}</p>
-          )}
-        </div>
-      </div>
+      )}
     </Card>
   );
 }
