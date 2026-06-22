@@ -64,21 +64,25 @@ export function TransactionCard({
       }}
       className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
     >
+      {showExtras && (
+        <div className="mb-3 space-y-1">
+          {userName && (
+            <p className="font-semibold text-foreground break-words w-full">{userName}</p>
+          )}
+          {rcNum && (
+            <p className="text-[11px] text-muted-foreground font-mono break-all w-full">
+              {rcNum}
+            </p>
+          )}
+        </div>
+      )}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          {showExtras && userName && (
-            <p className="font-semibold text-foreground truncate">{userName}</p>
-          )}
           {!showExtras && monthYear && (
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
           {!showExtras && displayText && (
             <p className={`text-xs mt-1 ${textClass}`}>{displayText}</p>
-          )}
-          {showExtras && rcNum && (
-            <p className="text-[11px] text-muted-foreground font-mono break-all mt-1">
-              {rcNum}
-            </p>
           )}
         </div>
         <div className="flex flex-col items-end gap-1.5 shrink-0">
