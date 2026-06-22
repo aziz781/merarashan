@@ -375,7 +375,6 @@ const Index = () => {
       >
         <div className="space-y-3 pt-2">
           <NotificationToggle mobile={mobile} />
-          <AppVersionInfo />
         </div>
       </SlideInPanel>
     </div>
