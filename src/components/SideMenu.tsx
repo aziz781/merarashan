@@ -3,6 +3,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Button } from "@/components/ui/button";
 import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
 import { toast } from "@/hooks/use-toast";
+import { AppVersionInfo } from "@/components/AppVersionInfo";
 
 interface SideMenuProps {
   open: boolean;
@@ -80,6 +81,9 @@ export function SideMenu({
             onClick={onLogout}
             destructive
           />
+        </div>
+        <div className="mt-auto pt-4">
+          <AppVersionInfo />
         </div>
       </SheetContent>
     </Sheet>
