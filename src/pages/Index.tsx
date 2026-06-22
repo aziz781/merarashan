@@ -386,6 +386,33 @@ const Index = () => {
           <NotificationToggle mobile={mobile} />
         </div>
       </SlideInPanel>
+
+      <SlideInPanel
+        open={privacyOpen}
+        onOpenChange={handlePrivacyPanelChange}
+        title="Privacy & Security"
+      >
+        <div className="space-y-3 pt-2">
+          <a
+            href="https://merarashan.pk/privacy-policy.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between rounded-md border border-border/60 bg-card px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
+          >
+            Privacy Policy
+            <span aria-hidden className="text-muted-foreground">↗</span>
+          </a>
+          <a
+            href="https://merarashan.pk/terms-of-service.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between rounded-md border border-border/60 bg-card px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
+          >
+            Terms of Service
+            <span aria-hidden className="text-muted-foreground">↗</span>
+          </a>
+        </div>
+      </SlideInPanel>
     </div>
   );
 };
