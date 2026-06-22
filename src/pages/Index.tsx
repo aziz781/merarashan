@@ -84,6 +84,7 @@ const Index = () => {
   const [helpOpen, setHelpOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [socialOpen, setSocialOpen] = useState(false);
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
   });
@@ -111,6 +112,7 @@ const Index = () => {
   const handleHelpPanelChange = useCallback(closeWithGuard(setHelpOpen), [closeWithGuard]);
   const handleSettingsPanelChange = useCallback(closeWithGuard(setSettingsOpen), [closeWithGuard]);
   const handlePrivacyPanelChange = useCallback(closeWithGuard(setPrivacyOpen), [closeWithGuard]);
+  const handleSocialPanelChange = useCallback(closeWithGuard(setSocialOpen), [closeWithGuard]);
   const { data: customerRaw } = useResource<unknown>("customers", mobile ?? undefined);
   const profileData: Customer | null = (() => {
     if (!customerRaw) return null;
@@ -165,10 +167,10 @@ const Index = () => {
 
   const handleMenuOpenChange = useCallback(
     (open: boolean) => {
-      if (!open && (profileOpen || helpOpen || settingsOpen || privacyOpen || slideInClosingRef.current)) return;
+      if (!open && (profileOpen || helpOpen || settingsOpen || privacyOpen || socialOpen || slideInClosingRef.current)) return;
       setMenuOpen(open);
     },
-    [profileOpen, helpOpen, settingsOpen, privacyOpen],
+    [profileOpen, helpOpen, settingsOpen, privacyOpen, socialOpen],
   );
   const handleOpenProfile = useCallback(() => {
     setHelpOpen(false);
@@ -188,6 +190,13 @@ const Index = () => {
     setHelpOpen(false);
     setSettingsOpen(false);
     setPrivacyOpen(true);
+  }, []);
+  const handleOpenSocial = useCallback(() => {
+    setProfileOpen(false);
+    setHelpOpen(false);
+    setSettingsOpen(false);
+    setPrivacyOpen(false);
+    setSocialOpen(true);
   }, []);
   const handleMenuLogout = useCallback(() => {
     setMenuOpen(false);
@@ -269,6 +278,7 @@ const Index = () => {
         onOpenHelp={handleOpenHelp}
         onOpenSettings={handleOpenSettings}
         onOpenPrivacy={handleOpenPrivacy}
+        onOpenSocial={handleOpenSocial}
         onLogout={handleMenuLogout}
       />
 
