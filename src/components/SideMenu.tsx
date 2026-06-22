@@ -82,6 +82,9 @@ export function SideMenu({
             destructive
           />
         </div>
+        <div className="mt-auto pt-4">
+          <AppVersionInfo />
+        </div>
       </SheetContent>
     </Sheet>
   );
