@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
-import { CreditCard, ArrowLeftRight, User, FileText } from "lucide-react";
+import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, Youtube } from "lucide-react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
@@ -431,19 +431,42 @@ const Index = () => {
       >
         <div className="space-y-3 pt-2">
           {[
-            { label: "X", href: "https://x.com/merarashancard" },
-            { label: "Instagram", href: "https://www.instagram.com/mera.rashan.card" },
-            { label: "Facebook", href: "https://www.facebook.com/MeraRashanCard" },
-            { label: "Youtube", href: "https://www.youtube.com/@MeraRashanCard" },
+            {
+              label: "X",
+              href: "https://x.com/merarashancard",
+              icon: (
+                <svg viewBox="0 0 24 24" aria-hidden className="h-5 w-5" fill="currentColor">
+                  <path d="M18.244 2H21l-6.52 7.45L22 22h-6.797l-4.77-6.231L4.8 22H2.04l6.974-7.967L2 2h6.91l4.314 5.7L18.244 2Zm-1.193 18h1.84L7.04 4H5.07l11.98 16Z" />
+                </svg>
+              ),
+            },
+            {
+              label: "Instagram",
+              href: "https://www.instagram.com/mera.rashan.card",
+              icon: <Instagram className="h-5 w-5 text-[#E4405F]" />,
+            },
+            {
+              label: "Facebook",
+              href: "https://www.facebook.com/MeraRashanCard",
+              icon: <Facebook className="h-5 w-5 text-[#1877F2]" />,
+            },
+            {
+              label: "Youtube",
+              href: "https://www.youtube.com/@MeraRashanCard",
+              icon: <Youtube className="h-5 w-5 text-[#FF0000]" />,
+            },
           ].map((item) => (
             <a
               key={item.label}
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between rounded-md border border-border/60 bg-card px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
+              className="flex items-center gap-3 rounded-md border border-border/60 bg-card px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
             >
-              {item.label}
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+                {item.icon}
+              </span>
+              <span className="flex-1">{item.label}</span>
               <span aria-hidden className="text-muted-foreground">↗</span>
             </a>
           ))}
