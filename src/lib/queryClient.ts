@@ -7,10 +7,16 @@ export const queryClient = new QueryClient({
     queries: {
       // Treat data as fresh for 5 minutes — no refetch on remount / focus within window.
       staleTime: 5 * 60 * 1000,
-      gcTime: 30 * 60 * 1000,
+      // Keep cached data for 30 days so the app works offline across sessions.
+      gcTime: 30 * 24 * 60 * 60 * 1000,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
       retry: 1,
+      // Resolve immediately from cache when offline instead of suspending forever.
+      networkMode: "offlineFirst",
+    },
+    mutations: {
+      networkMode: "offlineFirst",
     },
   },
 });
