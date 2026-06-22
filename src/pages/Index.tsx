@@ -84,6 +84,7 @@ const Index = () => {
   const [helpOpen, setHelpOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [socialOpen, setSocialOpen] = useState(false);
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
   });
@@ -111,6 +112,7 @@ const Index = () => {
   const handleHelpPanelChange = useCallback(closeWithGuard(setHelpOpen), [closeWithGuard]);
   const handleSettingsPanelChange = useCallback(closeWithGuard(setSettingsOpen), [closeWithGuard]);
   const handlePrivacyPanelChange = useCallback(closeWithGuard(setPrivacyOpen), [closeWithGuard]);
+  const handleSocialPanelChange = useCallback(closeWithGuard(setSocialOpen), [closeWithGuard]);
   const { data: customerRaw } = useResource<unknown>("customers", mobile ?? undefined);
   const profileData: Customer | null = (() => {
     if (!customerRaw) return null;
@@ -165,10 +167,10 @@ const Index = () => {
 
   const handleMenuOpenChange = useCallback(
     (open: boolean) => {
-      if (!open && (profileOpen || helpOpen || settingsOpen || privacyOpen || slideInClosingRef.current)) return;
+      if (!open && (profileOpen || helpOpen || settingsOpen || privacyOpen || socialOpen || slideInClosingRef.current)) return;
       setMenuOpen(open);
     },
-    [profileOpen, helpOpen, settingsOpen, privacyOpen],
+    [profileOpen, helpOpen, settingsOpen, privacyOpen, socialOpen],
   );
   const handleOpenProfile = useCallback(() => {
     setHelpOpen(false);
@@ -188,6 +190,13 @@ const Index = () => {
     setHelpOpen(false);
     setSettingsOpen(false);
     setPrivacyOpen(true);
+  }, []);
+  const handleOpenSocial = useCallback(() => {
+    setProfileOpen(false);
+    setHelpOpen(false);
+    setSettingsOpen(false);
+    setPrivacyOpen(false);
+    setSocialOpen(true);
   }, []);
   const handleMenuLogout = useCallback(() => {
     setMenuOpen(false);
@@ -269,6 +278,7 @@ const Index = () => {
         onOpenHelp={handleOpenHelp}
         onOpenSettings={handleOpenSettings}
         onOpenPrivacy={handleOpenPrivacy}
+        onOpenSocial={handleOpenSocial}
         onLogout={handleMenuLogout}
       />
 
@@ -411,6 +421,32 @@ const Index = () => {
             Terms of Service
             <span aria-hidden className="text-muted-foreground">↗</span>
           </a>
+        </div>
+      </SlideInPanel>
+
+      <SlideInPanel
+        open={socialOpen}
+        onOpenChange={handleSocialPanelChange}
+        title="Social media"
+      >
+        <div className="space-y-3 pt-2">
+          {[
+            { label: "X", href: "https://x.com/merarashancard" },
+            { label: "Instagram", href: "https://www.instagram.com/mera.rashan.card" },
+            { label: "Facebook", href: "https://www.facebook.com/MeraRashanCard" },
+            { label: "Youtube", href: "https://www.youtube.com/@MeraRashanCard" },
+          ].map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between rounded-md border border-border/60 bg-card px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
+            >
+              {item.label}
+              <span aria-hidden className="text-muted-foreground">↗</span>
+            </a>
+          ))}
         </div>
       </SlideInPanel>
     </div>
