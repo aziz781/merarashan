@@ -89,6 +89,15 @@ export function TransactionCard({
           <p className={`font-bold ${paymentStatus !== "EXPIRED" && !notDelivered && notPaid ? "text-destructive" : "text-foreground"}`}>
             Rs. {amount.toLocaleString("en-PK")}
           </p>
+        </div>
+      </div>
+      {showExtras && (status || displayText) && (
+        <div className="mt-2 flex items-center justify-between gap-3 w-full">
+          {displayText ? (
+            <p className={`text-xs ${textClass}`}>{displayText}</p>
+          ) : (
+            <span />
+          )}
           {status && (
             <Badge
               variant={
@@ -102,7 +111,7 @@ export function TransactionCard({
                         ? "destructive"
                         : "outline"
               }
-              className={`font-normal inline-flex items-center gap-1 ${
+              className={`font-normal inline-flex items-center gap-1 shrink-0 ${
                 notDelivered && paymentStatus !== "EXPIRED"
                   ? "bg-yellow-300 text-red-600 border-yellow-400 hover:bg-yellow-300"
                   : ""
@@ -112,11 +121,9 @@ export function TransactionCard({
               {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
             </Badge>
           )}
-          {showExtras && displayText && (
-            <p className={`text-xs ${textClass}`}>{displayText}</p>
-          )}
         </div>
-      </div>
+      )}
+
     </Card>
   );
 }
