@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
-import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, Youtube } from "lucide-react";
+import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, Youtube, ShieldCheck, ScrollText } from "lucide-react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
@@ -407,18 +407,24 @@ const Index = () => {
             href="https://merarashan.pk/privacy-policy.html"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between rounded-md border border-border/60 bg-card px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
+            className="flex items-center gap-3 rounded-md border border-border/60 bg-card px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
           >
-            Privacy Policy
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+            </span>
+            <span className="flex-1">Privacy Policy</span>
             <span aria-hidden className="text-muted-foreground">↗</span>
           </a>
           <a
             href="https://merarashan.pk/terms-of-service.html"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between rounded-md border border-border/60 bg-card px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
+            className="flex items-center gap-3 rounded-md border border-border/60 bg-card px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
           >
-            Terms of Service
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+              <ScrollText className="h-5 w-5 text-primary" />
+            </span>
+            <span className="flex-1">Terms of Service</span>
             <span aria-hidden className="text-muted-foreground">↗</span>
           </a>
         </div>
