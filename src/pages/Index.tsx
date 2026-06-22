@@ -83,6 +83,7 @@ const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
   });
@@ -109,6 +110,7 @@ const Index = () => {
   const handleProfilePanelChange = useCallback(closeWithGuard(setProfileOpen), [closeWithGuard]);
   const handleHelpPanelChange = useCallback(closeWithGuard(setHelpOpen), [closeWithGuard]);
   const handleSettingsPanelChange = useCallback(closeWithGuard(setSettingsOpen), [closeWithGuard]);
+  const handlePrivacyPanelChange = useCallback(closeWithGuard(setPrivacyOpen), [closeWithGuard]);
   const { data: customerRaw } = useResource<unknown>("customers", mobile ?? undefined);
   const profileData: Customer | null = (() => {
     if (!customerRaw) return null;
@@ -163,10 +165,10 @@ const Index = () => {
 
   const handleMenuOpenChange = useCallback(
     (open: boolean) => {
-      if (!open && (profileOpen || helpOpen || settingsOpen || slideInClosingRef.current)) return;
+      if (!open && (profileOpen || helpOpen || settingsOpen || privacyOpen || slideInClosingRef.current)) return;
       setMenuOpen(open);
     },
-    [profileOpen, helpOpen, settingsOpen],
+    [profileOpen, helpOpen, settingsOpen, privacyOpen],
   );
   const handleOpenProfile = useCallback(() => {
     setHelpOpen(false);
@@ -180,6 +182,12 @@ const Index = () => {
     setProfileOpen(false);
     setHelpOpen(false);
     setSettingsOpen(true);
+  }, []);
+  const handleOpenPrivacy = useCallback(() => {
+    setProfileOpen(false);
+    setHelpOpen(false);
+    setSettingsOpen(false);
+    setPrivacyOpen(true);
   }, []);
   const handleMenuLogout = useCallback(() => {
     setMenuOpen(false);
@@ -260,6 +268,7 @@ const Index = () => {
         onOpenProfile={handleOpenProfile}
         onOpenHelp={handleOpenHelp}
         onOpenSettings={handleOpenSettings}
+        onOpenPrivacy={handleOpenPrivacy}
         onLogout={handleMenuLogout}
       />
 
@@ -375,6 +384,33 @@ const Index = () => {
       >
         <div className="space-y-3 pt-2">
           <NotificationToggle mobile={mobile} />
+        </div>
+      </SlideInPanel>
+
+      <SlideInPanel
+        open={privacyOpen}
+        onOpenChange={handlePrivacyPanelChange}
+        title="Privacy & Security"
+      >
+        <div className="space-y-3 pt-2">
+          <a
+            href="https://merarashan.pk/privacy-policy.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between rounded-md border border-border/60 bg-card px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
+          >
+            Privacy Policy
+            <span aria-hidden className="text-muted-foreground">↗</span>
+          </a>
+          <a
+            href="https://merarashan.pk/terms-of-service.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between rounded-md border border-border/60 bg-card px-4 py-3 text-sm font-medium hover:bg-muted transition-colors"
+          >
+            Terms of Service
+            <span aria-hidden className="text-muted-foreground">↗</span>
+          </a>
         </div>
       </SlideInPanel>
     </div>
