@@ -75,7 +75,7 @@ export default defineConfig(({ mode }) => ({
             options: {
               cacheName: "merarashan-api-cache",
               networkTimeoutSeconds: 5,
-              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 7 },
               cacheableResponse: { statuses: [0, 200] },
             },
           },
