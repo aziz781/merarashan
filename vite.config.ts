@@ -64,6 +64,21 @@ export default defineConfig(({ mode }) => ({
               expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
             },
           },
+          // Offline support: cache GET responses from our Supabase proxy
+          // (cards, transactions, statements, customers). NetworkFirst so
+          // online users get fresh data; offline users get last-known data.
+          {
+            urlPattern: ({ url, request }) =>
+              request.method === "GET" &&
+              url.pathname.includes("/functions/v1/merarashan-proxy"),
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "merarashan-api-cache",
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
         ],
       },
     }),

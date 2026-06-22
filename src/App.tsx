@@ -11,6 +11,7 @@ import {
   type PushNotificationPayload,
 } from "@/components/PushNotificationDialog";
 import { InstallNativeAppBanner } from "@/components/InstallNativeAppBanner";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import { addNotification, syncNotificationInbox } from "@/lib/notificationsStore";
 import { supabase } from "@/integrations/supabase/client";
 import { openAppLink } from "@/lib/openAppLink";
@@ -114,6 +115,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <OfflineBanner />
         <InstallNativeAppBanner />
         <NativePushBridge />
         <Suspense fallback={<RouteFallback />}>
