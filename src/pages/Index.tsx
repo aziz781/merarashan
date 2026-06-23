@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
-import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, Youtube, ShieldCheck, ScrollText } from "lucide-react";
+import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText } from "lucide-react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
@@ -455,11 +455,6 @@ const Index = () => {
               label: "Facebook",
               href: "https://www.facebook.com/MeraRashanCard",
               icon: <Facebook className="h-5 w-5 text-[#1877F2]" />,
-            },
-            {
-              label: "Youtube",
-              href: "https://www.youtube.com/@MeraRashanCard",
-              icon: <Youtube className="h-5 w-5 text-[#FF0000]" />,
             },
           ].map((item) => (
             <a
