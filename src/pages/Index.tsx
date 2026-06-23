@@ -456,11 +456,6 @@ const Index = () => {
               href: "https://www.facebook.com/MeraRashanCard",
               icon: <Facebook className="h-5 w-5 text-[#1877F2]" />,
             },
-            {
-              label: "Youtube",
-              href: "https://www.youtube.com/@MeraRashanCard",
-              icon: <Youtube className="h-5 w-5 text-[#FF0000]" />,
-            },
           ].map((item) => (
             <a
               key={item.label}
