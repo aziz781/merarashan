@@ -3,8 +3,8 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-echo "🔄 Pulling latest changes from Git..."
-git pull
+#echo "🔄 Pulling latest changes from Git..."
+#git pull
 
 echo "📦 Building the project..."
 npm run build
