@@ -297,6 +297,19 @@ const Index = () => {
 
       <PageFooter />
 
+      {tab === "transactions" && (
+        <button
+          type="button"
+          onClick={() => navigate("/rashans/dashboard")}
+          aria-label="Open rashan dashboard"
+          className="fixed left-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
+          style={{ bottom: "calc(env(safe-area-inset-bottom) + 5rem)" }}
+        >
+          <BarChart3 className="h-5 w-5" />
+        </button>
+      )}
+
+
       <nav
         className="fixed bottom-0 inset-x-0 z-40 border-t border-border/60 bg-card/85 backdrop-blur-md shadow-[0_-4px_20px_-8px_hsl(var(--foreground)/0.15)]"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
