@@ -513,10 +513,20 @@ const RashanDetails = () => {
     try {
       const bgEl = document.querySelector(".bg-background") as HTMLElement | null;
       const bg = bgEl ? getComputedStyle(bgEl).backgroundColor : "#ffffff";
+      // Measure actual rendered content to avoid extra whitespace in the export.
+      const rect = node.getBoundingClientRect();
+      const width = Math.ceil(rect.width);
+      const height = Math.ceil(Math.max(node.scrollHeight, rect.height));
       const canvas = await html2canvas(node, {
         backgroundColor: bg || "#ffffff",
         scale: Math.min(window.devicePixelRatio || 2, 2),
         useCORS: true,
+        width,
+        height,
+        windowWidth: width,
+        windowHeight: height,
+        scrollX: 0,
+        scrollY: -window.scrollY,
       });
       const blob: Blob | null = await new Promise((resolve) =>
         canvas.toBlob((b) => resolve(b), "image/png", 0.95),
@@ -612,15 +622,6 @@ const RashanDetails = () => {
       <div ref={shareRef} className="bg-background">
       <header className="px-5 pt-10 pb-6 text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
         <div className="flex items-center justify-end gap-2 mb-3" data-share-hide>
-          <button
-            type="button"
-            onClick={handleShare}
-            disabled={sharing}
-            aria-label="Share as image on WhatsApp"
-            className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors disabled:opacity-60"
-          >
-            <Share2 className="h-5 w-5" />
-          </button>
           <button
             type="button"
             onClick={() => navigate("/notifications")}
@@ -724,6 +725,17 @@ const RashanDetails = () => {
           </Card>
         );})}
       </main>
+      </div>
+      <div className="px-5 mt-6">
+        <Button
+          type="button"
+          onClick={handleShare}
+          disabled={sharing}
+          className="w-full h-12 gap-2"
+        >
+          <Share2 className="h-5 w-5" />
+          {sharing ? "Preparing image..." : "Share on WhatsApp"}
+        </Button>
       </div>
       <CardDetailsPopup card={cardData} open={cardPopupOpen} onOpenChange={setCardPopupOpen} />
       <button
