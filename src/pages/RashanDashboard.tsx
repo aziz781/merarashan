@@ -297,6 +297,19 @@ export default function RashanDashboard() {
         )}
       </main>
 
+      <div className="flex justify-center pt-6">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => navigate(-1)}
+          aria-label="Back"
+          className="rounded-full"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+      </div>
+
       <PageFooter />
     </div>
   );
