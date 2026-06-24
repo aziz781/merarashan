@@ -726,17 +726,6 @@ const RashanDetails = () => {
         );})}
       </main>
       </div>
-      <div className="px-5 mt-6">
-        <Button
-          type="button"
-          onClick={handleShare}
-          disabled={sharing}
-          className="w-full h-12 gap-2"
-        >
-          <Share2 className="h-5 w-5" />
-          {sharing ? "Preparing image..." : "Share on WhatsApp"}
-        </Button>
-      </div>
       <CardDetailsPopup card={cardData} open={cardPopupOpen} onOpenChange={setCardPopupOpen} />
       <button
         type="button"
@@ -746,6 +735,16 @@ const RashanDetails = () => {
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
         <ArrowLeft className="h-5 w-5" />
+      </button>
+      <button
+        type="button"
+        onClick={handleShare}
+        disabled={sharing}
+        aria-label="Share as image on WhatsApp"
+        className="fixed bottom-6 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-primary/30 hover:bg-primary/90 transition-colors animate-in fade-in slide-in-from-bottom-2 disabled:opacity-60"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      >
+        <Share2 className="h-5 w-5" />
       </button>
       <PageFooter />
     </div>
