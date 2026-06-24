@@ -135,19 +135,6 @@ export default function Notifications() {
             </h1>
             <p className="text-xs opacity-80">{items.length} total · {items.filter((n) => !n.read).length} unread</p>
           </div>
-          {items.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setUnreadOnly((v) => !v)}
-              aria-pressed={unreadOnly}
-              aria-label={unreadOnly ? "Showing unread only" : "Show unread only"}
-              title={unreadOnly ? "Showing unread only" : "Show unread only"}
-              className="flex h-10 items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-sm ring-1 ring-white/25 hover:bg-white/25 transition-colors px-3 text-xs font-medium"
-            >
-              <Filter className="h-4 w-4" />
-              {unreadOnly ? "Unread" : "All"}
-            </button>
-          )}
         </div>
       </header>
 
