@@ -266,16 +266,6 @@ const Index = () => {
               )}
             </div>
           </div>
-          {tab === "transactions" && (
-            <button
-              type="button"
-              onClick={() => navigate("/rashans/dashboard")}
-              aria-label="Open rashan dashboard"
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors"
-            >
-              <BarChart3 className="h-5 w-5" />
-            </button>
-          )}
         </div>
       </header>
 
@@ -306,6 +296,19 @@ const Index = () => {
       </main>
 
       <PageFooter />
+
+      {tab === "transactions" && (
+        <button
+          type="button"
+          onClick={() => navigate("/rashans/dashboard")}
+          aria-label="Open rashan dashboard"
+          className="fixed left-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
+          style={{ bottom: "calc(env(safe-area-inset-bottom) + 5rem)" }}
+        >
+          <BarChart3 className="h-5 w-5" />
+        </button>
+      )}
+
 
       <nav
         className="fixed bottom-0 inset-x-0 z-40 border-t border-border/60 bg-card/85 backdrop-blur-md shadow-[0_-4px_20px_-8px_hsl(var(--foreground)/0.15)]"
