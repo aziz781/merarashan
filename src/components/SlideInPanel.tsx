@@ -33,7 +33,13 @@ export function SlideInPanel({
         <DialogPrimitive.Content
           onInteractOutside={(e) => e.preventDefault()}
           {...swipe}
-          className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
+          style={{
+            paddingTop: "max(1.5rem, env(safe-area-inset-top))",
+            paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
+            paddingLeft: "max(1.5rem, env(safe-area-inset-left))",
+            paddingRight: "max(1.5rem, env(safe-area-inset-right))",
+          }}
+          className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
         >
           <div className="mb-2">
             <DialogPrimitive.Close
