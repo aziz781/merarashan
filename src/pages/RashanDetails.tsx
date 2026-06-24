@@ -724,6 +724,7 @@ const RashanDetails = () => {
           </Card>
         );})}
       </main>
+      </div>
       <CardDetailsPopup card={cardData} open={cardPopupOpen} onOpenChange={setCardPopupOpen} />
       <button
         type="button"
