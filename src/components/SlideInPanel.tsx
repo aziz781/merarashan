@@ -33,12 +33,19 @@ export function SlideInPanel({
         <DialogPrimitive.Content
           onInteractOutside={(e) => e.preventDefault()}
           {...swipe}
-          className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background p-6 shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
+          style={{
+            paddingTop: "max(1.5rem, env(safe-area-inset-top))",
+            paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
+            paddingLeft: "max(1.5rem, env(safe-area-inset-left))",
+            paddingRight: "max(1.5rem, env(safe-area-inset-right))",
+          }}
+          className="fixed inset-y-0 right-0 z-50 h-full w-full sm:max-w-md border-l bg-background shadow-lg overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-300 data-[state=open]:duration-500"
         >
           <div className="mb-2">
             <DialogPrimitive.Close
-              className="-ml-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
+              className="-ml-2 inline-flex h-11 w-11 items-center justify-center rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring touch-manipulation"
               aria-label="Back"
+              onPointerDown={(e) => e.stopPropagation()}
             >
               <ArrowLeft className="h-5 w-5" />
             </DialogPrimitive.Close>
