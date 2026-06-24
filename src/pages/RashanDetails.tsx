@@ -726,6 +726,17 @@ const RashanDetails = () => {
         );})}
       </main>
       </div>
+      <div className="px-5 mt-6">
+        <Button
+          type="button"
+          onClick={handleShare}
+          disabled={sharing}
+          className="w-full h-12 gap-2"
+        >
+          <Share2 className="h-5 w-5" />
+          {sharing ? "Preparing image..." : "Share on WhatsApp"}
+        </Button>
+      </div>
       <CardDetailsPopup card={cardData} open={cardPopupOpen} onOpenChange={setCardPopupOpen} />
       <button
         type="button"
