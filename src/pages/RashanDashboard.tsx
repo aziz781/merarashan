@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, BarChart3, TrendingUp, Wallet, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Bar,
   BarChart,
@@ -128,23 +129,13 @@ export default function RashanDashboard() {
         className="px-5 pt-10 pb-6 text-primary-foreground"
         style={{ background: "var(--gradient-primary)", minHeight: 132 }}
       >
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            aria-label="Back"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm ring-1 ring-white/25 hover:bg-white/25 transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="min-w-0">
-            <h1 className="text-xl font-bold leading-tight truncate">
-              Rashan Dashboard
-            </h1>
-            <p className="text-xs text-primary-foreground/80 mt-0.5">
-              Monthly spending overview
-            </p>
-          </div>
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold leading-tight truncate">
+            Rashan Dashboard
+          </h1>
+          <p className="text-xs text-primary-foreground/80 mt-0.5">
+            Monthly spending overview
+          </p>
         </div>
       </header>
 
@@ -305,6 +296,19 @@ export default function RashanDashboard() {
           </>
         )}
       </main>
+
+      <div className="flex justify-center pt-6">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => navigate(-1)}
+          aria-label="Back"
+          className="rounded-full"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+      </div>
 
       <PageFooter />
     </div>
