@@ -506,6 +506,55 @@ const RashanDetails = () => {
   }, [cardData, cardRcNumTop, item]);
   const cardLongPress = useLongPress(openCardPopup, 500);
 
+  const handleShare = useCallback(async () => {
+    const node = shareRef.current;
+    if (!node || sharing) return;
+    setSharing(true);
+    try {
+      const bgEl = document.querySelector(".bg-background") as HTMLElement | null;
+      const bg = bgEl ? getComputedStyle(bgEl).backgroundColor : "#ffffff";
+      const canvas = await html2canvas(node, {
+        backgroundColor: bg || "#ffffff",
+        scale: Math.min(window.devicePixelRatio || 2, 2),
+        useCORS: true,
+      });
+      const blob: Blob | null = await new Promise((resolve) =>
+        canvas.toBlob((b) => resolve(b), "image/png", 0.95),
+      );
+      if (!blob) throw new Error("Could not create image");
+      const fileName = `rashan-${getRcNum(item) || "details"}.png`;
+      const file = new File([blob], fileName, { type: "image/png" });
+      const shareText = `Rashan Details${item?.month_year ? ` — ${item.month_year}` : ""}`;
+      const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
+      if (nav.canShare && nav.canShare({ files: [file] }) && navigator.share) {
+        try {
+          await navigator.share({ files: [file], title: shareText, text: shareText });
+          return;
+        } catch (err) {
+          if ((err as DOMException)?.name === "AbortError") return;
+        }
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank", "noopener,noreferrer");
+      toast({ title: "Image downloaded", description: "Attach it in the WhatsApp chat that just opened." });
+    } catch (e) {
+      toast({
+        title: "Share failed",
+        description: e instanceof Error ? e.message : "Could not create share image",
+        variant: "destructive",
+      });
+    } finally {
+      setSharing(false);
+    }
+  }, [item, sharing]);
+
   if (!item) {
     return (
       <div className="min-h-screen px-5 pt-10">
