@@ -404,6 +404,8 @@ const RashanDetails = () => {
   const [notifUnread, setNotifUnread] = useState(0);
   const [cardPopupOpen, setCardPopupOpen] = useState(false);
   const [cardData, setCardData] = useState<Record<string, unknown> | null>(null);
+  const [sharing, setSharing] = useState(false);
+  const shareRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setNotifUnread(unreadCount());
