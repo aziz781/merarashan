@@ -108,7 +108,31 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
     };
   }, [mobile, native]);
 
-  if (!supported) return null;
+  if (!supported) {
+    const inIframe = (() => {
+      try { return window.self !== window.top; } catch { return true; }
+    })();
+    return (
+      <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+            <BellOff className="w-5 h-5 text-muted-foreground" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground">Push Notifications</p>
+            <p className="text-xs text-muted-foreground">
+              {inIframe
+                ? "Open the app in your browser or install it to enable notifications."
+                : "Not supported on this device or browser."}
+            </p>
+          </div>
+          <Button size="sm" variant="outline" disabled>
+            Enable
+          </Button>
+        </div>
+      </Card>
+    );
+  }
 
   const doEnableNative = async () => {
     setBusy(true);
