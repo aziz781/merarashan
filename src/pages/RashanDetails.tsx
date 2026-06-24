@@ -513,7 +513,6 @@ const RashanDetails = () => {
     try {
       const bgEl = document.querySelector(".bg-background") as HTMLElement | null;
       const bg = bgEl ? getComputedStyle(bgEl).backgroundColor : "#ffffff";
-      // Measure actual rendered content to avoid extra whitespace in the export.
       const rect = node.getBoundingClientRect();
       const width = Math.ceil(rect.width);
       const height = Math.ceil(Math.max(node.scrollHeight, rect.height));
@@ -533,8 +532,41 @@ const RashanDetails = () => {
       );
       if (!blob) throw new Error("Could not create image");
       const fileName = `rashan-${getRcNum(item) || "details"}.png`;
-      const file = new File([blob], fileName, { type: "image/png" });
       const shareText = `Rashan Details${item?.month_year ? ` — ${item.month_year}` : ""}`;
+
+      // Native (Capacitor) path: write file to disk and use the native share sheet so
+      // the image actually gets attached when picking WhatsApp.
+      try {
+        const { Capacitor } = await import("@capacitor/core");
+        if (Capacitor.isNativePlatform?.()) {
+          const dataUrl: string = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(String(reader.result || ""));
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(blob);
+          });
+          const base64 = dataUrl.split(",")[1] || "";
+          const { Filesystem, Directory } = await import("@capacitor/filesystem");
+          const { Share } = await import("@capacitor/share");
+          const written = await Filesystem.writeFile({
+            path: fileName,
+            data: base64,
+            directory: Directory.Cache,
+          });
+          await Share.share({
+            title: shareText,
+            text: shareText,
+            url: written.uri,
+            dialogTitle: "Share Rashan",
+          });
+          return;
+        }
+      } catch (err) {
+        if ((err as { message?: string })?.message?.toLowerCase().includes("cancel")) return;
+        // fall through to web flow
+      }
+
+      const file = new File([blob], fileName, { type: "image/png" });
       const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
       if (nav.canShare && nav.canShare({ files: [file] }) && navigator.share) {
         try {
@@ -552,8 +584,10 @@ const RashanDetails = () => {
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank", "noopener,noreferrer");
-      toast({ title: "Image downloaded", description: "Attach it in the WhatsApp chat that just opened." });
+      toast({
+        title: "Image downloaded",
+        description: "WhatsApp Web can't auto-attach images. Open WhatsApp and attach the saved image.",
+      });
     } catch (e) {
       toast({
         title: "Share failed",
