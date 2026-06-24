@@ -20,6 +20,7 @@ import { queryClient } from "@/lib/queryClient";
 // Lazy-load non-critical routes so they're not in the initial bundle.
 const CardDetails = lazy(() => import("./pages/CardDetails.tsx"));
 const RashanDetails = lazy(() => import("./pages/RashanDetails.tsx"));
+const RashanDashboard = lazy(() => import("./pages/RashanDashboard.tsx"));
 const DevTroubleshooting = lazy(() => import("./pages/DevTroubleshooting.tsx"));
 const AdminNotify = lazy(() => import("./pages/AdminNotify.tsx"));
 const Notifications = lazy(() => import("./pages/Notifications.tsx"));
