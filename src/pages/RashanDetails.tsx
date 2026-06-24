@@ -513,10 +513,20 @@ const RashanDetails = () => {
     try {
       const bgEl = document.querySelector(".bg-background") as HTMLElement | null;
       const bg = bgEl ? getComputedStyle(bgEl).backgroundColor : "#ffffff";
+      // Measure actual rendered content to avoid extra whitespace in the export.
+      const rect = node.getBoundingClientRect();
+      const width = Math.ceil(rect.width);
+      const height = Math.ceil(Math.max(node.scrollHeight, rect.height));
       const canvas = await html2canvas(node, {
         backgroundColor: bg || "#ffffff",
         scale: Math.min(window.devicePixelRatio || 2, 2),
         useCORS: true,
+        width,
+        height,
+        windowWidth: width,
+        windowHeight: height,
+        scrollX: 0,
+        scrollY: -window.scrollY,
       });
       const blob: Blob | null = await new Promise((resolve) =>
         canvas.toBlob((b) => resolve(b), "image/png", 0.95),
