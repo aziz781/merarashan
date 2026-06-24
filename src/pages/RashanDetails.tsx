@@ -609,8 +609,18 @@ const RashanDetails = () => {
 
   return (
     <div className="min-h-screen pb-16">
+      <div ref={shareRef} className="bg-background">
       <header className="px-5 pt-10 pb-6 text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
-        <div className="flex items-center justify-end mb-3">
+        <div className="flex items-center justify-end gap-2 mb-3" data-share-hide>
+          <button
+            type="button"
+            onClick={handleShare}
+            disabled={sharing}
+            aria-label="Share as image on WhatsApp"
+            className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors disabled:opacity-60"
+          >
+            <Share2 className="h-5 w-5" />
+          </button>
           <button
             type="button"
             onClick={() => navigate("/notifications")}
