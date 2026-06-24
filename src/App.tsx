@@ -125,6 +125,7 @@ const App = () => (
             <Route path="/cards/:rcNum" element={<CardDetails />} />
             <Route path="/rashans/detail" element={<RashanDetails />} />
             <Route path="/rashans/detail/:rcNum" element={<RashanDetails />} />
+            <Route path="/rashans/dashboard" element={<RashanDashboard />} />
             <Route path="/dev/troubleshooting" element={<DevTroubleshooting />} />
             <Route path="/admin/notify" element={<AdminNotify />} />
             <Route path="/notifications" element={<Notifications />} />
