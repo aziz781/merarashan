@@ -266,16 +266,6 @@ const Index = () => {
               )}
             </div>
           </div>
-          {tab === "transactions" && (
-            <button
-              type="button"
-              onClick={() => navigate("/rashans/dashboard")}
-              aria-label="Open rashan dashboard"
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors"
-            >
-              <BarChart3 className="h-5 w-5" />
-            </button>
-          )}
         </div>
       </header>
 
