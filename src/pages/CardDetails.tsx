@@ -182,9 +182,7 @@ const CardDetails = () => {
           <CreditCard className="w-6 h-6 opacity-90" />
           <div className="min-w-0">
             <h1 className="text-xl font-bold truncate">میرا راشن کارڈ</h1>
-            {title && title !== "Card Details" && (
-              <p className="text-xs opacity-80 truncate">{title}</p>
-            )}
+
           </div>
         </div>
       </PageHeader>
