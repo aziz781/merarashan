@@ -21,6 +21,7 @@ import {
 } from "@/lib/notificationsStore";
 import { SwipeableNotification } from "@/components/SwipeableNotification";
 import { openAppLink } from "@/lib/openAppLink";
+import { PageHeader } from "@/components/PageHeader";
 
 function timeAgo(ts: number): string {
   const diff = Math.max(0, Date.now() - ts);
