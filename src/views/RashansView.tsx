@@ -179,6 +179,3 @@ export function RashansView({ mobile }: { mobile: string }) {
   );
 }
 
-    </>
-  );
-}
