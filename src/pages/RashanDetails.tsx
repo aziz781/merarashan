@@ -560,20 +560,30 @@ const RashanDetails = () => {
           const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
           const base64 = dataUrl.split(",")[1] || "";
           const [{ Filesystem, Directory }, { Share }] = await nativePluginsPromise;
+          // External directory maps to getExternalFilesDir() on Android, which
+          // is covered by <external-path> in file_paths.xml and reliably
+          // resolvable by the FileProvider used by @capacitor/share.
           const written = await Filesystem.writeFile({
             path: fileName,
             data: base64,
-            directory: Directory.Cache,
+            directory: Directory.External,
+            recursive: true,
           });
           await Share.share({
             title: shareText,
             text: shareText,
-            files: [written.uri],
+            url: written.uri,
             dialogTitle: "Share Rashan",
           });
           return;
         } catch (err) {
-          if ((err as { message?: string })?.message?.toLowerCase().includes("cancel")) return;
+          const msg = (err as { message?: string })?.message || "";
+          if (msg.toLowerCase().includes("cancel")) return;
+          toast({
+            title: "Native share failed",
+            description: msg || "Falling back to download",
+            variant: "destructive",
+          });
           // fall through to web flow
         }
       }
