@@ -511,15 +511,33 @@ const RashanDetails = () => {
     const node = shareRef.current;
     if (!node || sharing) return;
     setSharing(true);
+
+    // Detect native up-front so we can tune capture cost and preload plugins
+    // in parallel with html2canvas (saves ~hundreds of ms on Android).
+    const capMod = await import("@capacitor/core").catch(() => null);
+    const isNative = !!capMod?.Capacitor?.isNativePlatform?.();
+    const nativePluginsPromise = isNative
+      ? Promise.all([
+          import("@capacitor/filesystem"),
+          import("@capacitor/share"),
+        ])
+      : null;
+
+    // Immediate feedback — html2canvas blocks the main thread.
+    toast({ title: "Preparing image…" });
+
     try {
       const bgEl = document.querySelector(".bg-background") as HTMLElement | null;
       const bg = bgEl ? getComputedStyle(bgEl).backgroundColor : "#ffffff";
       const rect = node.getBoundingClientRect();
       const width = Math.ceil(rect.width);
       const height = Math.ceil(Math.max(node.scrollHeight, rect.height));
+      // Cap scale lower on native — Android WebView is slow at PNG/JPEG
+      // encoding of large canvases and the share preview is small anyway.
+      const scale = isNative ? 1.5 : Math.min(window.devicePixelRatio || 2, 2);
       const canvas = await html2canvas(node, {
         backgroundColor: bg || "#ffffff",
-        scale: Math.min(window.devicePixelRatio || 2, 2),
+        scale,
         useCORS: true,
         width,
         height,
@@ -527,28 +545,21 @@ const RashanDetails = () => {
         windowHeight: height,
         scrollX: 0,
         scrollY: -window.scrollY,
+        logging: false,
+        imageTimeout: 0,
       });
-      const blob: Blob | null = await new Promise((resolve) =>
-        canvas.toBlob((b) => resolve(b), "image/png", 0.95),
-      );
-      if (!blob) throw new Error("Could not create image");
-      const fileName = `rashan-${getRcNum(item) || "details"}.png`;
+
+      const fileName = `rashan-${getRcNum(item) || "details"}.jpg`;
       const shareText = `Rashan Details${item?.month_year ? ` — ${item.month_year}` : ""}`;
 
-      // Native (Capacitor) path: write file to disk and use the native share sheet so
-      // the image actually gets attached when picking WhatsApp.
-      try {
-        const { Capacitor } = await import("@capacitor/core");
-        if (Capacitor.isNativePlatform?.()) {
-          const dataUrl: string = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(String(reader.result || ""));
-            reader.onerror = () => reject(reader.error);
-            reader.readAsDataURL(blob);
-          });
+      // Native (Capacitor) path: skip Blob+FileReader and go straight to
+      // a base64 JPEG data URL — JPEG encodes ~3–5x faster than PNG and
+      // we avoid an extra copy round-trip.
+      if (isNative && nativePluginsPromise) {
+        try {
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
           const base64 = dataUrl.split(",")[1] || "";
-          const { Filesystem, Directory } = await import("@capacitor/filesystem");
-          const { Share } = await import("@capacitor/share");
+          const [{ Filesystem, Directory }, { Share }] = await nativePluginsPromise;
           const written = await Filesystem.writeFile({
             path: fileName,
             data: base64,
@@ -561,13 +572,19 @@ const RashanDetails = () => {
             dialogTitle: "Share Rashan",
           });
           return;
+        } catch (err) {
+          if ((err as { message?: string })?.message?.toLowerCase().includes("cancel")) return;
+          // fall through to web flow
         }
-      } catch (err) {
-        if ((err as { message?: string })?.message?.toLowerCase().includes("cancel")) return;
-        // fall through to web flow
       }
 
-      const file = new File([blob], fileName, { type: "image/png" });
+      // Web path keeps PNG quality for desktop downloads.
+      const blob: Blob | null = await new Promise((resolve) =>
+        canvas.toBlob((b) => resolve(b), "image/png", 0.95),
+      );
+      if (!blob) throw new Error("Could not create image");
+      const webFileName = `rashan-${getRcNum(item) || "details"}.png`;
+      const file = new File([blob], webFileName, { type: "image/png" });
       const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
       if (nav.canShare && nav.canShare({ files: [file] }) && navigator.share) {
         try {
@@ -580,7 +597,7 @@ const RashanDetails = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = fileName;
+      a.download = webFileName;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -599,6 +616,7 @@ const RashanDetails = () => {
       setSharing(false);
     }
   }, [item, sharing]);
+
 
   if (!item) {
     return (
