@@ -654,7 +654,7 @@ const RashanDetails = () => {
   return (
     <div className="min-h-screen pb-16">
       <div ref={shareRef} className="bg-background">
-      <header className="px-5 pt-10 pb-6 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md">
+      <header className="px-5 pt-10 pb-6 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md" style={{ minHeight: 132 }}>
         <div className="flex items-center justify-end gap-2 mb-3" data-share-hide>
           <button
             type="button"
