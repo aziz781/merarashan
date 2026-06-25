@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { LayoutGrid, List } from "lucide-react";
+import { ArrowUp, LayoutGrid, List } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RecordCard, CardGridTile } from "@/components/RecordCard";
@@ -10,6 +10,28 @@ import { useResourceItems } from "@/hooks/use-resource-items";
 import type { Card as CardModel } from "@/types/domain";
 
 const VIEW_KEY = "mr_cards_view";
+
+function BackToTopButton() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShow(window.scrollY > 800);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  if (!show) return null;
+  return (
+    <button
+      type="button"
+      aria-label="Back to top"
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="fixed left-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
+      style={{ bottom: "calc(env(safe-area-inset-bottom) + 5rem)" }}
+    >
+      <ArrowUp className="h-5 w-5" />
+    </button>
+  );
+}
 
 function CardsList({ items, mobile }: { items: Record<string, unknown>[]; mobile: string }) {
   const [selected, setSelected] = useState<string>(() => {
@@ -129,7 +151,12 @@ export function CardsView({ resource, mobile }: { resource: Resource; mobile: st
   }
 
   if (resource === "cards") {
-    return <CardsList items={items} mobile={mobile} />;
+    return (
+      <>
+        <CardsList items={items} mobile={mobile} />
+        <BackToTopButton />
+      </>
+    );
   }
 
   return (
