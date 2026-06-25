@@ -129,7 +129,12 @@ export function CardsView({ resource, mobile }: { resource: Resource; mobile: st
   }
 
   if (resource === "cards") {
-    return <CardsList items={items} mobile={mobile} />;
+    return (
+      <>
+        <CardsList items={items} mobile={mobile} />
+        <BackToTopButton />
+      </>
+    );
   }
 
   return (
