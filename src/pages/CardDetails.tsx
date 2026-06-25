@@ -181,9 +181,9 @@ const CardDetails = () => {
         <div className="flex items-center gap-3">
           <CreditCard className="w-6 h-6 opacity-90" />
           <div className="min-w-0">
-            <h1 className="text-xl font-bold truncate">میرا راشن کارڈ</h1>
-            {title && title !== "Card Details" && (
-              <p className="text-xs opacity-80 truncate">{title}</p>
+            <h1 className="text-xl font-bold truncate">{title}</h1>
+            {(card?.month_year as string) && (
+              <p className="text-xs opacity-80 truncate">{String(card?.month_year)}</p>
             )}
           </div>
         </div>
