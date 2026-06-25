@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { LayoutGrid, List } from "lucide-react";
+import { ArrowUp, LayoutGrid, List } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RecordCard, CardGridTile } from "@/components/RecordCard";
