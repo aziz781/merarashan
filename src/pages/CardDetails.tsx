@@ -198,7 +198,7 @@ const CardDetails = () => {
       >
       {(() => {
         const renderCardBody = (c: Record<string, unknown>) => (
-          <Card className="p-5 bg-card/95 backdrop-blur shadow-[var(--shadow-card)] border-0">
+          <Card className="p-5 bg-card/95 backdrop-blur shadow-[var(--shadow-card)] border border-border">
             <div className="space-y-1.5">
               {fields.map(({ key, label }) => {
                 const isName = key === "person_name";
