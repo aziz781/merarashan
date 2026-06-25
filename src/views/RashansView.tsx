@@ -92,14 +92,7 @@ export function RashansView({ mobile }: { mobile: string }) {
   }, [filters]);
 
   const [statuses, setStatuses] = useState<string[]>([]);
-  const [showBackToTop, setShowBackToTop] = useState<boolean>(false);
 
-  useEffect(() => {
-    const onScroll = () => setShowBackToTop(window.scrollY > 400);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const params = useMemo<Record<string, string>>(() => {
     const p: Record<string, string> = {};
