@@ -665,9 +665,10 @@ const RashanDetails = () => {
   }).filter((g) => g.rows.length > 0);
 
   const personName =
-    (item.code_user_name as string) || (item.person_name as string) || "";
-  const title = (item.month_year as string) || personName || "Rashan Details";
-  const subtitle = title === personName ? "" : personName;
+    (item.person_name as string) || (item.name as string) || (item.customer_name as string) || "";
+  const monthYear = (item.month_year as string) || "";
+  const title = personName || monthYear || "Rashan Details";
+  const subtitle = personName ? monthYear : "";
 
 
   return (
