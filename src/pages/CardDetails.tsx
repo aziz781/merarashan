@@ -242,9 +242,13 @@ const CardDetails = () => {
             </div>
           </Card>
         );
-        const transition = animating ? "transform 220ms ease-out" : "none";
+        const transition = animating
+          ? "transform 260ms ease-out, opacity 260ms ease-out"
+          : "none";
         const PEEK = 25; // px of neighbor card edge visible on each side
         const GAP = 12;
+        const w = typeof window !== "undefined" ? window.innerWidth : 400;
+        const fadeOpacity = exiting ? 0 : Math.max(0.55, 1 - Math.abs(swipeDx) / w);
         return (
           <div className="relative -mx-5 overflow-hidden px-5">
             <div
@@ -252,6 +256,7 @@ const CardDetails = () => {
               style={{
                 width: `calc(100% - ${PEEK * 2}px)`,
                 transform: `translateX(${swipeDx}px) rotate(${swipeDx * 0.02}deg)`,
+                opacity: fadeOpacity,
                 transition,
               }}
             >
