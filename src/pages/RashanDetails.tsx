@@ -10,7 +10,7 @@ import {
   TicketPercent,
   ShoppingBag,
   Check,
-  Bell,
+  
   Copy,
   Share2,
 } from "lucide-react";
