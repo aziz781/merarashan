@@ -304,7 +304,7 @@ const Index = () => {
           type="button"
           onClick={() => navigate("/rashans/dashboard")}
           aria-label="Open rashan dashboard"
-          className="fixed right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
+          className="fixed left-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
           style={{ bottom: "calc(env(safe-area-inset-bottom) + 5rem)" }}
         >
           <BarChart3 className="h-5 w-5" />
