@@ -10,6 +10,7 @@ import { PageFooter } from "@/components/PageFooter";
 import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
 import { extractItems, digitsOnly, getItemKey } from "@/lib/itemUtils";
 import type { Card as CardModel, Transaction } from "@/types/domain";
+import { PageHeader } from "@/components/PageHeader";
 
 const STORAGE_KEY = "mr_mobile";
 
