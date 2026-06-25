@@ -24,6 +24,7 @@ import { PageFooter } from "@/components/PageFooter";
 import { useResourceItems } from "@/hooks/use-resource-items";
 import { formatPKR, getItemDate } from "@/lib/itemUtils";
 import type { Transaction } from "@/types/domain";
+import { PageHeader } from "@/components/PageHeader";
 
 const MOBILE_STORAGE_KEY = "mr_mobile";
 
