@@ -114,14 +114,6 @@ export default function Notifications() {
     <div className="min-h-screen bg-background">
       <PageHeader>
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            aria-label="Back"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm ring-1 ring-white/25 hover:bg-white/25 transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold leading-tight flex items-center gap-2">
               Notifications
