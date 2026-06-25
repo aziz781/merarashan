@@ -24,6 +24,7 @@ import { toast } from "@/hooks/use-toast";
 import { PageFooter } from "@/components/PageFooter";
 import { fetchResource } from "@/lib/api";
 import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
+import { PageHeader } from "@/components/PageHeader";
 
 type Item = Record<string, unknown>;
 
