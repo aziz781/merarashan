@@ -36,6 +36,7 @@ const CardDetails = () => {
   const [notifUnread, setNotifUnread] = useState(0);
   const [swipeDx, setSwipeDx] = useState(0);
   const [animating, setAnimating] = useState(false);
+  const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
     setNotifUnread(unreadCount());
