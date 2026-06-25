@@ -17,7 +17,7 @@ const STORAGE_KEY = "mr_mobile";
 function BackToTopButton() {
   const [show, setShow] = useState(false);
   useEffect(() => {
-    const onScroll = () => setShow(window.scrollY > 800);
+    const onScroll = () => setShow(window.scrollY > 300);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
