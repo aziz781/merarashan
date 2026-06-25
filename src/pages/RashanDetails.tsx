@@ -568,7 +568,7 @@ const RashanDetails = () => {
           await Share.share({
             title: shareText,
             text: shareText,
-            url: written.uri,
+            files: [written.uri],
             dialogTitle: "Share Rashan",
           });
           return;
