@@ -160,16 +160,19 @@ const CardDetails = () => {
     startX.current = null;
     startY.current = null;
     locked.current = null;
-    setAnimating(true);
     if (d <= -SWIPE_THRESHOLD && nextCard) {
+      // Navigate immediately without snap-back animation
+      setAnimating(false);
       setSwipeDx(0);
       dxRef.current = 0;
       goToCard(nextCard);
     } else if (d >= SWIPE_THRESHOLD && prevCard) {
+      setAnimating(false);
       setSwipeDx(0);
       dxRef.current = 0;
       goToCard(prevCard);
     } else {
+      setAnimating(true);
       setSwipeDx(0);
       dxRef.current = 0;
     }
