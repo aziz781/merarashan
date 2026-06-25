@@ -126,8 +126,8 @@ export default function RashanDashboard() {
   return (
     <div className="min-h-screen pb-24">
       <header
-        className="px-5 pt-10 pb-6 text-primary-foreground"
-        style={{ background: "var(--gradient-primary)", minHeight: 132 }}
+        className="px-5 pt-10 pb-6 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md"
+        style={{ minHeight: 132 }}
       >
         <div className="min-w-0">
           <h1 className="text-xl font-bold leading-tight truncate">
