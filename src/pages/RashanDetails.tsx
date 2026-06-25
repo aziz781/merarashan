@@ -13,6 +13,7 @@ import {
   
   Copy,
   Share2,
+  ArrowUp,
 } from "lucide-react";
 import html2canvas from "html2canvas";
 import { Button } from "@/components/ui/button";
@@ -406,7 +407,15 @@ const RashanDetails = () => {
   const [cardPopupOpen, setCardPopupOpen] = useState(false);
   const [cardData, setCardData] = useState<Record<string, unknown> | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const shareRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const onScroll = () => setShowBackToTop(window.scrollY > 300);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     setNotifUnread(unreadCount());
@@ -789,6 +798,16 @@ const RashanDetails = () => {
       >
         <Share2 className="h-5 w-5" />
       </button>
+      {showBackToTop && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Back to top"
+          className="fixed bottom-20 right-5 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-card text-foreground border border-border shadow-lg hover:bg-accent transition-colors animate-in fade-in slide-in-from-bottom-2"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </button>
+      )}
       <PageFooter />
     </div>
   );
