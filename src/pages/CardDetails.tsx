@@ -10,6 +10,7 @@ import { PageFooter } from "@/components/PageFooter";
 import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
 import { extractItems, digitsOnly, getItemKey } from "@/lib/itemUtils";
 import type { Card as CardModel, Transaction } from "@/types/domain";
+import { PageHeader } from "@/components/PageHeader";
 
 const STORAGE_KEY = "mr_mobile";
 
@@ -176,10 +177,7 @@ const CardDetails = () => {
 
   return (
     <div className="min-h-screen pb-16">
-      <header
-        className="px-5 pt-10 pb-6 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md"
-        style={{ minHeight: 132 }}
-      >
+      <PageHeader>
         <div className="flex items-center justify-end mb-3">
           <button
             type="button"
@@ -199,7 +197,7 @@ const CardDetails = () => {
           <CreditCard className="w-6 h-6 opacity-90" />
           <h1 className="text-xl font-bold truncate">میرا راشن کارڈ</h1>
         </div>
-      </header>
+      </PageHeader>
 
 
       <main

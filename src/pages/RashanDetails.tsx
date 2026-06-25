@@ -24,6 +24,7 @@ import { toast } from "@/hooks/use-toast";
 import { PageFooter } from "@/components/PageFooter";
 import { fetchResource } from "@/lib/api";
 import { subscribeNotifications, unreadCount } from "@/lib/notificationsStore";
+import { PageHeader } from "@/components/PageHeader";
 
 type Item = Record<string, unknown>;
 
@@ -654,7 +655,7 @@ const RashanDetails = () => {
   return (
     <div className="min-h-screen pb-16">
       <div ref={shareRef} className="bg-background">
-      <header className="px-5 pt-10 pb-6 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md" style={{ minHeight: 132 }}>
+      <PageHeader>
         <div className="flex items-center justify-end gap-2 mb-3" data-share-hide>
           <button
             type="button"
@@ -677,7 +678,7 @@ const RashanDetails = () => {
             {subtitle && <p className="text-xs opacity-80 truncate">{subtitle}</p>}
           </div>
         </div>
-      </header>
+      </PageHeader>
 
 
       <main className="px-5 -mt-3 space-y-4">

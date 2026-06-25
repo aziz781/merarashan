@@ -21,6 +21,7 @@ import {
 } from "@/lib/notificationsStore";
 import { SwipeableNotification } from "@/components/SwipeableNotification";
 import { openAppLink } from "@/lib/openAppLink";
+import { PageHeader } from "@/components/PageHeader";
 
 function timeAgo(ts: number): string {
   const diff = Math.max(0, Date.now() - ts);
@@ -111,10 +112,7 @@ export default function Notifications() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header
-        className="px-5 pt-10 pb-6 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md"
-        style={{ minHeight: 132 }}
-      >
+      <PageHeader>
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -136,7 +134,7 @@ export default function Notifications() {
             <p className="text-xs opacity-80">{items.length} total · {items.filter((n) => !n.read).length} unread</p>
           </div>
         </div>
-      </header>
+      </PageHeader>
 
       <div className="p-4 space-y-3 max-w-2xl mx-auto">
         {pushEnabled === false && mobile && (
