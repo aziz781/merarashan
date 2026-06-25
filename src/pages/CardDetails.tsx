@@ -28,8 +28,8 @@ function BackToTopButton() {
       type="button"
       aria-label="Back to top"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
-      style={{ bottom: "calc(env(safe-area-inset-bottom) + 5rem)" }}
+      className="fixed right-5 bottom-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
+      style={{ marginBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <ArrowUp className="h-5 w-5" />
     </button>
