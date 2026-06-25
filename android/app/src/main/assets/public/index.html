@@ -40,16 +40,22 @@
         align-items: center;
         justify-content: center;
         gap: 24px;
-        background: #3B82F6;
+        background: radial-gradient(circle at 50% 35%, #60A5FA 0%, #3B82F6 45%, #1D4ED8 100%);
         color: #fff;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         transition: opacity 250ms ease;
       }
       #app-splash.app-splash-hide { opacity: 0; pointer-events: none; }
-      #app-splash .app-splash-title {
-        font-size: 22px;
-        font-weight: 600;
-        letter-spacing: 0.2px;
+      #app-splash .app-splash-logo {
+        width: 160px;
+        height: auto;
+        -o-object-fit: contain;
+           object-fit: contain;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 32px;
+        box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(8px);
       }
       #app-splash .app-splash-spinner {
         width: 36px;
@@ -61,17 +67,19 @@
       }
       @keyframes app-splash-spin { to { transform: rotate(360deg); } }
       @media (prefers-color-scheme: dark) {
-        #app-splash { background: #0F172A; }
+        #app-splash {
+          background: radial-gradient(circle at 50% 35%, #1E3A8A 0%, #0F172A 70%);
+        }
       }
     </style>
-  <script type="module" crossorigin src="/assets/index-Do3WYgQQ.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-BoNmGoSJ.css">
+  <script type="module" crossorigin src="/assets/index-CwOGbaWp.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-4m4wovqw.css">
 </head>
 
   <body>
     <div id="app-splash" role="status" aria-label="Loading">
+      <img src="/mera-rashan-logo.webp?v=1" alt="Mera Rashan" class="app-splash-logo" />
       <div class="app-splash-spinner" aria-hidden="true"></div>
-      <div class="app-splash-title">Mera Rashan</div>
     </div>
     <div id="root"></div>
   </body>
