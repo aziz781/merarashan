@@ -162,14 +162,29 @@ const CardDetails = () => {
     startY.current = null;
     locked.current = null;
     setAnimating(true);
+    const w = typeof window !== "undefined" ? window.innerWidth : 400;
     if (d <= -SWIPE_THRESHOLD && nextCard) {
-      setSwipeDx(0);
-      dxRef.current = 0;
-      goToCard(nextCard);
+      setExiting(true);
+      setSwipeDx(-w);
+      dxRef.current = -w;
+      window.setTimeout(() => {
+        goToCard(nextCard);
+        setExiting(false);
+        setAnimating(false);
+        setSwipeDx(0);
+        dxRef.current = 0;
+      }, 260);
     } else if (d >= SWIPE_THRESHOLD && prevCard) {
-      setSwipeDx(0);
-      dxRef.current = 0;
-      goToCard(prevCard);
+      setExiting(true);
+      setSwipeDx(w);
+      dxRef.current = w;
+      window.setTimeout(() => {
+        goToCard(prevCard);
+        setExiting(false);
+        setAnimating(false);
+        setSwipeDx(0);
+        dxRef.current = 0;
+      }, 260);
     } else {
       setSwipeDx(0);
       dxRef.current = 0;
