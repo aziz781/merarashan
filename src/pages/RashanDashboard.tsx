@@ -126,10 +126,7 @@ export default function RashanDashboard() {
 
   return (
     <div className="min-h-screen pb-24">
-      <header
-        className="px-5 pt-10 pb-6 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md"
-        style={{ minHeight: 132 }}
-      >
+      <PageHeader>
         <div className="min-w-0">
           <h1 className="text-xl font-bold leading-tight truncate">
             Rashan Dashboard
@@ -138,7 +135,7 @@ export default function RashanDashboard() {
             Monthly spending overview
           </p>
         </div>
-      </header>
+      </PageHeader>
 
       <main className="px-5 pt-5 space-y-4">
         <Card className="p-4">
