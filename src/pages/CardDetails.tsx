@@ -36,7 +36,6 @@ const CardDetails = () => {
   const [notifUnread, setNotifUnread] = useState(0);
   const [swipeDx, setSwipeDx] = useState(0);
   const [animating, setAnimating] = useState(false);
-  const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
     setNotifUnread(unreadCount());
@@ -162,29 +161,14 @@ const CardDetails = () => {
     startY.current = null;
     locked.current = null;
     setAnimating(true);
-    const w = typeof window !== "undefined" ? window.innerWidth : 400;
     if (d <= -SWIPE_THRESHOLD && nextCard) {
-      setExiting(true);
-      setSwipeDx(-w);
-      dxRef.current = -w;
-      window.setTimeout(() => {
-        goToCard(nextCard);
-        setExiting(false);
-        setAnimating(false);
-        setSwipeDx(0);
-        dxRef.current = 0;
-      }, 260);
+      setSwipeDx(0);
+      dxRef.current = 0;
+      goToCard(nextCard);
     } else if (d >= SWIPE_THRESHOLD && prevCard) {
-      setExiting(true);
-      setSwipeDx(w);
-      dxRef.current = w;
-      window.setTimeout(() => {
-        goToCard(prevCard);
-        setExiting(false);
-        setAnimating(false);
-        setSwipeDx(0);
-        dxRef.current = 0;
-      }, 260);
+      setSwipeDx(0);
+      dxRef.current = 0;
+      goToCard(prevCard);
     } else {
       setSwipeDx(0);
       dxRef.current = 0;
@@ -242,13 +226,9 @@ const CardDetails = () => {
             </div>
           </Card>
         );
-        const transition = animating
-          ? "transform 260ms ease-out, opacity 260ms ease-out"
-          : "none";
+        const transition = animating ? "transform 220ms ease-out" : "none";
         const PEEK = 25; // px of neighbor card edge visible on each side
         const GAP = 12;
-        const w = typeof window !== "undefined" ? window.innerWidth : 400;
-        const fadeOpacity = exiting ? 0 : Math.max(0.55, 1 - Math.abs(swipeDx) / w);
         return (
           <div className="relative -mx-5 overflow-hidden px-5">
             <div
@@ -256,7 +236,6 @@ const CardDetails = () => {
               style={{
                 width: `calc(100% - ${PEEK * 2}px)`,
                 transform: `translateX(${swipeDx}px) rotate(${swipeDx * 0.02}deg)`,
-                opacity: fadeOpacity,
                 transition,
               }}
             >
