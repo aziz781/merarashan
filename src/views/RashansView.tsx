@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { ArrowUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+
 import { LoadingState } from "@/components/LoadingState";
 import { TransactionStats } from "@/components/TransactionStats";
 import { TransactionCard } from "@/components/TransactionCard";
@@ -159,7 +159,7 @@ export function RashansView({ mobile }: { mobile: string }) {
 
   const [showTop, setShowTop] = useState(false);
   useEffect(() => {
-    const onScroll = () => setShowTop(window.scrollY > 300);
+    const onScroll = () => setShowTop(window.scrollY > 800);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
@@ -186,16 +186,15 @@ export function RashansView({ mobile }: { mobile: string }) {
         </div>
       )}
       {filtered.length > 6 && showTop && (
-        <Button
+        <button
           type="button"
-          size="icon"
           aria-label="Back to top"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-24 right-4 z-40 h-12 w-12 rounded-full shadow-lg"
-          style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 6rem)" }}
+          className="fixed right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
+          style={{ bottom: "calc(env(safe-area-inset-bottom) + 5rem)" }}
         >
           <ArrowUp className="h-5 w-5" />
-        </Button>
+        </button>
       )}
     </>
   );
