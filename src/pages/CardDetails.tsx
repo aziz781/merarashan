@@ -28,8 +28,8 @@ function BackToTopButton() {
       type="button"
       aria-label="Back to top"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
-      style={{ bottom: "calc(env(safe-area-inset-bottom) + 5rem)" }}
+      className="fixed right-5 bottom-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
+      style={{ marginBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <ArrowUp className="h-5 w-5" />
     </button>
@@ -384,7 +384,7 @@ const CardDetails = () => {
         onClick={() => navigate(-1)}
         aria-label="Back"
         className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-primary/30 hover:bg-primary/90 transition-colors animate-in fade-in slide-in-from-bottom-2"
-        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        style={{ marginBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
         <ArrowLeft className="h-5 w-5" />
       </button>
