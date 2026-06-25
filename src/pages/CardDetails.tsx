@@ -178,6 +178,7 @@ const CardDetails = () => {
     <div className="min-h-screen pb-16">
       <header
         className="px-5 pt-10 pb-6 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md"
+        style={{ minHeight: 132 }}
       >
         <div className="flex items-center justify-end mb-3">
           <button
