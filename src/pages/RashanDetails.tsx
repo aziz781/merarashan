@@ -664,31 +664,16 @@ const RashanDetails = () => {
     return { ...c, rows };
   }).filter((g) => g.rows.length > 0);
 
-  const title =
-    (item.code_user_name as string) || (item.person_name as string) || (item.month_year as string) || "Rashan Details";
-
-  const subtitle = (item.month_year as string) || "";
+  const personName =
+    (item.code_user_name as string) || (item.person_name as string) || "";
+  const title = (item.month_year as string) || personName || "Rashan Details";
+  const subtitle = title === personName ? "" : personName;
 
 
   return (
     <div className="min-h-screen pb-16">
       <div ref={shareRef} className="bg-background">
       <PageHeader>
-        <div className="flex items-center justify-end gap-2 mb-3" data-share-hide>
-          <button
-            type="button"
-            onClick={() => navigate("/notifications")}
-            aria-label="Notifications"
-            className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
-          >
-            <Bell className="h-5 w-5" />
-            {notifUnread > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-[18px] text-center ring-2 ring-[hsl(var(--primary))]">
-                {notifUnread > 99 ? "99+" : notifUnread}
-              </span>
-            )}
-          </button>
-        </div>
         <div className="flex items-center gap-3">
           <Receipt className="w-6 h-6 opacity-90" />
           <div className="min-w-0">
