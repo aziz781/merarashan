@@ -161,27 +161,14 @@ const CardDetails = () => {
     startY.current = null;
     locked.current = null;
     setAnimating(true);
-    const width = typeof window !== "undefined" ? window.innerWidth : 400;
     if (d <= -SWIPE_THRESHOLD && nextCard) {
-      // Continue animating to the left, then navigate
-      setSwipeDx(-width);
-      dxRef.current = -width;
-      window.setTimeout(() => {
-        setAnimating(false);
-        setSwipeDx(0);
-        dxRef.current = 0;
-        goToCard(nextCard);
-      }, 220);
+      setSwipeDx(0);
+      dxRef.current = 0;
+      goToCard(nextCard);
     } else if (d >= SWIPE_THRESHOLD && prevCard) {
-      // Continue animating to the right, then navigate
-      setSwipeDx(width);
-      dxRef.current = width;
-      window.setTimeout(() => {
-        setAnimating(false);
-        setSwipeDx(0);
-        dxRef.current = 0;
-        goToCard(prevCard);
-      }, 220);
+      setSwipeDx(0);
+      dxRef.current = 0;
+      goToCard(prevCard);
     } else {
       setSwipeDx(0);
       dxRef.current = 0;
