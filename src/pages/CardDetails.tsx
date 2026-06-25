@@ -389,6 +389,7 @@ const CardDetails = () => {
         <ArrowLeft className="h-5 w-5" />
       </button>
       <PageFooter />
+      <BackToTopButton />
     </div>
   );
 };
