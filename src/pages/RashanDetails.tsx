@@ -407,7 +407,15 @@ const RashanDetails = () => {
   const [cardPopupOpen, setCardPopupOpen] = useState(false);
   const [cardData, setCardData] = useState<Record<string, unknown> | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const shareRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const onScroll = () => setShowBackToTop(window.scrollY > 300);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     setNotifUnread(unreadCount());
