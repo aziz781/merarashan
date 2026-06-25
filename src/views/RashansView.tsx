@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUp } from "lucide-react";
+
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Card } from "@/components/ui/card";
 import { LoadingState } from "@/components/LoadingState";
@@ -92,14 +92,7 @@ export function RashansView({ mobile }: { mobile: string }) {
   }, [filters]);
 
   const [statuses, setStatuses] = useState<string[]>([]);
-  const [showBackToTop, setShowBackToTop] = useState<boolean>(false);
 
-  useEffect(() => {
-    const onScroll = () => setShowBackToTop(window.scrollY > 400);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const params = useMemo<Record<string, string>>(() => {
     const p: Record<string, string> = {};
@@ -182,17 +175,7 @@ export function RashansView({ mobile }: { mobile: string }) {
           )}
         </div>
       )}
-      {filtered.length > 8 && showBackToTop && (
-        <button
-          type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="Back to top"
-          className="fixed bottom-24 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-primary/30 hover:bg-primary/90 transition-all animate-in fade-in slide-in-from-bottom-2"
-          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
-        >
-          <ArrowUp className="h-5 w-5" />
-        </button>
-      )}
     </>
   );
 }
+
