@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUp } from "lucide-react";
+
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Card } from "@/components/ui/card";
 import { LoadingState } from "@/components/LoadingState";
