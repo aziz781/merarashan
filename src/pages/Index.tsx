@@ -289,7 +289,10 @@ const Index = () => {
               </button>
             )}
             <div className="min-w-0 min-h-[44px]">
-              <h1 className="text-xl font-bold leading-tight truncate">{tab === "transactions" ? "Monthly Rashans" : tab === "cards" ? "Rashan Cards" : tab === "statements" ? "Monthly Statements" : String(displayName)}</h1>
+              <h1 className="text-xl font-bold leading-tight truncate">{tab === "transactions" ? "Rashans" : tab === "cards" ? "Rashan Cards" : tab === "statements" ? "Monthly Statements" : String(displayName)}</h1>
+              {tab === "transactions" && (
+                <p className="text-xs text-primary-foreground/80 mt-0.5 truncate">Monthly rashan details</p>
+              )}
               {tab === "customers" && (
                 <span
                   className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] ${
