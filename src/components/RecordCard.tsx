@@ -72,8 +72,8 @@ function CardRecordCard({ item, index }: CardRowProps) {
             open();
           }
         }}
-        style={{ backgroundColor: "hsl(158 64% 20%)" }}
-        className="p-5 border-0 text-white shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99] select-none"
+        style={{ backgroundColor: isDark ? "hsl(var(--card) / 0.8)" : "hsl(158 64% 20%)" }}
+        className="p-5 border-0 text-white dark:text-foreground dark:border dark:border-border/50 dark:backdrop-blur shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99] select-none"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
