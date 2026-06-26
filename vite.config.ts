@@ -91,11 +91,38 @@ export default defineConfig(({ mode }) => ({
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "@tanstack/react-query", "@tanstack/query-core"],
   },
   build: {
-    // Our true heavy code (markdown, login, per-page chunks) is already
-    // split via dynamic import(). The remaining main bundle is the React
-    // + Supabase + Radix runtime — splitting those further with
-    // manualChunks caused Capacitor WebView startup issues, so we stay
-    // on Vite's default chunking and just silence the cosmetic warning.
     chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        // Conservative vendor splitting. React + jsx-runtime MUST stay
+        // together or Capacitor's WebView throws "Invalid hook call" on
+        // startup. Router stays with React because it imports hooks at
+        // module scope. Everything else is safe to split.
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return undefined;
+          if (
+            id.includes("/react/") ||
+            id.includes("/react-dom/") ||
+            id.includes("/scheduler/") ||
+            id.includes("/react-router") ||
+            id.includes("/@remix-run/router/")
+          ) {
+            return "react-vendor";
+          }
+          if (id.includes("/@supabase/")) return "supabase";
+          if (
+            id.includes("/@tanstack/react-query") ||
+            id.includes("/@tanstack/query-core") ||
+            id.includes("/@tanstack/query-sync-storage-persister") ||
+            id.includes("/@tanstack/react-query-persist-client")
+          ) {
+            return "query";
+          }
+          if (id.includes("/@radix-ui/")) return "radix";
+          if (id.includes("/lucide-react/")) return "icons";
+          return undefined;
+        },
+      },
+    },
   },
 }));

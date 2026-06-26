@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
 import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3 } from "lucide-react";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
 import { LoadingState } from "@/components/LoadingState";
@@ -286,15 +286,11 @@ const Index = () => {
       />
 
       <main className="px-5 pt-5">
-        <Tabs value={tab} onValueChange={(v) => setTab(v as Resource)} className="w-full">
-          {TABS.map(({ id }) => (
-            <TabsContent key={id} value={id} className="mt-0">
-              <Suspense fallback={<LoadingState label="Loading…" />}>
-                <ResourceView resource={id} mobile={mobile} onNavigate={setTab} />
-              </Suspense>
-            </TabsContent>
-          ))}
-        </Tabs>
+        {/* Only the active tab is rendered — keeps inactive view code
+            from parsing/running until the user actually opens it. */}
+        <Suspense fallback={<LoadingState label="Loading…" />}>
+          <ResourceView resource={tab} mobile={mobile} onNavigate={setTab} />
+        </Suspense>
       </main>
 
       <PageFooter />
