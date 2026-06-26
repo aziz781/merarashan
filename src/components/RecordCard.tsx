@@ -117,6 +117,7 @@ function CardRecordCard({ item, index }: CardRowProps) {
 }
 
 export function CardGridTile({ item, index }: { item: Record<string, unknown>; index: number }) {
+  const isDark = useIsDark();
   const navigate = useNavigate();
   const rcNum = (item.cm_card_number as string) || "";
   const name = String(item.person_name ?? "—");
