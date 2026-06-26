@@ -16,11 +16,11 @@ export function PageHeader({ children, className, style, ...rest }: PageHeaderPr
   return (
     <header
       className={cn(
-        "px-5 pt-10 pb-6 text-primary-foreground [background:var(--gradient-primary)]",
+        "px-5 pb-6 text-primary-foreground [background:var(--gradient-primary)]",
         "dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md",
         className,
       )}
-      style={{ minHeight: 132, ...style }}
+      style={{ paddingTop: "calc(env(safe-area-inset-top) + 2.5rem)", minHeight: 132, ...style }}
       {...rest}
     >
       {children}
