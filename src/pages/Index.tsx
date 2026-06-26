@@ -291,13 +291,13 @@ const Index = () => {
             <div className="min-w-0 min-h-[44px]">
               <h1 className="text-xl font-bold leading-tight truncate">{tab === "transactions" ? "Rashans" : tab === "cards" ? "Cards" : tab === "statements" ? "Statements" : String(displayName)}</h1>
               {tab === "transactions" && (
-                <p className="text-xs text-primary-foreground/80 dark:!text-foreground/70 mt-0.5 truncate">Mera Rashan Details</p>
+                <p className="text-xs text-primary-foreground/80 dark:!text-foreground mt-0.5 truncate">Mera Rashan Details</p>
               )}
               {tab === "cards" && (
-                <p className="text-xs text-primary-foreground/80 dark:!text-foreground/70 mt-0.5 truncate">Mera Rashan Card Details</p>
+                <p className="text-xs text-primary-foreground/80 dark:!text-foreground mt-0.5 truncate">Mera Rashan Card Details</p>
               )}
               {tab === "statements" && (
-                <p className="text-xs text-primary-foreground/80 dark:!text-foreground/70 mt-0.5 truncate">Mera Rashan Monthly Statements</p>
+                <p className="text-xs text-primary-foreground/80 dark:!text-foreground mt-0.5 truncate">Mera Rashan Monthly Statements</p>
               )}
               {tab === "customers" && (
                 <span
