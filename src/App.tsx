@@ -17,7 +17,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { openAppLink } from "@/lib/openAppLink";
 import { queryClient } from "@/lib/queryClient";
 
-// Lazy-load non-critical routes so they're not in the initial bundle.
+// Lazy-load every route — including the authenticated shell — so the
+// initial bundle for unauthenticated/first-time visitors stays minimal.
+const Index = lazy(() => import("./pages/Index.tsx"));
 const CardDetails = lazy(() => import("./pages/CardDetails.tsx"));
 const RashanDetails = lazy(() => import("./pages/RashanDetails.tsx"));
 const RashanDashboard = lazy(() => import("./pages/RashanDashboard.tsx"));
