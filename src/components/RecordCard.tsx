@@ -39,6 +39,7 @@ interface CardRowProps {
 }
 
 function CardRecordCard({ item, index }: CardRowProps) {
+  const isDark = useIsDark();
   const navigate = useNavigate();
   const rcNum = (item.cm_card_number as string) || "";
   const [detailsOpen, setDetailsOpen] = useState(false);
