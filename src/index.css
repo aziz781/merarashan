@@ -107,4 +107,37 @@
     background: var(--gradient-bg);
     min-height: 100vh;
   }
+
+  /* Accessibility: user-controlled root font scaling.
+     Tailwind's rem-based utilities inherit from <html>, so bumping the
+     root font-size rescales the entire UI proportionally. */
+  html.font-size-large { font-size: 112.5%; }   /* 18px */
+  html.font-size-xlarge { font-size: 125%; }    /* 20px */
+
+  /* High contrast: deepen foreground/background separation and strengthen borders. */
+  html.high-contrast {
+    --foreground: 0 0% 0%;
+    --background: 0 0% 100%;
+    --muted-foreground: 0 0% 20%;
+    --border: 0 0% 30%;
+    --input: 0 0% 30%;
+    --primary: 158 80% 22%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 0 0% 0%;
+  }
+  html.high-contrast.dark {
+    --foreground: 0 0% 100%;
+    --background: 0 0% 4%;
+    --card: 0 0% 8%;
+    --muted-foreground: 0 0% 85%;
+    --border: 0 0% 70%;
+    --input: 0 0% 70%;
+    --primary: 158 80% 60%;
+    --primary-foreground: 0 0% 0%;
+    --ring: 0 0% 100%;
+  }
+  html.high-contrast *:focus-visible {
+    outline: 3px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
 }
