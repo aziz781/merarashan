@@ -97,6 +97,8 @@ export function useResource<T = unknown>(
     queryKey: resourceQueryKey(resource, mobile ?? "", params),
     queryFn: () => rawFetch<T>(buildUrl(resource, mobile!, params)),
     enabled: !!mobile && (options?.enabled ?? true),
+    staleTime: RESOURCE_STALE_TIME[resource],
+    gcTime: RESOURCE_GC_TIME[resource],
     ...options,
   });
 }
