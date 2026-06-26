@@ -56,7 +56,7 @@ function CardRecordCard({ item, index }: CardRowProps) {
           }
         }}
         style={{ backgroundColor: "hsl(158 64% 20%)" }}
-        className="p-5 border-0 text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99] select-none"
+        className="p-5 border-0 text-white shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99] select-none"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ export function CardGridTile({ item, index }: { item: Record<string, unknown>; i
           }
         }}
         style={{ backgroundColor: "hsl(158 64% 20%)" }}
-        className="p-3 border-0 text-primary-foreground shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] select-none"
+        className="p-3 border-0 text-white shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] select-none"
       >
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-mono opacity-90">{String(index).padStart(2, "0")}</span>
