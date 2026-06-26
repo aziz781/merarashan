@@ -104,6 +104,25 @@ const Index = () => {
       /* ignore */
     }
   }, [tab]);
+
+  // Warm sibling tab chunks in the background so tapping a tab feels instant.
+  useEffect(() => {
+    if (!mobile) return;
+    const loaders = TAB_PRELOADERS[tab] ?? [];
+    const handle = scheduleIdle(
+      () => {
+        loaders.forEach((load) => {
+          load().catch(() => { /* ignore */ });
+        });
+      },
+      { timeout: 2000 },
+    );
+    return () => {
+      try {
+        (window as unknown as { cancelIdleCallback?: (h: number) => void }).cancelIdleCallback?.(handle);
+      } catch { /* ignore */ }
+    };
+  }, [tab, mobile]);
   const [profileOpen, setProfileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
