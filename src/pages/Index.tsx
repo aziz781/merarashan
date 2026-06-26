@@ -297,7 +297,7 @@ const Index = () => {
                 <p className="text-xs text-primary-foreground/80 mt-0.5 truncate">Monthly Rashan Card Details</p>
               )}
               {tab === "statements" && (
-                <p className="text-xs text-primary-foreground/80 mt-0.5 truncate">Monthly Statement Overview</p>
+                <p className="text-xs text-primary-foreground/80 mt-0.5 truncate">Monthly Rashan Statements</p>
               )}
               {tab === "customers" && (
                 <span
