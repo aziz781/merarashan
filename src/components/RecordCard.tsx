@@ -1,6 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreditCard } from "lucide-react";
+
+function useIsDark() {
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== "undefined" && document.documentElement.classList.contains("dark"),
+  );
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const el = document.documentElement;
+    const update = () => setIsDark(el.classList.contains("dark"));
+    update();
+    const obs = new MutationObserver(update);
+    obs.observe(el, { attributes: true, attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
+  return isDark;
+}
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Resource } from "@/lib/api";
@@ -23,6 +39,7 @@ interface CardRowProps {
 }
 
 function CardRecordCard({ item, index }: CardRowProps) {
+  const isDark = useIsDark();
   const navigate = useNavigate();
   const rcNum = (item.cm_card_number as string) || "";
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -55,8 +72,8 @@ function CardRecordCard({ item, index }: CardRowProps) {
             open();
           }
         }}
-        style={{ backgroundColor: "hsl(158 64% 20%)" }}
-        className="p-5 border-0 text-white shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99] select-none"
+        style={{ backgroundColor: isDark ? "hsl(var(--card) / 0.8)" : "hsl(158 64% 20%)" }}
+        className="p-5 border-0 text-white dark:text-foreground dark:border dark:border-border/50 dark:backdrop-blur shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99] select-none"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -100,6 +117,7 @@ function CardRecordCard({ item, index }: CardRowProps) {
 }
 
 export function CardGridTile({ item, index }: { item: Record<string, unknown>; index: number }) {
+  const isDark = useIsDark();
   const navigate = useNavigate();
   const rcNum = (item.cm_card_number as string) || "";
   const name = String(item.person_name ?? "—");
@@ -139,8 +157,8 @@ export function CardGridTile({ item, index }: { item: Record<string, unknown>; i
             open();
           }
         }}
-        style={{ backgroundColor: "hsl(158 64% 20%)" }}
-        className="p-3 border-0 text-white shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] select-none"
+        style={{ backgroundColor: isDark ? "hsl(var(--card) / 0.8)" : "hsl(158 64% 20%)" }}
+        className="p-3 border-0 text-white dark:text-foreground dark:border dark:border-border/50 dark:backdrop-blur shadow-[var(--shadow-card)] cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] select-none"
       >
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-mono opacity-90">{String(index).padStart(2, "0")}</span>
