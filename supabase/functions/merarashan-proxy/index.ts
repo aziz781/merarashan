@@ -51,18 +51,11 @@ Deno.serve(async (req) => {
       await new Promise((r) => setTimeout(r, delays[attempt]));
     }
 
-    // Cache successful GETs for 60s in the browser/SW + 5min SWR window.
-    // Errors are not cached so retries hit upstream fresh.
-    const cacheControl = upstream.ok
-      ? "private, max-age=60, stale-while-revalidate=300"
-      : "no-store";
-
     return new Response(text, {
       status: upstream.status,
       headers: {
         ...corsHeaders,
         "Content-Type": upstream.headers.get("content-type") ?? "application/json",
-        "Cache-Control": cacheControl,
       },
     });
   } catch (e) {
