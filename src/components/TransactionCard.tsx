@@ -62,7 +62,7 @@ export function TransactionCard({
           open();
         }
       }}
-      className="p-4 bg-card/80 dark:!bg-[hsl(158_64%_20%)] dark:!text-white dark:!border-transparent backdrop-blur shadow-[var(--shadow-soft)] border-border/50 cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
+      className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
     >
       {showExtras && (
         <div className="mb-3 space-y-1">
