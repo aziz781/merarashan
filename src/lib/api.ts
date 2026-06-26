@@ -3,6 +3,26 @@ import { queryClient } from "./queryClient";
 
 export type Resource = "cards" | "transactions" | "customers" | "statements";
 
+const MIN = 60 * 1000;
+/**
+ * Per-resource cache freshness windows. Cards/customers change rarely, so we
+ * keep them fresh longer to avoid background refetches on tab switches.
+ * Statements/transactions update more often (new month, new payment).
+ */
+const RESOURCE_STALE_TIME: Record<Resource, number> = {
+  cards: 30 * MIN,
+  customers: 30 * MIN,
+  statements: 5 * MIN,
+  transactions: 2 * MIN,
+};
+
+const RESOURCE_GC_TIME: Record<Resource, number> = {
+  cards: 7 * 24 * 60 * MIN,
+  customers: 7 * 24 * 60 * MIN,
+  statements: 30 * 24 * 60 * MIN,
+  transactions: 30 * 24 * 60 * MIN,
+};
+
 function buildUrl(
   resource: Resource,
   mobile: string,
