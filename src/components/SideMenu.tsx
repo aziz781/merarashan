@@ -77,10 +77,10 @@ export function SideMenu({
         )}
         <div className="flex flex-col gap-1 mt-4">
           <MenuItem icon={<User className="w-4 h-4" />} label="Profile" onClick={onOpenProfile} />
-          <MenuItem icon={<HelpCircle className="w-4 h-4" />} label="Help" onClick={onOpenHelp} />
           <MenuItem icon={<Settings className="w-4 h-4" />} label="Settings" onClick={onOpenSettings} />
           <MenuItem icon={<Shield className="w-4 h-4" />} label="Privacy & Security" onClick={onOpenPrivacy} />
           <MenuItem icon={<Share2 className="w-4 h-4" />} label="Social media" onClick={onOpenSocial} />
+          <MenuItem icon={<HelpCircle className="w-4 h-4" />} label="Help" onClick={onOpenHelp} />
           <MenuItem
             icon={<LogOut className="w-4 h-4" />}
             label="Log out"
