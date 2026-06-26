@@ -16,10 +16,33 @@ import { PageFooter } from "@/components/PageFooter";
 
 // Lazy-load the four primary tab views so each tab's code (and its
 // dependencies — virtualizer, stat components, etc.) ships in its own chunk.
-const RashansView = lazy(() => import("@/views/RashansView").then((m) => ({ default: m.RashansView })));
-const StatementsView = lazy(() => import("@/views/StatementsView").then((m) => ({ default: m.StatementsView })));
-const CardsView = lazy(() => import("@/views/CardsView").then((m) => ({ default: m.CardsView })));
-const ProfileView = lazy(() => import("@/views/ProfileView").then((m) => ({ default: m.ProfileView })));
+// Keep module loaders separately so we can also warm them on idle.
+const loadRashansView = () => import("@/views/RashansView");
+const loadStatementsView = () => import("@/views/StatementsView");
+const loadCardsView = () => import("@/views/CardsView");
+const loadProfileView = () => import("@/views/ProfileView");
+
+const RashansView = lazy(() => loadRashansView().then((m) => ({ default: m.RashansView })));
+const StatementsView = lazy(() => loadStatementsView().then((m) => ({ default: m.StatementsView })));
+const CardsView = lazy(() => loadCardsView().then((m) => ({ default: m.CardsView })));
+const ProfileView = lazy(() => loadProfileView().then((m) => ({ default: m.ProfileView })));
+
+// Map tab id → loaders for sibling chunks we want to warm in the background
+// once the active tab has finished mounting. Keeps tab switches instant
+// without inflating the initial bundle.
+const TAB_PRELOADERS: Record<string, Array<() => Promise<unknown>>> = {
+  customers: [loadRashansView, loadCardsView, loadStatementsView],
+  transactions: [loadCardsView, loadStatementsView, loadProfileView],
+  cards: [loadRashansView, loadStatementsView, loadProfileView],
+  statements: [loadRashansView, loadCardsView, loadProfileView],
+};
+
+type IdleScheduler = (cb: () => void, opts?: { timeout?: number }) => number;
+const scheduleIdle: IdleScheduler =
+  typeof window !== "undefined" &&
+  typeof (window as unknown as { requestIdleCallback?: IdleScheduler }).requestIdleCallback === "function"
+    ? (window as unknown as { requestIdleCallback: IdleScheduler }).requestIdleCallback.bind(window)
+    : ((cb: () => void) => window.setTimeout(cb, 200) as unknown as number);
 
 
 import { NotificationToggle } from "@/components/NotificationToggle";
@@ -81,6 +104,25 @@ const Index = () => {
       /* ignore */
     }
   }, [tab]);
+
+  // Warm sibling tab chunks in the background so tapping a tab feels instant.
+  useEffect(() => {
+    if (!mobile) return;
+    const loaders = TAB_PRELOADERS[tab] ?? [];
+    const handle = scheduleIdle(
+      () => {
+        loaders.forEach((load) => {
+          load().catch(() => { /* ignore */ });
+        });
+      },
+      { timeout: 2000 },
+    );
+    return () => {
+      try {
+        (window as unknown as { cancelIdleCallback?: (h: number) => void }).cancelIdleCallback?.(handle);
+      } catch { /* ignore */ }
+    };
+  }, [tab, mobile]);
   const [profileOpen, setProfileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
