@@ -53,7 +53,17 @@ function NativePushBridge() {
     const onSwMessage = (event: MessageEvent) => {
       const data = event.data as { type?: string; payload?: PushNotificationPayload } | undefined;
       if (data?.type === "push-received" && data.payload) {
-        addNotification(data.payload);
+        const p = data.payload;
+        addNotification(p);
+        const title = p.title || "Notification";
+        toast(title, {
+          description: p.body,
+          duration: 6000,
+          action: p.url
+            ? { label: "Open", onClick: () => openAppLink(p.url, navigate) }
+            : undefined,
+        });
+        setPending({ title: p.title, body: p.body, url: p.url });
       }
     };
     if ("serviceWorker" in navigator) {
