@@ -65,6 +65,7 @@ async function presentForegroundLocalNotification(n: {
           channelId: "default",
           sound: "default",
           extra: n.data || {},
+          autoCancel: true,
         },
       ],
     });
@@ -467,7 +468,11 @@ export async function initNativePushListeners(opts: {
     void presentForegroundLocalNotification(n);
   };
 
-  if (isIOS()) {
+  // Attach BOTH native foreground listeners. On Android, whichever plugin owns
+  // Firebase's onMessage callback receives foreground FCM first; if we listen
+  // only to @capacitor/push-notifications, foreground messages can be missed
+  // while background/closed delivery still works.
+  try {
     await FirebaseMessaging.addListener("notificationReceived", (event) => {
       const n = (event as { notification?: { title?: string; body?: string; data?: Record<string, unknown> } }).notification || {};
       const data = (n.data || {}) as Record<string, unknown>;
@@ -475,10 +480,9 @@ export async function initNativePushListeners(opts: {
       const dTitle = typeof data.title === "string" ? data.title : undefined;
       fireForeground({ title: n.title || dTitle, body: n.body || dBody, data });
     });
-  }
-  // Always attach @capacitor/push-notifications listener too — on iOS this is
-  // the fallback when PushNotifications.register() captured the UN delegate,
-  // and on Android it's the primary foreground source.
+  } catch { /* ignore */ }
+
+  // Keep @capacitor/push-notifications as the second source/fallback.
   await PushNotifications.addListener("pushNotificationReceived", (notification) => {
     const data = (notification.data || {}) as Record<string, unknown>;
     const dBody = typeof data.body === "string" ? data.body : undefined;
