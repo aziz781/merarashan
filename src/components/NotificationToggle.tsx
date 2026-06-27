@@ -187,10 +187,14 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
         setBusy(true);
         try {
           await disableNativePush();
-          localStorage.removeItem(NATIVE_ENABLED_KEY);
+          try { localStorage.setItem(NATIVE_ENABLED_KEY, "0"); } catch { /* ignore */ }
           setEnabled(false);
           setSyncStatus("not-enabled");
-          toast.success("Notifications disabled");
+          toast.success("Notifications disabled", {
+            description: isIOSNative()
+              ? "To fully block at the OS level, open iOS Settings → MeraRashan → Notifications."
+              : "To fully block at the OS level, open Android Settings → Apps → MeraRashan → Notifications.",
+          });
         } catch (e: unknown) {
           toast.error(e instanceof Error ? e.message : "Something went wrong");
         } finally {
