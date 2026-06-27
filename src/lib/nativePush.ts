@@ -5,6 +5,53 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 import { NativeSettings, AndroidSettings, IOSSettings } from "capacitor-native-settings";
 import { supabase } from "@/integrations/supabase/client";
 
+/**
+ * Present a system heads-up notification while the app is in the foreground.
+ * FCM / APNs suppress tray notifications when the app is open, so we mirror
+ * the push as a local notification so the user actually sees a banner.
+ */
+let localNotifsReady: Promise<boolean> | null = null;
+async function ensureLocalNotifsPermission(): Promise<boolean> {
+  if (!isNativePlatform()) return false;
+  if (!localNotifsReady) {
+    localNotifsReady = (async () => {
+      try {
+        const perm = await LocalNotifications.checkPermissions();
+        if (perm.display === "granted") return true;
+        const req = await LocalNotifications.requestPermissions();
+        return req.display === "granted";
+      } catch {
+        return false;
+      }
+    })();
+  }
+  return localNotifsReady;
+}
+
+async function presentForegroundLocalNotification(n: {
+  title?: string;
+  body?: string;
+  data?: Record<string, unknown>;
+}): Promise<void> {
+  try {
+    const ok = await ensureLocalNotifsPermission();
+    if (!ok) return;
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: Math.floor(Math.random() * 2_000_000_000),
+          title: n.title || "Notification",
+          body: n.body || "",
+          channelId: "default",
+          sound: "default",
+          extra: n.data || {},
+        },
+      ],
+    });
+  } catch { /* ignore */ }
+}
+
+
 
 /**
  * Deep-link the user into the OS settings page for this app's notifications.
