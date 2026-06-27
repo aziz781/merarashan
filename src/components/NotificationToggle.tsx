@@ -207,9 +207,10 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
       if (isIOSNative()) {
         const status = await getIOSNotificationPermission();
         if (status === "denied") {
-          toast.error("Notifications are blocked", {
-            description: "Open iOS Settings → MeraRashan → Notifications to allow alerts.",
+          toast.message("Opening Settings…", {
+            description: "Enable notifications for MeraRashan in iOS Settings.",
           });
+          await openAppNotificationSettings();
           return;
         }
         if (status === "prompt" || status === "prompt-with-rationale") {
@@ -219,9 +220,10 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
       } else if (isAndroidNative()) {
         const status = await getAndroidNotificationPermission();
         if (status === "denied") {
-          toast.error("Notifications are blocked", {
-            description: "Open Android Settings → Apps → MeraRashan → Notifications to allow alerts.",
+          toast.message("Opening Settings…", {
+            description: "Enable notifications for MeraRashan in Android Settings.",
           });
+          await openAppNotificationSettings();
           return;
         }
         if (status === "prompt" || status === "prompt-with-rationale") {
