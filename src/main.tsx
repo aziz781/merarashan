@@ -10,13 +10,19 @@ void earlyInitNativePush();
 
 createRoot(document.getElementById("root")!).render(<App />);
 
-// Hide the inline splash once React has painted the first frame.
+// Hide the inline splash after a minimum 2s display, once React has painted.
+const SPLASH_MIN_MS = 2000;
+const splashStart = performance.now();
 requestAnimationFrame(() => {
   requestAnimationFrame(() => {
     const splash = document.getElementById("app-splash");
     if (!splash) return;
-    splash.classList.add("app-splash-hide");
-    setTimeout(() => splash.remove(), 300);
+    const elapsed = performance.now() - splashStart;
+    const remaining = Math.max(0, SPLASH_MIN_MS - elapsed);
+    setTimeout(() => {
+      splash.classList.add("app-splash-hide");
+      setTimeout(() => splash.remove(), 300);
+    }, remaining);
   });
 });
 
