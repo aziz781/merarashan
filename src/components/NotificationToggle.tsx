@@ -191,11 +191,12 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
           try { localStorage.setItem(NATIVE_ENABLED_KEY, "0"); } catch { /* ignore */ }
           setEnabled(false);
           setSyncStatus("not-enabled");
-          toast.success("Notifications disabled", {
+          toast.message("Opening Settings…", {
             description: isIOSNative()
-              ? "To fully block at the OS level, open iOS Settings → MeraRashan → Notifications."
-              : "To fully block at the OS level, open Android Settings → Apps → MeraRashan → Notifications.",
+              ? "Turn off notifications for MeraRashan in iOS Settings."
+              : "Turn off notifications for MeraRashan in Android Settings.",
           });
+          await openAppNotificationSettings();
         } catch (e: unknown) {
           toast.error(e instanceof Error ? e.message : "Something went wrong");
         } finally {
