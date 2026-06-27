@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Users can view their own notifications" ON public.notification_inbox;
