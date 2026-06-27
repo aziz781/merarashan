@@ -93,6 +93,33 @@ export async function getNativeNotificationPermission(): Promise<PermStatus | "u
   return "unknown";
 }
 
+/**
+ * Open the OS app-notification settings screen for this app so the user can
+ * toggle the system-level notification permission. Apps cannot change that
+ * permission programmatically on iOS or Android — this is the closest UX.
+ */
+export async function openAppNotificationSettings(): Promise<boolean> {
+  if (!isNativePlatform()) return false;
+  try {
+    if (isIOS()) {
+      // iOS deep link to this app's Settings page.
+      await App.openUrl({ url: "app-settings:" });
+      return true;
+    }
+    // Android: deep link to this app's notification settings via intent URI.
+    const pkg = "pk.merarashan.app";
+    const intent =
+      `intent://#Intent;` +
+      `action=android.settings.APP_NOTIFICATION_SETTINGS;` +
+      `S.android.provider.extra.APP_PACKAGE=${pkg};` +
+      `end`;
+    await App.openUrl({ url: intent });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** Request OS permission (shows the native system prompt if status is "prompt"). */
 export async function requestNativeNotificationPermission(): Promise<PermStatus | "unknown"> {
   try {
