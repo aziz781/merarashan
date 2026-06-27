@@ -1,5 +1,5 @@
-import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 
 interface LoadingStateProps {
   label?: string;
@@ -8,14 +8,13 @@ interface LoadingStateProps {
 }
 
 const sizes = {
-  sm: "h-5 w-5",
-  md: "h-8 w-8",
-  lg: "h-10 w-10",
+  sm: "h-8 w-8",
+  md: "h-14 w-14",
+  lg: "h-20 w-20",
 };
 
 /**
- * Standardized loading indicator: centered spinner with optional label.
- * Use everywhere in place of ad-hoc spinners / skeleton stacks for list loads.
+ * Standardized loading indicator: spinning Mera Rashan logo with optional label.
  */
 export function LoadingState({ label, className, size = "md" }: LoadingStateProps) {
   return (
@@ -27,7 +26,12 @@ export function LoadingState({ label, className, size = "md" }: LoadingStateProp
       role="status"
       aria-live="polite"
     >
-      <Loader2 className={cn("animate-spin text-primary", sizes[size])} />
+      <img
+        src={meraRashanLogo}
+        alt="Loading"
+        className={cn("animate-spin rounded-full object-contain", sizes[size])}
+        style={{ animationDuration: "1.5s" }}
+      />
       {label && <p className="text-sm">{label}</p>}
     </div>
   );
