@@ -90,6 +90,14 @@ function NativePushBridge() {
           addNotification({ title: n.title, body: n.body, url, dedupeKey, month, year });
         },
       }).catch(() => { /* ignore */ });
+
+      // On native start: check OS notification setting and prompt the user
+      // if they have not yet responded. If permission is granted and we know
+      // the user's mobile, silently register/refresh the FCM token.
+      try {
+        const mobile = localStorage.getItem("mr_mobile");
+        void ensureNativeNotificationsOnStart(mobile);
+      } catch { /* ignore */ }
     }
 
     const onFocus = () => void syncNotificationInbox();
