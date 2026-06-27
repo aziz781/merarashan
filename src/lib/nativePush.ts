@@ -185,7 +185,21 @@ export async function enableNativePush(mobile: string): Promise<string> {
     if (status !== "granted") {
       throw new Error("Notification permission denied.");
     }
-    const { token } = await FirebaseMessaging.getToken();
+    // iOS: FCM token requires an APNs token first. Trigger APNs registration
+    // via @capacitor/push-notifications so AppDelegate forwards the device
+    // token to Firebase Messaging (Messaging.messaging().apnsToken = ...).
+    try {
+      await PushNotifications.register();
+    } catch { /* ignore — getToken will surface a clearer error */ }
+    // Poll briefly for the FCM token — APNs registration is async.
+    let token = "";
+    for (let i = 0; i < 10; i++) {
+      try {
+        const res = await FirebaseMessaging.getToken();
+        if (res?.token) { token = res.token; break; }
+      } catch { /* retry */ }
+      await new Promise((r) => setTimeout(r, 500));
+    }
     if (!token) throw new Error("Failed to obtain FCM token on iOS");
     currentToken = token;
     const { error } = await supabase.functions.invoke("native-push-subscribe", {
