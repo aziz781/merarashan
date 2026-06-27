@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import appLogo from "@/assets/mera-rashan-logo.webp";
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { getCurrentSubscription, pushSupported } from "@/lib/push";
-import { isNativePlatform } from "@/lib/nativePush";
+import { isNativePlatform, isIOSNative, getIOSNotificationPermission, getAndroidNotificationPermission } from "@/lib/nativePush";
 import {
   clearAll,
   getNotifications,
