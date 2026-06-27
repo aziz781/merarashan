@@ -5,7 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-import { initNativePushListeners, isNativePlatform } from "@/lib/nativePush";
+import { ensureNativeNotificationsOnStart, initNativePushListeners, isNativePlatform } from "@/lib/nativePush";
 import {
   PushNotificationDialog,
   type PushNotificationPayload,
