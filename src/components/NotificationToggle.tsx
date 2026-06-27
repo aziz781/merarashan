@@ -285,11 +285,11 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
         </div>
         <Button
           size="sm"
-          variant={enabled ? "outline" : "default"}
-          disabled={busy}
+          variant={native ? "default" : enabled ? "outline" : "default"}
+          disabled={busy || (native && enabled)}
           onClick={onToggle}
         >
-          {busy ? "…" : enabled ? "Disable" : "Enable"}
+          {busy ? "…" : native ? "Enable" : enabled ? "Disable" : "Enable"}
         </Button>
       </div>
 
