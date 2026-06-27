@@ -11,6 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
  * the push as a local notification so the user actually sees a banner.
  */
 let localNotifsReady: Promise<boolean> | null = null;
+const FOREGROUND_ANDROID_CHANNEL_ID = "foreground_alerts";
+
 async function ensureLocalNotifsPermission(): Promise<boolean> {
   if (!isNativePlatform()) return false;
   if (!localNotifsReady) {
@@ -23,16 +25,16 @@ async function ensureLocalNotifsPermission(): Promise<boolean> {
           granted = req.display === "granted";
         }
         if (granted && Capacitor.getPlatform() === "android") {
-          // LocalNotifications uses its own channel registry — create a
-          // high-importance one so foreground banners actually appear.
+          // Android channels are immutable after creation. Use a dedicated
+          // foreground channel instead of the app's old/default FCM channel so
+          // foreground mirrors can be high-importance heads-up banners.
           try {
             await LocalNotifications.createChannel({
-              id: "default",
-              name: "Default",
-              description: "General notifications",
-              importance: 5, // IMPORTANCE_HIGH
+              id: FOREGROUND_ANDROID_CHANNEL_ID,
+              name: "Foreground alerts",
+              description: "Notifications shown while Mera Rashan is open",
+              importance: 5, // IMPORTANCE_MAX (heads-up + sound)
               visibility: 1,
-              sound: "default",
               vibration: true,
               lights: true,
             });
@@ -62,7 +64,7 @@ async function presentForegroundLocalNotification(n: {
           id: Math.floor(Math.random() * 2_000_000_000),
           title: n.title || "Notification",
           body: n.body || "",
-          channelId: "default",
+          channelId: Capacitor.getPlatform() === "android" ? FOREGROUND_ANDROID_CHANNEL_ID : "default",
           sound: "default",
           extra: n.data || {},
           autoCancel: true,
