@@ -62,11 +62,19 @@ export default function Notifications() {
     });
     setItems(getNotifications());
 
+    const computeNative = async () => {
+      const status = isIOSNative()
+        ? await getIOSNotificationPermission()
+        : await getAndroidNotificationPermission();
+      const optedIn = localStorage.getItem(NATIVE_ENABLED_KEY) === "1";
+      return status === "granted" && optedIn;
+    };
+
     // Determine push enabled state
     (async () => {
       try {
         if (isNativePlatform()) {
-          setPushEnabled(localStorage.getItem(NATIVE_ENABLED_KEY) === "1");
+          setPushEnabled(await computeNative());
           return;
         }
         if (!pushSupported()) {
@@ -85,7 +93,7 @@ export default function Notifications() {
         (async () => {
           try {
             if (isNativePlatform()) {
-              setPushEnabled(localStorage.getItem(NATIVE_ENABLED_KEY) === "1");
+              setPushEnabled(await computeNative());
               return;
             }
             if (!pushSupported()) return;
