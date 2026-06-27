@@ -78,15 +78,9 @@ function NativePushBridge() {
           const month = data.month != null ? String(data.month) : null;
           const year = data.year != null ? String(data.year) : null;
           addNotification({ title: n.title, body: n.body, url, month, year });
-          // Non-blocking toast so rapid pushes aren't hidden behind one modal.
-          const title = n.title || "Notification";
-          toast(title, {
-            description: n.body,
-            duration: 6000,
-            action: url
-              ? { label: "Open", onClick: () => openAppLink(url, navigate) }
-              : undefined,
-          });
+          // Foreground notifications are surfaced as a system heads-up banner
+          // by nativePush.ts; the in-app toast is intentionally skipped so the
+          // user isn't interrupted while already inside the app.
           // Also surface the richer modal for the latest message.
           setPending({ title: n.title, body: n.body, url });
         },
