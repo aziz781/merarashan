@@ -484,17 +484,23 @@ export async function initNativePushListeners(opts: {
     });
   } catch { /* ignore */ }
 
-  // Keep @capacitor/push-notifications as the second source/fallback.
-  await PushNotifications.addListener("pushNotificationReceived", (notification) => {
-    const data = (notification.data || {}) as Record<string, unknown>;
-    const dBody = typeof data.body === "string" ? data.body : undefined;
-    const dTitle = typeof data.title === "string" ? data.title : undefined;
-    fireForeground({
-      title: notification.title || dTitle,
-      body: notification.body || dBody,
-      data,
+  // Keep @capacitor/push-notifications as the second source/fallback —
+  // but only on Android. On iOS both plugins reliably emit the same
+  // foreground event and the payload shape differs enough that the
+  // dedupe key misses, causing duplicate banners. FirebaseMessaging
+  // alone is sufficient on iOS.
+  if (!isIOS()) {
+    await PushNotifications.addListener("pushNotificationReceived", (notification) => {
+      const data = (notification.data || {}) as Record<string, unknown>;
+      const dBody = typeof data.body === "string" ? data.body : undefined;
+      const dTitle = typeof data.title === "string" ? data.title : undefined;
+      fireForeground({
+        title: notification.title || dTitle,
+        body: notification.body || dBody,
+        data,
+      });
     });
-  });
+  }
 
 
   // Wire the early-init tap queue to the caller's handler.
