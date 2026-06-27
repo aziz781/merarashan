@@ -58,14 +58,15 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
           ? await getIOSNotificationPermission()
           : await getAndroidNotificationPermission();
         if (cancelled) return;
-        const granted = status === "granted";
-        setEnabled(granted);
-        setSyncStatus(granted ? "matched" : "not-enabled");
-        if (granted) {
-          try { localStorage.setItem(NATIVE_ENABLED_KEY, "1"); } catch { /* ignore */ }
-        } else {
-          try { localStorage.removeItem(NATIVE_ENABLED_KEY); } catch { /* ignore */ }
-        }
+        const osGranted = status === "granted";
+        let userOptedIn = false;
+        try { userOptedIn = localStorage.getItem(NATIVE_ENABLED_KEY) === "1"; } catch { /* ignore */ }
+        // Toggle is "on" only when BOTH the OS allows it AND the user
+        // hasn't explicitly disabled it from this Settings screen.
+        const effective = osGranted && userOptedIn;
+        setEnabled(effective);
+        if (!osGranted) setSyncStatus("not-enabled");
+        else setSyncStatus(effective ? "matched" : "not-enabled");
       };
       void refresh();
       const onVis = () => {
