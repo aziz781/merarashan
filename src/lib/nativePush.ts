@@ -56,6 +56,10 @@ async function presentForegroundLocalNotification(n: {
   data?: Record<string, unknown>;
 }): Promise<void> {
   try {
+    // iOS already presents foreground remote notifications via the native
+    // plugin presentationOptions. Scheduling an extra local notification there
+    // creates duplicate banners/tray entries, so only mirror locally on Android.
+    if (isIOS()) return;
     const ok = await ensureLocalNotifsPermission();
     if (!ok) return;
     await LocalNotifications.schedule({
@@ -472,7 +476,8 @@ export async function initNativePushListeners(opts: {
       recentForeground.set(key, now);
       opts.onForeground?.(n);
     }
-    // …and independently dedupe the heads-up banner mirror.
+    // …and independently dedupe the Android heads-up banner mirror. On iOS,
+    // native presentationOptions handle the visible banner/sound.
     const seenBanner = recentBanner.get(key);
     if (!seenBanner || now - seenBanner >= FG_DEDUPE_MS) {
       recentBanner.set(key, now);
