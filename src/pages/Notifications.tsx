@@ -129,7 +129,7 @@ export default function Notifications() {
       </PageHeader>
 
       <div className="p-4 space-y-3 max-w-2xl mx-auto">
-        {pushEnabled !== true && mobile && (
+        {pushEnabled !== true && (
           <NotificationToggle mobile={mobile} />
         )}
         {items.length === 0 ? (
