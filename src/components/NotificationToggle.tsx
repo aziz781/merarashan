@@ -52,10 +52,32 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
     // --- Native (Capacitor/FCM) branch ---
     if (native) {
       setSupported(true);
-      const wasEnabled = localStorage.getItem(NATIVE_ENABLED_KEY) === "1";
-      setEnabled(wasEnabled);
-      setSyncStatus(wasEnabled ? "matched" : "not-enabled");
-      return;
+      let cancelled = false;
+      const refresh = async () => {
+        const status = isIOSNative()
+          ? await getIOSNotificationPermission()
+          : await getAndroidNotificationPermission();
+        if (cancelled) return;
+        const granted = status === "granted";
+        setEnabled(granted);
+        setSyncStatus(granted ? "matched" : "not-enabled");
+        if (granted) {
+          try { localStorage.setItem(NATIVE_ENABLED_KEY, "1"); } catch { /* ignore */ }
+        } else {
+          try { localStorage.removeItem(NATIVE_ENABLED_KEY); } catch { /* ignore */ }
+        }
+      };
+      void refresh();
+      const onVis = () => {
+        if (document.visibilityState === "visible") void refresh();
+      };
+      document.addEventListener("visibilitychange", onVis);
+      window.addEventListener("focus", refresh);
+      return () => {
+        cancelled = true;
+        document.removeEventListener("visibilitychange", onVis);
+        window.removeEventListener("focus", refresh);
+      };
     }
 
     // --- Web push branch ---
