@@ -1,8 +1,10 @@
 import { Capacitor, registerPlugin, type PluginListenerHandle } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { PushNotifications } from "@capacitor/push-notifications";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import { NativeSettings, AndroidSettings, IOSSettings } from "capacitor-native-settings";
 import { supabase } from "@/integrations/supabase/client";
+
 
 /**
  * Deep-link the user into the OS settings page for this app's notifications.
