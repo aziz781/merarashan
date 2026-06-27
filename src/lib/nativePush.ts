@@ -102,18 +102,17 @@ export async function openAppNotificationSettings(): Promise<boolean> {
   if (!isNativePlatform()) return false;
   try {
     if (isIOS()) {
-      // iOS deep link to this app's Settings page.
-      await App.openUrl({ url: "app-settings:" });
+      // iOS WKWebView handles the app-settings: scheme natively.
+      window.location.href = "app-settings:";
       return true;
     }
-    // Android: deep link to this app's notification settings via intent URI.
     const pkg = "pk.merarashan.app";
     const intent =
       `intent://#Intent;` +
       `action=android.settings.APP_NOTIFICATION_SETTINGS;` +
       `S.android.provider.extra.APP_PACKAGE=${pkg};` +
       `end`;
-    await App.openUrl({ url: intent });
+    window.location.href = intent;
     return true;
   } catch {
     return false;
