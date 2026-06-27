@@ -86,6 +86,53 @@ export async function getAndroidNotificationPermission(): Promise<PermStatus | "
   }
 }
 
+/** Unified permission check across iOS/Android native. */
+export async function getNativeNotificationPermission(): Promise<PermStatus | "unknown"> {
+  if (isIOSNative()) return getIOSNotificationPermission();
+  if (isAndroidNative()) return getAndroidNotificationPermission();
+  return "unknown";
+}
+
+/** Request OS permission (shows the native system prompt if status is "prompt"). */
+export async function requestNativeNotificationPermission(): Promise<PermStatus | "unknown"> {
+  try {
+    if (isIOSNative()) {
+      const { receive } = await FirebaseMessaging.requestPermissions();
+      return receive;
+    }
+    if (isAndroidNative()) {
+      const { receive } = await PushNotifications.requestPermissions();
+      return receive as PermStatus;
+    }
+  } catch {
+    return "unknown";
+  }
+  return "unknown";
+}
+
+/**
+ * On native app start: check the OS notification setting. If the user has not
+ * answered yet, show the native system prompt. When permission is granted and
+ * a mobile is known, silently register/refresh the FCM token.
+ * Returns the final permission status.
+ */
+export async function ensureNativeNotificationsOnStart(
+  mobile: string | null,
+): Promise<PermStatus | "unknown"> {
+  if (!isNativePlatform()) return "unknown";
+  let status = await getNativeNotificationPermission();
+  if (status === "prompt" || status === "prompt-with-rationale") {
+    status = await requestNativeNotificationPermission();
+  }
+  if (status === "granted" && mobile) {
+    try {
+      await enableNativePush(mobile);
+      try { localStorage.setItem("mr_native_push_enabled", "1"); } catch { /* ignore */ }
+    } catch { /* ignore — UI toggle will reflect real state */ }
+  }
+  return status;
+}
+
 /**
  * Request permission and register with FCM/APNs.
  * - Android: uses @capacitor/push-notifications (returns FCM token directly).
