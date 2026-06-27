@@ -451,29 +451,39 @@ export async function initNativePushListeners(opts: {
   // plugin grabbed the UNUserNotificationCenter delegate first will be the
   // one that actually receives the event — dedupe on a recent-key cache.
   const recentForeground = new Map<string, number>();
+  const recentBanner = new Map<string, number>();
   const FG_DEDUPE_MS = 4000;
+  const makeKey = (n: { title?: string; body?: string }) => `${n.title || ""}|${n.body || ""}`;
   const fireForeground = (n: { title?: string; body?: string; data?: Record<string, unknown> }) => {
-    const key = `${n.title || ""}|${n.body || ""}|${JSON.stringify(n.data || {})}`;
+    const key = makeKey(n);
     const now = Date.now();
-    const seen = recentForeground.get(key);
-    if (seen && now - seen < FG_DEDUPE_MS) return;
-    recentForeground.set(key, now);
     // GC old entries
     if (recentForeground.size > 50) {
       for (const [k, t] of recentForeground) {
         if (now - t > FG_DEDUPE_MS) recentForeground.delete(k);
       }
+      for (const [k, t] of recentBanner) {
+        if (now - t > FG_DEDUPE_MS) recentBanner.delete(k);
+      }
     }
-    opts.onForeground?.(n);
-    // Also present a system heads-up notification so the user sees a banner
-    // even while the app is foreground (FCM suppresses tray on foreground).
-    void presentForegroundLocalNotification(n);
+    // Dedupe the in-app modal/inbox callback…
+    const seen = recentForeground.get(key);
+    if (!seen || now - seen >= FG_DEDUPE_MS) {
+      recentForeground.set(key, now);
+      opts.onForeground?.(n);
+    }
+    // …and independently dedupe the heads-up banner mirror.
+    const seenBanner = recentBanner.get(key);
+    if (!seenBanner || now - seenBanner >= FG_DEDUPE_MS) {
+      recentBanner.set(key, now);
+      void presentForegroundLocalNotification(n);
+    }
   };
 
-  // Attach BOTH native foreground listeners. On Android, whichever plugin owns
-  // Firebase's onMessage callback receives foreground FCM first; if we listen
-  // only to @capacitor/push-notifications, foreground messages can be missed
-  // while background/closed delivery still works.
+  // Attach BOTH native foreground listeners on every platform. On iOS,
+  // whichever plugin grabs UNUserNotificationCenter.delegate first wins the
+  // event — listening to only one risks missing foreground notifications.
+  // Dedupe (title+body) keeps the modal/banner single.
   try {
     await FirebaseMessaging.addListener("notificationReceived", (event) => {
       const n = (event as { notification?: { title?: string; body?: string; data?: Record<string, unknown> } }).notification || {};
@@ -484,12 +494,7 @@ export async function initNativePushListeners(opts: {
     });
   } catch { /* ignore */ }
 
-  // Keep @capacitor/push-notifications as the second source/fallback —
-  // but only on Android. On iOS both plugins reliably emit the same
-  // foreground event and the payload shape differs enough that the
-  // dedupe key misses, causing duplicate banners. FirebaseMessaging
-  // alone is sufficient on iOS.
-  if (!isIOS()) {
+  {
     await PushNotifications.addListener("pushNotificationReceived", (notification) => {
       const data = (notification.data || {}) as Record<string, unknown>;
       const dBody = typeof data.body === "string" ? data.body : undefined;
