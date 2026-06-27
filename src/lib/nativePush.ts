@@ -17,9 +17,28 @@ async function ensureLocalNotifsPermission(): Promise<boolean> {
     localNotifsReady = (async () => {
       try {
         const perm = await LocalNotifications.checkPermissions();
-        if (perm.display === "granted") return true;
-        const req = await LocalNotifications.requestPermissions();
-        return req.display === "granted";
+        let granted = perm.display === "granted";
+        if (!granted) {
+          const req = await LocalNotifications.requestPermissions();
+          granted = req.display === "granted";
+        }
+        if (granted && Capacitor.getPlatform() === "android") {
+          // LocalNotifications uses its own channel registry — create a
+          // high-importance one so foreground banners actually appear.
+          try {
+            await LocalNotifications.createChannel({
+              id: "default",
+              name: "Default",
+              description: "General notifications",
+              importance: 5, // IMPORTANCE_HIGH
+              visibility: 1,
+              sound: "default",
+              vibration: true,
+              lights: true,
+            });
+          } catch { /* ignore */ }
+        }
+        return granted;
       } catch {
         return false;
       }
@@ -27,6 +46,7 @@ async function ensureLocalNotifsPermission(): Promise<boolean> {
   }
   return localNotifsReady;
 }
+
 
 async function presentForegroundLocalNotification(n: {
   title?: string;
