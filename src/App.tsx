@@ -4,6 +4,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 import { ensureNativeNotificationsOnStart, initNativePushListeners, isNativePlatform } from "@/lib/nativePush";
 import {
@@ -52,7 +53,17 @@ function NativePushBridge() {
     const onSwMessage = (event: MessageEvent) => {
       const data = event.data as { type?: string; payload?: PushNotificationPayload } | undefined;
       if (data?.type === "push-received" && data.payload) {
-        addNotification(data.payload);
+        const p = data.payload;
+        addNotification(p);
+        const title = p.title || "Notification";
+        toast(title, {
+          description: p.body,
+          duration: 6000,
+          action: p.url
+            ? { label: "Open", onClick: () => openAppLink(p.url, navigate) }
+            : undefined,
+        });
+        setPending({ title: p.title, body: p.body, url: p.url });
       }
     };
     if ("serviceWorker" in navigator) {
@@ -67,6 +78,16 @@ function NativePushBridge() {
           const month = data.month != null ? String(data.month) : null;
           const year = data.year != null ? String(data.year) : null;
           addNotification({ title: n.title, body: n.body, url, month, year });
+          // Non-blocking toast so rapid pushes aren't hidden behind one modal.
+          const title = n.title || "Notification";
+          toast(title, {
+            description: n.body,
+            duration: 6000,
+            action: url
+              ? { label: "Open", onClick: () => openAppLink(url, navigate) }
+              : undefined,
+          });
+          // Also surface the richer modal for the latest message.
           setPending({ title: n.title, body: n.body, url });
         },
         onAction: (url, n) => {
