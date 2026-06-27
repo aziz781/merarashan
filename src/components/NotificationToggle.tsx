@@ -185,16 +185,17 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
   const onToggle = async () => {
     if (native) {
       if (enabled) {
+        // Unregister our token immediately, then deep-link the user into the
+        // OS notification settings so they can flip the system switch off.
         setBusy(true);
         try {
           await disableNativePush();
           try { localStorage.setItem(NATIVE_ENABLED_KEY, "0"); } catch { /* ignore */ }
           setEnabled(false);
           setSyncStatus("not-enabled");
-          toast.success("Notifications disabled", {
-            description: isIOSNative()
-              ? "To fully block at the OS level, open iOS Settings → MeraRashan → Notifications."
-              : "To fully block at the OS level, open Android Settings → Apps → MeraRashan → Notifications.",
+          await openAppNotificationSettings();
+          toast.success("Opened system notification settings", {
+            description: "Turn off Notifications for MeraRashan to fully disable.",
           });
         } catch (e: unknown) {
           toast.error(e instanceof Error ? e.message : "Something went wrong");
@@ -203,12 +204,13 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
         }
         return;
       }
-      // iOS / Android: show rationale the first time (status === prompt).
+      // Enabling: prompt the first time, otherwise open OS settings when blocked.
       if (isIOSNative()) {
         const status = await getIOSNotificationPermission();
         if (status === "denied") {
-          toast.error("Notifications are blocked", {
-            description: "Open iOS Settings → MeraRashan → Notifications to allow alerts.",
+          await openAppNotificationSettings();
+          toast.message("Enable notifications in Settings", {
+            description: "Turn on Notifications for MeraRashan, then return here.",
           });
           return;
         }
@@ -219,8 +221,9 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
       } else if (isAndroidNative()) {
         const status = await getAndroidNotificationPermission();
         if (status === "denied") {
-          toast.error("Notifications are blocked", {
-            description: "Open Android Settings → Apps → MeraRashan → Notifications to allow alerts.",
+          await openAppNotificationSettings();
+          toast.message("Enable notifications in Settings", {
+            description: "Turn on Notifications for MeraRashan, then return here.",
           });
           return;
         }
