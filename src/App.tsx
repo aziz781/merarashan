@@ -4,6 +4,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 import { ensureNativeNotificationsOnStart, initNativePushListeners, isNativePlatform } from "@/lib/nativePush";
 import {
