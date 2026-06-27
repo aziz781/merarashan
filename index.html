@@ -67,7 +67,16 @@
       @keyframes app-splash-spin { to { transform: rotate(360deg); } }
       @media (prefers-color-scheme: dark) {
         #app-splash {
-          background: radial-gradient(circle at 50% 35%, #1E3A8A 0%, #0F172A 70%);
+          background: linear-gradient(180deg, hsl(158 30% 8%), hsl(158 28% 12%));
+          color: hsl(158 25% 94%);
+        }
+        #app-splash .app-splash-logo {
+          background: hsl(158 28% 11%);
+          box-shadow: 0 20px 50px -10px hsl(0 0% 0% / 0.6), inset 0 0 0 1px hsl(158 22% 20%);
+        }
+        #app-splash .app-splash-spinner {
+          border-color: hsl(158 22% 20%);
+          border-top-color: hsl(158 65% 48%);
         }
       }
     </style>
