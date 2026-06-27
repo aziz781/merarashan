@@ -120,6 +120,16 @@ export async function ensureNativeNotificationsOnStart(
   mobile: string | null,
 ): Promise<PermStatus | "unknown"> {
   if (!isNativePlatform()) return "unknown";
+  // Respect explicit user opt-out from the Settings toggle: if the user
+  // tapped "Disable", do NOT prompt or re-register on subsequent launches.
+  let userDisabled = false;
+  try {
+    const v = localStorage.getItem("mr_native_push_enabled");
+    // Treat an explicit "0" as opted-out. Absent key = first run -> prompt.
+    userDisabled = v === "0";
+  } catch { /* ignore */ }
+  if (userDisabled) return await getNativeNotificationPermission();
+
   let status = await getNativeNotificationPermission();
   if (status === "prompt" || status === "prompt-with-rationale") {
     status = await requestNativeNotificationPermission();
