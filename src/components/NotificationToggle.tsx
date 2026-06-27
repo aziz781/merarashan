@@ -184,27 +184,8 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
 
   const onToggle = async () => {
     if (native) {
-      if (enabled) {
-        // Unregister our token immediately, then deep-link the user into the
-        // OS notification settings so they can flip the system switch off.
-        setBusy(true);
-        try {
-          await disableNativePush();
-          try { localStorage.setItem(NATIVE_ENABLED_KEY, "0"); } catch { /* ignore */ }
-          setEnabled(false);
-          setSyncStatus("not-enabled");
-          await openAppNotificationSettings();
-          toast.success("Opened system notification settings", {
-            description: "Turn off Notifications for MeraRashan to fully disable.",
-          });
-        } catch (e: unknown) {
-          toast.error(e instanceof Error ? e.message : "Something went wrong");
-        } finally {
-          setBusy(false);
-        }
-        return;
-      }
-      // Enabling: prompt the first time, otherwise open OS settings when blocked.
+      // Native: button only ever enables. If already enabled (system + user
+      // opted in), the button is greyed out and this handler is unreachable.
       if (isIOSNative()) {
         const status = await getIOSNotificationPermission();
         if (status === "denied") {
@@ -304,11 +285,11 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
         </div>
         <Button
           size="sm"
-          variant={enabled ? "outline" : "default"}
-          disabled={busy}
+          variant={native ? "default" : enabled ? "outline" : "default"}
+          disabled={busy || (native && enabled)}
           onClick={onToggle}
         >
-          {busy ? "…" : enabled ? "Disable" : "Enable"}
+          {busy ? "…" : native ? "Enable" : enabled ? "Disable" : "Enable"}
         </Button>
       </div>
 
