@@ -1,8 +1,57 @@
 import { Capacitor, registerPlugin, type PluginListenerHandle } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { PushNotifications } from "@capacitor/push-notifications";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import { NativeSettings, AndroidSettings, IOSSettings } from "capacitor-native-settings";
 import { supabase } from "@/integrations/supabase/client";
+
+/**
+ * Present a system heads-up notification while the app is in the foreground.
+ * FCM / APNs suppress tray notifications when the app is open, so we mirror
+ * the push as a local notification so the user actually sees a banner.
+ */
+let localNotifsReady: Promise<boolean> | null = null;
+async function ensureLocalNotifsPermission(): Promise<boolean> {
+  if (!isNativePlatform()) return false;
+  if (!localNotifsReady) {
+    localNotifsReady = (async () => {
+      try {
+        const perm = await LocalNotifications.checkPermissions();
+        if (perm.display === "granted") return true;
+        const req = await LocalNotifications.requestPermissions();
+        return req.display === "granted";
+      } catch {
+        return false;
+      }
+    })();
+  }
+  return localNotifsReady;
+}
+
+async function presentForegroundLocalNotification(n: {
+  title?: string;
+  body?: string;
+  data?: Record<string, unknown>;
+}): Promise<void> {
+  try {
+    const ok = await ensureLocalNotifsPermission();
+    if (!ok) return;
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: Math.floor(Math.random() * 2_000_000_000),
+          title: n.title || "Notification",
+          body: n.body || "",
+          channelId: "default",
+          sound: "default",
+          extra: n.data || {},
+        },
+      ],
+    });
+  } catch { /* ignore */ }
+}
+
+
 
 /**
  * Deep-link the user into the OS settings page for this app's notifications.
@@ -375,30 +424,52 @@ export async function initNativePushListeners(opts: {
     } catch { /* ignore */ }
   }
 
+  // Foreground delivery. iOS attaches BOTH listeners because whichever
+  // plugin grabbed the UNUserNotificationCenter delegate first will be the
+  // one that actually receives the event — dedupe on a recent-key cache.
+  const recentForeground = new Map<string, number>();
+  const FG_DEDUPE_MS = 4000;
+  const fireForeground = (n: { title?: string; body?: string; data?: Record<string, unknown> }) => {
+    const key = `${n.title || ""}|${n.body || ""}|${JSON.stringify(n.data || {})}`;
+    const now = Date.now();
+    const seen = recentForeground.get(key);
+    if (seen && now - seen < FG_DEDUPE_MS) return;
+    recentForeground.set(key, now);
+    // GC old entries
+    if (recentForeground.size > 50) {
+      for (const [k, t] of recentForeground) {
+        if (now - t > FG_DEDUPE_MS) recentForeground.delete(k);
+      }
+    }
+    opts.onForeground?.(n);
+    // Also present a system heads-up notification so the user sees a banner
+    // even while the app is foreground (FCM suppresses tray on foreground).
+    void presentForegroundLocalNotification(n);
+  };
+
   if (isIOS()) {
     await FirebaseMessaging.addListener("notificationReceived", (event) => {
       const n = (event as { notification?: { title?: string; body?: string; data?: Record<string, unknown> } }).notification || {};
       const data = (n.data || {}) as Record<string, unknown>;
       const dBody = typeof data.body === "string" ? data.body : undefined;
       const dTitle = typeof data.title === "string" ? data.title : undefined;
-      opts.onForeground?.({
-        title: n.title || dTitle,
-        body: n.body || dBody,
-        data,
-      });
-    });
-  } else {
-    await PushNotifications.addListener("pushNotificationReceived", (notification) => {
-      const data = (notification.data || {}) as Record<string, unknown>;
-      const dBody = typeof data.body === "string" ? data.body : undefined;
-      const dTitle = typeof data.title === "string" ? data.title : undefined;
-      opts.onForeground?.({
-        title: notification.title || dTitle,
-        body: notification.body || dBody,
-        data,
-      });
+      fireForeground({ title: n.title || dTitle, body: n.body || dBody, data });
     });
   }
+  // Always attach @capacitor/push-notifications listener too — on iOS this is
+  // the fallback when PushNotifications.register() captured the UN delegate,
+  // and on Android it's the primary foreground source.
+  await PushNotifications.addListener("pushNotificationReceived", (notification) => {
+    const data = (notification.data || {}) as Record<string, unknown>;
+    const dBody = typeof data.body === "string" ? data.body : undefined;
+    const dTitle = typeof data.title === "string" ? data.title : undefined;
+    fireForeground({
+      title: notification.title || dTitle,
+      body: notification.body || dBody,
+      data,
+    });
+  });
+
 
   // Wire the early-init tap queue to the caller's handler.
   if (opts.onAction) {
