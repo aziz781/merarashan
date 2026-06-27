@@ -18,6 +18,7 @@ import {
   isAndroidNative,
   getIOSNotificationPermission,
   getAndroidNotificationPermission,
+  openAppNotificationSettings,
 } from "@/lib/nativePush";
 import {
   AlertDialog,
