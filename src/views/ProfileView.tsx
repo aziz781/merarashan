@@ -283,9 +283,6 @@ function RecentRashans({
           <p className="text-[11px] text-muted-foreground mt-0.5">This month · {monthLabel}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className="inline-flex items-center rounded-full bg-primary/10 text-primary text-xs font-semibold px-2 py-0.5">
-            <span className="font-bold">{cardsUsed}</span>&nbsp;of {totalCards ?? 0} cards used
-          </span>
           <button type="button" onClick={onViewAll} className="text-xs font-medium text-primary hover:underline">
             View all
           </button>
