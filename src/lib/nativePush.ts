@@ -1,7 +1,26 @@
 import { Capacitor, registerPlugin, type PluginListenerHandle } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { PushNotifications } from "@capacitor/push-notifications";
+import { NativeSettings, AndroidSettings, IOSSettings } from "capacitor-native-settings";
 import { supabase } from "@/integrations/supabase/client";
+
+/**
+ * Deep-link the user into the OS settings page for this app's notifications.
+ * Apps cannot toggle the system notification switch programmatically; this
+ * opens the exact screen so the user can flip it in one tap.
+ */
+export async function openAppNotificationSettings(): Promise<void> {
+  if (!isNativePlatform()) return;
+  try {
+    if (isIOS()) {
+      await NativeSettings.openIOS({ option: IOSSettings.App });
+    } else {
+      await NativeSettings.openAndroid({ option: AndroidSettings.AppNotification });
+    }
+  } catch {
+    /* ignore */
+  }
+}
 
 // Use registerPlugin directly to avoid pulling the @capacitor-firebase/messaging
 // web entry (which depends on `firebase`) into the web bundle. On native iOS the
