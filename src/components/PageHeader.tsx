@@ -20,7 +20,7 @@ export function PageHeader({ children, className, style, ...rest }: PageHeaderPr
         "dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md",
         className,
       )}
-      style={{ paddingTop: "calc(env(safe-area-inset-top) + 2.5rem)", minHeight: 132, ...style }}
+      style={{ paddingTop: "calc(env(safe-area-inset-top) + 3.75rem)", minHeight: 148, ...style }}
       {...rest}
     >
       {children}
