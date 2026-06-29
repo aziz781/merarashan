@@ -21,9 +21,20 @@ Deno.serve(async (req) => {
     const cleaned = String(mobile ?? "").replace(/\D/g, "");
     const codeStr = String(code ?? "").trim();
 
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
     // Test account bypass: allow login without verifying the OTP.
-    const BYPASS_MOBILES = new Set(["447525776781", "447548989200"]);
-    const isBypass = BYPASS_MOBILES.has(cleaned);
+    // Configurable via the public.otp_bypass_mobiles table.
+    const { data: bypassRow } = await supabaseAdmin
+      .from("otp_bypass_mobiles")
+      .select("mobile")
+      .eq("mobile", cleaned)
+      .eq("active", true)
+      .maybeSingle();
+    const isBypass = !!bypassRow;
 
     if (!isBypass && !/^\d{6}$/.test(codeStr)) {
       return new Response(JSON.stringify({ error: "Invalid code format" }), {
@@ -32,10 +43,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
+    const supabase = supabaseAdmin;
 
     if (isBypass) {
       const email = `${cleaned}@${EMAIL_DOMAIN}`;
