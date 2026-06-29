@@ -79,6 +79,7 @@ Deno.serve(async (req) => {
     const delays = [200, 500, 1000];
     for (let attempt = 0; attempt <= delays.length; attempt++) {
       upstream = await fetch(upstreamUrl.toString(), {
+        method: req.method,
         headers: {
           "x-api-key": token,
           Accept: "application/json",
