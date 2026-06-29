@@ -480,7 +480,7 @@ const Index = () => {
         onOpenChange={handlePrivacyPanelChange}
         title="Privacy & Security"
       >
-        <div className="space-y-3 pt-2">
+        <div className="flex flex-col flex-1 gap-3">
           <a
             href="https://merarashan.pk/privacy-policy.html"
             target="_blank"
@@ -505,17 +505,19 @@ const Index = () => {
             <span className="flex-1">Terms of Service</span>
             <span aria-hidden className="text-muted-foreground">↗</span>
           </a>
-          <button
-            type="button"
-            onClick={handleOpenDeleteAccount}
-            className="flex w-full items-center gap-3 rounded-md border border-destructive/40 bg-card px-4 py-3 text-left text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
-          >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-destructive/10">
-              <Trash2 className="h-5 w-5" />
-            </span>
-            <span className="flex-1">Delete account</span>
-            <span aria-hidden>›</span>
-          </button>
+          <div className="mt-auto">
+            <button
+              type="button"
+              onClick={handleOpenDeleteAccount}
+              className="flex w-full items-center gap-3 rounded-md border border-destructive/40 bg-card px-4 py-3 text-left text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-destructive/10">
+                <Trash2 className="h-5 w-5" />
+              </span>
+              <span className="flex-1">Delete account</span>
+              <span aria-hidden>›</span>
+            </button>
+          </div>
         </div>
       </SlideInPanel>
 
