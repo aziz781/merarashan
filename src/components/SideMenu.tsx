@@ -15,7 +15,7 @@ interface SideMenuProps {
   onOpenSettings: () => void;
   onOpenPrivacy: () => void;
   onOpenSocial: () => void;
-  onOpenDeleteAccount: () => void;
+  
   onLogout: () => void;
 }
 
@@ -29,7 +29,7 @@ export function SideMenu({
   onOpenSettings,
   onOpenPrivacy,
   onOpenSocial,
-  onOpenDeleteAccount,
+  
   onLogout,
 }: SideMenuProps) {
   const swipe = useSwipeToClose({
