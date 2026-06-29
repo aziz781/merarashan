@@ -566,7 +566,6 @@ const Index = () => {
       <SlideInPanel
         open={deleteAccountOpen}
         onOpenChange={handleDeleteAccountPanelChange}
-        title="Delete account"
       >
         <div className="pt-2">
           <DeleteAccountSection
