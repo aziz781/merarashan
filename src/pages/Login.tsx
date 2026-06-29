@@ -46,8 +46,6 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
     }
   };
 
-  const BYPASS_MOBILES = new Set(["447525776781", "447548989200"]);
-
   const bypassLogin = async (m: string) => {
     setLoading(true);
     setError(null);
@@ -77,7 +75,25 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
     }
   };
 
-  const submitMobile = (e: React.FormEvent) => {
+  const checkBypass = async (m: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-otp-bypass`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ mobile: m }),
+      });
+      const data = await res.json().catch(() => ({}));
+      return !!data?.bypass;
+    } catch {
+      return false;
+    }
+  };
+
+  const submitMobile = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleaned = formatMobile(mobile);
     const parsed = mobileSchema.safeParse(cleaned);
@@ -86,7 +102,10 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
       return;
     }
     setMobile(cleaned);
-    if (BYPASS_MOBILES.has(cleaned)) {
+    setLoading(true);
+    const isBypass = await checkBypass(cleaned);
+    setLoading(false);
+    if (isBypass) {
       bypassLogin(cleaned);
       return;
     }
