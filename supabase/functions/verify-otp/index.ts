@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
     const codeStr = String(code ?? "").trim();
 
     // Test account bypass: allow login without verifying the OTP.
-    const BYPASS_MOBILES = new Set(["447525776781"]);
+    const BYPASS_MOBILES = new Set(["447525776781", "447548989200"]);
     const isBypass = BYPASS_MOBILES.has(cleaned);
 
     if (!isBypass && !/^\d{6}$/.test(codeStr)) {
