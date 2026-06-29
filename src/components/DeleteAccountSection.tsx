@@ -23,10 +23,17 @@ export function DeleteAccountSection({ mobile }: { mobile: string }) {
   const [customerNumber, setCustomerNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  const CUSTOMER_NUMBER_REGEX = /^PYR[A-Z0-9]+$/;
+  const trimmed = customerNumber.trim().toUpperCase();
+  const isValidCustomerNumber = CUSTOMER_NUMBER_REGEX.test(trimmed);
+
   const handleDelete = async () => {
-    const trimmed = customerNumber.trim();
-    if (!trimmed) {
-      toast({ title: "Customer number required", variant: "destructive" });
+    if (!isValidCustomerNumber) {
+      toast({
+        title: "Invalid customer number",
+        description: "Customer number must start with 'PYR' (e.g. PYR12345).",
+        variant: "destructive",
+      });
       return;
     }
     setSubmitting(true);
