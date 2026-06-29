@@ -38,6 +38,12 @@ async function compressBody(
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (!ALLOWED_METHODS.has(req.method)) {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   try {
     const token = Deno.env.get("MERARASHAN_API_TOKEN");
