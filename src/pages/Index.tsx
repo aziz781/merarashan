@@ -551,6 +551,21 @@ const Index = () => {
           ))}
         </div>
       </SlideInPanel>
+
+      <SlideInPanel
+        open={deleteAccountOpen}
+        onOpenChange={handleDeleteAccountPanelChange}
+        title="Delete account"
+      >
+        <div className="pt-2">
+          <DeleteAccountSection
+            mobile={mobile}
+            expectedCustomerNumber={
+              profileData?.payer_id != null ? String(profileData.payer_id) : ""
+            }
+          />
+        </div>
+      </SlideInPanel>
     </div>
   );
 };
