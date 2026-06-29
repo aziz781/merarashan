@@ -108,10 +108,20 @@ export function DeleteAccountSection({ mobile }: { mobile: string }) {
               id="customer-number"
               value={customerNumber}
               onChange={(e) => setCustomerNumber(e.target.value)}
-              placeholder="e.g. 12345"
+              placeholder="e.g. PYR12345"
               autoComplete="off"
               disabled={submitting}
+              aria-invalid={customerNumber.length > 0 && !isValidCustomerNumber}
             />
+            {customerNumber.length > 0 && !isValidCustomerNumber ? (
+              <p className="text-xs text-destructive">
+                Customer number must start with "PYR".
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Your customer ID starts with "PYR".
+              </p>
+            )}
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={submitting}>Cancel</AlertDialogCancel>
@@ -120,7 +130,7 @@ export function DeleteAccountSection({ mobile }: { mobile: string }) {
                 e.preventDefault();
                 handleDelete();
               }}
-              disabled={submitting || !customerNumber.trim()}
+              disabled={submitting || !isValidCustomerNumber}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {submitting ? (
