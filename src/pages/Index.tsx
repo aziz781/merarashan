@@ -6,6 +6,7 @@ import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, Shield
 
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
+import { DeleteAccountSection } from "@/components/DeleteAccountSection";
 import { LoadingState } from "@/components/LoadingState";
 import { toast } from "@/hooks/use-toast";
 import { useResource, type Resource } from "@/lib/api";
