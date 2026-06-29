@@ -573,6 +573,10 @@ const Index = () => {
             expectedCustomerNumber={
               profileData?.payer_id != null ? String(profileData.payer_id) : ""
             }
+            onDeleted={() => {
+              localStorage.removeItem(STORAGE_KEY);
+              setMobile(null);
+            }}
           />
         </div>
       </SlideInPanel>

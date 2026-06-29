@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AlertTriangle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -15,15 +16,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export function DeleteAccountSection({
   mobile,
   expectedCustomerNumber,
+  onDeleted,
 }: {
   mobile: string;
   expectedCustomerNumber?: string;
+  onDeleted?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [customerNumber, setCustomerNumber] = useState("");
@@ -38,18 +40,14 @@ export function DeleteAccountSection({
 
   const handleDelete = async () => {
     if (!CUSTOMER_NUMBER_REGEX.test(trimmed)) {
-      toast({
-        title: "Invalid customer number",
+      toast.error("Invalid customer number", {
         description: "Customer number must start with 'PYR' (e.g. PYR12345).",
-        variant: "destructive",
       });
       return;
     }
     if (!matchesProfile) {
-      toast({
-        title: "Customer number doesn't match",
+      toast.error("Customer number doesn't match", {
         description: "Enter the customer ID shown on your profile.",
-        variant: "destructive",
       });
       return;
     }
@@ -72,13 +70,15 @@ export function DeleteAccountSection({
         const txt = await res.text();
         throw new Error(`Request failed (${res.status}): ${txt}`);
       }
-      toast({ title: "Account deleted", description: "Signing you out…" });
+      toast.success("Account deleted successfully", {
+        description: "You will be redirected to the login screen.",
+      });
       setOpen(false);
       await supabase.auth.signOut();
-      window.location.reload();
+      onDeleted?.();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to delete account";
-      toast({ title: "Delete failed", description: msg, variant: "destructive" });
+      toast.error("Delete failed", { description: msg });
     } finally {
       setSubmitting(false);
     }
