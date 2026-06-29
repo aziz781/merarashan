@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TransactionCard } from "@/components/TransactionCard";
 import { MessageBox } from "@/components/MessageBox";
 import { useResource, type Resource } from "@/lib/api";
+import { DeleteAccountSection } from "@/components/DeleteAccountSection";
 import { extractItems, currentMonthParams, getItemDate, findValue, isTruthy, getItemKey } from "@/lib/itemUtils";
 import { useTransactions } from "@/hooks/use-transactions";
 import type { Customer } from "@/types/domain";
