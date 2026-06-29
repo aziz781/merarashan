@@ -345,7 +345,7 @@ const Index = () => {
         onOpenSettings={handleOpenSettings}
         onOpenPrivacy={handleOpenPrivacy}
         onOpenSocial={handleOpenSocial}
-        onOpenDeleteAccount={handleOpenDeleteAccount}
+        
         onLogout={handleMenuLogout}
       />
 
