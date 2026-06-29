@@ -2,7 +2,8 @@ import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
 
 const BASE_URL = "https://data.merarashan.pk";
 const ALLOWED = new Set(["cards", "transactions", "customers", "statements"]);
-const FORWARD_PARAMS = ["month", "year", "monthYear", "rcNum", "status"];
+const FORWARD_PARAMS = ["month", "year", "monthYear", "rcNum", "status", "customerNumber"];
+const ALLOWED_METHODS = new Set(["GET", "DELETE"]);
 
 // Only compress JSON-ish payloads above ~1KB — below that the framing
 // overhead negates the gains.
@@ -37,6 +38,12 @@ async function compressBody(
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (!ALLOWED_METHODS.has(req.method)) {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   try {
     const token = Deno.env.get("MERARASHAN_API_TOKEN");
@@ -72,6 +79,7 @@ Deno.serve(async (req) => {
     const delays = [200, 500, 1000];
     for (let attempt = 0; attempt <= delays.length; attempt++) {
       upstream = await fetch(upstreamUrl.toString(), {
+        method: req.method,
         headers: {
           "x-api-key": token,
           Accept: "application/json",

@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TransactionCard } from "@/components/TransactionCard";
 import { MessageBox } from "@/components/MessageBox";
 import { useResource, type Resource } from "@/lib/api";
+import { DeleteAccountSection } from "@/components/DeleteAccountSection";
 import { extractItems, currentMonthParams, getItemDate, findValue, isTruthy, getItemKey } from "@/lib/itemUtils";
 import { useTransactions } from "@/hooks/use-transactions";
 import type { Customer } from "@/types/domain";
@@ -399,9 +400,12 @@ export function ProfileView({
   return (
     <div className="space-y-3">
       {profileOnly && (
-        <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
-          <div className="space-y-1.5">{section1.map(renderRow)}</div>
-        </Card>
+        <>
+          <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+            <div className="space-y-1.5">{section1.map(renderRow)}</div>
+          </Card>
+          <DeleteAccountSection mobile={mobile} />
+        </>
       )}
       {!profileOnly && (
         <>
