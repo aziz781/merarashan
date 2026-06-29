@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
-import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3 } from "lucide-react";
+import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2 } from "lucide-react";
 
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
@@ -345,7 +345,7 @@ const Index = () => {
         onOpenSettings={handleOpenSettings}
         onOpenPrivacy={handleOpenPrivacy}
         onOpenSocial={handleOpenSocial}
-        onOpenDeleteAccount={handleOpenDeleteAccount}
+        
         onLogout={handleMenuLogout}
       />
 
@@ -505,6 +505,17 @@ const Index = () => {
             <span className="flex-1">Terms of Service</span>
             <span aria-hidden className="text-muted-foreground">↗</span>
           </a>
+          <button
+            type="button"
+            onClick={handleOpenDeleteAccount}
+            className="flex w-full items-center gap-3 rounded-md border border-destructive/40 bg-card px-4 py-3 text-left text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-destructive/10">
+              <Trash2 className="h-5 w-5" />
+            </span>
+            <span className="flex-1">Delete account</span>
+            <span aria-hidden>›</span>
+          </button>
         </div>
       </SlideInPanel>
 

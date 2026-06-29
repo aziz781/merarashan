@@ -1,4 +1,4 @@
-import { Copy, HelpCircle, LogOut, Settings, Share2, Shield, Trash2, User } from "lucide-react";
+import { Copy, HelpCircle, LogOut, Settings, Share2, Shield, User } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
@@ -15,7 +15,7 @@ interface SideMenuProps {
   onOpenSettings: () => void;
   onOpenPrivacy: () => void;
   onOpenSocial: () => void;
-  onOpenDeleteAccount: () => void;
+  
   onLogout: () => void;
 }
 
@@ -29,7 +29,7 @@ export function SideMenu({
   onOpenSettings,
   onOpenPrivacy,
   onOpenSocial,
-  onOpenDeleteAccount,
+  
   onLogout,
 }: SideMenuProps) {
   const swipe = useSwipeToClose({
@@ -83,12 +83,6 @@ export function SideMenu({
           <MenuItem icon={<Shield className="w-4 h-4" />} label="Privacy & Security" onClick={onOpenPrivacy} />
           <MenuItem icon={<Share2 className="w-4 h-4" />} label="Social media" onClick={onOpenSocial} />
           <MenuItem icon={<HelpCircle className="w-4 h-4" />} label="Help" onClick={onOpenHelp} />
-          <MenuItem
-            icon={<Trash2 className="w-4 h-4" />}
-            label="Delete account"
-            onClick={onOpenDeleteAccount}
-            destructive
-          />
           <MenuItem
             icon={<LogOut className="w-4 h-4" />}
             label="Log out"
