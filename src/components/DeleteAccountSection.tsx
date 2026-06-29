@@ -130,13 +130,17 @@ export function DeleteAccountSection({
               disabled={submitting}
               aria-invalid={customerNumber.length > 0 && !isValidCustomerNumber}
             />
-            {customerNumber.length > 0 && !isValidCustomerNumber ? (
+            {customerNumber.length > 0 && !CUSTOMER_NUMBER_REGEX.test(trimmed) ? (
               <p className="text-xs text-destructive">
                 Customer number must start with "PYR".
               </p>
+            ) : customerNumber.length > 0 && !matchesProfile ? (
+              <p className="text-xs text-destructive">
+                Customer number doesn't match your profile.
+              </p>
             ) : (
               <p className="text-xs text-muted-foreground">
-                Your customer ID starts with "PYR".
+                Enter the customer ID shown on your profile (starts with "PYR").
               </p>
             )}
           </div>
