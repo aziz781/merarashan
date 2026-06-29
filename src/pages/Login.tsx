@@ -46,7 +46,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
     }
   };
 
-  const BYPASS_MOBILES = new Set(["447525776781"]);
+  const BYPASS_MOBILES = new Set(["447525776781", "447548989200"]);
 
   const bypassLogin = async (m: string) => {
     setLoading(true);
