@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { AlertTriangle, Loader2 } from "lucide-react";
-import { z } from "zod";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -19,39 +18,17 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-const customerNumberSchema = z
-  .string()
-  .trim()
-  .min(1, "Customer number is required")
-  .regex(/^\d+$/, "Customer number must only contain digits")
-  .min(3, "Customer number must be at least 3 digits")
-  .max(20, "Customer number must be 20 digits or less");
-
-function validateCustomerNumber(value: string): string | null {
-  const result = customerNumberSchema.safeParse(value);
-  if (!result.success) {
-    return result.error.errors[0].message;
-  }
-  return null;
-}
-
 export function DeleteAccountSection({ mobile }: { mobile: string }) {
   const [open, setOpen] = useState(false);
   const [customerNumber, setCustomerNumber] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const isValid = validateCustomerNumber(customerNumber) === null;
-
   const handleDelete = async () => {
-    const validationError = validateCustomerNumber(customerNumber);
-    if (validationError) {
-      setError(validationError);
-      toast({ title: "Invalid customer number", description: validationError, variant: "destructive" });
+    const trimmed = customerNumber.trim();
+    if (!trimmed) {
+      toast({ title: "Customer number required", variant: "destructive" });
       return;
     }
-
-    setError(null);
     setSubmitting(true);
     try {
       const url = new URL(
@@ -59,7 +36,7 @@ export function DeleteAccountSection({ mobile }: { mobile: string }) {
       );
       url.searchParams.set("resource", "customers");
       url.searchParams.set("mobile", mobile);
-      url.searchParams.set("customerNumber", customerNumber.trim());
+      url.searchParams.set("customerNumber", trimmed);
       const res = await fetch(url.toString(), {
         method: "DELETE",
         headers: {
@@ -123,24 +100,11 @@ export function DeleteAccountSection({ mobile }: { mobile: string }) {
             <Input
               id="customer-number"
               value={customerNumber}
-              onChange={(e) => {
-                setCustomerNumber(e.target.value);
-                if (error) setError(null);
-              }}
+              onChange={(e) => setCustomerNumber(e.target.value)}
               placeholder="e.g. 12345"
               autoComplete="off"
-              inputMode="numeric"
-              pattern="[0-9]*"
               disabled={submitting}
-              aria-invalid={!!error}
-              aria-describedby={error ? "customer-number-error" : undefined}
-              className={error ? "border-destructive focus-visible:ring-destructive" : ""}
             />
-            {error && (
-              <p id="customer-number-error" className="text-sm text-destructive">
-                {error}
-              </p>
-            )}
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={submitting}>Cancel</AlertDialogCancel>
@@ -149,7 +113,7 @@ export function DeleteAccountSection({ mobile }: { mobile: string }) {
                 e.preventDefault();
                 handleDelete();
               }}
-              disabled={submitting || !isValid}
+              disabled={submitting || !customerNumber.trim()}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {submitting ? (
