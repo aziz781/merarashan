@@ -23,10 +23,17 @@ export function DeleteAccountSection({ mobile }: { mobile: string }) {
   const [customerNumber, setCustomerNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  const CUSTOMER_NUMBER_REGEX = /^PYR[A-Z0-9]+$/;
+  const trimmed = customerNumber.trim().toUpperCase();
+  const isValidCustomerNumber = CUSTOMER_NUMBER_REGEX.test(trimmed);
+
   const handleDelete = async () => {
-    const trimmed = customerNumber.trim();
-    if (!trimmed) {
-      toast({ title: "Customer number required", variant: "destructive" });
+    if (!isValidCustomerNumber) {
+      toast({
+        title: "Invalid customer number",
+        description: "Customer number must start with 'PYR' (e.g. PYR12345).",
+        variant: "destructive",
+      });
       return;
     }
     setSubmitting(true);
@@ -101,10 +108,20 @@ export function DeleteAccountSection({ mobile }: { mobile: string }) {
               id="customer-number"
               value={customerNumber}
               onChange={(e) => setCustomerNumber(e.target.value)}
-              placeholder="e.g. 12345"
+              placeholder="e.g. PYR12345"
               autoComplete="off"
               disabled={submitting}
+              aria-invalid={customerNumber.length > 0 && !isValidCustomerNumber}
             />
+            {customerNumber.length > 0 && !isValidCustomerNumber ? (
+              <p className="text-xs text-destructive">
+                Customer number must start with "PYR".
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Your customer ID starts with "PYR".
+              </p>
+            )}
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={submitting}>Cancel</AlertDialogCancel>
@@ -113,7 +130,7 @@ export function DeleteAccountSection({ mobile }: { mobile: string }) {
                 e.preventDefault();
                 handleDelete();
               }}
-              disabled={submitting || !customerNumber.trim()}
+              disabled={submitting || !isValidCustomerNumber}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {submitting ? (
