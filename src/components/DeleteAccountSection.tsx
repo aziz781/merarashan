@@ -40,18 +40,14 @@ export function DeleteAccountSection({
 
   const handleDelete = async () => {
     if (!CUSTOMER_NUMBER_REGEX.test(trimmed)) {
-      toast({
-        title: "Invalid customer number",
+      toast.error("Invalid customer number", {
         description: "Customer number must start with 'PYR' (e.g. PYR12345).",
-        variant: "destructive",
       });
       return;
     }
     if (!matchesProfile) {
-      toast({
-        title: "Customer number doesn't match",
+      toast.error("Customer number doesn't match", {
         description: "Enter the customer ID shown on your profile.",
-        variant: "destructive",
       });
       return;
     }
@@ -74,13 +70,15 @@ export function DeleteAccountSection({
         const txt = await res.text();
         throw new Error(`Request failed (${res.status}): ${txt}`);
       }
-      toast({ title: "Account deleted", description: "Signing you out…" });
+      toast.success("Account deleted successfully", {
+        description: "You will be redirected to the login screen.",
+      });
       setOpen(false);
       await supabase.auth.signOut();
-      window.location.reload();
+      onDeleted?.();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to delete account";
-      toast({ title: "Delete failed", description: msg, variant: "destructive" });
+      toast.error("Delete failed", { description: msg });
     } finally {
       setSubmitting(false);
     }
