@@ -18,20 +18,37 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-export function DeleteAccountSection({ mobile }: { mobile: string }) {
+export function DeleteAccountSection({
+  mobile,
+  expectedCustomerNumber,
+}: {
+  mobile: string;
+  expectedCustomerNumber?: string;
+}) {
   const [open, setOpen] = useState(false);
   const [customerNumber, setCustomerNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const CUSTOMER_NUMBER_REGEX = /^PYR[A-Z0-9]+$/;
   const trimmed = customerNumber.trim().toUpperCase();
-  const isValidCustomerNumber = CUSTOMER_NUMBER_REGEX.test(trimmed);
+  const expected = (expectedCustomerNumber ?? "").trim().toUpperCase();
+  const matchesProfile = expected.length > 0 && trimmed === expected;
+  const isValidCustomerNumber =
+    CUSTOMER_NUMBER_REGEX.test(trimmed) && matchesProfile;
 
   const handleDelete = async () => {
-    if (!isValidCustomerNumber) {
+    if (!CUSTOMER_NUMBER_REGEX.test(trimmed)) {
       toast({
         title: "Invalid customer number",
         description: "Customer number must start with 'PYR' (e.g. PYR12345).",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!matchesProfile) {
+      toast({
+        title: "Customer number doesn't match",
+        description: "Enter the customer ID shown on your profile.",
         variant: "destructive",
       });
       return;
