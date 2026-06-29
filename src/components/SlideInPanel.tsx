@@ -6,7 +6,7 @@ import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
 interface SlideInPanelProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  title: string;
+  title?: string;
   description?: ReactNode;
   children: ReactNode;
 }
@@ -49,10 +49,14 @@ export function SlideInPanel({
             >
               <ArrowLeft className="h-5 w-5" />
             </DialogPrimitive.Close>
-            <div className="h-6" aria-hidden />
-            <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
-              {title}
-            </DialogPrimitive.Title>
+            {title ? (
+              <>
+                <div className="h-6" aria-hidden />
+                <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
+                  {title}
+                </DialogPrimitive.Title>
+              </>
+            ) : null}
             {description && (
               <p className="mt-2 text-sm text-muted-foreground">{description}</p>
             )}
