@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AlertTriangle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -15,15 +16,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export function DeleteAccountSection({
   mobile,
   expectedCustomerNumber,
+  onDeleted,
 }: {
   mobile: string;
   expectedCustomerNumber?: string;
+  onDeleted?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [customerNumber, setCustomerNumber] = useState("");
