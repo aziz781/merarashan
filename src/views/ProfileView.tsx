@@ -399,9 +399,12 @@ export function ProfileView({
   return (
     <div className="space-y-3">
       {profileOnly && (
-        <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
-          <div className="space-y-1.5">{section1.map(renderRow)}</div>
-        </Card>
+        <>
+          <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+            <div className="space-y-1.5">{section1.map(renderRow)}</div>
+          </Card>
+          <DeleteAccountSection mobile={mobile} />
+        </>
       )}
       {!profileOnly && (
         <>
