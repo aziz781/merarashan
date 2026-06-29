@@ -129,6 +129,7 @@ const Index = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [socialOpen, setSocialOpen] = useState(false);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
   });
@@ -157,6 +158,7 @@ const Index = () => {
   const handleSettingsPanelChange = useCallback(closeWithGuard(setSettingsOpen), [closeWithGuard]);
   const handlePrivacyPanelChange = useCallback(closeWithGuard(setPrivacyOpen), [closeWithGuard]);
   const handleSocialPanelChange = useCallback(closeWithGuard(setSocialOpen), [closeWithGuard]);
+  const handleDeleteAccountPanelChange = useCallback(closeWithGuard(setDeleteAccountOpen), [closeWithGuard]);
   const { data: customerRaw } = useResource<unknown>("customers", mobile ?? undefined);
   const profileData: Customer | null = (() => {
     if (!customerRaw) return null;
@@ -211,10 +213,10 @@ const Index = () => {
 
   const handleMenuOpenChange = useCallback(
     (open: boolean) => {
-      if (!open && (profileOpen || helpOpen || settingsOpen || privacyOpen || socialOpen || slideInClosingRef.current)) return;
+      if (!open && (profileOpen || helpOpen || settingsOpen || privacyOpen || socialOpen || deleteAccountOpen || slideInClosingRef.current)) return;
       setMenuOpen(open);
     },
-    [profileOpen, helpOpen, settingsOpen, privacyOpen, socialOpen],
+    [profileOpen, helpOpen, settingsOpen, privacyOpen, socialOpen, deleteAccountOpen],
   );
   const handleOpenProfile = useCallback(() => {
     setHelpOpen(false);
@@ -241,6 +243,14 @@ const Index = () => {
     setSettingsOpen(false);
     setPrivacyOpen(false);
     setSocialOpen(true);
+  }, []);
+  const handleOpenDeleteAccount = useCallback(() => {
+    setProfileOpen(false);
+    setHelpOpen(false);
+    setSettingsOpen(false);
+    setPrivacyOpen(false);
+    setSocialOpen(false);
+    setDeleteAccountOpen(true);
   }, []);
   const handleMenuLogout = useCallback(() => {
     setMenuOpen(false);
@@ -334,6 +344,7 @@ const Index = () => {
         onOpenSettings={handleOpenSettings}
         onOpenPrivacy={handleOpenPrivacy}
         onOpenSocial={handleOpenSocial}
+        onOpenDeleteAccount={handleOpenDeleteAccount}
         onLogout={handleMenuLogout}
       />
 
