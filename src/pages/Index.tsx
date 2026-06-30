@@ -10,7 +10,7 @@ import { DeleteAccountSection } from "@/components/DeleteAccountSection";
 import { FreezeAccountSection } from "@/components/FreezeAccountSection";
 import { LoadingState } from "@/components/LoadingState";
 import { toast } from "@/hooks/use-toast";
-import { useResource, type Resource } from "@/lib/api";
+import { useResource, invalidateResource, type Resource } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import type { Customer } from "@/types/domain";
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
@@ -170,6 +170,7 @@ const Index = () => {
     const first = (items && items[0]) || customerRaw;
     return first as Customer;
   })();
+  const isCustomerActive = isTruthy(profileData?.is_active);
 
   useEffect(() => {
     const extract = (email?: string | null, meta?: Record<string, unknown> | null) => {
@@ -525,7 +526,16 @@ const Index = () => {
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-500/10">
                 <Snowflake className="h-5 w-5" />
               </span>
-              <span className="flex-1">Freeze account</span>
+              <span className="flex-1">{isCustomerActive ? "Freeze account" : "Unfreeze account"}</span>
+              <span
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                  isCustomerActive
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                    : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                }`}
+              >
+                {isCustomerActive ? "Active" : "Frozen"}
+              </span>
               <span aria-hidden>›</span>
             </button>
             <button
@@ -611,11 +621,15 @@ const Index = () => {
       >
         <div className="pt-2">
           <FreezeAccountSection
-            mobile={mobile}
+            mobile={mobile!}
             expectedCustomerNumber={
               profileData?.payer_id != null ? String(profileData.payer_id) : ""
             }
-            onFrozen={() => setFreezeAccountOpen(false)}
+            isActive={isCustomerActive}
+            onFrozen={() => {
+              setFreezeAccountOpen(false);
+              if (mobile) invalidateResource("customers", mobile);
+            }}
           />
         </div>
       </SlideInPanel>

@@ -20,15 +20,22 @@ import {
 export function FreezeAccountSection({
   mobile,
   expectedCustomerNumber,
+  isActive,
   onFrozen,
 }: {
   mobile: string;
   expectedCustomerNumber?: string;
+  isActive?: boolean;
   onFrozen?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [customerNumber, setCustomerNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const frozen = isActive === false;
+  const action = frozen ? "unfreeze" : "freeze";
+  const verb = frozen ? "Unfreeze" : "Freeze";
+  const pastVerb = frozen ? "Unfrozen" : "Frozen";
 
   const CUSTOMER_NUMBER_REGEX = /^PYR[A-Z0-9]+$/;
   const trimmed = customerNumber.trim().toUpperCase();
@@ -46,7 +53,7 @@ export function FreezeAccountSection({
       url.searchParams.set("resource", "customers");
       url.searchParams.set("mobile", mobile);
       url.searchParams.set("customerNumber", trimmed);
-      url.searchParams.set("action", "freeze");
+      url.searchParams.set("action", action);
       const res = await fetch(url.toString(), {
         method: "PUT",
         headers: {
@@ -58,14 +65,14 @@ export function FreezeAccountSection({
         const txt = await res.text();
         throw new Error(`Request failed (${res.status}): ${txt}`);
       }
-      toast.success("Account frozen", {
-        description: "Your account has been temporarily frozen.",
+      toast.success(`Account ${pastVerb.toLowerCase()}`, {
+        description: `Your account has been temporarily ${pastVerb.toLowerCase()}.`,
       });
       setOpen(false);
       onFrozen?.();
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Failed to freeze account";
-      toast.error("Freeze failed", { description: msg });
+      const msg = e instanceof Error ? e.message : `${verb} failed`;
+      toast.error(`${verb} failed`, { description: msg });
     } finally {
       setSubmitting(false);
     }
@@ -73,9 +80,9 @@ export function FreezeAccountSection({
 
   return (
     <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 space-y-3">
-      <h3 className="text-base font-bold text-foreground">Freeze account</h3>
+      <h3 className="text-base font-bold text-foreground">{verb} account</h3>
       <p className="text-sm text-muted-foreground">
-        Freezing your account is{" "}
+        {frozen ? "Unfreezing" : "Freezing"} your account is{" "}
         <em className="font-semibold text-foreground">temporary and can be undone</em>.
         It's free to keep it open.
       </p>
@@ -84,7 +91,7 @@ export function FreezeAccountSection({
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
           <p className="font-medium mb-1">
-            If you would still like to freeze your account, please make sure:
+            If you would still like to {verb.toLowerCase()} your account, please make sure:
           </p>
           <ol className="list-decimal pl-5 space-y-0.5 text-sm">
             <li>All Rashan transactions are completed</li>
@@ -98,15 +105,15 @@ export function FreezeAccountSection({
         className="w-full bg-yellow-500 text-white hover:bg-yellow-600"
       >
         <Snowflake className="h-4 w-4" />
-        Freeze account
+        {verb} account
       </Button>
 
       <AlertDialog open={open} onOpenChange={(o) => !submitting && setOpen(o)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm freeze account</AlertDialogTitle>
+            <AlertDialogTitle>Confirm {verb.toLowerCase()} account</AlertDialogTitle>
             <AlertDialogDescription>
-              Enter your customer number to temporarily freeze your account.
+              Enter your customer number to temporarily {verb.toLowerCase()} your account.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-2">
@@ -146,10 +153,12 @@ export function FreezeAccountSection({
             >
               {submitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Freezing…
+                  <Loader2 className="w-4 h-4 animate-spin" /> {verb}ing…
                 </>
               ) : (
-                "Freeze account"
+                <>
+                  {verb} account
+                </>
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
