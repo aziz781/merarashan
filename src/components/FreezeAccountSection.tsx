@@ -1,0 +1,160 @@
+import { useState } from "react";
+import { AlertTriangle, Loader2, Snowflake } from "lucide-react";
+import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+export function FreezeAccountSection({
+  mobile,
+  expectedCustomerNumber,
+  onFrozen,
+}: {
+  mobile: string;
+  expectedCustomerNumber?: string;
+  onFrozen?: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [customerNumber, setCustomerNumber] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const CUSTOMER_NUMBER_REGEX = /^PYR[A-Z0-9]+$/;
+  const trimmed = customerNumber.trim().toUpperCase();
+  const expected = (expectedCustomerNumber ?? "").trim().toUpperCase();
+  const matchesProfile = expected.length > 0 && trimmed === expected;
+  const isValid = CUSTOMER_NUMBER_REGEX.test(trimmed) && matchesProfile;
+
+  const handleFreeze = async () => {
+    if (!isValid) return;
+    setSubmitting(true);
+    try {
+      const url = new URL(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/merarashan-proxy`,
+      );
+      url.searchParams.set("resource", "customers");
+      url.searchParams.set("mobile", mobile);
+      url.searchParams.set("customerNumber", trimmed);
+      url.searchParams.set("action", "freeze");
+      const res = await fetch(url.toString(), {
+        method: "PUT",
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`Request failed (${res.status}): ${txt}`);
+      }
+      toast.success("Account frozen", {
+        description: "Your account has been temporarily frozen.",
+      });
+      setOpen(false);
+      onFrozen?.();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to freeze account";
+      toast.error("Freeze failed", { description: msg });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 space-y-3">
+      <h3 className="text-base font-bold text-foreground">Freeze account</h3>
+      <p className="text-sm text-muted-foreground">
+        Freezing your account is{" "}
+        <em className="font-semibold text-foreground">temporary and can be undone</em>.
+        It's free to keep it open.
+      </p>
+
+      <Alert className="border-amber-500/50 text-amber-900 dark:text-amber-200 [&>svg]:text-amber-600">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
+          <p className="font-medium mb-1">
+            If you would still like to freeze your account, please make sure:
+          </p>
+          <ol className="list-decimal pl-5 space-y-0.5 text-sm">
+            <li>All Rashan transactions are completed</li>
+            <li>Your account balance is zero</li>
+          </ol>
+        </AlertDescription>
+      </Alert>
+
+      <Button
+        onClick={() => setOpen(true)}
+        className="w-full bg-orange-500 text-white hover:bg-orange-600"
+      >
+        <Snowflake className="h-4 w-4" />
+        Freeze account
+      </Button>
+
+      <AlertDialog open={open} onOpenChange={(o) => !submitting && setOpen(o)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm freeze account</AlertDialogTitle>
+            <AlertDialogDescription>
+              Enter your customer number to temporarily freeze your account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="freeze-customer-number">Customer number</Label>
+            <Input
+              id="freeze-customer-number"
+              value={customerNumber}
+              onChange={(e) => setCustomerNumber(e.target.value)}
+              placeholder="e.g. PYR12345"
+              autoComplete="off"
+              disabled={submitting}
+              aria-invalid={customerNumber.length > 0 && !isValid}
+            />
+            {customerNumber.length > 0 && !CUSTOMER_NUMBER_REGEX.test(trimmed) ? (
+              <p className="text-xs text-destructive">
+                Customer number must start with "PYR".
+              </p>
+            ) : customerNumber.length > 0 && !matchesProfile ? (
+              <p className="text-xs text-destructive">
+                Customer number doesn't match your profile.
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Enter the customer ID shown on your profile (starts with "PYR").
+              </p>
+            )}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={submitting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleFreeze();
+              }}
+              disabled={submitting || !isValid}
+              className="bg-orange-500 text-white hover:bg-orange-600"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Freezing…
+                </>
+              ) : (
+                "Freeze account"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </Card>
+  );
+}

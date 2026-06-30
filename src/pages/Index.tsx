@@ -2,11 +2,12 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
-import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2 } from "lucide-react";
+import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake } from "lucide-react";
 
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
 import { DeleteAccountSection } from "@/components/DeleteAccountSection";
+import { FreezeAccountSection } from "@/components/FreezeAccountSection";
 import { LoadingState } from "@/components/LoadingState";
 import { toast } from "@/hooks/use-toast";
 import { useResource, type Resource } from "@/lib/api";
@@ -131,6 +132,7 @@ const Index = () => {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [socialOpen, setSocialOpen] = useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
+  const [freezeAccountOpen, setFreezeAccountOpen] = useState(false);
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
   });
@@ -160,6 +162,7 @@ const Index = () => {
   const handlePrivacyPanelChange = useCallback(closeWithGuard(setPrivacyOpen), [closeWithGuard]);
   const handleSocialPanelChange = useCallback(closeWithGuard(setSocialOpen), [closeWithGuard]);
   const handleDeleteAccountPanelChange = useCallback(closeWithGuard(setDeleteAccountOpen), [closeWithGuard]);
+  const handleFreezeAccountPanelChange = useCallback(closeWithGuard(setFreezeAccountOpen), [closeWithGuard]);
   const { data: customerRaw } = useResource<unknown>("customers", mobile ?? undefined);
   const profileData: Customer | null = (() => {
     if (!customerRaw) return null;
@@ -252,6 +255,14 @@ const Index = () => {
     setPrivacyOpen(false);
     setSocialOpen(false);
     setDeleteAccountOpen(true);
+  }, []);
+  const handleOpenFreezeAccount = useCallback(() => {
+    setProfileOpen(false);
+    setHelpOpen(false);
+    setSettingsOpen(false);
+    setPrivacyOpen(false);
+    setSocialOpen(false);
+    setFreezeAccountOpen(true);
   }, []);
   const handleMenuLogout = useCallback(() => {
     setMenuOpen(false);
@@ -505,7 +516,18 @@ const Index = () => {
             <span className="flex-1">Terms of Service</span>
             <span aria-hidden className="text-muted-foreground">↗</span>
           </a>
-          <div className="mt-auto">
+          <div className="mt-auto space-y-3">
+            <button
+              type="button"
+              onClick={handleOpenFreezeAccount}
+              className="flex w-full items-center gap-3 rounded-md border border-orange-500/40 bg-card px-4 py-3 text-left text-sm font-medium text-orange-600 dark:text-orange-400 hover:bg-orange-500/10 transition-colors"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-500/10">
+                <Snowflake className="h-5 w-5" />
+              </span>
+              <span className="flex-1">Freeze account</span>
+              <span aria-hidden>›</span>
+            </button>
             <button
               type="button"
               onClick={handleOpenDeleteAccount}
@@ -579,6 +601,21 @@ const Index = () => {
               localStorage.removeItem(STORAGE_KEY);
               setMobile(null);
             }}
+          />
+        </div>
+      </SlideInPanel>
+
+      <SlideInPanel
+        open={freezeAccountOpen}
+        onOpenChange={handleFreezeAccountPanelChange}
+      >
+        <div className="pt-2">
+          <FreezeAccountSection
+            mobile={mobile}
+            expectedCustomerNumber={
+              profileData?.payer_id != null ? String(profileData.payer_id) : ""
+            }
+            onFrozen={() => setFreezeAccountOpen(false)}
           />
         </div>
       </SlideInPanel>
