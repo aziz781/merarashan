@@ -526,7 +526,16 @@ const Index = () => {
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-500/10">
                 <Snowflake className="h-5 w-5" />
               </span>
-              <span className="flex-1">Freeze account</span>
+              <span className="flex-1">{isCustomerActive ? "Freeze account" : "Unfreeze account"}</span>
+              <span
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                  isCustomerActive
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                    : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                }`}
+              >
+                {isCustomerActive ? "Active" : "Frozen"}
+              </span>
               <span aria-hidden>›</span>
             </button>
             <button
