@@ -147,14 +147,14 @@ Deno.serve(async (req) => {
         responseHeaders["Content-Encoding"] = "gzip";
         responseHeaders["Content-Length"] = String(compressed.byteLength);
         return new Response(compressed, {
-          status: upstream.status,
+          status: responseStatus,
           headers: responseHeaders,
         });
       }
     }
 
     return new Response(text, {
-      status: upstream.status,
+      status: responseStatus,
       headers: responseHeaders,
     });
   } catch (e) {
