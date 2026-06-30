@@ -135,8 +135,14 @@ export function refetchResource(
   });
 }
 
-/** Clear all cached resource data (e.g. after account freeze/unfreeze). */
+/**
+ * Clear all cached resource data (e.g. after account freeze/unfreeze).
+ * Also bumps the cache-buster so the subsequent network refetch bypasses
+ * the browser HTTP cache and the service-worker NetworkFirst layer that
+ * would otherwise return the pre-mutation response for up to 60s.
+ */
 export function clearResourcesCache() {
+  cacheBust += 1;
   queryClient.removeQueries({ queryKey: ["merarashan"] });
   return queryClient.invalidateQueries({ queryKey: ["merarashan"], refetchType: "all" });
 }
