@@ -111,7 +111,19 @@ export function invalidateResource(
   const key: (string | undefined)[] = ["merarashan"];
   if (resource) key.push(resource);
   if (mobile) key.push(mobile);
-  return queryClient.invalidateQueries({ queryKey: key });
+  return queryClient.invalidateQueries({ queryKey: key, refetchType: "all" });
+}
+
+/** Force an immediate refetch of a specific resource (e.g. after freeze/unfreeze). */
+export function refetchResource(
+  resource: Resource,
+  mobile: string,
+  params?: Record<string, string | undefined>,
+) {
+  return queryClient.refetchQueries({
+    queryKey: resourceQueryKey(resource, mobile, params),
+    exact: true,
+  });
 }
 
 export function formatMobile(input: string): string {
