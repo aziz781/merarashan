@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { Loader2, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,21 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // If we were just kicked back here because a previous session resolved to
+  // an account-not-found state (e.g. customers fetch returned 403/404), show
+  // the dedicated UI immediately instead of the mobile-entry form.
+  useEffect(() => {
+    try {
+      const flagged = localStorage.getItem("mr_account_not_found");
+      if (flagged) {
+        setMobile(flagged);
+        setStep("account_not_found");
+        localStorage.removeItem("mr_account_not_found");
+      }
+    } catch { /* ignore */ }
+  }, []);
+
 
   const resetToMobile = () => {
     setStep("mobile");

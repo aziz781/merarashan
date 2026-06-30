@@ -48,6 +48,25 @@ function buildUrl(
   return url.toString();
 }
 
+export class ApiError extends Error {
+  status: number;
+  code?: "account_not_found";
+  body?: string;
+  constructor(message: string, status: number, body?: string, code?: "account_not_found") {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.body = body;
+    this.code = code;
+  }
+}
+
+function isAccountNotFound(status: number, body: string): boolean {
+  if (status === 404) return true;
+  if (status === 403 && /account does not exist|not found/i.test(body)) return true;
+  return false;
+}
+
 async function rawFetch<T>(url: string): Promise<T> {
   const bypass = cacheBust > 0;
   const res = await fetch(url, {
@@ -59,10 +78,12 @@ async function rawFetch<T>(url: string): Promise<T> {
   });
   if (!res.ok) {
     const txt = await res.text();
-    throw new Error(`Request failed (${res.status}): ${txt}`);
+    const code = isAccountNotFound(res.status, txt) ? "account_not_found" : undefined;
+    throw new ApiError(`Request failed (${res.status}): ${txt}`, res.status, txt, code);
   }
   return res.json();
 }
+
 
 export function resourceQueryKey(
   resource: Resource,
