@@ -358,12 +358,7 @@ const Index = () => {
         id: progressId,
         description: "Your account has been reactivated.",
       });
-      void invalidateResource("customers", mobile);
-      try {
-        await refetchResource("customers", mobile);
-      } catch {
-        // Refetch errors are non-fatal; background invalidation will retry.
-      }
+      void clearResourcesCache();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Unfreeze failed";
       sonnerToast.error("Unfreeze failed", { id: progressId, description: msg });
