@@ -173,6 +173,17 @@ const Index = () => {
     return first as Customer;
   })();
   const isCustomerActive = isTruthy(profileData?.is_active);
+  const PAYER_ID_KEY = "mr_payer_id";
+  useEffect(() => {
+    if (profileData?.payer_id != null) {
+      try { localStorage.setItem(PAYER_ID_KEY, String(profileData.payer_id)); } catch { /* ignore */ }
+    }
+  }, [profileData?.payer_id]);
+  const resolvePayerId = useCallback(() => {
+    if (profileData?.payer_id != null) return String(profileData.payer_id);
+    try { return localStorage.getItem(PAYER_ID_KEY) ?? ""; } catch { return ""; }
+  }, [profileData?.payer_id]);
+
 
   useEffect(() => {
     const extract = (email?: string | null, meta?: Record<string, unknown> | null) => {
@@ -269,11 +280,14 @@ const Index = () => {
     setFreezeAccountOpen(true);
   }, []);
   const handleUnfreezeAccount = useCallback(async () => {
-    const customerNumber = profileData?.payer_id != null ? String(profileData.payer_id) : "";
+    const customerNumber = resolvePayerId();
     if (!customerNumber || !mobile) {
-      sonnerToast.error("Unfreeze failed", { description: "Missing customer number." });
+      sonnerToast.error("Unfreeze failed", {
+        description: !mobile ? "Not signed in." : "Customer ID unavailable — please reopen the app.",
+      });
       return;
     }
+
     setUnfreezing(true);
     const progressId = sonnerToast.loading("Unfreezing account…");
     try {
@@ -306,7 +320,7 @@ const Index = () => {
     } finally {
       setUnfreezing(false);
     }
-  }, [mobile, profileData?.payer_id]);
+  }, [mobile, resolvePayerId]);
 
   const handleMenuLogout = useCallback(() => {
     setMenuOpen(false);
