@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { clearResourcesCache } from "@/lib/api";
+import { clearAllAppCache } from "@/lib/api";
 
 export function DeleteAccountSection({
   mobile,
@@ -75,7 +75,7 @@ export function DeleteAccountSection({
       toast.success("Account deleted successfully", {
         description: "You will be redirected to the login screen.",
       });
-      clearResourcesCache();
+      clearAllAppCache();
       setOpen(false);
       await supabase.auth.signOut();
       onDeleted?.();

@@ -147,6 +147,50 @@ export function clearResourcesCache() {
   return queryClient.invalidateQueries({ queryKey: ["merarashan"], refetchType: "all" });
 }
 
+/**
+ * Wipe every app-scoped cache and persisted storage. Used on account deletion
+ * so no customer data, tokens, or UI state survives after the session ends.
+ */
+export function clearAllAppCache() {
+  clearResourcesCache();
+
+  if (typeof window === "undefined") return;
+
+  try {
+    // React Query persisted cache
+    window.localStorage.removeItem("mr_rq_cache");
+
+    // Known app keys
+    const APP_KEYS = [
+      "mr_mobile",
+      "mr_payer_id",
+      "mr_cards_view",
+      "mr_theme",
+      "mr_font_size",
+      "mr_high_contrast",
+      "mr_native_push_enabled",
+      "mr_notifications_deleted_v1",
+      "mr_notifications_v1",
+      "mr_install_native_dismissed_at",
+      "mr_chunk_reload",
+    ];
+    for (const key of APP_KEYS) {
+      try { window.localStorage.removeItem(key); } catch { /* ignore */ }
+    }
+
+    // Catch any other mr_ prefixed keys that might have been added later
+    for (let i = window.localStorage.length - 1; i >= 0; i--) {
+      const key = window.localStorage.key(i);
+      if (key?.startsWith("mr_")) {
+        try { window.localStorage.removeItem(key); } catch { /* ignore */ }
+      }
+    }
+  } catch {
+    // Private browsing or quota — best-effort cleanup.
+  }
+}
+
+
 export function formatMobile(input: string): string {
   return input.replace(/\D/g, "");
 }
