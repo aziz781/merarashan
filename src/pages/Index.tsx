@@ -520,9 +520,9 @@ const Index = () => {
             <button
               type="button"
               onClick={handleOpenFreezeAccount}
-              className="flex w-full items-center gap-3 rounded-md border border-orange-500/40 bg-card px-4 py-3 text-left text-sm font-medium text-orange-600 dark:text-orange-400 hover:bg-orange-500/10 transition-colors"
+              className="flex w-full items-center gap-3 rounded-md border border-yellow-500/40 bg-card px-4 py-3 text-left text-sm font-medium text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/10 transition-colors"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-500/10">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-500/10">
                 <Snowflake className="h-5 w-5" />
               </span>
               <span className="flex-1">Freeze account</span>
