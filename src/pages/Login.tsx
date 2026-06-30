@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { z } from "zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { formatMobile } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
+import { WhatsAppTile } from "@/components/WhatsAppTile";
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 
 const mobileSchema = z
@@ -15,12 +16,20 @@ const mobileSchema = z
   .max(15, "Too long")
   .regex(/^\d+$/, "Digits only");
 
+type Step = "mobile" | "otp" | "account_not_found";
+
 export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
-  const [step, setStep] = useState<"mobile" | "otp">("mobile");
+  const [step, setStep] = useState<Step>("mobile");
   const [mobile, setMobile] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const resetToMobile = () => {
+    setStep("mobile");
+    setCode("");
+    setError(null);
+  };
 
   const sendOtp = async (m: string) => {
     setLoading(true);
@@ -93,6 +102,28 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
     }
   };
 
+  // Verify the mobile maps to an existing customer before sending an OTP.
+  // Returns true when an account exists, false when not, null on transport error
+  // (we let those fall through to the normal OTP flow rather than block login).
+  const checkAccountExists = async (m: string): Promise<boolean | null> => {
+    try {
+      const url = new URL(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/merarashan-proxy`);
+      url.searchParams.set("resource", "customers");
+      url.searchParams.set("mobile", m);
+      const res = await fetch(url.toString(), {
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return Array.isArray(data) && data.length > 0;
+    } catch {
+      return null;
+    }
+  };
+
   const submitMobile = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleaned = formatMobile(mobile);
@@ -104,9 +135,15 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
     setMobile(cleaned);
     setLoading(true);
     const isBypass = await checkBypass(cleaned);
-    setLoading(false);
     if (isBypass) {
+      setLoading(false);
       bypassLogin(cleaned);
+      return;
+    }
+    const exists = await checkAccountExists(cleaned);
+    setLoading(false);
+    if (exists === false) {
+      setStep("account_not_found");
       return;
     }
     sendOtp(cleaned);
@@ -152,9 +189,11 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
         <img src={meraRashanLogo} alt="Mera Rashan Card" className="w-32 h-32 mx-auto mb-4 object-contain" />
         <h1 className="sr-only">Mera Rashan</h1>
         <p className="text-sm text-muted-foreground text-center mt-1 mb-6">
-          {step === "mobile" ? "Sign in with your mobile number" : `Enter the code sent to ${mobile}`}
+          {step === "mobile" && "Sign in with your mobile number"}
+          {step === "otp" && `Enter the code sent to ${mobile}`}
+          {step === "account_not_found" && "We couldn't find an account"}
         </p>
-        {step === "mobile" ? (
+        {step === "mobile" && (
           <form onSubmit={submitMobile} className="space-y-3">
             <Input
               type="tel"
@@ -180,7 +219,8 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send code"}
             </Button>
           </form>
-        ) : (
+        )}
+        {step === "otp" && (
           <form onSubmit={submitOtp} className="space-y-3">
             <Input
               type="tel"
@@ -205,11 +245,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
               <button
                 type="button"
                 className="text-muted-foreground hover:text-foreground"
-                onClick={() => {
-                  setStep("mobile");
-                  setCode("");
-                  setError(null);
-                }}
+                onClick={resetToMobile}
                 disabled={loading}
               >
                 Change number
@@ -224,6 +260,35 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
               </button>
             </div>
           </form>
+        )}
+        {step === "account_not_found" && (
+          <div className="space-y-4">
+            <div className="rounded-lg border border-border bg-muted/40 p-4 text-center">
+              <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                <UserX className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <p className="text-sm font-semibold text-foreground">No account found</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                We couldn't find a Mera Rashan account linked to{" "}
+                <span className="font-mono text-foreground">+{mobile}</span>. Please check the
+                number or contact support for help.
+              </p>
+            </div>
+            <Button
+              type="button"
+              className="w-full h-12 text-base font-semibold text-primary-foreground border-0 hover:opacity-90"
+              style={{ background: "var(--gradient-primary)" }}
+              onClick={resetToMobile}
+            >
+              Try another number
+            </Button>
+            <WhatsAppTile
+              href="https://wa.me/923030812222"
+              number="923030812222"
+              title="Mera Rashan Support"
+              subtitle="Chat on WhatsApp"
+            />
+          </div>
         )}
       </Card>
     </div>
