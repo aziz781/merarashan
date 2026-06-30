@@ -11,6 +11,16 @@ import { FreezeAccountSection } from "@/components/FreezeAccountSection";
 import { LoadingState } from "@/components/LoadingState";
 import { toast } from "@/hooks/use-toast";
 import { toast as sonnerToast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { useResource, invalidateResource, type Resource } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
