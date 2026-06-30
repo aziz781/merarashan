@@ -281,6 +281,7 @@ const Index = () => {
     setDeleteAccountOpen(true);
   }, []);
   const [unfreezing, setUnfreezing] = useState(false);
+  const [unfreezeConfirmOpen, setUnfreezeConfirmOpen] = useState(false);
   const handleOpenFreezeAccount = useCallback(() => {
     setProfileOpen(false);
     setHelpOpen(false);
