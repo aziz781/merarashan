@@ -22,7 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { useResource, invalidateResource, refetchResource, type Resource } from "@/lib/api";
+import { useResource, invalidateResource, clearResourcesCache, type Resource } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import type { Customer } from "@/types/domain";
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
