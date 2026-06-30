@@ -740,11 +740,37 @@ const Index = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <SlideInPanel
-        open={socialOpen}
-        onOpenChange={handleSocialPanelChange}
-        title="Social media"
-      >
+      <AlertDialog open={frozenInfoOpen} onOpenChange={setFrozenInfoOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Account frozen</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your account is currently frozen. While frozen:
+            </AlertDialogDescription>
+            <div className="text-sm text-foreground space-y-1">
+              <p><strong>Card Inactive:</strong> Your Mera Rashan Card will not work.</p>
+              <p><strong>No New Codes:</strong> Ration Codes cannot be generated.</p>
+              <p><strong>View Only:</strong> You can still log in to view your cards, rations, and statements.</p>
+              <p><strong>Unfreeze Anytime:</strong> Restore full access whenever you need to.</p>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                setFrozenInfoOpen(false);
+                setUnfreezeConfirmOpen(true);
+              }}
+              className="bg-green-500 text-white hover:bg-green-600 inline-flex items-center gap-2"
+            >
+              <Unlock className="h-4 w-4" />
+              Unfreeze account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
         <div className="space-y-3 pt-2">
           {[
             {
