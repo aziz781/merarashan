@@ -172,7 +172,6 @@ const Index = () => {
   const handlePrivacyPanelChange = useCallback(closeWithGuard(setPrivacyOpen), [closeWithGuard]);
   const handleSocialPanelChange = useCallback(closeWithGuard(setSocialOpen), [closeWithGuard]);
   const handleDeleteAccountPanelChange = useCallback(closeWithGuard(setDeleteAccountOpen), [closeWithGuard]);
-  const handleFreezeAccountPanelChange = useCallback(closeWithGuard(setFreezeAccountOpen), [closeWithGuard]);
   const { data: customerRaw } = useResource<unknown>("customers", mobile ?? undefined);
   const profileData: Customer | null = (() => {
     if (!customerRaw) return null;
