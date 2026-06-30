@@ -721,7 +721,7 @@ const Index = () => {
                 </ul>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">Are you sure you want to freeze your account?</p>
+            <p className="text-sm text-muted-foreground"><strong>Are you sure you want to freeze your account?</strong></p>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={freezing}>Cancel</AlertDialogCancel>
