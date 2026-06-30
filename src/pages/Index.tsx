@@ -604,6 +604,21 @@ const Index = () => {
           />
         </div>
       </SlideInPanel>
+
+      <SlideInPanel
+        open={freezeAccountOpen}
+        onOpenChange={handleFreezeAccountPanelChange}
+      >
+        <div className="pt-2">
+          <FreezeAccountSection
+            mobile={mobile}
+            expectedCustomerNumber={
+              profileData?.payer_id != null ? String(profileData.payer_id) : ""
+            }
+            onFrozen={() => setFreezeAccountOpen(false)}
+          />
+        </div>
+      </SlideInPanel>
     </div>
   );
 };
