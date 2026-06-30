@@ -694,7 +694,7 @@ const Index = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm freeze account</AlertDialogTitle>
             <AlertDialogDescription>
-              Freezing your account is temporary and can be <em className="font-semibold not-italic">undone later</em>.
+              Freezing your account is temporary and can be <em className="font-semibold">undone later</em>.
             </AlertDialogDescription>
             <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 flex gap-3 items-start text-sm">
               <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
