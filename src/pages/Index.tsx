@@ -760,8 +760,9 @@ const Index = () => {
               onClick={(e) => {
                 e.preventDefault();
                 setFrozenInfoOpen(false);
-                setUnfreezeConfirmOpen(true);
+                void handleUnfreezeAccount();
               }}
+              disabled={unfreezing}
               className="bg-green-500 text-white hover:bg-green-600 inline-flex items-center gap-2"
             >
               <Unlock className="h-4 w-4" />
