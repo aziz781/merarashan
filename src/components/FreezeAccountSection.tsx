@@ -153,10 +153,12 @@ export function FreezeAccountSection({
             >
               {submitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Freezing…
+                  <Loader2 className="w-4 h-4 animate-spin" /> {verb}ing…
                 </>
               ) : (
-                "Freeze account"
+                <>
+                  {verb} account
+                </>
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
