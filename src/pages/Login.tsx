@@ -125,7 +125,12 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
       const url = new URL(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/merarashan-proxy`);
       url.searchParams.set("resource", "customers");
       url.searchParams.set("mobile", m);
+      // Bust both the browser HTTP cache and the service-worker NetworkFirst
+      // layer so a previously successful (pre-deletion) response can't mask
+      // a fresh 404 for a deleted account.
+      url.searchParams.set("_b", String(Date.now()));
       const res = await fetch(url.toString(), {
+        cache: "no-store",
         headers: {
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
