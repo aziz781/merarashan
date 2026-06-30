@@ -3,7 +3,7 @@ import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
-import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle } from "lucide-react";
+import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle, Lock } from "lucide-react";
 
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
@@ -444,7 +444,12 @@ const Index = () => {
                   {profileData && (
                     <>
                       <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-green-300" : "bg-red-300"}`} />
-                      {isActive ? "Sponsor" : "Inactive"}
+                      {isActive ? "Sponsor" : (
+                        <>
+                          Freeze account
+                          <Lock className="shrink-0" size={10} strokeWidth={2.5} />
+                        </>
+                      )}
                     </>
                   )}
                 </span>
