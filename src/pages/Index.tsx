@@ -3,7 +3,7 @@ import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
-import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle, Lock } from "lucide-react";
+import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle, Lock, Unlock } from "lucide-react";
 
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
@@ -282,6 +282,7 @@ const Index = () => {
   const [unfreezeConfirmOpen, setUnfreezeConfirmOpen] = useState(false);
   const [freezing, setFreezing] = useState(false);
   const [freezeConfirmOpen, setFreezeConfirmOpen] = useState(false);
+  const [frozenInfoOpen, setFrozenInfoOpen] = useState(false);
   const handleFreezeAccount = useCallback(async () => {
     const customerNumber = resolvePayerId();
     if (!customerNumber || !mobile) {
@@ -431,28 +432,28 @@ const Index = () => {
                 <p className="text-xs text-primary-foreground/80 dark:!text-foreground/70 mt-0.5 truncate">Mera Rashan Monthly Statements</p>
               )}
               {tab === "customers" && (
-                <span
-                  className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] ${
-                    !profileData
-                      ? "bg-white/10 text-white/0 ring-1 ring-white/10"
-                      : isActive
-                      ? "bg-green-400/20 text-green-50 ring-1 ring-green-300/40"
-                      : "bg-red-400/20 text-red-50 ring-1 ring-red-300/40"
-                  }`}
-                  aria-hidden={!profileData}
-                >
-                  {profileData && (
-                    <>
-                      <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-green-300" : "bg-red-300"}`} />
-                      {isActive ? "Sponsor" : (
-                        <>
-                          Freeze account
-                          <Lock className="shrink-0" size={10} strokeWidth={2.5} />
-                        </>
-                      )}
-                    </>
-                  )}
-                </span>
+                !profileData ? (
+                  <span
+                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-white/10 text-white/0 ring-1 ring-white/10"
+                    aria-hidden
+                  />
+                ) : isActive ? (
+                  <span className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-green-400/20 text-green-50 ring-1 ring-green-300/40">
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-300" />
+                    Sponsor
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setFrozenInfoOpen(true)}
+                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-red-400/20 text-red-50 ring-1 ring-red-300/40 hover:bg-red-400/30 transition-colors"
+                    aria-label="Account frozen. Open unfreeze options"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-300" />
+                    Freeze account
+                    <Lock className="shrink-0" size={10} strokeWidth={2.5} />
+                  </button>
+                )
               )}
             </div>
           </div>
@@ -734,6 +735,37 @@ const Index = () => {
               className="bg-green-500 text-white hover:bg-green-600"
             >
               Freeze account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={frozenInfoOpen} onOpenChange={setFrozenInfoOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Account frozen</AlertDialogTitle>
+            <div className="text-sm text-foreground space-y-1">
+              <p>While your account is frozen:</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li><strong>Card Inactive:</strong> Your Mera Rashan Card will not work.</li>
+                <li><strong>No New Codes:</strong> Ration Codes cannot be generated.</li>
+                <li><strong>View Only:</strong> You can still log in to view your cards, rations, and statements.</li>
+                <li><strong>Unfreeze Anytime:</strong> Restore full access whenever you need to.</li>
+              </ul>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                setFrozenInfoOpen(false);
+                setUnfreezeConfirmOpen(true);
+              }}
+              className="bg-green-500 text-white hover:bg-green-600 inline-flex items-center gap-2"
+            >
+              <Unlock className="h-4 w-4" />
+              Unfreeze account
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
