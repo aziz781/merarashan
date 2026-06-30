@@ -11,6 +11,16 @@ import { FreezeAccountSection } from "@/components/FreezeAccountSection";
 import { LoadingState } from "@/components/LoadingState";
 import { toast } from "@/hooks/use-toast";
 import { toast as sonnerToast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { useResource, invalidateResource, type Resource } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
@@ -271,6 +281,7 @@ const Index = () => {
     setDeleteAccountOpen(true);
   }, []);
   const [unfreezing, setUnfreezing] = useState(false);
+  const [unfreezeConfirmOpen, setUnfreezeConfirmOpen] = useState(false);
   const handleOpenFreezeAccount = useCallback(() => {
     setProfileOpen(false);
     setHelpOpen(false);
@@ -577,7 +588,13 @@ const Index = () => {
           <div className="mt-auto space-y-3">
             <button
               type="button"
-              onClick={isCustomerActive ? handleOpenFreezeAccount : handleUnfreezeAccount}
+              onClick={() => {
+                if (isCustomerActive) {
+                  handleOpenFreezeAccount();
+                } else {
+                  setUnfreezeConfirmOpen(true);
+                }
+              }}
               disabled={unfreezing}
               className="flex w-full items-center gap-3 rounded-md border border-green-500/40 bg-card px-4 py-3 text-left text-sm font-medium text-green-600 dark:text-green-400 hover:bg-green-500/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
@@ -613,6 +630,31 @@ const Index = () => {
           </div>
         </div>
       </SlideInPanel>
+
+      <AlertDialog open={unfreezeConfirmOpen} onOpenChange={(o) => !unfreezing && setUnfreezeConfirmOpen(o)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm unfreeze account</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your account is currently frozen. Unfreezing will reactivate your account and restore full access. Are you sure?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={unfreezing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                setUnfreezeConfirmOpen(false);
+                void handleUnfreezeAccount();
+              }}
+              disabled={unfreezing}
+              className="bg-green-500 text-white hover:bg-green-600"
+            >
+              Unfreeze account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <SlideInPanel
         open={socialOpen}
