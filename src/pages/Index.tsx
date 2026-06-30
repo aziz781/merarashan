@@ -588,7 +588,13 @@ const Index = () => {
           <div className="mt-auto space-y-3">
             <button
               type="button"
-              onClick={isCustomerActive ? handleOpenFreezeAccount : handleUnfreezeAccount}
+              onClick={() => {
+                if (isCustomerActive) {
+                  handleOpenFreezeAccount();
+                } else {
+                  setUnfreezeConfirmOpen(true);
+                }
+              }}
               disabled={unfreezing}
               className="flex w-full items-center gap-3 rounded-md border border-green-500/40 bg-card px-4 py-3 text-left text-sm font-medium text-green-600 dark:text-green-400 hover:bg-green-500/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
