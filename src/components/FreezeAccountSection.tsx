@@ -102,7 +102,7 @@ export function FreezeAccountSection({
 
       <Button
         onClick={() => setOpen(true)}
-        className="w-full bg-yellow-500 text-white hover:bg-yellow-600"
+        className="w-full bg-green-500 text-white hover:bg-green-600"
       >
         <Snowflake className="h-4 w-4" />
         {verb} account
@@ -149,7 +149,7 @@ export function FreezeAccountSection({
                 handleFreeze();
               }}
               disabled={submitting || !isValid}
-              className="bg-yellow-500 text-white hover:bg-yellow-600"
+              className="bg-green-500 text-white hover:bg-green-600"
             >
               {submitting ? (
                 <>
