@@ -704,12 +704,12 @@ const Index = () => {
                 <ul className="list-disc pl-4 space-y-1">
                   <li><strong>Card Inactive:</strong> Your Mera Rashan Card will not work.</li>
                   <li><strong>No New Codes:</strong> Ration Codes cannot be generated.</li>
-                  <li><strong>View Only:</strong> You can still log in to view your cards, rations, and statements.</li>
+                  <li><strong>View Only:</strong> You can still log in to view your cards, rashans, and statements.</li>
                   <li><strong>Unfreeze Anytime:</strong> Restore full access whenever you need to.</li>
                 </ul>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">Are you sure?</p>
+            <p className="text-sm text-muted-foreground">Are you sure you want to freeze your account?</p>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={freezing}>Cancel</AlertDialogCancel>
