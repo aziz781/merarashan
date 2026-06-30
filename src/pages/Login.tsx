@@ -313,7 +313,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
             <WhatsAppTile
               href="https://wa.me/923030812222"
               number="923030812222"
-              title="Customer Support"
+              title="@mera.rashan"
               subtitle="Chat on WhatsApp"
               showCopy={false}
             />
