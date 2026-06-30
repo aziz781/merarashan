@@ -317,11 +317,6 @@ const Index = () => {
         description: "Your account has been temporarily frozen.",
       });
       void clearResourcesCache();
-      try {
-        await queryClient.invalidateQueries({ queryKey: ["merarashan"], refetchType: "all" });
-      } catch {
-        // Refetch errors are non-fatal; background invalidation will retry.
-      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Freeze failed";
       sonnerToast.error("Freeze failed", { id: progressId, description: msg });
