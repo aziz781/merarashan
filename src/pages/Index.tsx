@@ -316,9 +316,9 @@ const Index = () => {
         id: progressId,
         description: "Your account has been temporarily frozen.",
       });
-      void invalidateResource("customers", mobile);
+      void clearResourcesCache();
       try {
-        await refetchResource("customers", mobile);
+        await queryClient.invalidateQueries({ queryKey: ["merarashan"], refetchType: "all" });
       } catch {
         // Refetch errors are non-fatal; background invalidation will retry.
       }
