@@ -689,6 +689,31 @@ const Index = () => {
         </AlertDialogContent>
       </AlertDialog>
 
+      <AlertDialog open={freezeConfirmOpen} onOpenChange={(o) => !freezing && setFreezeConfirmOpen(o)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm freeze account</AlertDialogTitle>
+            <AlertDialogDescription>
+              Freezing your account is temporary and can be undone later. While frozen, you won't be able to make Rashan transactions. Are you sure?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={freezing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                setFreezeConfirmOpen(false);
+                void handleFreezeAccount();
+              }}
+              disabled={freezing}
+              className="bg-green-500 text-white hover:bg-green-600"
+            >
+              Freeze account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <SlideInPanel
         open={socialOpen}
         onOpenChange={handleSocialPanelChange}
@@ -746,25 +771,6 @@ const Index = () => {
             onDeleted={() => {
               localStorage.removeItem(STORAGE_KEY);
               setMobile(null);
-            }}
-          />
-        </div>
-      </SlideInPanel>
-
-      <SlideInPanel
-        open={freezeAccountOpen}
-        onOpenChange={handleFreezeAccountPanelChange}
-      >
-        <div className="pt-2">
-          <FreezeAccountSection
-            mobile={mobile!}
-            expectedCustomerNumber={
-              profileData?.payer_id != null ? String(profileData.payer_id) : ""
-            }
-            isActive={isCustomerActive}
-            onFrozen={() => {
-              setFreezeAccountOpen(false);
-              if (mobile) invalidateResource("customers", mobile);
             }}
           />
         </div>
