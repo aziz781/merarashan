@@ -320,7 +320,7 @@ const Index = () => {
     } finally {
       setUnfreezing(false);
     }
-  }, [mobile, profileData?.payer_id]);
+  }, [mobile, resolvePayerId]);
 
   const handleMenuLogout = useCallback(() => {
     setMenuOpen(false);
