@@ -279,14 +279,50 @@ const Index = () => {
   }, []);
   const [unfreezing, setUnfreezing] = useState(false);
   const [unfreezeConfirmOpen, setUnfreezeConfirmOpen] = useState(false);
-  const handleOpenFreezeAccount = useCallback(() => {
-    setProfileOpen(false);
-    setHelpOpen(false);
-    setSettingsOpen(false);
-    setPrivacyOpen(false);
-    setSocialOpen(false);
-    setFreezeAccountOpen(true);
-  }, []);
+  const [freezing, setFreezing] = useState(false);
+  const [freezeConfirmOpen, setFreezeConfirmOpen] = useState(false);
+  const handleFreezeAccount = useCallback(async () => {
+    const customerNumber = resolvePayerId();
+    if (!customerNumber || !mobile) {
+      sonnerToast.error("Freeze failed", {
+        description: !mobile ? "Not signed in." : "Customer ID unavailable — please reopen the app.",
+      });
+      return;
+    }
+
+    setFreezing(true);
+    const progressId = sonnerToast.loading("Freezing account…");
+    try {
+      const url = new URL(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/merarashan-proxy`,
+      );
+      url.searchParams.set("resource", "customers");
+      url.searchParams.set("mobile", mobile);
+      url.searchParams.set("customerNumber", customerNumber);
+      url.searchParams.set("action", "freeze");
+      const res = await fetch(url.toString(), {
+        method: "PUT",
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`Request failed (${res.status}): ${txt}`);
+      }
+      sonnerToast.success("Account frozen", {
+        id: progressId,
+        description: "Your account has been temporarily frozen.",
+      });
+      void invalidateResource("customers", mobile);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Freeze failed";
+      sonnerToast.error("Freeze failed", { id: progressId, description: msg });
+    } finally {
+      setFreezing(false);
+    }
+  }, [mobile, resolvePayerId]);
   const handleUnfreezeAccount = useCallback(async () => {
     const customerNumber = resolvePayerId();
     if (!customerNumber || !mobile) {
