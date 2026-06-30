@@ -126,6 +126,12 @@ export function refetchResource(
   });
 }
 
+/** Clear all cached resource data (e.g. after account freeze/unfreeze). */
+export function clearResourcesCache() {
+  queryClient.removeQueries({ queryKey: ["merarashan"] });
+  return queryClient.invalidateQueries({ queryKey: ["merarashan"], refetchType: "all" });
+}
+
 export function formatMobile(input: string): string {
   return input.replace(/\D/g, "");
 }
