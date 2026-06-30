@@ -173,7 +173,18 @@ export function clearResourcesCache() {
  * so no customer data, tokens, or UI state survives after the session ends.
  */
 export function clearAllAppCache() {
-  clearResourcesCache();
+  // Bump the cache-buster so any in-flight or subsequent fetches bypass the
+  // browser HTTP cache and the service-worker NetworkFirst layer.
+  cacheBust += 1;
+
+  // Wipe the entire React Query cache — not just the "merarashan" namespace —
+  // so any ad-hoc keys (customers, profile lookups, admin queries, etc.) are
+  // dropped along with the persisted snapshot.
+  try {
+    queryClient.cancelQueries();
+  } catch { /* ignore */ }
+  queryClient.removeQueries();
+  queryClient.clear();
 
   if (typeof window === "undefined") return;
 
