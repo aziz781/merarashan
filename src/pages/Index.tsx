@@ -10,6 +10,8 @@ import { DeleteAccountSection } from "@/components/DeleteAccountSection";
 import { FreezeAccountSection } from "@/components/FreezeAccountSection";
 import { LoadingState } from "@/components/LoadingState";
 import { toast } from "@/hooks/use-toast";
+import { toast as sonnerToast } from "sonner";
+
 import { useResource, invalidateResource, type Resource } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import type { Customer } from "@/types/domain";
@@ -257,6 +259,7 @@ const Index = () => {
     setSocialOpen(false);
     setDeleteAccountOpen(true);
   }, []);
+  const [unfreezing, setUnfreezing] = useState(false);
   const handleOpenFreezeAccount = useCallback(() => {
     setProfileOpen(false);
     setHelpOpen(false);
@@ -265,6 +268,46 @@ const Index = () => {
     setSocialOpen(false);
     setFreezeAccountOpen(true);
   }, []);
+  const handleUnfreezeAccount = useCallback(async () => {
+    const customerNumber = profileData?.payer_id != null ? String(profileData.payer_id) : "";
+    if (!customerNumber || !mobile) {
+      sonnerToast.error("Unfreeze failed", { description: "Missing customer number." });
+      return;
+    }
+    setUnfreezing(true);
+    const progressId = sonnerToast.loading("Unfreezing account…");
+    try {
+      const url = new URL(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/merarashan-proxy`,
+      );
+      url.searchParams.set("resource", "customers");
+      url.searchParams.set("mobile", mobile);
+      url.searchParams.set("customerNumber", customerNumber);
+      url.searchParams.set("action", "unfreeze");
+      const res = await fetch(url.toString(), {
+        method: "PUT",
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`Request failed (${res.status}): ${txt}`);
+      }
+      sonnerToast.success("Account unfrozen", {
+        id: progressId,
+        description: "Your account has been reactivated.",
+      });
+      void invalidateResource("customers", mobile);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Unfreeze failed";
+      sonnerToast.error("Unfreeze failed", { id: progressId, description: msg });
+    } finally {
+      setUnfreezing(false);
+    }
+  }, [mobile, profileData?.payer_id]);
+
   const handleMenuLogout = useCallback(() => {
     setMenuOpen(false);
     handleLogout();
@@ -520,13 +563,16 @@ const Index = () => {
           <div className="mt-auto space-y-3">
             <button
               type="button"
-              onClick={handleOpenFreezeAccount}
-              className="flex w-full items-center gap-3 rounded-md border border-green-500/40 bg-card px-4 py-3 text-left text-sm font-medium text-green-600 dark:text-green-400 hover:bg-green-500/10 transition-colors"
+              onClick={isCustomerActive ? handleOpenFreezeAccount : handleUnfreezeAccount}
+              disabled={unfreezing}
+              className="flex w-full items-center gap-3 rounded-md border border-green-500/40 bg-card px-4 py-3 text-left text-sm font-medium text-green-600 dark:text-green-400 hover:bg-green-500/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-500/10">
-                <Snowflake className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <Snowflake className={`h-5 w-5 text-green-600 dark:text-green-400 ${unfreezing ? "animate-spin" : ""}`} />
               </span>
-              <span className="flex-1">{isCustomerActive ? "Freeze account" : "Unfreeze account"}</span>
+              <span className="flex-1">
+                {unfreezing ? "Unfreezing…" : isCustomerActive ? "Freeze account" : "Unfreeze account"}
+              </span>
               <span
                 className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                   isCustomerActive
@@ -538,6 +584,7 @@ const Index = () => {
               </span>
               <span aria-hidden>›</span>
             </button>
+
             <button
               type="button"
               onClick={handleOpenDeleteAccount}
