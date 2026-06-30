@@ -67,7 +67,25 @@ Deno.serve(async (req) => {
       });
     }
 
-    const upstreamUrl = new URL(`${BASE_URL}/${resource}`);
+    const action = url.searchParams.get("action") ?? "";
+    const customerNumberParam = url.searchParams.get("customerNumber") ?? "";
+    let upstreamPath = `${BASE_URL}/${resource}`;
+    if (action) {
+      if (!ALLOWED_ACTIONS.has(action)) {
+        return new Response(JSON.stringify({ error: "Invalid action" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (!/^[A-Z0-9]+$/i.test(customerNumberParam)) {
+        return new Response(JSON.stringify({ error: "Invalid customer number" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      upstreamPath = `${BASE_URL}/${resource}/${encodeURIComponent(customerNumberParam)}/${action}`;
+    }
+    const upstreamUrl = new URL(upstreamPath);
     upstreamUrl.searchParams.set("mobile", mobile);
     for (const key of FORWARD_PARAMS) {
       const v = url.searchParams.get(key);
