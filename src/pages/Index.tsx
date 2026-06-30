@@ -771,6 +771,11 @@ const Index = () => {
         </AlertDialogContent>
       </AlertDialog>
 
+      <SlideInPanel
+        open={socialOpen}
+        onOpenChange={handleSocialPanelChange}
+        title="Social media"
+      >
         <div className="space-y-3 pt-2">
           {[
             {
