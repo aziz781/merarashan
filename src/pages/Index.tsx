@@ -632,10 +632,10 @@ const Index = () => {
               className="flex w-full items-center gap-3 rounded-md border border-green-500/40 bg-card px-4 py-3 text-left text-sm font-medium text-green-600 dark:text-green-400 hover:bg-green-500/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-500/10">
-                <Snowflake className={`h-5 w-5 text-green-600 dark:text-green-400 ${unfreezing ? "animate-spin" : ""}`} />
+                <Snowflake className={`h-5 w-5 text-green-600 dark:text-green-400 ${freezing || unfreezing ? "animate-spin" : ""}`} />
               </span>
               <span className="flex-1">
-                {unfreezing ? "Unfreezing…" : isCustomerActive ? "Freeze account" : "Unfreeze account"}
+                {freezing ? "Freezing…" : unfreezing ? "Unfreezing…" : isCustomerActive ? "Freeze account" : "Unfreeze account"}
               </span>
               <span
                 className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
