@@ -173,13 +173,39 @@ const Index = () => {
   const handlePrivacyPanelChange = useCallback(closeWithGuard(setPrivacyOpen), [closeWithGuard]);
   const handleSocialPanelChange = useCallback(closeWithGuard(setSocialOpen), [closeWithGuard]);
   const handleDeleteAccountPanelChange = useCallback(closeWithGuard(setDeleteAccountOpen), [closeWithGuard]);
-  const { data: customerRaw } = useResource<unknown>("customers", mobile ?? undefined);
+  const { data: customerRaw, error: customerError } = useResource<unknown>("customers", mobile ?? undefined, undefined, { retry: false });
   const profileData: Customer | null = (() => {
     if (!customerRaw) return null;
     const items = extractItems(customerRaw);
     const first = (items && items[0]) || customerRaw;
     return first as Customer;
   })();
+
+  // Any 403/404 "account does not exist" on the primary customers fetch means
+  // the user is signed in but the upstream account is gone (deleted, deactivated,
+  // never existed via bypass). Sign out cleanly and route them back to Login,
+  // which will render the dedicated account_not_found UI.
+  const accountMissingHandledRef = useRef(false);
+  useEffect(() => {
+    if (!customerError || accountMissingHandledRef.current) return;
+    const isAccountMissing = customerError instanceof ApiError && customerError.code === "account_not_found";
+    if (!isAccountMissing) return;
+    accountMissingHandledRef.current = true;
+    const lastMobile = mobile;
+    (async () => {
+      try {
+        if (lastMobile) localStorage.setItem("mr_account_not_found", lastMobile);
+      } catch { /* ignore */ }
+      clearAllAppCache();
+      try { await supabase.auth.signOut(); } catch { /* ignore */ }
+      localStorage.removeItem(STORAGE_KEY);
+      setMobile(null);
+      sonnerToast.error("Account not found", {
+        description: "We couldn't find your Mera Rashan account. Please contact support.",
+      });
+    })();
+  }, [customerError, mobile]);
+
   const isCustomerActive = isTruthy(profileData?.is_active);
   const PAYER_ID_KEY = "mr_payer_id";
   useEffect(() => {
