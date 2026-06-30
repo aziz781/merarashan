@@ -256,6 +256,14 @@ const Index = () => {
     setSocialOpen(false);
     setDeleteAccountOpen(true);
   }, []);
+  const handleOpenFreezeAccount = useCallback(() => {
+    setProfileOpen(false);
+    setHelpOpen(false);
+    setSettingsOpen(false);
+    setPrivacyOpen(false);
+    setSocialOpen(false);
+    setFreezeAccountOpen(true);
+  }, []);
   const handleMenuLogout = useCallback(() => {
     setMenuOpen(false);
     handleLogout();
