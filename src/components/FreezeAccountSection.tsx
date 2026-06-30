@@ -20,15 +20,22 @@ import {
 export function FreezeAccountSection({
   mobile,
   expectedCustomerNumber,
+  isActive,
   onFrozen,
 }: {
   mobile: string;
   expectedCustomerNumber?: string;
+  isActive?: boolean;
   onFrozen?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [customerNumber, setCustomerNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const frozen = isActive === false;
+  const action = frozen ? "unfreeze" : "freeze";
+  const verb = frozen ? "Unfreeze" : "Freeze";
+  const pastVerb = frozen ? "Unfrozen" : "Frozen";
 
   const CUSTOMER_NUMBER_REGEX = /^PYR[A-Z0-9]+$/;
   const trimmed = customerNumber.trim().toUpperCase();
