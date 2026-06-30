@@ -450,7 +450,7 @@ const Index = () => {
                     aria-label="Account frozen. Open unfreeze options"
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-red-300" />
-                    Freeze account
+                    Frozen account
                     <Lock className="shrink-0" size={10} strokeWidth={2.5} />
                   </button>
                 )
