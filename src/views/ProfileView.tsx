@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, X, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Lock, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -376,8 +376,8 @@ export function ProfileView({
         </span>
       ) : (
         <span className="inline-flex items-center gap-1.5 font-medium">
-          Inactive
-          <X className="w-4 h-4 text-destructive" />
+          Freeze account
+          <Lock className="w-4 h-4 text-destructive" />
         </span>
       );
     } else if (key === "active_cards") {
