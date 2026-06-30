@@ -53,7 +53,7 @@ export function FreezeAccountSection({
       url.searchParams.set("resource", "customers");
       url.searchParams.set("mobile", mobile);
       url.searchParams.set("customerNumber", trimmed);
-      url.searchParams.set("action", "freeze");
+      url.searchParams.set("action", action);
       const res = await fetch(url.toString(), {
         method: "PUT",
         headers: {
@@ -65,14 +65,14 @@ export function FreezeAccountSection({
         const txt = await res.text();
         throw new Error(`Request failed (${res.status}): ${txt}`);
       }
-      toast.success("Account frozen", {
-        description: "Your account has been temporarily frozen.",
+      toast.success(`Account ${pastVerb.toLowerCase()}`, {
+        description: `Your account has been temporarily ${pastVerb.toLowerCase()}.`,
       });
       setOpen(false);
       onFrozen?.();
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Failed to freeze account";
-      toast.error("Freeze failed", { description: msg });
+      const msg = e instanceof Error ? e.message : `${verb} failed`;
+      toast.error(`${verb} failed`, { description: msg });
     } finally {
       setSubmitting(false);
     }
