@@ -10,7 +10,7 @@ import { DeleteAccountSection } from "@/components/DeleteAccountSection";
 import { FreezeAccountSection } from "@/components/FreezeAccountSection";
 import { LoadingState } from "@/components/LoadingState";
 import { toast } from "@/hooks/use-toast";
-import { useResource, type Resource } from "@/lib/api";
+import { useResource, invalidateResource, type Resource } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import type { Customer } from "@/types/domain";
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
