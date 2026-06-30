@@ -375,9 +375,9 @@ export function ProfileView({
           Active
         </span>
       ) : (
-        <span className="inline-flex items-center gap-1.5 font-medium">
+        <span className="inline-flex items-center gap-1.5 font-medium text-destructive">
           Freeze account
-          <Lock className="w-4 h-4 text-destructive" />
+          <Lock className="w-4 h-4" />
         </span>
       );
     } else if (key === "active_cards") {
