@@ -116,8 +116,14 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
       });
-      if (!res.ok) return null;
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        const msg = typeof data?.message === "string" ? data.message : typeof data?.error === "string" ? data.error : "";
+        if (res.status === 403 || res.status === 404 || /account does not exist|not found/i.test(msg)) {
+          return false;
+        }
+        return null;
+      }
       return Array.isArray(data) && data.length > 0;
     } catch {
       return null;
