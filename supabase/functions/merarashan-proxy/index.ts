@@ -4,7 +4,7 @@ const BASE_URL = "https://data.merarashan.pk";
 const ALLOWED = new Set(["cards", "transactions", "customers", "statements"]);
 const FORWARD_PARAMS = ["month", "year", "monthYear", "rcNum", "status", "customerNumber"];
 const ALLOWED_METHODS = new Set(["GET", "DELETE", "PUT"]);
-const ALLOWED_ACTIONS = new Set(["freeze"]);
+const ALLOWED_ACTIONS = new Set(["freeze", "unfreeze"]);
 
 // Only compress JSON-ish payloads above ~1KB — below that the framing
 // overhead negates the gains.
