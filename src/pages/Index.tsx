@@ -173,6 +173,17 @@ const Index = () => {
     return first as Customer;
   })();
   const isCustomerActive = isTruthy(profileData?.is_active);
+  const PAYER_ID_KEY = "mr_payer_id";
+  useEffect(() => {
+    if (profileData?.payer_id != null) {
+      try { localStorage.setItem(PAYER_ID_KEY, String(profileData.payer_id)); } catch { /* ignore */ }
+    }
+  }, [profileData?.payer_id]);
+  const resolvePayerId = useCallback(() => {
+    if (profileData?.payer_id != null) return String(profileData.payer_id);
+    try { return localStorage.getItem(PAYER_ID_KEY) ?? ""; } catch { return ""; }
+  }, [profileData?.payer_id]);
+
 
   useEffect(() => {
     const extract = (email?: string | null, meta?: Record<string, unknown> | null) => {
