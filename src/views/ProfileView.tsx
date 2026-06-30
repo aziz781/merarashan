@@ -376,7 +376,7 @@ export function ProfileView({
         </span>
       ) : (
         <span className="inline-flex items-center gap-1.5 font-medium text-destructive">
-          Freeze account
+          Frozen account
           <Lock className="w-4 h-4" />
         </span>
       );
