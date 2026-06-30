@@ -140,16 +140,18 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
     }
     setMobile(cleaned);
     setLoading(true);
-    const isBypass = await checkBypass(cleaned);
-    if (isBypass) {
+    // Always check the account exists first — even bypass numbers must map
+    // to a real customer or the post-login screen will 403 on /customers.
+    const exists = await checkAccountExists(cleaned);
+    if (exists === false) {
       setLoading(false);
-      bypassLogin(cleaned);
+      setStep("account_not_found");
       return;
     }
-    const exists = await checkAccountExists(cleaned);
+    const isBypass = await checkBypass(cleaned);
     setLoading(false);
-    if (exists === false) {
-      setStep("account_not_found");
+    if (isBypass) {
+      bypassLogin(cleaned);
       return;
     }
     sendOtp(cleaned);
