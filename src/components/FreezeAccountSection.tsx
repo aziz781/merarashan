@@ -80,9 +80,9 @@ export function FreezeAccountSection({
 
   return (
     <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50 space-y-3">
-      <h3 className="text-base font-bold text-foreground">Freeze account</h3>
+      <h3 className="text-base font-bold text-foreground">{verb} account</h3>
       <p className="text-sm text-muted-foreground">
-        Freezing your account is{" "}
+        {frozen ? "Unfreezing" : "Freezing"} your account is{" "}
         <em className="font-semibold text-foreground">temporary and can be undone</em>.
         It's free to keep it open.
       </p>
@@ -91,7 +91,7 @@ export function FreezeAccountSection({
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
           <p className="font-medium mb-1">
-            If you would still like to freeze your account, please make sure:
+            If you would still like to {verb.toLowerCase()} your account, please make sure:
           </p>
           <ol className="list-decimal pl-5 space-y-0.5 text-sm">
             <li>All Rashan transactions are completed</li>
@@ -105,15 +105,15 @@ export function FreezeAccountSection({
         className="w-full bg-yellow-500 text-white hover:bg-yellow-600"
       >
         <Snowflake className="h-4 w-4" />
-        Freeze account
+        {verb} account
       </Button>
 
       <AlertDialog open={open} onOpenChange={(o) => !submitting && setOpen(o)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm freeze account</AlertDialogTitle>
+            <AlertDialogTitle>Confirm {verb.toLowerCase()} account</AlertDialogTitle>
             <AlertDialogDescription>
-              Enter your customer number to temporarily freeze your account.
+              Enter your customer number to temporarily {verb.toLowerCase()} your account.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-2">
