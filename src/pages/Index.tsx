@@ -257,6 +257,7 @@ const Index = () => {
     setSocialOpen(false);
     setDeleteAccountOpen(true);
   }, []);
+  const [unfreezing, setUnfreezing] = useState(false);
   const handleOpenFreezeAccount = useCallback(() => {
     setProfileOpen(false);
     setHelpOpen(false);
@@ -265,6 +266,46 @@ const Index = () => {
     setSocialOpen(false);
     setFreezeAccountOpen(true);
   }, []);
+  const handleUnfreezeAccount = useCallback(async () => {
+    const customerNumber = profileData?.payer_id != null ? String(profileData.payer_id) : "";
+    if (!customerNumber || !mobile) {
+      sonnerToast.error("Unfreeze failed", { description: "Missing customer number." });
+      return;
+    }
+    setUnfreezing(true);
+    const progressId = sonnerToast.loading("Unfreezing account…");
+    try {
+      const url = new URL(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/merarashan-proxy`,
+      );
+      url.searchParams.set("resource", "customers");
+      url.searchParams.set("mobile", mobile);
+      url.searchParams.set("customerNumber", customerNumber);
+      url.searchParams.set("action", "unfreeze");
+      const res = await fetch(url.toString(), {
+        method: "PUT",
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`Request failed (${res.status}): ${txt}`);
+      }
+      sonnerToast.success("Account unfrozen", {
+        id: progressId,
+        description: "Your account has been reactivated.",
+      });
+      void invalidateResource("customers", mobile);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Unfreeze failed";
+      sonnerToast.error("Unfreeze failed", { id: progressId, description: msg });
+    } finally {
+      setUnfreezing(false);
+    }
+  }, [mobile, profileData?.payer_id]);
+
   const handleMenuLogout = useCallback(() => {
     setMenuOpen(false);
     handleLogout();
