@@ -66,9 +66,16 @@ Deno.serve(async (req) => {
       });
     }
 
-    const upstreamUrl = new URL(`${BASE_URL}/${resource}`);
+    // Upstream expects DELETE on /customers/{customerNumber}; GET stays on /customers
+    const customerNumberParam = url.searchParams.get("customerNumber");
+    const upstreamPath =
+      req.method === "DELETE" && resource === "customers" && customerNumberParam
+        ? `${resource}/${encodeURIComponent(customerNumberParam)}`
+        : resource;
+    const upstreamUrl = new URL(`${BASE_URL}/${upstreamPath}`);
     upstreamUrl.searchParams.set("mobile", mobile);
     for (const key of FORWARD_PARAMS) {
+      if (req.method === "DELETE" && key === "customerNumber") continue;
       const v = url.searchParams.get(key);
       if (v) upstreamUrl.searchParams.set(key, v);
     }
