@@ -744,14 +744,14 @@ const Index = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Account frozen</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your account is currently frozen. While frozen:
-            </AlertDialogDescription>
             <div className="text-sm text-foreground space-y-1">
-              <p><strong>Card Inactive:</strong> Your Mera Rashan Card will not work.</p>
-              <p><strong>No New Codes:</strong> Ration Codes cannot be generated.</p>
-              <p><strong>View Only:</strong> You can still log in to view your cards, rations, and statements.</p>
-              <p><strong>Unfreeze Anytime:</strong> Restore full access whenever you need to.</p>
+              <p>While your account is frozen:</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li><strong>Card Inactive:</strong> Your Mera Rashan Card will not work.</li>
+                <li><strong>No New Codes:</strong> Ration Codes cannot be generated.</li>
+                <li><strong>View Only:</strong> You can still log in to view your cards, rations, and statements.</li>
+                <li><strong>Unfreeze Anytime:</strong> Restore full access whenever you need to.</li>
+              </ul>
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
