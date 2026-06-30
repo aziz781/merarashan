@@ -631,6 +631,31 @@ const Index = () => {
         </div>
       </SlideInPanel>
 
+      <AlertDialog open={unfreezeConfirmOpen} onOpenChange={(o) => !unfreezing && setUnfreezeConfirmOpen(o)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm unfreeze account</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your account is currently frozen. Unfreezing will reactivate your account and restore full access. Are you sure?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={unfreezing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                setUnfreezeConfirmOpen(false);
+                void handleUnfreezeAccount();
+              }}
+              disabled={unfreezing}
+              className="bg-green-500 text-white hover:bg-green-600"
+            >
+              Unfreeze account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <SlideInPanel
         open={socialOpen}
         onOpenChange={handleSocialPanelChange}
