@@ -170,6 +170,7 @@ const Index = () => {
     const first = (items && items[0]) || customerRaw;
     return first as Customer;
   })();
+  const isCustomerActive = isTruthy(profileData?.is_active);
 
   useEffect(() => {
     const extract = (email?: string | null, meta?: Record<string, unknown> | null) => {
