@@ -258,6 +258,8 @@ const Index = () => {
 
   const handleLogout = useCallback(async () => {
     await supabase.auth.signOut();
+    // Wipe cached customer/API responses so the next login starts clean.
+    clearAllAppCache();
     localStorage.removeItem(STORAGE_KEY);
     setMobile(null);
     // profileData clears automatically via useResource when mobile becomes null
