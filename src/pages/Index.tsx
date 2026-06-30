@@ -132,6 +132,7 @@ const Index = () => {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [socialOpen, setSocialOpen] = useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
+  const [freezeAccountOpen, setFreezeAccountOpen] = useState(false);
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
   });
