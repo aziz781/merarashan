@@ -140,18 +140,6 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
     }
     setMobile(cleaned);
     setLoading(true);
-    // Short-circuit: if this mobile was just deleted on this device, show
-    // the account_not_found UI immediately (upstream may still return the
-    // soft-deleted record for a while).
-    try {
-      const raw = localStorage.getItem("mr_deleted_mobiles");
-      const arr = raw ? JSON.parse(raw) : [];
-      if (Array.isArray(arr) && arr.includes(cleaned)) {
-        setLoading(false);
-        setStep("account_not_found");
-        return;
-      }
-    } catch { /* ignore */ }
     // Always check the account exists first — even bypass numbers must map
     // to a real customer or the post-login screen will 403 on /customers.
     const exists = await checkAccountExists(cleaned);

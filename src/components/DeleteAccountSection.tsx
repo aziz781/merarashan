@@ -75,18 +75,7 @@ export function DeleteAccountSection({
       toast.success("Account deleted successfully", {
         description: "You will be redirected to the login screen.",
       });
-      try {
-        const raw = localStorage.getItem("mr_deleted_mobiles");
-        const arr = raw ? JSON.parse(raw) : [];
-        const set = new Set<string>(Array.isArray(arr) ? arr : []);
-        set.add(mobile);
-        localStorage.setItem("mr_deleted_mobiles", JSON.stringify([...set]));
-      } catch { /* ignore */ }
       clearAllAppCache();
-      // clearAllAppCache wipes mr_* keys; re-write after clearing
-      try {
-        localStorage.setItem("mr_deleted_mobiles", JSON.stringify([mobile]));
-      } catch { /* ignore */ }
       setOpen(false);
       await supabase.auth.signOut();
       onDeleted?.();
