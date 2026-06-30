@@ -621,11 +621,15 @@ const Index = () => {
       >
         <div className="pt-2">
           <FreezeAccountSection
-            mobile={mobile}
+            mobile={mobile!}
             expectedCustomerNumber={
               profileData?.payer_id != null ? String(profileData.payer_id) : ""
             }
-            onFrozen={() => setFreezeAccountOpen(false)}
+            isActive={isCustomerActive}
+            onFrozen={() => {
+              setFreezeAccountOpen(false);
+              if (mobile) invalidateResource("customers", mobile);
+            }}
           />
         </div>
       </SlideInPanel>
