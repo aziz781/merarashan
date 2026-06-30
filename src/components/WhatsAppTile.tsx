@@ -8,11 +8,13 @@ export function WhatsAppTile({
   number,
   title,
   subtitle,
+  showCopy = true,
 }: {
   href: string;
   number: string;
   title: string;
   subtitle: string;
+  showCopy?: boolean;
 }) {
   const formatted = `+${number.slice(0, 2)} ${number.slice(2, 5)} ${number.slice(5, 8)} ${number.slice(8)}`;
   const handleCopy = async (e: React.MouseEvent) => {
@@ -37,16 +39,18 @@ export function WhatsAppTile({
             <p className="text-xs text-muted-foreground truncate">{subtitle}</p>
             <p className="text-xs text-foreground/80 font-mono truncate">{formatted}</p>
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={handleCopy}
-            className="shrink-0 h-8 w-8 hover:bg-[#25D366]/20"
-            aria-label={`Copy ${title} number`}
-          >
-            <Copy className="w-4 h-4" />
-          </Button>
+          {showCopy && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={handleCopy}
+              className="shrink-0 h-8 w-8 hover:bg-[#25D366]/20"
+              aria-label={`Copy ${title} number`}
+            >
+              <Copy className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </Card>
     </a>
