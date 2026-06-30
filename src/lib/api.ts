@@ -23,6 +23,12 @@ const RESOURCE_GC_TIME: Record<Resource, number> = {
   transactions: 30 * 24 * 60 * MIN,
 };
 
+// Cache-buster bumped whenever we explicitly clear server-derived data
+// (e.g. after a freeze/unfreeze mutation). Appended to outgoing URLs so
+// the browser HTTP cache and the service-worker NetworkFirst layer can't
+// return a stale snapshot from before the mutation.
+let cacheBust = 0;
+
 function buildUrl(
   resource: Resource,
   mobile: string,
@@ -38,11 +44,14 @@ function buildUrl(
       if (v) url.searchParams.set(k, v);
     }
   }
+  if (cacheBust > 0) url.searchParams.set("_b", String(cacheBust));
   return url.toString();
 }
 
 async function rawFetch<T>(url: string): Promise<T> {
+  const bypass = cacheBust > 0;
   const res = await fetch(url, {
+    cache: bypass ? "no-store" : "default",
     headers: {
       apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
       Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
@@ -126,8 +135,14 @@ export function refetchResource(
   });
 }
 
-/** Clear all cached resource data (e.g. after account freeze/unfreeze). */
+/**
+ * Clear all cached resource data (e.g. after account freeze/unfreeze).
+ * Also bumps the cache-buster so the subsequent network refetch bypasses
+ * the browser HTTP cache and the service-worker NetworkFirst layer that
+ * would otherwise return the pre-mutation response for up to 60s.
+ */
 export function clearResourcesCache() {
+  cacheBust += 1;
   queryClient.removeQueries({ queryKey: ["merarashan"] });
   return queryClient.invalidateQueries({ queryKey: ["merarashan"], refetchType: "all" });
 }
