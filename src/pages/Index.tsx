@@ -744,16 +744,19 @@ const Index = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Account frozen</AlertDialogTitle>
-            <div className="text-sm text-foreground space-y-1">
-              <p>While your account is frozen:</p>
-              <ul className="list-disc pl-4 space-y-1">
-                <li><strong>Card Inactive:</strong> Your Mera Rashan Card will not work.</li>
-                <li><strong>No New Codes:</strong> Ration Codes cannot be generated.</li>
-                <li><strong>View Only:</strong> You can still log in to view your cards, rations, and statements.</li>
-                <li><strong>Unfreeze Anytime:</strong> Restore full access whenever you need to.</li>
-              </ul>
-              <p className="pt-2">Unfreezing will reactivate your account and restore full access. Are you sure?</p>
+            <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 flex gap-3 items-start text-sm">
+              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div className="text-foreground space-y-1">
+                <p>While your account is frozen:</p>
+                <ul className="list-disc pl-4 space-y-1">
+                  <li><strong>Card Inactive:</strong> Your Mera Rashan Card will not work.</li>
+                  <li><strong>No New Codes:</strong> Ration Codes cannot be generated.</li>
+                  <li><strong>View Only:</strong> You can still log in to view your cards, rations, and statements.</li>
+                  <li><strong>Unfreeze Anytime:</strong> Restore full access whenever you need to.</li>
+                </ul>
+              </div>
             </div>
+            <p className="text-sm text-muted-foreground">Unfreezing will reactivate your account and restore full access. Are you sure?</p>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
