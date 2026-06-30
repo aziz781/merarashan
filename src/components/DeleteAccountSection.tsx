@@ -75,6 +75,7 @@ export function DeleteAccountSection({
       toast.success("Account deleted successfully", {
         description: "You will be redirected to the login screen.",
       });
+      clearResourcesCache();
       setOpen(false);
       await supabase.auth.signOut();
       onDeleted?.();
