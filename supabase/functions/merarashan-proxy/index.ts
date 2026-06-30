@@ -115,6 +115,14 @@ Deno.serve(async (req) => {
       await new Promise((r) => setTimeout(r, delays[attempt]));
     }
 
+    // Normalize upstream "account does not exist" responses: upstream returns
+    // 403 with this message when the customer is unknown. Remap to 404 so the
+    // client treats it consistently as account_not_found.
+    let responseStatus = upstream.status;
+    if (responseStatus === 403 && /account does not exist/i.test(text)) {
+      responseStatus = 404;
+    }
+
     const contentType = upstream.headers.get("content-type") ?? "application/json";
     const responseHeaders: Record<string, string> = {
       ...corsHeaders,
