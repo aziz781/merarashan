@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
-import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake } from "lucide-react";
+import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle } from "lucide-react";
 
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
@@ -694,8 +694,15 @@ const Index = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm freeze account</AlertDialogTitle>
             <AlertDialogDescription>
-              Freezing your account is temporary and can be undone later. While frozen, you won't be able to make Rashan transactions. Are you sure?
+              Freezing your account is temporary and can be <em className="font-semibold not-italic">undone later</em>.
             </AlertDialogDescription>
+            <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 flex gap-3 items-start text-sm">
+              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <span className="text-foreground">
+                While frozen, you won't be able to make Rashan transactions.
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground">Are you sure?</p>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={freezing}>Cancel</AlertDialogCancel>
