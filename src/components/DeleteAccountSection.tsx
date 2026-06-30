@@ -59,6 +59,7 @@ export function DeleteAccountSection({
       url.searchParams.set("resource", "customers");
       url.searchParams.set("mobile", mobile);
       url.searchParams.set("customerNumber", trimmed);
+      url.searchParams.set("action", "delete-account");
       const res = await fetch(url.toString(), {
         method: "DELETE",
         headers: {
