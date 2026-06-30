@@ -752,6 +752,7 @@ const Index = () => {
                 <li><strong>View Only:</strong> You can still log in to view your cards, rations, and statements.</li>
                 <li><strong>Unfreeze Anytime:</strong> Restore full access whenever you need to.</li>
               </ul>
+              <p className="pt-2">Unfreezing will reactivate your account and restore full access. Are you sure?</p>
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
