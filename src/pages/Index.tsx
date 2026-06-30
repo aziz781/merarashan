@@ -316,6 +316,9 @@ const Index = () => {
         id: progressId,
         description: "Your account has been temporarily frozen.",
       });
+      setPrivacyOpen(false);
+      setMenuOpen(false);
+      setTab("customers");
       void clearResourcesCache();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Freeze failed";
@@ -358,6 +361,9 @@ const Index = () => {
         id: progressId,
         description: "Your account has been reactivated.",
       });
+      setPrivacyOpen(false);
+      setMenuOpen(false);
+      setTab("customers");
       void clearResourcesCache();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Unfreeze failed";
