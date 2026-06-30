@@ -623,12 +623,12 @@ const Index = () => {
               type="button"
               onClick={() => {
                 if (isCustomerActive) {
-                  handleOpenFreezeAccount();
+                  setFreezeConfirmOpen(true);
                 } else {
                   setUnfreezeConfirmOpen(true);
                 }
               }}
-              disabled={unfreezing}
+              disabled={freezing || unfreezing}
               className="flex w-full items-center gap-3 rounded-md border border-green-500/40 bg-card px-4 py-3 text-left text-sm font-medium text-green-600 dark:text-green-400 hover:bg-green-500/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-500/10">
