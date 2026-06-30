@@ -756,7 +756,7 @@ const Index = () => {
                 </ul>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">Unfreezing will reactivate your account and restore full access. Are you sure?</p>
+            <p className="text-sm text-muted-foreground"><strong>Unfreezing will reactivate your account and restore full access. Are you sure?</strong></p>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
