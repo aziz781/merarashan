@@ -605,13 +605,13 @@ const Index = () => {
           <WhatsAppTile
             href="https://wa.me/923030812222"
             number="923030812222"
-            title="Mera Rashan Support"
+            title="@mera.rashan"
             subtitle="Chat on WhatsApp"
           />
           <WhatsAppTile
             href="https://wa.me/923091493053"
             number="923091493053"
-            title="Mera Rashan Chat Bot"
+            title="@mera.rashan.chatbot"
             subtitle="Automated assistant"
           />
         </div>
