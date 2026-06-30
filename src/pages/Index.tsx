@@ -280,11 +280,14 @@ const Index = () => {
     setFreezeAccountOpen(true);
   }, []);
   const handleUnfreezeAccount = useCallback(async () => {
-    const customerNumber = profileData?.payer_id != null ? String(profileData.payer_id) : "";
+    const customerNumber = resolvePayerId();
     if (!customerNumber || !mobile) {
-      sonnerToast.error("Unfreeze failed", { description: "Missing customer number." });
+      sonnerToast.error("Unfreeze failed", {
+        description: !mobile ? "Not signed in." : "Customer ID unavailable — please reopen the app.",
+      });
       return;
     }
+
     setUnfreezing(true);
     const progressId = sonnerToast.loading("Unfreezing account…");
     try {
