@@ -65,7 +65,7 @@ export function TransactionCard({
     <button
       type="button"
       onClick={handleCopyCode}
-      className="inline-flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-md"
+      className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-md"
       aria-label="Copy rashan code"
     >
       <span className="font-mono tracking-wide">{uniqueCode}</span>
@@ -118,6 +118,7 @@ export function TransactionCard({
           {!showExtras && monthYear && (
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
+          {!showExtras && showUniqueCode && <CopyableCode />}
           {!showExtras && displayText && (
             <p className={`text-xs mt-1 ${textClass}`}>{displayText}</p>
           )}
@@ -129,32 +130,30 @@ export function TransactionCard({
             </p>
           )}
 
-          <div className="flex items-center gap-2">
-            {showUniqueCode && <CopyableCode />}
-            {status && (
-              <Badge
-                variant={
-                  paymentStatus === "EXPIRED"
-                    ? "destructive"
-                    : delivered
-                      ? "default"
-                      : notDelivered
-                        ? "outline"
-                        : notPaid
-                          ? "destructive"
-                          : "outline"
-                }
-                className={`font-normal inline-flex items-center gap-1 ${
-                  notDelivered && paymentStatus !== "EXPIRED"
-                    ? "bg-yellow-300 text-red-600 border-yellow-400 hover:bg-yellow-300"
-                    : ""
-                }`}
-              >
-                {paymentStatus === "PAID" && <Check className="w-3 h-3" />}
-                {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
-              </Badge>
-            )}
-          </div>
+          {status && (
+            <Badge
+              variant={
+                paymentStatus === "EXPIRED"
+                  ? "destructive"
+                  : delivered
+                    ? "default"
+                    : notDelivered
+                      ? "outline"
+                      : notPaid
+                        ? "destructive"
+                        : "outline"
+              }
+              className={`font-normal inline-flex items-center gap-1 ${
+                notDelivered && paymentStatus !== "EXPIRED"
+                  ? "bg-yellow-300 text-red-600 border-yellow-400 hover:bg-yellow-300"
+                  : ""
+              }`}
+            >
+              {paymentStatus === "PAID" && <Check className="w-3 h-3" />}
+              {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
+            </Badge>
+          )}
+          {showExtras && showUniqueCode && <CopyableCode />}
           {showExtras && displayText && (
             <p className={`text-xs ${textClass}`}>{displayText}</p>
           )}
