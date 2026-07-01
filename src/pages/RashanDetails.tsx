@@ -681,8 +681,23 @@ const RashanDetails = () => {
     (item.customer_name as string) ||
     "";
   const monthYear = (item.month_year as string) || "";
+  const uniqueCode = String(item.unique_code || "");
+  const showUniqueCode = String(item.things_status || "").toLowerCase() === "not_delivered" && uniqueCode;
+
+  const handleCopyCode = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!uniqueCode) return;
+    try {
+      await navigator.clipboard.writeText(uniqueCode);
+      toast({ title: "Rashan code copied" });
+    } catch {
+      toast({ title: "Could not copy code", variant: "destructive" });
+    }
+  };
+
   const title = personName || monthYear || "Rashan Details";
   const subtitle = personName ? monthYear : "";
+
 
 
   return (
