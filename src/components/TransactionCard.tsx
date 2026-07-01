@@ -158,8 +158,13 @@ export function TransactionCard({
               {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
             </Badge>
           )}
-          {showExtras && showUniqueCode && <CopyableCode />}
-          {showExtras && displayText && (
+          {showExtras && showUniqueCode && (
+            <div className="inline-flex items-center gap-2 flex-wrap">
+              {displayText && <span className={`text-xs ${textClass}`}>{displayText}</span>}
+              <CopyableCode />
+            </div>
+          )}
+          {showExtras && !showUniqueCode && displayText && (
             <p className={`text-xs ${textClass}`}>{displayText}</p>
           )}
         </div>
