@@ -129,37 +129,69 @@ export function TransactionCard({
             </p>
           )}
 
-          <div className="flex items-center gap-2">
-            {showUniqueCode && <CopyableCode />}
-            {status && (
-              <Badge
-                variant={
-                  paymentStatus === "EXPIRED"
-                    ? "destructive"
-                    : delivered
-                      ? "default"
-                      : notDelivered
-                        ? "outline"
-                        : notPaid
-                          ? "destructive"
-                          : "outline"
-                }
-                className={`font-normal inline-flex items-center gap-1 ${
-                  notDelivered && paymentStatus !== "EXPIRED"
-                    ? "bg-yellow-300 text-red-600 border-yellow-400 hover:bg-yellow-300"
-                    : ""
-                }`}
-              >
-                {paymentStatus === "PAID" && <Check className="w-3 h-3" />}
-                {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
-              </Badge>
-            )}
-          </div>
+          {showExtras && (
+            <div className="flex items-center gap-2">
+              {showUniqueCode && <CopyableCode />}
+              {status && (
+                <Badge
+                  variant={
+                    paymentStatus === "EXPIRED"
+                      ? "destructive"
+                      : delivered
+                        ? "default"
+                        : notDelivered
+                          ? "outline"
+                          : notPaid
+                            ? "destructive"
+                            : "outline"
+                  }
+                  className={`font-normal inline-flex items-center gap-1 ${
+                    notDelivered && paymentStatus !== "EXPIRED"
+                      ? "bg-yellow-300 text-red-600 border-yellow-400 hover:bg-yellow-300"
+                      : ""
+                  }`}
+                >
+                  {paymentStatus === "PAID" && <Check className="w-3 h-3" />}
+                  {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
+                </Badge>
+              )}
+            </div>
+          )}
           {showExtras && displayText && (
             <p className={`text-xs ${textClass}`}>{displayText}</p>
           )}
         </div>
       </div>
+      {!showExtras && (showUniqueCode || status) && (
+        <div className="flex items-center justify-between gap-2 mt-2">
+          <div>
+            {showUniqueCode && <CopyableCode />}
+          </div>
+          {status && (
+            <Badge
+              variant={
+                paymentStatus === "EXPIRED"
+                  ? "destructive"
+                  : delivered
+                    ? "default"
+                    : notDelivered
+                      ? "outline"
+                      : notPaid
+                        ? "destructive"
+                        : "outline"
+              }
+              className={`font-normal inline-flex items-center gap-1 ${
+                notDelivered && paymentStatus !== "EXPIRED"
+                  ? "bg-yellow-300 text-red-600 border-yellow-400 hover:bg-yellow-300"
+                  : ""
+              }`}
+            >
+              {paymentStatus === "PAID" && <Check className="w-3 h-3" />}
+              {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
+            </Badge>
+          )}
+        </div>
+      )}
     </Card>
   );
 }
