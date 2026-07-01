@@ -778,6 +778,17 @@ const RashanDetails = () => {
                               : "text-foreground";
                       return (
                         <span className={`font-medium text-right break-all ml-auto ${colorCls}`}>
+                          {showUniqueCode && k === "datetime_display" && (
+                            <button
+                              type="button"
+                              onClick={handleCopyCode}
+                              className="mb-1 inline-flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-md"
+                              aria-label="Copy rashan code"
+                            >
+                              <span className="font-mono tracking-wide">{uniqueCode}</span>
+                              <Copy className="w-3 h-3" />
+                            </button>
+                          )}
                           {showExpired
                             ? `Rashan code is expired as not used by ${item.valid_to || "—"}.`
                             : showPlaceholder
