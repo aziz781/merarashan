@@ -65,7 +65,7 @@ export function TransactionCard({
     <button
       type="button"
       onClick={handleCopyCode}
-      className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-md"
+      className="inline-flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-md"
       aria-label="Copy rashan code"
     >
       <span className="font-mono tracking-wide">{uniqueCode}</span>
