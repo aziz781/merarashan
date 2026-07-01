@@ -181,6 +181,19 @@ function UpdatesTimeline({ item }: { item: Item }) {
     const v = item[k];
     return v == null || v === "" ? "" : String(v);
   };
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const handleCopy = async (value: string) => {
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(value);
+      toast({ title: "Copied to clipboard" });
+      setTimeout(() => setCopied((c) => (c === value ? null : c)), 1500);
+    } catch (_) {
+      toast({ title: "Copy failed", variant: "destructive" });
+    }
+  };
 
   return (
     <ol className="relative">
@@ -213,6 +226,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
             : lower === "not_paid" || lower === "not_delivered" || lower === "cancelled" || lower === "rejected"
               ? "destructive"
               : "outline";
+        const detailCode = step.detailCodeKey ? get(step.detailCodeKey) : "";
 
         return (
           <li key={step.label} className="relative pl-7 pb-5 last:pb-0">
@@ -273,7 +287,26 @@ function UpdatesTimeline({ item }: { item: Item }) {
                   )}
                   <span>
                     {step.detailPrefix.replace(/\{(\w+)\}/g, (_, key) => get(key))}{" "}
-                    {step.detailCodeKey && `(${get(step.detailCodeKey)})`}{" "}
+                    {step.detailCodeKey && (
+                      <span className="inline-flex items-center gap-1">
+                        <span className="font-mono">({detailCode})</span>
+                        {detailCode && (
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(detailCode)}
+                            aria-label="Copy rashan code"
+                            title="Copy code"
+                            className="inline-flex items-center text-primary hover:text-foreground transition-colors"
+                          >
+                            {copied === detailCode ? (
+                              <Check className="w-3 h-3" />
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </button>
+                        )}
+                      </span>
+                    )}{" "}
                     {step.detailConnector && `${step.detailConnector} `}
                     {detail}
                     {step.detailSuffixKey &&
