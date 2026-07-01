@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check } from "lucide-react";
+import { Check, Copy } from "lucide-react";
+import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -23,6 +25,8 @@ export function TransactionCard({
   const datetimeDisplay = (item.datetime_display as string) || "";
   const monthYear = (item.month_year as string) || "";
   const codeStatus = (item.code_status as string) || "";
+  const uniqueCode = (item.unique_code as string) || "";
+
   const displayText =
     codeStatus === "EXPIRED"
       ? "Rashan code expired"
@@ -40,6 +44,34 @@ export function TransactionCard({
   const notDelivered = status === "NOT_DELIVERED";
   const notPaid = paymentStatus === "NOT_PAID";
   const showExtras = variant === "full";
+  const showUniqueCode = notDelivered && uniqueCode;
+
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyCode = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!uniqueCode) return;
+    try {
+      await navigator.clipboard.writeText(uniqueCode);
+      setCopied(true);
+      toast.success("Rashan code copied");
+      setTimeout(() => setCopied(false), 1500);
+    } catch (_) {
+      toast.error("Could not copy code");
+    }
+  };
+
+  const CopyableCode = () => (
+    <button
+      type="button"
+      onClick={handleCopyCode}
+      className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-md"
+      aria-label="Copy rashan code"
+    >
+      <span className="font-mono tracking-wide">{uniqueCode}</span>
+      {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+    </button>
+  );
 
   const open = () => {
     try {
@@ -86,6 +118,7 @@ export function TransactionCard({
           {!showExtras && monthYear && (
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
+          {!showExtras && showUniqueCode && <CopyableCode />}
           {!showExtras && displayText && (
             <p className={`text-xs mt-1 ${textClass}`}>{displayText}</p>
           )}
@@ -120,6 +153,7 @@ export function TransactionCard({
               {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
             </Badge>
           )}
+          {showExtras && showUniqueCode && <CopyableCode />}
           {showExtras && displayText && (
             <p className={`text-xs ${textClass}`}>{displayText}</p>
           )}
