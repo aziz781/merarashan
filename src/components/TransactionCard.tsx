@@ -118,8 +118,13 @@ export function TransactionCard({
           {!showExtras && monthYear && (
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
-          {!showExtras && showUniqueCode && <CopyableCode />}
-          {!showExtras && displayText && (
+          {!showExtras && showUniqueCode && (
+            <div className="inline-flex items-center gap-2 flex-wrap mt-1">
+              {displayText && <span className={`text-xs ${textClass}`}>{displayText}</span>}
+              <CopyableCode />
+            </div>
+          )}
+          {!showExtras && !showUniqueCode && displayText && (
             <p className={`text-xs mt-1 ${textClass}`}>{displayText}</p>
           )}
         </div>
