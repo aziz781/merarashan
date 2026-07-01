@@ -65,7 +65,7 @@ export function TransactionCard({
     <button
       type="button"
       onClick={handleCopyCode}
-      className="inline-flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-md"
+      className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-md"
       aria-label="Copy rashan code"
     >
       <span className="font-mono tracking-wide">{uniqueCode}</span>
@@ -118,13 +118,8 @@ export function TransactionCard({
           {!showExtras && monthYear && (
             <p className="text-xs font-bold text-foreground">{monthYear}</p>
           )}
-          {!showExtras && showUniqueCode && (
-            <div className="inline-flex items-center gap-2 flex-wrap mt-1">
-              {displayText && <span className={`text-xs ${textClass}`}>{displayText}</span>}
-              <CopyableCode />
-            </div>
-          )}
-          {!showExtras && !showUniqueCode && displayText && (
+          {!showExtras && showUniqueCode && <CopyableCode />}
+          {!showExtras && displayText && (
             <p className={`text-xs mt-1 ${textClass}`}>{displayText}</p>
           )}
         </div>
@@ -158,13 +153,8 @@ export function TransactionCard({
               {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
             </Badge>
           )}
-          {showExtras && showUniqueCode && (
-            <div className="inline-flex items-center gap-2 flex-wrap">
-              {displayText && <span className={`text-xs ${textClass}`}>{displayText}</span>}
-              <CopyableCode />
-            </div>
-          )}
-          {showExtras && !showUniqueCode && displayText && (
+          {showExtras && showUniqueCode && <CopyableCode />}
+          {showExtras && displayText && (
             <p className={`text-xs ${textClass}`}>{displayText}</p>
           )}
         </div>
