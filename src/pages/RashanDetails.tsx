@@ -289,7 +289,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
                     {step.detailPrefix.replace(/\{(\w+)\}/g, (_, key) => get(key))}{" "}
                     {step.detailCodeKey && (
                       <span className="inline-flex items-center gap-1">
-                        <span className="font-mono">({detailCode})</span>
+                        <span className="font-mono">({detailCode}</span>
                         {detailCode && (
                           <button
                             type="button"
@@ -305,6 +305,7 @@ function UpdatesTimeline({ item }: { item: Item }) {
                             )}
                           </button>
                         )}
+                        <span className="font-mono">)</span>
                       </span>
                     )}{" "}
                     {step.detailConnector && `${step.detailConnector} `}
