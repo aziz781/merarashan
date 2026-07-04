@@ -129,8 +129,7 @@ export function TransactionCard({
             </p>
           )}
 
-          <div className="flex items-center justify-between gap-2 w-full">
-            {showUniqueCode && <CopyableCode />}
+          <div className="flex flex-col items-start gap-1.5">
             {status && (
               <Badge
                 variant={
@@ -154,6 +153,7 @@ export function TransactionCard({
                 {paymentStatus === "EXPIRED" ? "EXPIRED" : status}
               </Badge>
             )}
+            {showUniqueCode && <CopyableCode />}
           </div>
           {showExtras && displayText && (
             <p className={`text-xs ${textClass}`}>{displayText}</p>
