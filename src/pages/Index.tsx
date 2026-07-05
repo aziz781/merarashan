@@ -21,6 +21,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 import { useResource, clearResourcesCache, clearAllAppCache, ApiError, type Resource } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
