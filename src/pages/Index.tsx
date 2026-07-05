@@ -3,7 +3,7 @@ import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
-import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle, Lock, Unlock, Sun, Moon } from "lucide-react";
+import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle, Lock, Unlock } from "lucide-react";
 
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
@@ -62,7 +62,7 @@ const scheduleIdle: IdleScheduler =
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AccessibilitySettings } from "@/components/AccessibilitySettings";
-import { useTheme } from "@/hooks/use-theme";
+
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
 
 const STORAGE_KEY = "mr_mobile";
@@ -96,7 +96,7 @@ const TABS: { id: Resource; label: string; icon: typeof CreditCard }[] = [
 
 const Index = () => {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
+  
   const [mobile, setMobile] = useState<string | null>(null);
   const [tab, setTab] = useState<Resource>(() => {
     try {
@@ -487,14 +487,16 @@ const Index = () => {
               )}
           </div>
         </div>
-        <button
-          type="button"
-          onClick={toggleTheme}
-          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
-        >
-          {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-        </button>
+        {tab === "customers" && (
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
+          >
+            {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+          </button>
+        )}
         </div>
       </header>
 
