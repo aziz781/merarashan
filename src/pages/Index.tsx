@@ -61,8 +61,9 @@ const scheduleIdle: IdleScheduler =
 
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { AccessibilitySettings } from "@/components/AccessibilitySettings";
 import { useTheme } from "@/hooks/use-theme";
+import { AccessibilitySettings } from "@/components/AccessibilitySettings";
+
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
 
 const STORAGE_KEY = "mr_mobile";
@@ -487,14 +488,16 @@ const Index = () => {
               )}
           </div>
         </div>
-        <button
-          type="button"
-          onClick={toggleTheme}
-          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
-        >
-          {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-        </button>
+        {tab === "customers" && (
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
+          >
+            {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+          </button>
+        )}
         </div>
       </header>
 
