@@ -516,12 +516,10 @@ const Index = () => {
 
       <Dialog open={sponsorProfileOpen} onOpenChange={setSponsorProfileOpen}>
         <DialogContent className="max-w-md p-0 overflow-hidden">
-          <div className="sr-only">
-            <DialogHeader>
-              <DialogTitle>Sponsor profile</DialogTitle>
-              <DialogDescription>Your account details as a sponsor.</DialogDescription>
-            </DialogHeader>
-          </div>
+          <DialogHeader className="p-5 pb-0">
+            <DialogTitle>Sponsor profile</DialogTitle>
+            <DialogDescription>Your account details as a sponsor.</DialogDescription>
+          </DialogHeader>
           <div className="p-5">
             {mobile && <ProfileView mobile={mobile} profileOnly={true} />}
           </div>
