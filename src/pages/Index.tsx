@@ -21,6 +21,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 import { useResource, clearResourcesCache, clearAllAppCache, ApiError, type Resource } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
@@ -146,6 +153,7 @@ const Index = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [socialOpen, setSocialOpen] = useState(false);
+  const [sponsorProfileOpen, setSponsorProfileOpen] = useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
@@ -469,10 +477,15 @@ const Index = () => {
                     aria-hidden
                   />
                 ) : isActive ? (
-                  <span className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-green-400/20 text-green-50 ring-1 ring-green-300/40">
+                  <button
+                    type="button"
+                    onClick={() => setSponsorProfileOpen(true)}
+                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-green-400/20 text-green-50 ring-1 ring-green-300/40 hover:bg-green-400/30 transition-colors"
+                    aria-label="Sponsor profile. Open details"
+                  >
                     <span className="h-1.5 w-1.5 rounded-full bg-green-300" />
                     Sponsor
-                  </span>
+                  </button>
                 ) : (
                   <button
                     type="button"
@@ -500,6 +513,18 @@ const Index = () => {
         )}
         </div>
       </header>
+
+      <Dialog open={sponsorProfileOpen} onOpenChange={setSponsorProfileOpen}>
+        <DialogContent className="max-w-md p-0 overflow-hidden">
+          <DialogHeader className="p-5 pb-0">
+            <DialogTitle>Sponsor profile</DialogTitle>
+            <DialogDescription>Your account details as a sponsor.</DialogDescription>
+          </DialogHeader>
+          <div className="p-5">
+            {mobile && <ProfileView mobile={mobile} profileOnly={true} />}
+          </div>
+        </DialogContent>
+      </Dialog>
 
 
       <SideMenu
