@@ -477,10 +477,15 @@ const Index = () => {
                     aria-hidden
                   />
                 ) : isActive ? (
-                  <span className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-green-400/20 text-green-50 ring-1 ring-green-300/40">
+                  <button
+                    type="button"
+                    onClick={() => setSponsorProfileOpen(true)}
+                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-green-400/20 text-green-50 ring-1 ring-green-300/40 hover:bg-green-400/30 transition-colors"
+                    aria-label="Sponsor profile. Open details"
+                  >
                     <span className="h-1.5 w-1.5 rounded-full bg-green-300" />
                     Sponsor
-                  </span>
+                  </button>
                 ) : (
                   <button
                     type="button"
