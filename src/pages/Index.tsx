@@ -514,6 +514,20 @@ const Index = () => {
         </div>
       </header>
 
+      <Dialog open={sponsorProfileOpen} onOpenChange={setSponsorProfileOpen}>
+        <DialogContent className="max-w-md p-0 overflow-hidden">
+          <div className="sr-only">
+            <DialogHeader>
+              <DialogTitle>Sponsor profile</DialogTitle>
+              <DialogDescription>Your account details as a sponsor.</DialogDescription>
+            </DialogHeader>
+          </div>
+          <div className="p-5">
+            {mobile && <ProfileView mobile={mobile} profileOnly={true} />}
+          </div>
+        </DialogContent>
+      </Dialog>
+
 
       <SideMenu
         open={menuOpen}
