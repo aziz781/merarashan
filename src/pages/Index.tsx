@@ -60,6 +60,7 @@ const scheduleIdle: IdleScheduler =
 
 
 import { NotificationToggle } from "@/components/NotificationToggle";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { AccessibilitySettings } from "@/components/AccessibilitySettings";
 import { useTheme } from "@/hooks/use-theme";
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
@@ -632,6 +633,7 @@ const Index = () => {
         title="Settings"
       >
         <div className="space-y-3 pt-2">
+          <ThemeToggle />
           <AccessibilitySettings />
           <NotificationToggle mobile={mobile} />
         </div>
