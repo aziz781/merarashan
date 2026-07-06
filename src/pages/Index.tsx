@@ -98,8 +98,8 @@ function ResourceView({
 const TABS: { id: Resource; label: string; icon: typeof CreditCard }[] = [
   { id: "customers", label: "Home", icon: User },
   { id: "transactions", label: "Rashans", icon: ArrowLeftRight },
-  { id: "cards", label: "Cards", icon: CreditCard },
   { id: "statements", label: "Statements", icon: FileText },
+  { id: "cards", label: "Cards", icon: CreditCard },
 ];
 
 const Index = () => {
