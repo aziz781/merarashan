@@ -1,6 +1,6 @@
 {
 	"appId": "pk.merarashan.app",
-	"appName": "merarashan",
+	"appName": "Mera Rashan",
 	"webDir": "dist",
 	"plugins": {
 		"FirebaseMessaging": {
