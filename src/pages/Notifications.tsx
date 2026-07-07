@@ -4,6 +4,16 @@ import { ArrowLeft, ArrowUp, Bell, BellOff, Home, Trash2, CheckCheck, Filter } f
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import appLogo from "@/assets/mera-rashan-logo.webp";
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { getCurrentSubscription, pushSupported } from "@/lib/push";
