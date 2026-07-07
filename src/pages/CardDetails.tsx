@@ -203,16 +203,12 @@ const CardDetails = () => {
   return (
     <div className="min-h-screen pb-16">
       <PageHeader>
-        <div className="grid grid-cols-[44px_1fr_44px] items-center gap-3">
-          <div />
-          <div className="min-w-0 flex items-center justify-center gap-3">
-            <CreditCard className="w-6 h-6 opacity-90" />
-            <div className="text-center">
-              <h1 className="text-xl font-bold truncate">میرا راشن کارڈ</h1>
+        <div className="flex items-center gap-3">
+          <CreditCard className="w-6 h-6 opacity-90" />
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold truncate">میرا راشن کارڈ</h1>
 
-            </div>
           </div>
-          <div />
         </div>
       </PageHeader>
 

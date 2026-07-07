@@ -127,17 +127,13 @@ export default function RashanDashboard() {
   return (
     <div className="min-h-screen pb-24">
       <PageHeader>
-        <div className="grid grid-cols-[44px_1fr_44px] items-start gap-3">
-          <div />
-          <div className="min-w-0 text-center">
-            <h1 className="text-xl font-bold leading-tight truncate">
-              Rashan Dashboard
-            </h1>
-            <p className="text-xs text-primary-foreground/80 mt-0.5">
-              Monthly spending overview
-            </p>
-          </div>
-          <div />
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold leading-tight truncate">
+            Rashan Dashboard
+          </h1>
+          <p className="text-xs text-primary-foreground/80 mt-0.5">
+            Monthly spending overview
+          </p>
         </div>
       </PageHeader>
 
