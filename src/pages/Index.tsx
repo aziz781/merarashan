@@ -497,27 +497,27 @@ const Index = () => {
               {tab === "customers" && (
                 !profileData ? (
                   <span
-                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-white/10 text-white/0 ring-1 ring-white/10"
+                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-primary/10 text-primary/0 ring-1 ring-primary/10"
                     aria-hidden
                   />
                 ) : isActive ? (
                   <button
                     type="button"
                     onClick={() => setSponsorProfileOpen(true)}
-                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-green-400/20 text-green-50 ring-1 ring-green-300/40 hover:bg-green-400/30 transition-colors"
+                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-green-100 text-green-700 ring-1 ring-green-300/50 hover:bg-green-200/70 transition-colors dark:bg-green-400/20 dark:text-green-50 dark:ring-green-300/40 dark:hover:bg-green-400/30"
                     aria-label="Sponsor profile. Open details"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-green-300" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-500 dark:bg-green-300" />
                     Sponsor
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={() => setFrozenInfoOpen(true)}
-                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-red-400/20 text-red-50 ring-1 ring-red-300/40 hover:bg-red-400/30 transition-colors"
+                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-red-100 text-red-700 ring-1 ring-red-300/50 hover:bg-red-200/70 transition-colors dark:bg-red-400/20 dark:text-red-50 dark:ring-red-300/40 dark:hover:bg-red-400/30"
                     aria-label="Account frozen. Open unfreeze options"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-red-300" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-500 dark:bg-red-300" />
                     Frozen account
                     <Lock className="shrink-0" size={10} strokeWidth={2.5} />
                   </button>
