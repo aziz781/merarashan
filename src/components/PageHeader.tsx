@@ -29,7 +29,7 @@ export function PageHeader({ children, className, style, ...rest }: PageHeaderPr
       )}
       style={{
         paddingTop: `calc(env(safe-area-inset-top) + ${isNativeIOS ? "1.5rem" : "0.75rem"})`,
-        minHeight: isNativeIOS ? 112 : 88,
+        minHeight: isNativeIOS ? 128 : 104,
         ...style,
       }}
       {...rest}
