@@ -109,6 +109,7 @@ export function PostLoginNotificationPrompt({
     try {
       if (isNativePlatform()) {
         await enableNativePush(mobile);
+        try { localStorage.setItem("mr_native_push_enabled", "1"); } catch { /* ignore */ }
       } else {
         await enablePush(mobile);
       }
