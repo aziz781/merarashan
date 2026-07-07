@@ -1,4 +1,12 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+
+// Detect native iOS (Capacitor) so the top title bar gets extra height to
+// clear the taller iOS status bar / notch.
+const isNativeIOSPlatform =
+  typeof window !== "undefined" &&
+  ((window as unknown as { Capacitor?: { getPlatform?: () => string } })
+    .Capacitor?.getPlatform?.() === "ios");
+
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
