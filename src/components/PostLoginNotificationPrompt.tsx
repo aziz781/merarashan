@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bell } from "lucide-react";
+import { Bell, Settings } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,7 +11,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { isNativePlatform, getNativeNotificationPermission, enableNativePush } from "@/lib/nativePush";
+import {
+  isNativePlatform,
+  getNativeNotificationPermission,
+  enableNativePush,
+  openAppNotificationSettings,
+} from "@/lib/nativePush";
 import { pushSupported, getCurrentSubscription, enablePush } from "@/lib/push";
 
 const DISMISSED_KEY = "mr_post_login_prompt_dismissed";
@@ -26,10 +31,12 @@ export function PostLoginNotificationPrompt({
   onClose: () => void;
 }) {
   const [visible, setVisible] = useState(false);
+  const [denied, setDenied] = useState(false);
 
   useEffect(() => {
     if (!open || !mobile) {
       setVisible(false);
+      setDenied(false);
       return;
     }
 
@@ -46,9 +53,15 @@ export function PostLoginNotificationPrompt({
         if (isNativePlatform()) {
           const status = await getNativeNotificationPermission();
           if (!cancelled) {
-            if (status === "granted" || status === "denied" || status === "unknown") {
+            if (status === "granted") {
+              onClose();
+            } else if (status === "denied") {
+              setDenied(true);
+              setVisible(true);
+            } else if (status === "unknown") {
               onClose();
             } else {
+              setDenied(false);
               setVisible(true);
             }
           }
@@ -59,11 +72,15 @@ export function PostLoginNotificationPrompt({
           if (!cancelled) onClose();
           return;
         }
-        const sub = await getCurrentSubscription();
+        await getCurrentSubscription();
         if (!cancelled) {
-          if (Notification.permission === "granted" || Notification.permission === "denied") {
+          if (Notification.permission === "granted") {
             onClose();
+          } else if (Notification.permission === "denied") {
+            setDenied(true);
+            setVisible(true);
           } else {
+            setDenied(false);
             setVisible(true);
           }
         }
@@ -91,12 +108,33 @@ export function PostLoginNotificationPrompt({
       toast.success("Notifications enabled", {
         description: "You'll receive alerts on this device.",
       });
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not enable notifications");
-    } finally {
       setVisible(false);
       onClose();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Could not enable notifications";
+      if (/denied/i.test(msg)) {
+        setDenied(true);
+      } else {
+        toast.error(msg);
+        setVisible(false);
+        onClose();
+      }
     }
+  };
+
+  const handleOpenSettings = async () => {
+    if (isNativePlatform()) {
+      await openAppNotificationSettings();
+      toast.message("Enable notifications in Settings", {
+        description: "Turn on Notifications for Mera Rashan, then return here.",
+      });
+    } else {
+      toast.message("Enable notifications in your browser", {
+        description: "Open your browser settings and allow notifications for this site.",
+      });
+    }
+    setVisible(false);
+    onClose();
   };
 
   const handleDismiss = () => {
@@ -112,23 +150,42 @@ export function PostLoginNotificationPrompt({
       <AlertDialogContent>
         <AlertDialogHeader>
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <Bell className="h-6 w-6 text-primary" />
+            {denied ? (
+              <Settings className="h-6 w-6 text-primary" />
+            ) : (
+              <Bell className="h-6 w-6 text-primary" />
+            )}
           </div>
-          <AlertDialogTitle className="text-center">Stay updated</AlertDialogTitle>
+          <AlertDialogTitle className="text-center">
+            {denied ? "Notifications are blocked" : "Stay updated"}
+          </AlertDialogTitle>
           <AlertDialogDescription className="text-center">
-            Get notified when your monthly rashan is issued, statements are ready, and for important account updates.
+            {denied
+              ? isNativePlatform()
+                ? "Open your device settings and enable notifications for Mera Rashan to receive alerts."
+                : "Open your browser settings and allow notifications for this site to receive alerts."
+              : "Get notified when your monthly rashan is issued, statements are ready, and for important account updates."}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col sm:flex-row gap-2">
           <AlertDialogCancel onClick={handleDismiss} className="w-full sm:w-auto">
             Not now
           </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleEnable}
-            className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            Enable notifications
-          </AlertDialogAction>
+          {denied ? (
+            <AlertDialogAction
+              onClick={handleOpenSettings}
+              className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Open settings
+            </AlertDialogAction>
+          ) : (
+            <AlertDialogAction
+              onClick={handleEnable}
+              className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Enable notifications
+            </AlertDialogAction>
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
