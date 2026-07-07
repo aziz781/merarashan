@@ -460,8 +460,10 @@ const Index = () => {
       <header
         className="px-5 pb-2 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md"
         style={{
-          paddingTop: `calc(env(safe-area-inset-top) + ${isNativeIOSPlatform ? "1.5rem" : "0.75rem"})`,
-          minHeight: isNativeIOSPlatform ? 112 : 88,
+          paddingTop: isNativeIOSPlatform
+            ? "calc(max(env(safe-area-inset-top), 44px) + 1.5rem)"
+            : "calc(env(safe-area-inset-top) + 0.75rem)",
+          minHeight: isNativeIOSPlatform ? 152 : 88,
         }}
       >
         <div className="flex items-start justify-between gap-3">
