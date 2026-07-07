@@ -7,6 +7,13 @@ interface PageHeaderProps extends HTMLAttributes<HTMLElement> {
   style?: CSSProperties;
 }
 
+// Detect native iOS (Capacitor) so we can give the title bar extra height,
+// which looks better against the taller iOS status bar / notch.
+const isNativeIOS =
+  typeof window !== "undefined" &&
+  ((window as unknown as { Capacitor?: { getPlatform?: () => string } })
+    .Capacitor?.getPlatform?.() === "ios");
+
 /**
  * Shared top-bar shell used by inner pages (Notifications, Rashan details,
  * Card details, Dashboard) so padding, height, and dark-mode treatment stay
@@ -20,7 +27,11 @@ export function PageHeader({ children, className, style, ...rest }: PageHeaderPr
         "dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md",
         className,
       )}
-      style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)", minHeight: 88, ...style }}
+      style={{
+        paddingTop: `calc(env(safe-area-inset-top) + ${isNativeIOS ? "1.5rem" : "0.75rem"})`,
+        minHeight: isNativeIOS ? 112 : 88,
+        ...style,
+      }}
       {...rest}
     >
       {children}
