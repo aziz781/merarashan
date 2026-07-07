@@ -28,8 +28,13 @@ export function PageHeader({ children, className, style, ...rest }: PageHeaderPr
         className,
       )}
       style={{
-        paddingTop: `calc(env(safe-area-inset-top) + ${isNativeIOS ? "1.5rem" : "0.75rem"})`,
-        minHeight: isNativeIOS ? 150 : 104,
+        // On iOS we need the header to start well below the status bar / notch.
+        // Use the safe-area inset, but never less than the classic 44px status bar,
+        // plus an extra 1.5rem so the title text never touches the notch.
+        paddingTop: isNativeIOS
+          ? "calc(max(env(safe-area-inset-top), 44px) + 1.5rem)"
+          : "calc(env(safe-area-inset-top) + 0.75rem)",
+        minHeight: isNativeIOS ? 164 : 104,
         ...style,
       }}
       {...rest}
