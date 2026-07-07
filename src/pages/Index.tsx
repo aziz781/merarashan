@@ -437,8 +437,8 @@ const Index = () => {
   return (
     <div className="min-h-screen pb-32">
       <header
-        className="page-header px-5 pb-3 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 2.5rem)", minHeight: 100 }}
+        className="px-5 pb-2 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)", minHeight: 88 }}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">

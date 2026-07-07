@@ -1,5 +1,4 @@
 import { createRoot } from "react-dom/client";
-import { Capacitor } from "@capacitor/core";
 import App from "./App.tsx";
 import "./index.css";
 import { earlyInitNativePush } from "@/lib/nativePush";
@@ -8,10 +7,6 @@ import "@/hooks/use-theme";
 // Register the cold-start push-tap listener before React mounts so taps
 // that launch the app from a killed state are not dropped.
 void earlyInitNativePush();
-
-if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === "ios") {
-  document.body.classList.add("native-ios");
-}
 
 createRoot(document.getElementById("root")!).render(<App />);
 
