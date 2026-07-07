@@ -518,8 +518,10 @@ export async function initNativePushListeners(opts: {
   const syncToken = async (token: string, platform: string) => {
     if (!token || token === currentToken) return;
     let mobile: string | null = null;
+    let optedOut = false;
     try { mobile = localStorage.getItem("mr_mobile"); } catch { /* ignore */ }
-    if (!mobile) return;
+    try { optedOut = localStorage.getItem("mr_native_push_enabled") === "0"; } catch { /* ignore */ }
+    if (!mobile || optedOut) return;
     try {
       const { error } = await supabase.functions.invoke("native-push-subscribe", {
         body: { mobile, fcm_token: token, platform, user_agent: navigator.userAgent },
