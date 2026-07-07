@@ -133,6 +133,18 @@ export default function Notifications() {
             </h1>
             <p className="text-xs opacity-80">{items.length} total · {items.filter((n) => !n.read).length} unread</p>
           </div>
+          {items.length > 0 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => clearAll()}
+              aria-label="Delete all notifications"
+              title="Delete all notifications"
+              className="shrink-0 text-primary-foreground hover:bg-primary-foreground/10 dark:text-foreground dark:hover:bg-foreground/10"
+            >
+              <Trash2 className="h-5 w-5" />
+            </Button>
+          )}
         </div>
       </PageHeader>
 
