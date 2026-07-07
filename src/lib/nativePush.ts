@@ -512,6 +512,37 @@ export async function initNativePushListeners(opts: {
     });
   }
 
+  // Persistent token-sync listener: whenever FCM/APNs (re)issues a token —
+  // fresh registration, rotation on reinstall, or Firebase refresh — push it
+  // to the backend immediately so the device stays reachable.
+  const syncToken = async (token: string, platform: string) => {
+    if (!token || token === currentToken) return;
+    let mobile: string | null = null;
+    try { mobile = localStorage.getItem("mr_mobile"); } catch { /* ignore */ }
+    if (!mobile) return;
+    try {
+      const { error } = await supabase.functions.invoke("native-push-subscribe", {
+        body: { mobile, fcm_token: token, platform, user_agent: navigator.userAgent },
+      });
+      if (!error) {
+        currentToken = token;
+        registered = true;
+      }
+    } catch { /* ignore — will retry on next event */ }
+  };
+  try {
+    if (isIOS()) {
+      await FirebaseMessaging.addListener("tokenReceived" as never, ((event: { token?: string }) => {
+        if (event?.token) void syncToken(event.token, "ios");
+      }) as never);
+    } else {
+      await PushNotifications.addListener("registration", (token) => {
+        void syncToken(token.value, Capacitor.getPlatform());
+      });
+    }
+  } catch { /* ignore */ }
+
+
 
   // Wire the early-init tap queue to the caller's handler.
   if (opts.onAction) {
