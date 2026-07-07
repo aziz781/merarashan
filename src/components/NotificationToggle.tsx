@@ -30,6 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { NotificationPermissionBadge } from "@/components/NotificationPermissionBadge";
 
 type SyncStatus =
   | "checking"
@@ -294,6 +295,10 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
           </Button>
         )}
       </div>
+
+      <NotificationPermissionBadge className="mt-3" />
+
+
 
       {status && (
         <div className={`mt-3 flex items-center gap-1.5 text-xs ${status.className}`}>
