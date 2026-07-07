@@ -530,7 +530,7 @@ const Index = () => {
             type="button"
             onClick={toggleTheme}
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/15 backdrop-blur-sm text-primary ring-1 ring-primary/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 hover:bg-primary/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
           >
             {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
           </button>
