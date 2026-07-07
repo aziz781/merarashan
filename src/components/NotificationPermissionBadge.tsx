@@ -1,0 +1,133 @@
+import { useEffect, useState } from "react";
+import { Bell, BellOff, BellRing, HelpCircle } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
+import {
+  isNativePlatform,
+  isIOSNative,
+  isAndroidNative,
+  getNativeNotificationPermission,
+} from "@/lib/nativePush";
+
+type Status = "granted" | "denied" | "prompt" | "prompt-with-rationale" | "unknown";
+
+type Meta = {
+  icon: typeof Bell;
+  label: string;
+  hint: string;
+  className: string;
+  iconClassName: string;
+};
+
+function metaFor(status: Status, os: "iOS" | "Android"): Meta {
+  switch (status) {
+    case "granted":
+      return {
+        icon: BellRing,
+        label: "Notifications allowed",
+        hint: `${os} is delivering push alerts to this device.`,
+        className:
+          "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+        iconClassName: "text-emerald-600 dark:text-emerald-400",
+      };
+    case "denied":
+      return {
+        icon: BellOff,
+        label: "Notifications blocked",
+        hint: `Open ${os} Settings → MeraRashan → Notifications to allow alerts.`,
+        className:
+          "border-destructive/30 bg-destructive/10 text-destructive",
+        iconClassName: "text-destructive",
+      };
+    case "prompt":
+    case "prompt-with-rationale":
+      return {
+        icon: Bell,
+        label: "Notifications not enabled yet",
+        hint: `${os} hasn't asked yet — tap Enable to allow push alerts.`,
+        className:
+          "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+        iconClassName: "text-amber-600 dark:text-amber-400",
+      };
+    default:
+      return {
+        icon: HelpCircle,
+        label: "Notification status unknown",
+        hint: "We couldn't read the current permission state.",
+        className: "border-border bg-muted text-muted-foreground",
+        iconClassName: "text-muted-foreground",
+      };
+  }
+}
+
+export function NotificationPermissionBadge({
+  compact = false,
+  className = "",
+}: {
+  compact?: boolean;
+  className?: string;
+}) {
+  const [status, setStatus] = useState<Status>("unknown");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (!isNativePlatform()) return;
+    let cancelled = false;
+    const refresh = async () => {
+      const s = await getNativeNotificationPermission();
+      if (!cancelled) {
+        setStatus(s as Status);
+        setReady(true);
+      }
+    };
+    void refresh();
+    const onVis = () => {
+      if (document.visibilityState === "visible") void refresh();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", refresh);
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", refresh);
+    };
+  }, []);
+
+  if (!isNativePlatform() || !ready) return null;
+
+  const os: "iOS" | "Android" = isIOSNative()
+    ? "iOS"
+    : isAndroidNative()
+      ? "Android"
+      : (Capacitor.getPlatform() as "iOS" | "Android");
+  const meta = metaFor(status, os);
+  const Icon = meta.icon;
+
+  if (compact) {
+    return (
+      <div
+        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${meta.className} ${className}`}
+        role="status"
+        aria-label={`${os} ${meta.label}`}
+      >
+        <Icon className={`w-3.5 h-3.5 shrink-0 ${meta.iconClassName}`} />
+        <span className="truncate">{meta.label}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`flex items-start gap-2.5 rounded-lg border px-3 py-2 text-xs ${meta.className} ${className}`}
+      role="status"
+      aria-label={`${os} ${meta.label}`}
+    >
+      <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${meta.iconClassName}`} />
+      <div className="min-w-0">
+        <p className="font-semibold leading-tight">
+          {os}: {meta.label}
+        </p>
+        <p className="mt-0.5 leading-snug opacity-90">{meta.hint}</p>
+      </div>
+    </div>
+  );
+}
