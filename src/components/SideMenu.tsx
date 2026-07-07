@@ -84,6 +84,11 @@ export function SideMenu({
           <MenuItem icon={<Share2 className="w-4 h-4" />} label="Social media" onClick={onOpenSocial} />
           <MenuItem icon={<HelpCircle className="w-4 h-4" />} label="Help" onClick={onOpenHelp} />
           <MenuItem
+            icon={<Info className="w-4 h-4" />}
+            label="About"
+            onClick={() => window.open("https://merarashan.pk", "_blank")}
+          />
+          <MenuItem
             icon={<LogOut className="w-4 h-4" />}
             label="Log out"
             onClick={onLogout}
