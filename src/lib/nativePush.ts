@@ -225,10 +225,10 @@ export async function ensureNativeNotificationsOnStart(
   } catch { /* ignore */ }
   if (userDisabled) return await getNativeNotificationPermission();
 
-  let status = await getNativeNotificationPermission();
-  if (status === "prompt" || status === "prompt-with-rationale") {
-    status = await requestNativeNotificationPermission();
-  }
+  // Do NOT prompt on app start — permission prompts only happen after a
+  // successful login via <PostLoginNotificationPrompt/>. Here we simply
+  // auto-register the device when the OS already allows notifications.
+  const status = await getNativeNotificationPermission();
   if (status === "granted" && mobile) {
     try {
       await enableNativePush(mobile);
