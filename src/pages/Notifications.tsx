@@ -56,6 +56,7 @@ export default function Notifications() {
   const [mobile, setMobile] = useState<string>("");
   const [unreadOnly, setUnreadOnly] = useState<boolean>(false);
   const [showBackToTop, setShowBackToTop] = useState<boolean>(false);
+  const [deleteAllOpen, setDeleteAllOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const onScroll = () => setShowBackToTop(window.scrollY > 400);
