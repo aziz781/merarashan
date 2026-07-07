@@ -140,4 +140,12 @@
     outline: 3px solid hsl(var(--ring));
     outline-offset: 2px;
   }
+
+  /* Native iOS: keep the top bar compact so the in-app title bar doesn’t
+     dominate the screen after the system status bar / notch. */
+  .native-ios .page-header {
+    min-height: 88px !important;
+    padding-bottom: 0.5rem !important;
+    padding-top: calc(env(safe-area-inset-top) + 0.75rem) !important;
+  }
 }
