@@ -283,14 +283,16 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
             {enabled ? "You'll receive updates on this device" : "Get alerts about your rashans"}
           </p>
         </div>
-        <Button
-          size="sm"
-          variant={native ? "default" : enabled ? "outline" : "default"}
-          disabled={busy || (native && enabled)}
-          onClick={onToggle}
-        >
-          {busy ? "…" : native ? "Enable" : enabled ? "Disable" : "Enable"}
-        </Button>
+        {!enabled && (
+          <Button
+            size="sm"
+            variant={native ? "default" : "default"}
+            disabled={busy}
+            onClick={onToggle}
+          >
+            {busy ? "…" : "Enable"}
+          </Button>
+        )}
       </div>
 
       {status && (
