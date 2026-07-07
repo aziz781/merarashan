@@ -132,9 +132,10 @@ export default function Notifications() {
   return (
     <div className="min-h-screen bg-background">
       <PageHeader>
-        <div className="flex items-center gap-3">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold leading-tight flex items-center gap-2">
+        <div className="grid grid-cols-[44px_1fr_44px] items-start gap-3">
+          <div />
+          <div className="min-w-0 text-center">
+            <h1 className="text-xl font-bold leading-tight flex items-center justify-center gap-2">
               Notifications
               {pushEnabled === false && (
                 <span className="relative inline-flex" aria-label="Push notifications disabled" title="Push notifications disabled">
@@ -144,18 +145,20 @@ export default function Notifications() {
             </h1>
             <p className="text-xs opacity-80">{items.length} total · {items.filter((n) => !n.read).length} unread</p>
           </div>
-          {items.length > 0 && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setDeleteAllOpen(true)}
-              aria-label="Delete all notifications"
-              title="Delete all notifications"
-              className="shrink-0 text-primary-foreground hover:bg-primary-foreground/10 dark:text-foreground dark:hover:bg-foreground/10"
-            >
-              <Trash2 className="h-5 w-5" />
-            </Button>
-          )}
+          <div className="flex justify-end">
+            {items.length > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setDeleteAllOpen(true)}
+                aria-label="Delete all notifications"
+                title="Delete all notifications"
+                className="shrink-0 text-primary-foreground hover:bg-primary-foreground/10 dark:text-foreground dark:hover:bg-foreground/10"
+              >
+                <Trash2 className="h-5 w-5" />
+              </Button>
+            )}
+          </div>
         </div>
       </PageHeader>
 
