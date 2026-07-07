@@ -67,6 +67,7 @@ const scheduleIdle: IdleScheduler =
 
 
 import { NotificationToggle } from "@/components/NotificationToggle";
+import { PostLoginNotificationPrompt } from "@/components/PostLoginNotificationPrompt";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/hooks/use-theme";
 import { AccessibilitySettings } from "@/components/AccessibilitySettings";
@@ -128,6 +129,8 @@ const Index = () => {
       /* ignore */
     }
   }, [tab]);
+
+  const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
 
   // Warm sibling tab chunks in the background so tapping a tab feels instant.
   useEffect(() => {
@@ -265,6 +268,7 @@ const Index = () => {
     localStorage.setItem(STORAGE_KEY, m);
     setMobile(m);
     toast({ title: "Welcome", description: `Signed in as ${m}` });
+    setShowNotificationPrompt(true);
   }, []);
 
   const handleLogout = useCallback(async () => {
@@ -436,6 +440,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen pb-32">
+      <PostLoginNotificationPrompt
+        mobile={mobile}
+        open={showNotificationPrompt}
+        onClose={() => setShowNotificationPrompt(false)}
+      />
       <header
         className="px-5 pb-2 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)", minHeight: 88 }}
