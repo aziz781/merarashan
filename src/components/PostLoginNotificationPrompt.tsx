@@ -34,6 +34,14 @@ export function PostLoginNotificationPrompt({
   const [denied, setDenied] = useState(false);
 
   useEffect(() => {
+    try {
+      if (new URLSearchParams(window.location.search).get("__mr_prompt_test") === "denied") {
+        setDenied(true);
+        setVisible(true);
+        return;
+      }
+    } catch { /* ignore */ }
+
     if (!open || !mobile) {
       setVisible(false);
       setDenied(false);
