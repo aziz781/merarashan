@@ -11,13 +11,14 @@ const DevTroubleshooting = () => {
   return (
     <div className="min-h-screen pb-16">
       <header
-        className="px-5 pt-10 pb-6 text-foreground bg-card/85 border-b border-border/60 backdrop-blur-md"
+        className="px-5 pt-10 pb-6 text-primary-foreground"
+        style={{ background: "var(--gradient-primary)" }}
       >
         <Button
           variant="ghost"
           size="sm"
           onClick={() => navigate(-1)}
-          className="text-foreground hover:bg-foreground/10 -ml-2 mb-3"
+          className="text-primary-foreground hover:bg-white/10 -ml-2 mb-3"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
           Back

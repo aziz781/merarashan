@@ -458,7 +458,7 @@ const Index = () => {
         onClose={() => setShowNotificationPrompt(false)}
       />
       <header
-        className="px-5 pb-2 text-foreground bg-card/85 border-b border-border/60 backdrop-blur-md"
+        className="px-5 pb-2 text-primary-foreground [background:var(--gradient-primary)] dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md"
         style={{
           paddingTop: `calc(env(safe-area-inset-top) + ${isNativeIOSPlatform ? "1.5rem" : "0.75rem"})`,
           minHeight: isNativeIOSPlatform ? 112 : 88,
@@ -471,7 +471,7 @@ const Index = () => {
                 type="button"
                 onClick={() => setMenuOpen(true)}
                 aria-label="Open menu"
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/15 backdrop-blur-sm text-primary text-sm font-semibold ring-1 ring-primary/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 hover:bg-primary/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground text-sm font-semibold ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
               >
                 {String(displayName)
                   .replace(/^\+/, "")
@@ -486,38 +486,38 @@ const Index = () => {
             <div className="min-w-0 min-h-[44px]">
               <h1 className="text-3xl font-bold leading-tight truncate">{tab === "transactions" ? "Rashans" : tab === "cards" ? "Cards" : tab === "statements" ? "Statements" : String(displayName)}</h1>
               {tab === "transactions" && (
-                <p className="text-xs text-foreground/70 mt-0.5 truncate">Mera Rashan Details</p>
+                <p className="text-xs text-primary-foreground/80 dark:!text-foreground/70 mt-0.5 truncate">Mera Rashan Details</p>
               )}
               {tab === "cards" && (
-                <p className="text-xs text-foreground/70 mt-0.5 truncate">Mera Rashan Card Details</p>
+                <p className="text-xs text-primary-foreground/80 dark:!text-foreground/70 mt-0.5 truncate">Mera Rashan Card Details</p>
               )}
               {tab === "statements" && (
-                <p className="text-xs text-foreground/70 mt-0.5 truncate">Mera Rashan Monthly Statements</p>
+                <p className="text-xs text-primary-foreground/80 dark:!text-foreground/70 mt-0.5 truncate">Mera Rashan Monthly Statements</p>
               )}
               {tab === "customers" && (
                 !profileData ? (
                   <span
-                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-primary/10 text-primary/0 ring-1 ring-primary/10"
+                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-white/10 text-white/0 ring-1 ring-white/10"
                     aria-hidden
                   />
                 ) : isActive ? (
                   <button
                     type="button"
                     onClick={() => setSponsorProfileOpen(true)}
-                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-green-100 text-green-700 ring-1 ring-green-300/50 hover:bg-green-200/70 transition-colors dark:bg-green-400/20 dark:text-green-50 dark:ring-green-300/40 dark:hover:bg-green-400/30"
+                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-green-400/20 text-green-50 ring-1 ring-green-300/40 hover:bg-green-400/30 transition-colors"
                     aria-label="Sponsor profile. Open details"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-green-500 dark:bg-green-300" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-300" />
                     Sponsor
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={() => setFrozenInfoOpen(true)}
-                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-red-100 text-red-700 ring-1 ring-red-300/50 hover:bg-red-200/70 transition-colors dark:bg-red-400/20 dark:text-red-50 dark:ring-red-300/40 dark:hover:bg-red-400/30"
+                    className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium min-h-[18px] bg-red-400/20 text-red-50 ring-1 ring-red-300/40 hover:bg-red-400/30 transition-colors"
                     aria-label="Account frozen. Open unfreeze options"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-red-500 dark:bg-red-300" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-300" />
                     Frozen account
                     <Lock className="shrink-0" size={10} strokeWidth={2.5} />
                   </button>
@@ -530,7 +530,7 @@ const Index = () => {
             type="button"
             onClick={toggleTheme}
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/15 backdrop-blur-sm text-primary ring-1 ring-primary/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 hover:bg-primary/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
           >
             {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
           </button>

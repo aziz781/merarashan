@@ -23,7 +23,8 @@ export function PageHeader({ children, className, style, ...rest }: PageHeaderPr
   return (
     <header
       className={cn(
-        "px-5 pb-2 text-foreground bg-card/85 border-b border-border/60 backdrop-blur-md",
+        "px-5 pb-2 text-primary-foreground [background:var(--gradient-primary)]",
+        "dark:![background:hsl(var(--card)/0.85)] dark:!text-foreground dark:border-b dark:border-border/60 dark:backdrop-blur-md",
         className,
       )}
       style={{

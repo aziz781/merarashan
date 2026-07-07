@@ -151,7 +151,7 @@ export default function Notifications() {
               onClick={() => setDeleteAllOpen(true)}
               aria-label="Delete all notifications"
               title="Delete all notifications"
-              className="shrink-0 text-foreground hover:bg-foreground/10 dark:text-foreground dark:hover:bg-foreground/10"
+              className="shrink-0 text-primary-foreground hover:bg-primary-foreground/10 dark:text-foreground dark:hover:bg-foreground/10"
             >
               <Trash2 className="h-5 w-5" />
             </Button>

@@ -131,7 +131,7 @@ export default function RashanDashboard() {
           <h1 className="text-xl font-bold leading-tight truncate">
             Rashan Dashboard
           </h1>
-          <p className="text-xs text-foreground/70 mt-0.5">
+          <p className="text-xs text-primary-foreground/80 mt-0.5">
             Monthly spending overview
           </p>
         </div>
