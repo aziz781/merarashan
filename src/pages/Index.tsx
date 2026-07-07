@@ -263,6 +263,10 @@ const Index = () => {
       if (m) {
         setMobile(m);
         localStorage.setItem(STORAGE_KEY, m);
+        // App started with an already-signed-in user — check & ask for push
+        // notification permission (the prompt itself skips if permission is
+        // already granted or the user dismissed it this session).
+        setShowNotificationPrompt(true);
       } else {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) setMobile(saved);
