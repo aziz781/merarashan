@@ -54,6 +54,13 @@ export function PostLoginNotificationPrompt({
           const status = await getNativeNotificationPermission();
           if (!cancelled) {
             if (status === "granted") {
+              // Permission already granted on a prior run — silently refresh
+              // the FCM/APNs token on the backend so this login's device is
+              // registered for push.
+              try {
+                await enableNativePush(mobile);
+                try { localStorage.setItem("mr_native_push_enabled", "1"); } catch { /* ignore */ }
+              } catch { /* ignore — UI toggle will reflect real state */ }
               onClose();
             } else if (status === "denied") {
               setDenied(true);
