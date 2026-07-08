@@ -689,7 +689,7 @@ const Index = () => {
         <div className="space-y-3 pt-2">
           <ThemeToggle />
           <AccessibilitySettings />
-          <NotificationToggle mobile={mobile} />
+          <NotificationToggle mobile={mobile} showStatus={false} />
         </div>
       </SlideInPanel>
 
