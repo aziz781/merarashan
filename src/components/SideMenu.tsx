@@ -102,6 +102,7 @@ export function SideMenu({
           <AppVersionInfo />
         </div>
       </SheetContent>
+      <AboutModal open={aboutOpen} onOpenChange={setAboutOpen} />
     </Sheet>
   );
 }
