@@ -16,9 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import appLogo from "@/assets/mera-rashan-logo.webp";
 import { NotificationToggle } from "@/components/NotificationToggle";
-import { getCurrentSubscription, pushSupported } from "@/lib/push";
-import { isNativePlatform, isIOSNative, getIOSNotificationPermission, getAndroidNotificationPermission } from "@/lib/nativePush";
-import { App } from "@capacitor/app";
+import { usePushEnabled } from "@/hooks/use-push-enabled";
 import {
   clearAll,
   getNotifications,
@@ -47,13 +45,12 @@ function timeAgo(ts: number): string {
   return new Date(ts).toLocaleDateString();
 }
 
-const NATIVE_ENABLED_KEY = "mr_native_push_enabled";
 const MOBILE_KEY = "mr_mobile";
 
 export default function Notifications() {
   const navigate = useNavigate();
   const [items, setItems] = useState<StoredNotification[]>(() => getNotifications());
-  const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
+  const { enabled: pushEnabled } = usePushEnabled();
   const [mobile, setMobile] = useState<string>("");
   const [unreadOnly, setUnreadOnly] = useState<boolean>(false);
   const [showBackToTop, setShowBackToTop] = useState<boolean>(false);
@@ -73,68 +70,11 @@ export default function Notifications() {
       setItems(getNotifications());
     });
     setItems(getNotifications());
-
-    const computeNative = async () => {
-      const status = isIOSNative()
-        ? await getIOSNotificationPermission()
-        : await getAndroidNotificationPermission();
-      const optedIn = localStorage.getItem(NATIVE_ENABLED_KEY) === "1";
-      return status === "granted" && optedIn;
-    };
-
-    // Determine push enabled state
-    (async () => {
-      try {
-        if (isNativePlatform()) {
-          setPushEnabled(await computeNative());
-          return;
-        }
-        if (!pushSupported()) {
-          setPushEnabled(false);
-          return;
-        }
-        const sub = await getCurrentSubscription();
-        setPushEnabled(!!sub && Notification.permission === "granted");
-      } catch {
-        setPushEnabled(false);
-      }
-    })();
-
-    const onVis = () => {
-      if (document.visibilityState === "visible") {
-        (async () => {
-          try {
-            if (isNativePlatform()) {
-              setPushEnabled(await computeNative());
-              return;
-            }
-            if (!pushSupported()) return;
-            const sub = await getCurrentSubscription();
-            setPushEnabled(!!sub && Notification.permission === "granted");
-          } catch { /* ignore */ }
-        })();
-      }
-    };
-    document.addEventListener("visibilitychange", onVis);
-
-    let removeResume: (() => void) | null = null;
-    if (isNativePlatform()) {
-      const handle = App.addListener("resume", async () => {
-        try {
-          setPushEnabled(await computeNative());
-        } catch { /* ignore */ }
-      });
-      removeResume = () => {
-        void handle.then((h) => h.remove());
-      };
-    }
-
     return () => {
       unsub();
-      document.removeEventListener("visibilitychange", onVis);
-      removeResume?.();
     };
   }, []);
+
 
   const openNotification = (n: StoredNotification) => {
     if (!n.read) markRead(n.id);
