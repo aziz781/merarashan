@@ -42,7 +42,7 @@ type SyncStatus =
 
 const NATIVE_ENABLED_KEY = "mr_native_push_enabled";
 
-export function NotificationToggle({ mobile }: { mobile: string }) {
+export function NotificationToggle({ mobile, showStatus = true }: { mobile: string; showStatus?: boolean }) {
   const native = isNativePlatform();
   const { enabled: enabledFromHook, refresh } = usePushEnabled();
   const enabled = enabledFromHook === true;
