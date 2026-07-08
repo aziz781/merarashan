@@ -320,7 +320,6 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
             />
           </div>
         )}
-        <NotificationPermissionBadge className="mt-5" />
       </Card>
     </div>
   );
