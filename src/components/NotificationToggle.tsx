@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bell, BellOff, Info, RefreshCw, AlertTriangle } from "lucide-react";
+import { Bell, BellOff, CheckCircle2, Info, RefreshCw, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -229,14 +229,14 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
       className: "text-muted-foreground",
     },
     matched: {
-      icon: Info,
-      text: "Get alerts for rashan updates, statements, and account news",
-      className: "text-primary",
+      icon: CheckCircle2,
+      text: "Device is registered for push notifications",
+      className: "text-green-600",
     },
     resubscribed: {
-      icon: Info,
-      text: "Get alerts for rashan updates, statements, and account news",
-      className: "text-primary",
+      icon: CheckCircle2,
+      text: "Device is registered for push notifications",
+      className: "text-green-600",
     },
     "mismatch-failed": {
       icon: AlertTriangle,
@@ -265,14 +265,16 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
             {enabled ? "You'll receive updates on this device" : "Get alerts about your rashans"}
           </p>
         </div>
-        <Button
-          size="sm"
-          variant={enabled ? "outline" : "default"}
-          disabled={busy}
-          onClick={onToggle}
-        >
-          {busy ? "…" : enabled ? "Disable" : "Enable"}
-        </Button>
+        {!enabled && (
+          <Button
+            size="sm"
+            variant="default"
+            disabled={busy}
+            onClick={onToggle}
+          >
+            {busy ? "…" : "Enable"}
+          </Button>
+        )}
       </div>
 
       <NotificationPermissionBadge className="mt-3" />
