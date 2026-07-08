@@ -50,7 +50,7 @@ const MOBILE_KEY = "mr_mobile";
 export default function Notifications() {
   const navigate = useNavigate();
   const [items, setItems] = useState<StoredNotification[]>(() => getNotifications());
-  const pushEnabled = usePushEnabled();
+  const { enabled: pushEnabled } = usePushEnabled();
   const [mobile, setMobile] = useState<string>("");
   const [unreadOnly, setUnreadOnly] = useState<boolean>(false);
   const [showBackToTop, setShowBackToTop] = useState<boolean>(false);
