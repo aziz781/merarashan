@@ -183,7 +183,9 @@ export default function Notifications() {
       </AlertDialog>
 
       <div className="p-4 space-y-3 max-w-2xl mx-auto">
-        <NotificationToggle mobile={mobile} />
+        {pushEnabled !== true && (
+          <NotificationToggle mobile={mobile} />
+        )}
         {items.length === 0 ? (
           <Card className="p-8 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
