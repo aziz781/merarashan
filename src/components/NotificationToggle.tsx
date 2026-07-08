@@ -42,7 +42,7 @@ type SyncStatus =
 
 const NATIVE_ENABLED_KEY = "mr_native_push_enabled";
 
-export function NotificationToggle({ mobile, showStatus = true }: { mobile: string; showStatus?: boolean }) {
+export function NotificationToggle({ mobile }: { mobile: string }) {
   const native = isNativePlatform();
   const { enabled: enabledFromHook, refresh } = usePushEnabled();
   const enabled = enabledFromHook === true;
@@ -281,7 +281,7 @@ export function NotificationToggle({ mobile, showStatus = true }: { mobile: stri
 
 
 
-      {showStatus && status && (
+      {status && (
         <div className={`mt-3 flex items-center gap-1.5 text-xs ${status.className}`}>
           <status.icon
             className={`w-3.5 h-3.5 shrink-0 ${syncStatus === "checking" ? "animate-spin" : ""}`}
