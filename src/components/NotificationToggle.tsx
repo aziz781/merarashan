@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import {
   disablePush,
   enablePush,
-  getCurrentSubscription,
   pushSupported,
   syncPushSubscription,
 } from "@/lib/push";
@@ -20,7 +19,6 @@ import {
   getAndroidNotificationPermission,
   openAppNotificationSettings,
 } from "@/lib/nativePush";
-import { App } from "@capacitor/app";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +30,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { NotificationPermissionBadge } from "@/components/NotificationPermissionBadge";
+import { usePushEnabled } from "@/hooks/use-push-enabled";
 
 type SyncStatus =
   | "checking"
@@ -45,49 +44,21 @@ const NATIVE_ENABLED_KEY = "mr_native_push_enabled";
 
 export function NotificationToggle({ mobile }: { mobile: string }) {
   const native = isNativePlatform();
-  const [supported, setSupported] = useState(false);
-  const [enabled, setEnabled] = useState(false);
+  const { enabled: enabledFromHook, refresh } = usePushEnabled();
+  const enabled = enabledFromHook === true;
+  const [supported, setSupported] = useState<boolean>(native || pushSupported());
   const [busy, setBusy] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("checking");
   const [rationaleOpen, setRationaleOpen] = useState(false);
 
   useEffect(() => {
-    // --- Native (Capacitor/FCM) branch ---
     if (native) {
       setSupported(true);
-      let cancelled = false;
-      const refresh = async () => {
-        const status = isIOSNative()
-          ? await getIOSNotificationPermission()
-          : await getAndroidNotificationPermission();
-        if (cancelled) return;
-        const osGranted = status === "granted";
-        let userOptedIn = false;
-        try { userOptedIn = localStorage.getItem(NATIVE_ENABLED_KEY) === "1"; } catch { /* ignore */ }
-        // Toggle is "on" only when BOTH the OS allows it AND the user
-        // hasn't explicitly disabled it from this Settings screen.
-        const effective = osGranted && userOptedIn;
-        setEnabled(effective);
-        if (!osGranted) setSyncStatus("not-enabled");
-        else setSyncStatus(effective ? "matched" : "not-enabled");
-      };
-      void refresh();
-      const onVis = () => {
-        if (document.visibilityState === "visible") void refresh();
-      };
-      document.addEventListener("visibilitychange", onVis);
-      window.addEventListener("focus", refresh);
-
-      const handle = App.addListener("resume", refresh);
-      return () => {
-        cancelled = true;
-        document.removeEventListener("visibilitychange", onVis);
-        window.removeEventListener("focus", refresh);
-        void handle.then((h) => h.remove());
-      };
+      if (enabledFromHook === null) return;
+      setSyncStatus(enabledFromHook ? "matched" : "not-enabled");
+      return;
     }
 
-    // --- Web push branch ---
     if (!pushSupported()) {
       setSupported(false);
       setSyncStatus("unsupported");
@@ -101,21 +72,17 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
         const result = await syncPushSubscription(mobile);
         if (cancelled) return;
         if (result === "resubscribed") {
-          setEnabled(true);
           setSyncStatus("resubscribed");
+          void refresh();
           toast.success("Notifications updated", {
             description: "Re-subscribed this device to the latest push key.",
           });
           return;
         }
         if (result === "unchanged") {
-          setEnabled(true);
           setSyncStatus("matched");
           return;
         }
-        const s = await getCurrentSubscription();
-        if (cancelled) return;
-        setEnabled(!!s && Notification.permission === "granted");
         setSyncStatus("not-enabled");
       } catch (e: unknown) {
         if (cancelled) return;
@@ -124,18 +91,13 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
           description:
             e instanceof Error ? e.message : "Please toggle notifications off and back on.",
         });
-        try {
-          const s = await getCurrentSubscription();
-          if (!cancelled) setEnabled(!!s && Notification.permission === "granted");
-        } catch {
-          if (!cancelled) setEnabled(false);
-        }
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [mobile, native]);
+  }, [mobile, native, enabledFromHook, refresh]);
+
 
   if (!supported) {
     const inIframe = (() => {
