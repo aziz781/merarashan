@@ -116,9 +116,23 @@ export default function Notifications() {
       }
     };
     document.addEventListener("visibilitychange", onVis);
+
+    let removeResume: (() => void) | null = null;
+    if (isNativePlatform()) {
+      const handle = App.addListener("resume", async () => {
+        try {
+          setPushEnabled(await computeNative());
+        } catch { /* ignore */ }
+      });
+      removeResume = () => {
+        void handle.then((h) => h.remove());
+      };
+    }
+
     return () => {
       unsub();
       document.removeEventListener("visibilitychange", onVis);
+      removeResume?.();
     };
   }, []);
 
