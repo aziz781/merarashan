@@ -18,6 +18,7 @@ import appLogo from "@/assets/mera-rashan-logo.webp";
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { getCurrentSubscription, pushSupported } from "@/lib/push";
 import { isNativePlatform, isIOSNative, getIOSNotificationPermission, getAndroidNotificationPermission } from "@/lib/nativePush";
+import { App } from "@capacitor/app";
 import {
   clearAll,
   getNotifications,
