@@ -8,7 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { formatMobile } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
-import { NotificationPermissionBadge } from "@/components/NotificationPermissionBadge";
+
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 
 const mobileSchema = z
@@ -320,7 +320,6 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
             />
           </div>
         )}
-        <NotificationPermissionBadge className="mt-5" />
       </Card>
     </div>
   );
