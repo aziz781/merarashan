@@ -89,7 +89,7 @@ export function SideMenu({
           <MenuItem
             icon={<Info className="w-4 h-4" />}
             label="About"
-            onClick={() => window.open("https://merarashan.pk", "_blank")}
+            onClick={() => setAboutOpen(true)}
           />
           <MenuItem
             icon={<LogOut className="w-4 h-4" />}
