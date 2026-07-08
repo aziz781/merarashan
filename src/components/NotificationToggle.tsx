@@ -130,7 +130,7 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
     try {
       await enableNativePush(mobile);
       localStorage.setItem(NATIVE_ENABLED_KEY, "1");
-      setEnabled(true);
+      void refresh();
       setSyncStatus("matched");
       toast.success("Notifications enabled");
     } catch (e: unknown) {
@@ -156,7 +156,7 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
         try {
           await disableNativePush();
           localStorage.setItem(NATIVE_ENABLED_KEY, "0");
-          setEnabled(false);
+          void refresh();
           setSyncStatus("not-enabled");
           toast.success("Notifications disabled");
         } catch (e: unknown) {
@@ -203,12 +203,12 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
     try {
       if (enabled) {
         await disablePush();
-        setEnabled(false);
+        void refresh();
         setSyncStatus("not-enabled");
         toast.success("Notifications disabled");
       } else {
         await enablePush(mobile);
-        setEnabled(true);
+        void refresh();
         setSyncStatus("matched");
         toast.success("Notifications enabled");
       }
