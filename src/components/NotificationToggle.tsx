@@ -283,8 +283,6 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
         </Button>
       </div>
 
-      <NotificationPermissionBadge className="mt-3" />
-
       <AlertDialog open={rationaleOpen} onOpenChange={setRationaleOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
