@@ -315,17 +315,6 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
 
       <NotificationPermissionBadge className="mt-3" />
 
-
-
-      {status && (
-        <div className={`mt-3 flex items-center gap-1.5 text-xs ${status.className}`}>
-          <status.icon
-            className={`w-3.5 h-3.5 shrink-0 ${syncStatus === "checking" ? "animate-spin" : ""}`}
-          />
-          <span className="truncate">{status.text}</span>
-        </div>
-      )}
-
       <AlertDialog open={rationaleOpen} onOpenChange={setRationaleOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
