@@ -20,6 +20,7 @@ import {
   getAndroidNotificationPermission,
   openAppNotificationSettings,
 } from "@/lib/nativePush";
+import { App } from "@capacitor/app";
 import {
   AlertDialog,
   AlertDialogAction,
