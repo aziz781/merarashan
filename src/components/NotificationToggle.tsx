@@ -247,7 +247,14 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
     unsupported: null,
   };
 
-  const status = statusMeta[syncStatus];
+  const status =
+    enabled && syncStatus !== "mismatch-failed"
+      ? {
+          icon: CheckCircle2,
+          text: "Device is registered for push notifications",
+          className: "text-green-600",
+        }
+      : statusMeta[syncStatus];
 
   return (
     <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
