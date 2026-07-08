@@ -31,7 +31,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { NotificationPermissionBadge } from "@/components/NotificationPermissionBadge";
 
 type SyncStatus =
   | "checking"
