@@ -4,7 +4,7 @@
 set -e
 
 #echo "🔄 Pulling latest changes from Git..."
-git pull
+#git pull
 
 echo "📦 Building the project..."
 npm install

@@ -24,7 +24,7 @@ function metaFor(status: Status, os: "iOS" | "Android"): Meta {
       return {
         icon: BellRing,
         label: "Notifications allowed",
-        hint: `${os} is delivering push alerts to this device.`,
+        hint: `Delivering push alerts to this device.`,
         className:
           "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
         iconClassName: "text-emerald-600 dark:text-emerald-400",
@@ -33,7 +33,7 @@ function metaFor(status: Status, os: "iOS" | "Android"): Meta {
       return {
         icon: BellOff,
         label: "Notifications blocked",
-        hint: `Open ${os} Settings → MeraRashan → Notifications to allow alerts.`,
+        hint: `Open Settings → Mera Rashan → Notifications to allow alerts.`,
         className:
           "border-destructive/30 bg-destructive/10 text-destructive",
         iconClassName: "text-destructive",
@@ -43,7 +43,7 @@ function metaFor(status: Status, os: "iOS" | "Android"): Meta {
       return {
         icon: Bell,
         label: "Notifications not enabled yet",
-        hint: `${os} hasn't asked yet — tap Enable to allow push alerts.`,
+        hint: `Hasn't asked yet — tap Enable to allow push alerts.`,
         className:
           "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
         iconClassName: "text-amber-600 dark:text-amber-400",
@@ -93,6 +93,7 @@ export function NotificationPermissionBadge({
   }, []);
 
   if (!isNativePlatform() || !ready) return null;
+  if (isNativePlatform() || !ready) return null;
 
   const os: "iOS" | "Android" = isIOSNative()
     ? "iOS"
@@ -107,9 +108,9 @@ export function NotificationPermissionBadge({
       <div
         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${meta.className} ${className}`}
         role="status"
-        aria-label={`${os} ${meta.label}`}
+        aria-label={`${meta.label}`}
       >
-        <Icon className={`w-3.5 h-3.5 shrink-0 ${meta.iconClassName}`} />
+
         <span className="truncate">{meta.label}</span>
       </div>
     );
@@ -119,12 +120,11 @@ export function NotificationPermissionBadge({
     <div
       className={`flex items-start gap-2.5 rounded-lg border px-3 py-2 text-xs ${meta.className} ${className}`}
       role="status"
-      aria-label={`${os} ${meta.label}`}
+      aria-label={`${meta.label}`}
     >
-      <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${meta.iconClassName}`} />
       <div className="min-w-0">
         <p className="font-semibold leading-tight">
-          {os}: {meta.label}
+          {meta.label}
         </p>
         <p className="mt-0.5 leading-snug opacity-90">{meta.hint}</p>
       </div>
