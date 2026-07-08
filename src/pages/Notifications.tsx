@@ -212,8 +212,8 @@ export default function Notifications() {
           aria-pressed={unreadOnly}
           aria-label={unreadOnly ? "Showing unread only" : "Show unread only"}
           title={unreadOnly ? "Showing unread only" : "Show unread only"}
-          className="fixed left-5 z-50 flex h-12 items-center gap-1.5 rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-primary/30 hover:bg-primary/90 transition-all px-4 text-xs font-semibold"
-          style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 1.5rem)" }}
+          className="fixed bottom-6 left-5 z-50 flex h-12 items-center gap-1.5 rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-primary/30 hover:bg-primary/90 transition-all px-4 text-xs font-semibold"
+          style={{ marginBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           <Filter className="h-4 w-4" />
           {unreadOnly ? "Unread" : "All"}
@@ -226,7 +226,7 @@ export default function Notifications() {
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Back to top"
           className="fixed bottom-6 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-primary/30 hover:bg-primary/90 transition-all animate-in fade-in slide-in-from-bottom-2"
-          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+          style={{ marginBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           <ArrowUp className="h-5 w-5" />
         </button>
@@ -237,7 +237,7 @@ export default function Notifications() {
         onClick={() => navigate("/")}
         aria-label="Go to home"
         className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-primary/30 hover:bg-primary/90 transition-all animate-in fade-in slide-in-from-bottom-2"
-        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        style={{ marginBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
         <Home className="h-5 w-5" />
       </button>
