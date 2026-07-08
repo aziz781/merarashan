@@ -299,16 +299,14 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
             {enabled ? "You'll receive updates on this device" : "Get alerts about your rashans"}
           </p>
         </div>
-        {!enabled && (
-          <Button
-            size="sm"
-            variant={native ? "default" : "default"}
-            disabled={busy}
-            onClick={onToggle}
-          >
-            {busy ? "…" : "Enable"}
-          </Button>
-        )}
+        <Button
+          size="sm"
+          variant={enabled ? "outline" : "default"}
+          disabled={busy}
+          onClick={onToggle}
+        >
+          {busy ? "…" : enabled ? "Disable" : "Enable"}
+        </Button>
       </div>
 
       <NotificationPermissionBadge className="mt-3" />
