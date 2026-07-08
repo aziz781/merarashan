@@ -185,6 +185,21 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
 
   const onToggle = async () => {
     if (native) {
+      if (enabled) {
+        setBusy(true);
+        try {
+          await disableNativePush();
+          localStorage.setItem(NATIVE_ENABLED_KEY, "0");
+          setEnabled(false);
+          setSyncStatus("not-enabled");
+          toast.success("Notifications disabled");
+        } catch (e: unknown) {
+          toast.error(e instanceof Error ? e.message : "Something went wrong");
+        } finally {
+          setBusy(false);
+        }
+        return;
+      }
       // Native: button only ever enables. If already enabled (system + user
       // opted in), the button is greyed out and this handler is unreachable.
       if (isIOSNative()) {
