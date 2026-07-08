@@ -300,6 +300,7 @@ export default function RashanDashboard() {
         onClick={() => navigate(-1)}
         aria-label="Back"
         className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
+        style={{ marginBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
         <ArrowLeft className="h-5 w-5" />
       </button>
