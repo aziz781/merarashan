@@ -20,6 +20,7 @@ import {
   getAndroidNotificationPermission,
   openAppNotificationSettings,
 } from "@/lib/nativePush";
+import { App } from "@capacitor/app";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -76,10 +77,13 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
       };
       document.addEventListener("visibilitychange", onVis);
       window.addEventListener("focus", refresh);
+
+      const handle = App.addListener("resume", refresh);
       return () => {
         cancelled = true;
         document.removeEventListener("visibilitychange", onVis);
         window.removeEventListener("focus", refresh);
+        void handle.then((h) => h.remove());
       };
     }
 

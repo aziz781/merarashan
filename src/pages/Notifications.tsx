@@ -18,6 +18,7 @@ import appLogo from "@/assets/mera-rashan-logo.webp";
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { getCurrentSubscription, pushSupported } from "@/lib/push";
 import { isNativePlatform, isIOSNative, getIOSNotificationPermission, getAndroidNotificationPermission } from "@/lib/nativePush";
+import { App } from "@capacitor/app";
 import {
   clearAll,
   getNotifications,
@@ -115,9 +116,23 @@ export default function Notifications() {
       }
     };
     document.addEventListener("visibilitychange", onVis);
+
+    let removeResume: (() => void) | null = null;
+    if (isNativePlatform()) {
+      const handle = App.addListener("resume", async () => {
+        try {
+          setPushEnabled(await computeNative());
+        } catch { /* ignore */ }
+      });
+      removeResume = () => {
+        void handle.then((h) => h.remove());
+      };
+    }
+
     return () => {
       unsub();
       document.removeEventListener("visibilitychange", onVis);
+      removeResume?.();
     };
   }, []);
 
