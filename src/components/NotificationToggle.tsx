@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bell, BellOff } from "lucide-react";
+import { Bell, BellOff, Info, RefreshCw, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { NotificationPermissionBadge } from "@/components/NotificationPermissionBadge";
 
 type SyncStatus =
   | "checking"
@@ -256,6 +257,36 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
     }
   };
 
+  const statusMeta: Record<
+    SyncStatus,
+    { icon: typeof Info; text: string; className: string } | null
+  > = {
+    checking: {
+      icon: RefreshCw,
+      text: "Checking subscription…",
+      className: "text-muted-foreground",
+    },
+    matched: {
+      icon: Info,
+      text: "Get alerts for rashan updates, statements, and account news",
+      className: "text-primary",
+    },
+    resubscribed: {
+      icon: Info,
+      text: "Get alerts for rashan updates, statements, and account news",
+      className: "text-primary",
+    },
+    "mismatch-failed": {
+      icon: AlertTriangle,
+      text: "Push key changed — tap Disable then Enable to fix",
+      className: "text-destructive",
+    },
+    "not-enabled": null,
+    unsupported: null,
+  };
+
+  const status = statusMeta[syncStatus];
+
   return (
     <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
       <div className="flex items-center gap-3">
@@ -281,6 +312,19 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
           {busy ? "…" : enabled ? "Disable" : "Enable"}
         </Button>
       </div>
+
+      <NotificationPermissionBadge className="mt-3" />
+
+
+
+      {status && (
+        <div className={`mt-3 flex items-center gap-1.5 text-xs ${status.className}`}>
+          <status.icon
+            className={`w-3.5 h-3.5 shrink-0 ${syncStatus === "checking" ? "animate-spin" : ""}`}
+          />
+          <span className="truncate">{status.text}</span>
+        </div>
+      )}
 
       <AlertDialog open={rationaleOpen} onOpenChange={setRationaleOpen}>
         <AlertDialogContent>
