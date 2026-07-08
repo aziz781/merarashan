@@ -281,7 +281,7 @@ export function NotificationToggle({ mobile, showStatus = true }: { mobile: stri
 
 
 
-      {status && (
+      {showStatus && status && (
         <div className={`mt-3 flex items-center gap-1.5 text-xs ${status.className}`}>
           <status.icon
             className={`w-3.5 h-3.5 shrink-0 ${syncStatus === "checking" ? "animate-spin" : ""}`}
