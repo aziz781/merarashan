@@ -229,14 +229,14 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
       className: "text-muted-foreground",
     },
     matched: {
-      icon: Info,
-      text: "Get alerts for rashan updates, statements, and account news",
-      className: "text-primary",
+      icon: CheckCircle2,
+      text: "Device is registered for push notifications",
+      className: "text-green-600",
     },
     resubscribed: {
-      icon: Info,
-      text: "Get alerts for rashan updates, statements, and account news",
-      className: "text-primary",
+      icon: CheckCircle2,
+      text: "Device is registered for push notifications",
+      className: "text-green-600",
     },
     "mismatch-failed": {
       icon: AlertTriangle,
