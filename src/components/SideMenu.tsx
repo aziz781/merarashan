@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Copy, HelpCircle, Info, LogOut, Settings, Share2, Shield, User } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
 import { toast } from "@/hooks/use-toast";
 import { AppVersionInfo } from "@/components/AppVersionInfo";
+import { AboutModal } from "@/components/AboutModal";
 
 interface SideMenuProps {
   open: boolean;
@@ -32,6 +34,7 @@ export function SideMenu({
   
   onLogout,
 }: SideMenuProps) {
+  const [aboutOpen, setAboutOpen] = useState(false);
   const swipe = useSwipeToClose({
     direction: "left",
     onClose: () => onOpenChange(false),
@@ -86,7 +89,7 @@ export function SideMenu({
           <MenuItem
             icon={<Info className="w-4 h-4" />}
             label="About"
-            onClick={() => window.open("https://merarashan.pk", "_blank")}
+            onClick={() => setAboutOpen(true)}
           />
           <MenuItem
             icon={<LogOut className="w-4 h-4" />}
@@ -99,6 +102,7 @@ export function SideMenu({
           <AppVersionInfo />
         </div>
       </SheetContent>
+      <AboutModal open={aboutOpen} onOpenChange={setAboutOpen} />
     </Sheet>
   );
 }
