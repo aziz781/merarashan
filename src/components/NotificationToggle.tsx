@@ -259,7 +259,7 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
 
   const statusMeta: Record<
     SyncStatus,
-    { icon: typeof CheckCircle2; text: string; className: string } | null
+    { icon: typeof Info; text: string; className: string } | null
   > = {
     checking: {
       icon: RefreshCw,
@@ -267,13 +267,13 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
       className: "text-muted-foreground",
     },
     matched: {
-      icon: CheckCircle2,
-      text: native ? "Device registered for push" : "Subscription up to date",
-      className: "text-emerald-600 dark:text-emerald-400",
+      icon: Info,
+      text: "Get alerts for rashan updates, statements, and account news",
+      className: "text-primary",
     },
     resubscribed: {
-      icon: RefreshCw,
-      text: "Re-subscribed to the latest push key",
+      icon: Info,
+      text: "Get alerts for rashan updates, statements, and account news",
       className: "text-primary",
     },
     "mismatch-failed": {
