@@ -257,36 +257,6 @@ export function NotificationToggle({ mobile }: { mobile: string }) {
     }
   };
 
-  const statusMeta: Record<
-    SyncStatus,
-    { icon: typeof Info; text: string; className: string } | null
-  > = {
-    checking: {
-      icon: RefreshCw,
-      text: "Checking subscription…",
-      className: "text-muted-foreground",
-    },
-    matched: {
-      icon: Info,
-      text: "Get alerts for rashan updates, statements, and account news",
-      className: "text-primary",
-    },
-    resubscribed: {
-      icon: Info,
-      text: "Get alerts for rashan updates, statements, and account news",
-      className: "text-primary",
-    },
-    "mismatch-failed": {
-      icon: AlertTriangle,
-      text: "Push key changed — tap Disable then Enable to fix",
-      className: "text-destructive",
-    },
-    "not-enabled": null,
-    unsupported: null,
-  };
-
-  const status = statusMeta[syncStatus];
-
   return (
     <Card className="p-4 bg-card/80 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
       <div className="flex items-center gap-3">
