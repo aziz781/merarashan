@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Copy, HelpCircle, Info, LogOut, Settings, Share2, Shield, User } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
 import { toast } from "@/hooks/use-toast";
 import { AppVersionInfo } from "@/components/AppVersionInfo";
+import { AboutModal } from "@/components/AboutModal";
 
 interface SideMenuProps {
   open: boolean;
