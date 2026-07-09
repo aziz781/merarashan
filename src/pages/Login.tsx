@@ -23,7 +23,7 @@ import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 function getMobileSchema(country: Country) {
   return z
     .string()
-    .regex(/^\d+$/, "Digits only")
+    .regex(/^\d+$/, "Enter Mobile Number!")
     .length(country.maxLength, `Enter a valid ${country.name} number (${country.maxLength} digits)`);
 }
 
