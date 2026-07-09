@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import { Loader2, UserX } from "lucide-react";
+import { ChevronDown, Loader2, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -16,12 +16,7 @@ import {
   formatLocalNumber,
   buildFullNumber,
 } from "@/lib/countries";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 
@@ -42,6 +37,19 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [countryOpen, setCountryOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState("");
+
+  const filteredCountries = useMemo(() => {
+    const q = countrySearch.trim().toLowerCase();
+    if (!q) return COUNTRIES;
+    return COUNTRIES.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.dialCode.includes(q) ||
+        c.code.toLowerCase().includes(q)
+    );
+  }, [countrySearch]);
 
   // Detect the user's country from device timezone/language on mount.
   useEffect(() => {
@@ -262,31 +270,58 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
         {step === "mobile" && (
           <form onSubmit={submitMobile} className="space-y-3">
             <div className="flex flex-col gap-2">
-              <Select
-                value={selectedCountry.code}
-                onValueChange={(code) => {
-                  const country = getCountryByCode(code) ?? COUNTRIES[0];
-                  setSelectedCountry(country);
-                  setLocalNumber((prev) => formatLocalNumber(prev, country.maxLength));
-                  setError(null);
-                }}
-                disabled={loading}
-              >
-                <SelectTrigger className="h-12 w-full text-base px-2">
-                  <span className="mr-1.5">{selectedCountry.flag}</span>
-                  <span className="text-muted-foreground">+{selectedCountry.dialCode}</span>
-                  <span className="ml-2 truncate">{selectedCountry.name}</span>
-                </SelectTrigger>
-                <SelectContent className="min-w-56 w-auto">
-                  {COUNTRIES.map((country) => (
-                    <SelectItem key={country.code} value={country.code}>
-                      <span className="mr-2">{country.flag}</span>
-                      <span className="text-muted-foreground">+{country.dialCode}</span>
-                      <span className="ml-2">{country.name}</span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={countryOpen} onOpenChange={setCountryOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={loading}
+                    className="h-12 w-full justify-between px-2 text-base font-normal"
+                  >
+                    <span className="flex items-center overflow-hidden">
+                      <span className="mr-1.5">{selectedCountry.flag}</span>
+                      <span className="text-muted-foreground">+{selectedCountry.dialCode}</span>
+                      <span className="ml-2 truncate">{selectedCountry.name}</span>
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-50 shrink-0 ml-2" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[calc(100vw-2.5rem)] max-w-sm p-0" align="start">
+                  <Input
+                    type="text"
+                    placeholder="Search country or code"
+                    value={countrySearch}
+                    onChange={(e) => setCountrySearch(e.target.value)}
+                    className="rounded-none border-0 border-b px-3 py-3 focus-visible:ring-0"
+                    autoFocus
+                  />
+                  <div className="max-h-60 overflow-y-auto p-1">
+                    {filteredCountries.map((country) => (
+                      <button
+                        key={country.code}
+                        type="button"
+                        className="w-full flex items-center rounded-sm px-2 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
+                        onClick={() => {
+                          setSelectedCountry(country);
+                          setLocalNumber((prev) => formatLocalNumber(prev, country.maxLength));
+                          setCountrySearch("");
+                          setCountryOpen(false);
+                          setError(null);
+                        }}
+                      >
+                        <span className="mr-2">{country.flag}</span>
+                        <span className="text-muted-foreground">+{country.dialCode}</span>
+                        <span className="ml-2">{country.name}</span>
+                      </button>
+                    ))}
+                    {filteredCountries.length === 0 && (
+                      <p className="px-2 py-3 text-sm text-muted-foreground text-center">
+                        No country found
+                      </p>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
               <Input
                 type="tel"
                 inputMode="numeric"
