@@ -809,7 +809,7 @@ const Index = () => {
                   <li>Your Mera Rashan Card will not work.</li>
                   <li>Ration Codes cannot be generated.</li>
                   <li>You can still log in.</li>
-                  <li>Restore full access whenever you need to.</li>
+                  <li>Restore full access whenever you need.</li>
                 </ul>
               </div>
             </div>
