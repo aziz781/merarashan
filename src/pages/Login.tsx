@@ -20,7 +20,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
