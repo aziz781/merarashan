@@ -806,10 +806,10 @@ const Index = () => {
               <div className="text-foreground space-y-1">
                 <p>While your account is frozen:</p>
                 <ul className="list-disc pl-4 space-y-1">
-                  <li><strong>Card Inactive:</strong> Your Mera Rashan Card will not work.</li>
-                  <li><strong>No New Codes:</strong> Ration Codes cannot be generated.</li>
-                  <li><strong>View Only:</strong> You can still log in to view your cards, rashans, and statements.</li>
-                  <li><strong>Unfreeze Anytime:</strong> Restore full access whenever you need to.</li>
+                  <li>Your Mera Rashan Card will not work.</li>
+                  <li>Ration Codes cannot be generated.</li>
+                  <li>You can still log in to view your cards, rashans, and statements.</li>
+                  <li>Restore full access whenever you need to.</li>
                 </ul>
               </div>
             </div>
