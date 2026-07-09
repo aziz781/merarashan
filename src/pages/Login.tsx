@@ -24,11 +24,12 @@ import {
 
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 
-const mobileSchema = z
-  .string()
-  .min(6, "Enter a valid mobile number.")
-  .max(15, "Too long")
-  .regex(/^\d+$/, "Digits only");
+function getMobileSchema(country: Country) {
+  return z
+    .string()
+    .regex(/^\d+$/, "Digits only")
+    .length(country.maxLength, `Enter a valid ${country.name} number (${country.maxLength} digits)`);
+}
 
 type Step = "mobile" | "otp" | "account_not_found";
 
