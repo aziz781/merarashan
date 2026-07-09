@@ -816,7 +816,7 @@ const Index = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
-                    <span>You can still log in.</span>
+                    <span>You can still log in to view.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
