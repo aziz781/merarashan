@@ -8,6 +8,19 @@ import { toast } from "@/hooks/use-toast";
 import { formatMobile } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
+import {
+  COUNTRIES,
+  detectCountry,
+  getCountryByCode,
+  formatLocalNumber,
+  buildFullNumber,
+} from "@/lib/countries";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
 
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 
@@ -22,9 +35,18 @@ type Step = "mobile" | "otp" | "account_not_found";
 export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
   const [step, setStep] = useState<Step>("mobile");
   const [mobile, setMobile] = useState("");
+  const [localNumber, setLocalNumber] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Detect the user's country from device timezone/language on mount.
+  useEffect(() => {
+    const detected = detectCountry();
+    const country = getCountryByCode(detected) ?? COUNTRIES[0];
+    setSelectedCountry(country);
+  }, []);
 
   // If we were just kicked back here because a previous session resolved to
   // an account-not-found state (e.g. customers fetch returned 403/404), show
@@ -33,12 +55,18 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
     try {
       const flagged = localStorage.getItem("mr_account_not_found");
       if (flagged) {
-        setMobile(flagged);
+        const cleaned = formatMobile(flagged);
+        const country = COUNTRIES.find((c) => cleaned.startsWith(c.dialCode)) ?? COUNTRIES[0];
+        const local = cleaned.slice(country.dialCode.length);
+        setSelectedCountry(country);
+        setLocalNumber(formatLocalNumber(local, country.maxLength));
+        setMobile(cleaned);
         setStep("account_not_found");
         localStorage.removeItem("mr_account_not_found");
       }
     } catch { /* ignore */ }
   }, []);
+
 
 
   const resetToMobile = () => {
@@ -153,7 +181,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
 
   const submitMobile = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleaned = formatMobile(mobile);
+    const cleaned = buildFullNumber(selectedCountry.dialCode, localNumber);
     const parsed = mobileSchema.safeParse(cleaned);
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
@@ -224,20 +252,46 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
         </p>
         {step === "mobile" && (
           <form onSubmit={submitMobile} className="space-y-3">
-            <Input
-              type="tel"
-              inputMode="numeric"
-              autoComplete="tel"
-              maxLength={15}
-              placeholder="923030812222"
-              value={mobile}
-              onChange={(e) => {
-                setMobile(e.target.value.replace(/\D/g, ""));
-                setError(null);
-              }}
-              className="h-12 text-base text-left"
-              disabled={loading}
-            />
+            <div className="flex gap-2">
+              <Select
+                value={selectedCountry.code}
+                onValueChange={(code) => {
+                  const country = getCountryByCode(code) ?? COUNTRIES[0];
+                  setSelectedCountry(country);
+                  setLocalNumber((prev) => formatLocalNumber(prev, country.maxLength));
+                  setError(null);
+                }}
+                disabled={loading}
+              >
+                <SelectTrigger className="h-12 w-[7rem] shrink-0 text-base px-2">
+                  <span className="mr-1.5">{selectedCountry.flag}</span>
+                  <span className="text-muted-foreground">+{selectedCountry.dialCode}</span>
+                </SelectTrigger>
+                <SelectContent>
+                  {COUNTRIES.map((country) => (
+                    <SelectItem key={country.code} value={country.code}>
+                      <span className="mr-2">{country.flag}</span>
+                      <span className="text-muted-foreground">+{country.dialCode}</span>
+                      <span className="ml-2">{country.name}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                maxLength={selectedCountry.maxLength}
+                placeholder={selectedCountry.placeholder}
+                value={localNumber}
+                onChange={(e) => {
+                  setLocalNumber(formatLocalNumber(e.target.value, selectedCountry.maxLength));
+                  setError(null);
+                }}
+                className="h-12 text-base text-left flex-1"
+                disabled={loading}
+              />
+            </div>
             {error && <p className="text-xs text-destructive">{error}</p>}
             <Button
               type="submit"
