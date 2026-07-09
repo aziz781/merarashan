@@ -831,7 +831,15 @@ const Index = () => {
                 </ul>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground"><strong>Are you sure you want to freeze your account?</strong></p>
+            <label className="flex items-start gap-2 text-sm text-muted-foreground cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-1 h-4 w-4 rounded border-input text-primary focus:ring-primary accent-primary"
+                checked={freezeConfirmed}
+                onChange={(e) => setFreezeConfirmed(e.target.checked)}
+              />
+              <span>I understand and want to freeze my account.</span>
+            </label>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={freezing}>Cancel</AlertDialogCancel>
