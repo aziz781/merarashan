@@ -796,7 +796,7 @@ const Index = () => {
 
       <AlertDialog open={freezeConfirmOpen} onOpenChange={(o) => !freezing && setFreezeConfirmOpen(o)}>
         <AlertDialogContent>
-          <AlertDialogHeader>
+          <AlertDialogHeader className="text-left sm:text-left">
             <AlertDialogTitle>Confirm freeze account</AlertDialogTitle>
             <AlertDialogDescription>
               Freezing your account is temporary and can be <em className="font-semibold">undone later</em>.
