@@ -808,7 +808,7 @@ const Index = () => {
                 <ul className="list-disc pl-4 space-y-1">
                   <li>Your Mera Rashan Card will not work.</li>
                   <li>Ration Codes cannot be generated.</li>
-                  <li>You can still log in to view your cards, rashans, and statements.</li>
+                  <li>You can still log in.</li>
                   <li>Restore full access whenever you need to.</li>
                 </ul>
               </div>
