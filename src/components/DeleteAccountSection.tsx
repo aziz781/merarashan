@@ -102,10 +102,10 @@ export function DeleteAccountSection({
           <p className="font-medium mb-1">
             If you would still like to delete your account, please make sure:
           </p>
-          <ol className="list-decimal pl-5 space-y-0.5 text-sm">
-            <li>All Rashan transactions are complete</li>
-            <li>Your account balance is zero</li>
-          </ol>
+          <ul className="list-disc pl-4 space-y-0.5 text-sm text-left">
+            <li>All Rashan transactions are complete.</li>
+            <li>Your account balance is zero.</li>
+          </ul>
         </AlertDescription>
       </Alert>
 
