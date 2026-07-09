@@ -153,9 +153,9 @@ export function getCountryByCode(code: string): Country | undefined {
 }
 
 export function formatLocalNumber(input: string, maxLength: number): string {
-  return input.replace(/\D/g, "").slice(0, maxLength);
+  return input.replace(/\D/g, "").replace(/^0+/, "").slice(0, maxLength);
 }
 
 export function buildFullNumber(dialCode: string, localNumber: string): string {
-  return dialCode + localNumber.replace(/\D/g, "");
+  return dialCode + localNumber.replace(/\D/g, "").replace(/^0+/, "");
 }
