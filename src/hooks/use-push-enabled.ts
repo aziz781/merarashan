@@ -10,6 +10,17 @@ import {
 
 const NATIVE_ENABLED_KEY = "mr_native_push_enabled";
 
+/** Event fired whenever push permission/subscription state may have changed. */
+export const PUSH_PERMISSION_CHANGED_EVENT = "mr:push-permission-changed";
+
+/** Broadcast so all listening hooks/components refresh their view of push state. */
+export function notifyPushPermissionChanged(): void {
+  try {
+    window.dispatchEvent(new CustomEvent(PUSH_PERMISSION_CHANGED_EVENT));
+  } catch { /* ignore */ }
+}
+
+
 async function computePushEnabled(): Promise<boolean> {
   try {
     if (isNativePlatform()) {
@@ -44,6 +55,7 @@ export function usePushEnabled(): { enabled: boolean | null; refresh: () => Prom
   const refresh = useCallback(async () => {
     const next = await computePushEnabled();
     if (!cancelledRef.current) setEnabled(next);
+    notifyPushPermissionChanged();
   }, []);
 
   useEffect(() => {
@@ -53,7 +65,15 @@ export function usePushEnabled(): { enabled: boolean | null; refresh: () => Prom
     const onVis = () => {
       if (document.visibilityState === "visible") void refresh();
     };
+    const onChanged = () => {
+      // Re-read state without re-broadcasting (avoid loops).
+      void (async () => {
+        const next = await computePushEnabled();
+        if (!cancelledRef.current) setEnabled(next);
+      })();
+    };
     document.addEventListener("visibilitychange", onVis);
+    window.addEventListener(PUSH_PERMISSION_CHANGED_EVENT, onChanged);
 
     let removeResume: (() => void) | null = null;
     if (isNativePlatform()) {
@@ -64,9 +84,11 @@ export function usePushEnabled(): { enabled: boolean | null; refresh: () => Prom
     return () => {
       cancelledRef.current = true;
       document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener(PUSH_PERMISSION_CHANGED_EVENT, onChanged);
       removeResume?.();
     };
   }, [refresh]);
 
   return { enabled, refresh };
 }
+
