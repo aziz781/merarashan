@@ -183,12 +183,13 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
 
   const submitMobile = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleaned = buildFullNumber(selectedCountry.dialCode, localNumber);
-    const parsed = mobileSchema.safeParse(cleaned);
+    const localDigits = localNumber.replace(/\D/g, "");
+    const parsed = getMobileSchema(selectedCountry).safeParse(localDigits);
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
       return;
     }
+    const cleaned = buildFullNumber(selectedCountry.dialCode, localNumber);
     setMobile(cleaned);
     setLoading(true);
     // Always check the account exists first — even bypass numbers must map
