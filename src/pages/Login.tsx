@@ -267,7 +267,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
                   <span className="mr-1.5">{selectedCountry.flag}</span>
                   <span className="text-muted-foreground">+{selectedCountry.dialCode}</span>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="min-w-56 w-auto">
                   {COUNTRIES.map((country) => (
                     <SelectItem key={country.code} value={country.code}>
                       <span className="mr-2">{country.flag}</span>
