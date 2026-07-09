@@ -87,12 +87,15 @@ export function NotificationPermissionBadge({
     };
     document.addEventListener("visibilitychange", onVis);
     window.addEventListener("focus", refresh);
+    window.addEventListener(PUSH_PERMISSION_CHANGED_EVENT, refresh);
     return () => {
       cancelled = true;
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("focus", refresh);
+      window.removeEventListener(PUSH_PERMISSION_CHANGED_EVENT, refresh);
     };
   }, []);
+
 
   if (!isNativePlatform() || !ready) return null;
 
