@@ -253,20 +253,45 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
         </p>
         {step === "mobile" && (
           <form onSubmit={submitMobile} className="space-y-3">
-            <Input
-              type="tel"
-              inputMode="numeric"
-              autoComplete="tel"
-              maxLength={15}
-              placeholder="923030812222"
-              value={mobile}
-              onChange={(e) => {
-                setMobile(e.target.value.replace(/\D/g, ""));
-                setError(null);
-              }}
-              className="h-12 text-base text-left"
-              disabled={loading}
-            />
+            <div className="flex gap-2">
+              <Select
+                value={selectedCountry.code}
+                onValueChange={(code) => {
+                  const country = getCountryByCode(code) ?? COUNTRIES[0];
+                  setSelectedCountry(country);
+                  setLocalNumber((prev) => formatLocalNumber(prev, country.maxLength));
+                  setError(null);
+                }}
+                disabled={loading}
+              >
+                <SelectTrigger className="h-12 w-[8.5rem] shrink-0 text-base px-2">
+                  <SelectValue placeholder="Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COUNTRIES.map((country) => (
+                    <SelectItem key={country.code} value={country.code}>
+                      <span className="mr-2">{country.flag}</span>
+                      <span className="text-muted-foreground">+{country.dialCode}</span>
+                      <span className="ml-2">{country.name}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                maxLength={selectedCountry.maxLength}
+                placeholder={selectedCountry.placeholder}
+                value={localNumber}
+                onChange={(e) => {
+                  setLocalNumber(formatLocalNumber(e.target.value, selectedCountry.maxLength));
+                  setError(null);
+                }}
+                className="h-12 text-base text-left flex-1"
+                disabled={loading}
+              />
+            </div>
             {error && <p className="text-xs text-destructive">{error}</p>}
             <Button
               type="submit"
