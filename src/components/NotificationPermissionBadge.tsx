@@ -93,7 +93,6 @@ export function NotificationPermissionBadge({
   }, []);
 
   if (!isNativePlatform() || !ready) return null;
-  if (isNativePlatform() || !ready) return null;
 
   const os: "iOS" | "Android" = isIOSNative()
     ? "iOS"
@@ -110,11 +109,12 @@ export function NotificationPermissionBadge({
         role="status"
         aria-label={`${meta.label}`}
       >
-
+        <Icon className={`h-3.5 w-3.5 shrink-0 ${meta.iconClassName}`} aria-hidden="true" />
         <span className="truncate">{meta.label}</span>
       </div>
     );
   }
+
 
   return (
     <div
@@ -122,7 +122,9 @@ export function NotificationPermissionBadge({
       role="status"
       aria-label={`${meta.label}`}
     >
+      <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${meta.iconClassName}`} aria-hidden="true" />
       <div className="min-w-0">
+
         <p className="font-semibold leading-tight">
           {meta.label}
         </p>
