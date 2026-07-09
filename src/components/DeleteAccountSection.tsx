@@ -31,6 +31,8 @@ export function DeleteAccountSection({
   const [open, setOpen] = useState(false);
   const [customerNumber, setCustomerNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+
 
   const CUSTOMER_NUMBER_REGEX = /^PYR[A-Z0-9]+$/;
   const trimmed = customerNumber.trim().toUpperCase();
