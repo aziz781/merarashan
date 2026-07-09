@@ -36,9 +36,18 @@ type Step = "mobile" | "otp" | "account_not_found";
 export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
   const [step, setStep] = useState<Step>("mobile");
   const [mobile, setMobile] = useState("");
+  const [localNumber, setLocalNumber] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Detect the user's country from device timezone/language on mount.
+  useEffect(() => {
+    const detected = detectCountry();
+    const country = getCountryByCode(detected) ?? COUNTRIES[0];
+    setSelectedCountry(country);
+  }, []);
 
   // If we were just kicked back here because a previous session resolved to
   // an account-not-found state (e.g. customers fetch returned 403/404), show
@@ -47,12 +56,18 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
     try {
       const flagged = localStorage.getItem("mr_account_not_found");
       if (flagged) {
-        setMobile(flagged);
+        const cleaned = formatMobile(flagged);
+        const country = COUNTRIES.find((c) => cleaned.startsWith(c.dialCode)) ?? COUNTRIES[0];
+        const local = cleaned.slice(country.dialCode.length);
+        setSelectedCountry(country);
+        setLocalNumber(formatLocalNumber(local, country.maxLength));
+        setMobile(cleaned);
         setStep("account_not_found");
         localStorage.removeItem("mr_account_not_found");
       }
     } catch { /* ignore */ }
   }, []);
+
 
 
   const resetToMobile = () => {
