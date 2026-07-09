@@ -10,6 +10,17 @@ import {
 
 const NATIVE_ENABLED_KEY = "mr_native_push_enabled";
 
+/** Event fired whenever push permission/subscription state may have changed. */
+export const PUSH_PERMISSION_CHANGED_EVENT = "mr:push-permission-changed";
+
+/** Broadcast so all listening hooks/components refresh their view of push state. */
+export function notifyPushPermissionChanged(): void {
+  try {
+    window.dispatchEvent(new CustomEvent(PUSH_PERMISSION_CHANGED_EVENT));
+  } catch { /* ignore */ }
+}
+
+
 async function computePushEnabled(): Promise<boolean> {
   try {
     if (isNativePlatform()) {
