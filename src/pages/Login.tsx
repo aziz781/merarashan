@@ -250,7 +250,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
         <h1 className="sr-only">Mera Rashan</h1>
         <p className="text-sm text-muted-foreground text-center mt-1 mb-6">
           {step === "mobile" && "Sign in with your mobile number"}
-          {step === "otp" && `Enter the code sent to ${mobile}`}
+          {step === "otp" && `Enter the code sent to ${mobile} (Sent to SMS & WhatsApp)`}
           {step === "account_not_found" && "We couldn't find an account"}
         </p>
         {step === "mobile" && (
