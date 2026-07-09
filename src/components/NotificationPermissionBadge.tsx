@@ -127,7 +127,7 @@ export function NotificationPermissionBadge({
       role="status"
       aria-label={`${meta.label}`}
     >
-      <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${meta.iconClassName}`} aria-hidden="true" />
+  
       <div className="min-w-0">
 
         <p className="font-semibold leading-tight">
