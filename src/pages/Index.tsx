@@ -849,7 +849,7 @@ const Index = () => {
                 setFreezeConfirmOpen(false);
                 void handleFreezeAccount();
               }}
-              disabled={freezing}
+              disabled={freezing || !freezeConfirmed}
               className="bg-green-500 text-white hover:bg-green-600"
             >
               Freeze account
