@@ -36,6 +36,8 @@ export const COUNTRIES: Country[] = [
   { code: "PT", name: "Portugal", dialCode: "351", flag: "🇵🇹", placeholder: "912345678", maxLength: 9 },
   { code: "GR", name: "Greece", dialCode: "30", flag: "🇬🇷", placeholder: "6912345678", maxLength: 10 },
   { code: "TR", name: "Turkey", dialCode: "90", flag: "🇹🇷", placeholder: "5321234567", maxLength: 10 },
+  { code: "JP", name: "Japan", dialCode: "81", flag: "🇯🇵", placeholder: "8012345678", maxLength: 10 },
+  { code: "CN", name: "China", dialCode: "86", flag: "🇨🇳", placeholder: "13800138000", maxLength: 11 },
 ];
 
 const TIMEZONE_COUNTRY_MAP: Record<string, string> = {
@@ -71,6 +73,12 @@ const TIMEZONE_COUNTRY_MAP: Record<string, string> = {
   "Europe/Lisbon": "PT",
   "Europe/Athens": "GR",
   "Europe/Istanbul": "TR",
+  "Asia/Tokyo": "JP",
+  "Asia/Shanghai": "CN",
+  "Asia/Hong_Kong": "CN",
+  "Asia/Beijing": "CN",
+  "Asia/Chongqing": "CN",
+  "Asia/Urumqi": "CN",
 };
 
 const LANGUAGE_COUNTRY_MAP: Record<string, string> = {
@@ -111,6 +119,10 @@ const LANGUAGE_COUNTRY_MAP: Record<string, string> = {
   "pt-PT": "PT",
   "el-GR": "GR",
   "tr-TR": "TR",
+  "ja-JP": "JP",
+  "zh-CN": "CN",
+  "zh-HK": "CN",
+  "zh-SG": "CN",
 };
 
 export function detectCountry(): string {
@@ -143,6 +155,8 @@ export function detectCountry(): string {
     if (langPrefix === "pt") return "PT";
     if (langPrefix === "el") return "GR";
     if (langPrefix === "tr") return "TR";
+    if (langPrefix === "ja") return "JP";
+    if (langPrefix === "zh") return "CN";
   } catch { /* ignore */ }
 
   return "PK";
