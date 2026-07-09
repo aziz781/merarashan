@@ -248,11 +248,17 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
       <Card className="w-full max-w-sm p-8 shadow-[var(--shadow-card)] border-0 bg-card/80 backdrop-blur">
         <img src={meraRashanLogo} alt="Mera Rashan Card" className="w-32 h-32 mx-auto mb-4 object-contain" />
         <h1 className="sr-only">Mera Rashan</h1>
-        <p className="text-sm text-muted-foreground text-center mt-1 mb-6">
-          {step === "mobile" && "Sign in with your mobile number"}
-          {step === "otp" && `Enter the code sent to ${mobile} (Sent to SMS & WhatsApp)`}
-          {step === "account_not_found" && "We couldn't find an account"}
-        </p>
+        <div className="text-sm text-muted-foreground text-center mt-1 mb-6 space-y-0.5">
+          {step === "mobile" && <p>Sign in with your mobile number</p>}
+          {step === "otp" && (
+            <>
+              <p>Enter the code sent to</p>
+              <p className="font-semibold text-foreground">{mobile}</p>
+              <p className="text-xs">(Sent to SMS & WhatsApp)</p>
+            </>
+          )}
+          {step === "account_not_found" && <p>We couldn't find an account</p>}
+        </div>
         {step === "mobile" && (
           <form onSubmit={submitMobile} className="space-y-3">
             <div className="flex flex-col gap-2">
