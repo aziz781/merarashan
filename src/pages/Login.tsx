@@ -8,6 +8,20 @@ import { toast } from "@/hooks/use-toast";
 import { formatMobile } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
+import {
+  COUNTRIES,
+  detectCountry,
+  getCountryByCode,
+  formatLocalNumber,
+  buildFullNumber,
+} from "@/lib/countries";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 
