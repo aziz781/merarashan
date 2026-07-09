@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import {
   COUNTRIES,
+  Country,
   detectCountry,
   getCountryByCode,
   formatLocalNumber,
@@ -24,11 +25,12 @@ import {
 
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 
-const mobileSchema = z
-  .string()
-  .min(6, "Enter a valid mobile number.")
-  .max(15, "Too long")
-  .regex(/^\d+$/, "Digits only");
+function getMobileSchema(country: Country) {
+  return z
+    .string()
+    .regex(/^\d+$/, "Digits only")
+    .length(country.maxLength, `Enter a valid ${country.name} number (${country.maxLength} digits)`);
+}
 
 type Step = "mobile" | "otp" | "account_not_found";
 
@@ -181,12 +183,13 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
 
   const submitMobile = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleaned = buildFullNumber(selectedCountry.dialCode, localNumber);
-    const parsed = mobileSchema.safeParse(cleaned);
+    const localDigits = localNumber.replace(/\D/g, "");
+    const parsed = getMobileSchema(selectedCountry).safeParse(localDigits);
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
       return;
     }
+    const cleaned = buildFullNumber(selectedCountry.dialCode, localNumber);
     setMobile(cleaned);
     setLoading(true);
     // Always check the account exists first — even bypass numbers must map
