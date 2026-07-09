@@ -7,6 +7,8 @@ import {
   isAndroidNative,
   getNativeNotificationPermission,
 } from "@/lib/nativePush";
+import { PUSH_PERMISSION_CHANGED_EVENT } from "@/hooks/use-push-enabled";
+
 
 type Status = "granted" | "denied" | "prompt" | "prompt-with-rationale" | "unknown";
 
