@@ -155,6 +155,8 @@ export function detectCountry(): string {
     if (langPrefix === "pt") return "PT";
     if (langPrefix === "el") return "GR";
     if (langPrefix === "tr") return "TR";
+    if (langPrefix === "ja") return "JP";
+    if (langPrefix === "zh") return "CN";
   } catch { /* ignore */ }
 
   return "PK";
