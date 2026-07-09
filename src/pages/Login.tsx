@@ -264,8 +264,9 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
                 }}
                 disabled={loading}
               >
-                <SelectTrigger className="h-12 w-[8.5rem] shrink-0 text-base px-2">
-                  <SelectValue placeholder="Country" />
+                <SelectTrigger className="h-12 w-[7rem] shrink-0 text-base px-2">
+                  <span className="mr-1.5">{selectedCountry.flag}</span>
+                  <span className="text-muted-foreground">+{selectedCountry.dialCode}</span>
                 </SelectTrigger>
                 <SelectContent>
                   {COUNTRIES.map((country) => (
