@@ -111,7 +111,17 @@ export function DeleteAccountSection({
         </AlertDescription>
       </Alert>
 
-      <Button variant="destructive" onClick={() => setOpen(true)} className="w-full">
+      <label className="flex items-start gap-2 text-sm text-muted-foreground cursor-pointer">
+        <input
+          type="checkbox"
+          className="mt-1 h-4 w-4 rounded border-input text-primary focus:ring-primary accent-primary"
+          checked={confirmed}
+          onChange={(e) => setConfirmed(e.target.checked)}
+        />
+        <span>I understand and want to delete my account.</span>
+      </label>
+
+      <Button variant="destructive" onClick={() => setOpen(true)} className="w-full" disabled={!confirmed}>
         Delete account
       </Button>
 
