@@ -182,7 +182,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
 
   const submitMobile = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleaned = formatMobile(mobile);
+    const cleaned = buildFullNumber(selectedCountry.dialCode, localNumber);
     const parsed = mobileSchema.safeParse(cleaned);
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
