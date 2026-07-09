@@ -805,11 +805,23 @@ const Index = () => {
               <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               <div className="text-foreground space-y-1">
                 <p>While your account is frozen:</p>
-                <ul className="list-disc pl-4 space-y-1">
-                  <li>Your Mera Rashan Card will not work.</li>
-                  <li>Ration Codes cannot be generated.</li>
-                  <li>You can still log in.</li>
-                  <li>Restore full access whenever you need.</li>
+                <ul className="space-y-1">
+                  <li className="flex items-start gap-2">
+                    <X className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+                    <span>Your Mera Rashan Card will not work.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <X className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+                    <span>Ration Codes cannot be generated.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
+                    <span>You can still log in.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
+                    <span>Restore full access whenever you need.</span>
+                  </li>
                 </ul>
               </div>
             </div>
