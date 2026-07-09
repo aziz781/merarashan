@@ -255,7 +255,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
         </p>
         {step === "mobile" && (
           <form onSubmit={submitMobile} className="space-y-3">
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2">
               <Select
                 value={selectedCountry.code}
                 onValueChange={(code) => {
@@ -266,7 +266,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
                 }}
                 disabled={loading}
               >
-                <SelectTrigger className="h-12 w-[7rem] shrink-0 text-base px-2">
+                <SelectTrigger className="h-12 w-full text-base px-2">
                   <span className="mr-1.5">{selectedCountry.flag}</span>
                   <span className="text-muted-foreground">+{selectedCountry.dialCode}</span>
                 </SelectTrigger>
