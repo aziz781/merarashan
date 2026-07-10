@@ -256,8 +256,13 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
       <Card className="w-full max-w-sm p-8 shadow-[var(--shadow-card)] border-0 bg-card/80 backdrop-blur">
         <img src={meraRashanLogo} alt="Mera Rashan Card" className="w-32 h-32 mx-auto mb-4 object-contain" />
         <h1 className="sr-only">Mera Rashan</h1>
-        <div className="text-sm text-muted-foreground text-center mt-1 mb-6 space-y-0.5">
-          {step === "mobile" && <p>Sign in with your mobile number</p>}
+        <div className="text-sm text-muted-foreground text-center mt-1 mb-6 space-y-1">
+          {step === "mobile" && (
+            <>
+              <h2 className="text-xl font-semibold text-foreground">Log in to your account</h2>
+              <p>Enter the mobile number associated with your Mera Rashan account.</p>
+            </>
+          )}
           {step === "otp" && (
             <>
               <p>Enter the code sent to</p>
