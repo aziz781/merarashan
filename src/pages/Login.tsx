@@ -316,7 +316,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
                   type="button"
                   variant="outline"
                   disabled={loading}
-                  className="h-12 w-auto shrink-0 px-2 text-base font-normal"
+                  className="h-12 w-auto shrink-0 px-3 text-base font-normal border-0 rounded-none rounded-l-md bg-transparent hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                 >
                   <span className="flex items-center overflow-hidden">
                     <span className="mr-1.5">{selectedCountry.flag}</span>
