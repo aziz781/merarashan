@@ -40,6 +40,14 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
   const [loading, setLoading] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
   const [countrySearch, setCountrySearch] = useState("");
+  const [resendIn, setResendIn] = useState(0);
+
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const t = setInterval(() => setResendIn((n) => (n > 0 ? n - 1 : 0)), 1000);
+    return () => clearInterval(t);
+  }, [resendIn]);
+
 
   const filteredCountries = useMemo(() => {
     const q = countrySearch.trim().toLowerCase();
@@ -136,6 +144,8 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to send code");
       setStep("otp");
+      setResendIn(30);
+
       toast({ title: "Code sent", description: `OTP sent to ${m}` });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to send code");
@@ -471,9 +481,6 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
             </div>
 
             {error && <p className="text-xs text-destructive">{error}</p>}
-            <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={loading}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify & continue"}
-            </Button>
             <div className="flex items-center justify-between text-xs">
               <button
                 type="button"
@@ -483,17 +490,24 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
               >
                 Change number
               </button>
-              <button
-                type="button"
-                className="text-primary font-medium hover:underline"
-                onClick={() => sendOtp(mobile)}
-                disabled={loading}
-              >
-                Resend code
-              </button>
+              {resendIn > 0 ? (
+                <span className="text-muted-foreground">
+                  Resend code in {resendIn}s
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  className="text-primary font-medium hover:underline disabled:opacity-50"
+                  onClick={() => sendOtp(mobile)}
+                  disabled={loading}
+                >
+                  Resend code
+                </button>
+              )}
             </div>
           </form>
         )}
+
         {step === "account_not_found" && (
           <div className="space-y-4">
             <div className="rounded-lg border border-border bg-muted/40 p-4 text-center">
