@@ -492,20 +492,29 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
               >
                 Change number
               </button>
-              {resendIn > 0 ? (
+              {loading && resendIn === 0 ? (
+                <span className="flex items-center gap-1 text-muted-foreground">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Resending…
+                </span>
+              ) : resendIn > 0 ? (
                 <span className="text-muted-foreground">
-                  Resend code in {resendIn}s
+                  Resend code in {resendIn} seconds
                 </span>
               ) : (
                 <button
                   type="button"
                   className="text-primary font-medium hover:underline disabled:opacity-50"
-                  onClick={() => sendOtp(mobile)}
+                  onClick={() => {
+                    setResendIn(30);
+                    sendOtp(mobile);
+                  }}
                   disabled={loading}
                 >
                   Resend code
                 </button>
               )}
+
             </div>
           </form>
         )}
