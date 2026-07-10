@@ -499,7 +499,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
                 </span>
               ) : resendIn > 0 ? (
                 <span className="text-muted-foreground">
-                  Resend code in <span className="font-semibold text-foreground">{resendIn}</span> seconds
+                  Resend code in <span className="font-semibold text-foreground">{resendIn} seconds</span>
                 </span>
               ) : (
                 <button
