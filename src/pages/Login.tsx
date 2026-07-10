@@ -252,12 +252,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
     sendOtp(cleaned);
   };
 
-  const submitOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!/^\d{6}$/.test(code)) {
-      setError("Enter the 6-digit code");
-      return;
-    }
+  const verifyOtpCode = async (otpCode: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -268,7 +263,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ mobile, code }),
+        body: JSON.stringify({ mobile, code: otpCode }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Verification failed");
@@ -285,6 +280,63 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
       setLoading(false);
     }
   };
+
+  const submitOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!/^\d{6}$/.test(code)) {
+      setError("Enter the 6-digit code");
+      return;
+    }
+    await verifyOtpCode(code);
+  };
+
+  const otpInputsRef = useRef<Array<HTMLInputElement | null>>([]);
+
+  const handleOtpChange = (index: number, value: string) => {
+    const digits = value.replace(/\D/g, "");
+    if (!digits) {
+      const next = code.split("");
+      next[index] = "";
+      const joined = next.join("").slice(0, 6);
+      setCode(joined);
+      setError(null);
+      return;
+    }
+    const current = code.split("");
+    let i = index;
+    for (const ch of digits) {
+      if (i >= 6) break;
+      current[i] = ch;
+      i++;
+    }
+    const joined = current.join("").slice(0, 6);
+    setCode(joined);
+    setError(null);
+    const focusIndex = Math.min(i, 5);
+    otpInputsRef.current[focusIndex]?.focus();
+    otpInputsRef.current[focusIndex]?.select();
+    if (joined.length === 6 && !loading) {
+      verifyOtpCode(joined);
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace") {
+      if (code[index]) {
+        const next = code.split("");
+        next[index] = "";
+        setCode(next.join(""));
+        setError(null);
+      } else if (index > 0) {
+        otpInputsRef.current[index - 1]?.focus();
+      }
+    } else if (e.key === "ArrowLeft" && index > 0) {
+      otpInputsRef.current[index - 1]?.focus();
+    } else if (e.key === "ArrowRight" && index < 5) {
+      otpInputsRef.current[index + 1]?.focus();
+    }
+  };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center px-5">
