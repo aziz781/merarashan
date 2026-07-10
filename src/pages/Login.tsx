@@ -144,6 +144,8 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to send code");
       setStep("otp");
+      setResendIn(30);
+
       toast({ title: "Code sent", description: `OTP sent to ${m}` });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to send code");
