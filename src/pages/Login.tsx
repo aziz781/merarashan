@@ -271,21 +271,20 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
           <form onSubmit={submitMobile} className="space-y-3">
             <div className="flex flex-col gap-2">
               <Popover open={countryOpen} onOpenChange={setCountryOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={loading}
-                    className="h-12 w-full justify-between px-2 text-base font-normal"
-                  >
-                    <span className="flex items-center overflow-hidden">
-                      <span className="mr-1.5">{selectedCountry.flag}</span>
-                      <span className="text-muted-foreground">+{selectedCountry.dialCode}</span>
-                      <span className="ml-2 truncate">{selectedCountry.name}</span>
-                    </span>
-                    <ChevronDown className="h-4 w-4 opacity-50 shrink-0 ml-2" />
-                  </Button>
-                </PopoverTrigger>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={loading}
+                  className="h-12 w-full justify-between px-2 text-base font-normal"
+                >
+                  <span className="flex items-center overflow-hidden">
+                    <span className="mr-1.5">{selectedCountry.flag}</span>
+                    <span className="text-muted-foreground">+{selectedCountry.dialCode}</span>
+                  </span>
+                  <ChevronDown className="h-4 w-4 opacity-50 shrink-0 ml-2" />
+                </Button>
+              </PopoverTrigger>
                 <PopoverContent className="w-[calc(100vw-2.5rem)] max-w-sm p-0" align="start">
                   <Input
                     type="text"
