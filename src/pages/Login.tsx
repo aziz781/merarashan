@@ -444,21 +444,32 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
         )}
         {step === "otp" && (
           <form onSubmit={submitOtp} className="space-y-3">
-            <Input
-              type="tel"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={6}
-              placeholder="6-digit code"
-              value={code}
-              onChange={(e) => {
-                setCode(e.target.value.replace(/\D/g, ""));
-                setError(null);
-              }}
-              className="h-12 text-base text-center tracking-[0.4em] font-semibold"
-              disabled={loading}
-              autoFocus
-            />
+            <div className="flex justify-between gap-2" onPaste={(e) => {
+              const text = e.clipboardData.getData("text");
+              if (/\d/.test(text)) {
+                e.preventDefault();
+                handleOtpChange(0, text);
+              }
+            }}>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Input
+                  key={i}
+                  ref={(el) => { otpInputsRef.current[i] = el; }}
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete={i === 0 ? "one-time-code" : "off"}
+                  maxLength={1}
+                  value={code[i] ?? ""}
+                  onChange={(e) => handleOtpChange(i, e.target.value)}
+                  onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                  onFocus={(e) => e.currentTarget.select()}
+                  className="h-12 w-full px-0 text-center text-lg font-semibold"
+                  disabled={loading}
+                  autoFocus={i === 0}
+                />
+              ))}
+            </div>
+
             {error && <p className="text-xs text-destructive">{error}</p>}
             <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={loading}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify & continue"}
