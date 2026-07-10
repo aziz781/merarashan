@@ -352,11 +352,14 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
           )}
           {step === "otp" && (
             <>
-              <p>Enter the code sent to</p>
-              <p className="font-semibold text-foreground">{mobile}</p>
-              <p className="text-xs">(Sent to SMS & WhatsApp)</p>
+              <h2 className="text-xl font-semibold text-foreground">Enter 6-digit the code</h2>
+              <p>
+                Code sent to <span className="font-semibold text-foreground">+{mobile}</span> if an
+                account exists with this number.
+              </p>
             </>
           )}
+
           {step === "account_not_found" && <p>We couldn't find an account</p>}
         </div>
         {step === "mobile" && (
