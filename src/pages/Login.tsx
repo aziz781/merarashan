@@ -28,6 +28,7 @@ function getMobileSchema(country: Country) {
 }
 
 type Step = "mobile" | "otp" | "account_not_found";
+const MOBILE_STORAGE_KEY = "mr_login_mobile";
 
 export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
   const [step, setStep] = useState<Step>("mobile");
@@ -76,6 +77,40 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
       }
     } catch { /* ignore */ }
   }, []);
+
+  // Restore the previously entered mobile number (unless we're showing the
+  // account-not-found state, which takes precedence).
+  useEffect(() => {
+    try {
+      const flagged = localStorage.getItem("mr_account_not_found");
+      if (flagged) return;
+      const saved = localStorage.getItem(MOBILE_STORAGE_KEY);
+      if (!saved) return;
+      const parsed = JSON.parse(saved) as { countryCode?: string; localNumber?: string };
+      if (!parsed.countryCode || !parsed.localNumber) return;
+      const country = getCountryByCode(parsed.countryCode) ?? COUNTRIES[0];
+      setSelectedCountry(country);
+      setLocalNumber(formatLocalNumber(parsed.localNumber, country.maxLength));
+    } catch { /* ignore */ }
+  }, []);
+
+  // Persist the mobile number as the user types so it survives page reloads.
+  useEffect(() => {
+    try {
+      const digits = localNumber.replace(/\D/g, "");
+      if (!digits) {
+        localStorage.removeItem(MOBILE_STORAGE_KEY);
+        return;
+      }
+      localStorage.setItem(
+        MOBILE_STORAGE_KEY,
+        JSON.stringify({ countryCode: selectedCountry.code, localNumber: digits }),
+      );
+    } catch { /* ignore */ }
+  }, [localNumber, selectedCountry]);
+
+
+
 
 
 
