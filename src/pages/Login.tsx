@@ -285,7 +285,9 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
       if (vErr) throw new Error(vErr.message);
       onLogin(mobile);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Verification failed");
+      const msg = e instanceof Error ? e.message : "Verification failed";
+      setError(/incorrect code/i.test(msg) ? "Wrong code. Please try again." : msg);
+
     } finally {
       setLoading(false);
     }
