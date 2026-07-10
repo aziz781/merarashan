@@ -309,7 +309,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
         </div>
         {step === "mobile" && (
           <form onSubmit={submitMobile} className="space-y-3">
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-row">
               <Popover open={countryOpen} onOpenChange={setCountryOpen}>
               <PopoverTrigger asChild>
                 <Button
