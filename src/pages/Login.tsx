@@ -40,6 +40,14 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
   const [loading, setLoading] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
   const [countrySearch, setCountrySearch] = useState("");
+  const [resendIn, setResendIn] = useState(0);
+
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const t = setInterval(() => setResendIn((n) => (n > 0 ? n - 1 : 0)), 1000);
+    return () => clearInterval(t);
+  }, [resendIn]);
+
 
   const filteredCountries = useMemo(() => {
     const q = countrySearch.trim().toLowerCase();
