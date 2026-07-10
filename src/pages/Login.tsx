@@ -27,6 +27,7 @@ function getMobileSchema(country: Country) {
     .length(country.maxLength, `Enter a valid ${country.name} number (${country.maxLength} digits)`);
 }
 
+type Step = "mobile" | "otp" | "account_not_found";
 const MOBILE_STORAGE_KEY = "mr_login_mobile";
 
 export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
