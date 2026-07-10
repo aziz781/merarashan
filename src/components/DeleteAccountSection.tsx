@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { AlertTriangle, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -101,12 +101,26 @@ export function DeleteAccountSection({
       <Alert variant="destructive" className="border-amber-500/50 text-amber-900 dark:text-amber-200 [&>svg]:text-amber-600">
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
-          <p className="font-medium mb-1">
-            If you would still like to delete your account, please make sure:
+          <p className="font-medium mb-2">
+            If you would still like to delete your account, then:
           </p>
-          <ul className="list-disc pl-4 space-y-0.5 text-sm text-left">
-            <li>All Rashan transactions are complete.</li>
-            <li>Your account balance is zero.</li>
+          <ul className="space-y-1.5 text-sm text-left">
+            <li className="flex items-start gap-2">
+              <X className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+              <span>Your Mera Rashan Cards will not work.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <X className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+              <span>Rashan Codes cannot be generated.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <X className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+              <span>You can't log in to the app.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <X className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+              <span>You can't restore the access.</span>
+            </li>
           </ul>
         </AlertDescription>
       </Alert>
