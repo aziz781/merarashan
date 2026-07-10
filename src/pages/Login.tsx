@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { ChevronDown, Loader2, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -252,12 +252,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
     sendOtp(cleaned);
   };
 
-  const submitOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!/^\d{6}$/.test(code)) {
-      setError("Enter the 6-digit code");
-      return;
-    }
+  const verifyOtpCode = async (otpCode: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -268,7 +263,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ mobile, code }),
+        body: JSON.stringify({ mobile, code: otpCode }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Verification failed");
@@ -286,6 +281,63 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
     }
   };
 
+  const submitOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!/^\d{6}$/.test(code)) {
+      setError("Enter the 6-digit code");
+      return;
+    }
+    await verifyOtpCode(code);
+  };
+
+  const otpInputsRef = useRef<Array<HTMLInputElement | null>>([]);
+
+  const handleOtpChange = (index: number, value: string) => {
+    const digits = value.replace(/\D/g, "");
+    if (!digits) {
+      const next = code.split("");
+      next[index] = "";
+      const joined = next.join("").slice(0, 6);
+      setCode(joined);
+      setError(null);
+      return;
+    }
+    const current = code.split("");
+    let i = index;
+    for (const ch of digits) {
+      if (i >= 6) break;
+      current[i] = ch;
+      i++;
+    }
+    const joined = current.join("").slice(0, 6);
+    setCode(joined);
+    setError(null);
+    const focusIndex = Math.min(i, 5);
+    otpInputsRef.current[focusIndex]?.focus();
+    otpInputsRef.current[focusIndex]?.select();
+    if (joined.length === 6 && !loading) {
+      verifyOtpCode(joined);
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace") {
+      if (code[index]) {
+        const next = code.split("");
+        next[index] = "";
+        setCode(next.join(""));
+        setError(null);
+      } else if (index > 0) {
+        otpInputsRef.current[index - 1]?.focus();
+      }
+    } else if (e.key === "ArrowLeft" && index > 0) {
+      otpInputsRef.current[index - 1]?.focus();
+    } else if (e.key === "ArrowRight" && index < 5) {
+      otpInputsRef.current[index + 1]?.focus();
+    }
+  };
+
+
   return (
     <div className="min-h-screen flex items-center justify-center px-5">
       <Card className="w-full max-w-sm p-8 shadow-[var(--shadow-card)] border-0 bg-card/80 backdrop-blur">
@@ -300,11 +352,14 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
           )}
           {step === "otp" && (
             <>
-              <p>Enter the code sent to</p>
-              <p className="font-semibold text-foreground">{mobile}</p>
-              <p className="text-xs">(Sent to SMS & WhatsApp)</p>
+              <h2 className="text-xl font-semibold text-foreground">Enter 6-digit the code</h2>
+              <p>
+                Code sent to <span className="font-semibold text-foreground">+{mobile}</span> if an
+                account exists with this number.
+              </p>
             </>
           )}
+
           {step === "account_not_found" && <p>We couldn't find an account</p>}
         </div>
         {step === "mobile" && (
@@ -389,21 +444,32 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
         )}
         {step === "otp" && (
           <form onSubmit={submitOtp} className="space-y-3">
-            <Input
-              type="tel"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={6}
-              placeholder="6-digit code"
-              value={code}
-              onChange={(e) => {
-                setCode(e.target.value.replace(/\D/g, ""));
-                setError(null);
-              }}
-              className="h-12 text-base text-center tracking-[0.4em] font-semibold"
-              disabled={loading}
-              autoFocus
-            />
+            <div className="flex justify-between gap-2" onPaste={(e) => {
+              const text = e.clipboardData.getData("text");
+              if (/\d/.test(text)) {
+                e.preventDefault();
+                handleOtpChange(0, text);
+              }
+            }}>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Input
+                  key={i}
+                  ref={(el) => { otpInputsRef.current[i] = el; }}
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete={i === 0 ? "one-time-code" : "off"}
+                  maxLength={1}
+                  value={code[i] ?? ""}
+                  onChange={(e) => handleOtpChange(i, e.target.value)}
+                  onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                  onFocus={(e) => e.currentTarget.select()}
+                  className="h-12 w-full px-0 text-center text-lg font-semibold"
+                  disabled={loading}
+                  autoFocus={i === 0}
+                />
+              ))}
+            </div>
+
             {error && <p className="text-xs text-destructive">{error}</p>}
             <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={loading}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify & continue"}
