@@ -309,14 +309,14 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
         </div>
         {step === "mobile" && (
           <form onSubmit={submitMobile} className="space-y-3">
-            <div className="flex flex-row">
+            <div className="flex flex-row items-stretch rounded-md border border-input bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
               <Popover open={countryOpen} onOpenChange={setCountryOpen}>
               <PopoverTrigger asChild>
                 <Button
                   type="button"
                   variant="outline"
                   disabled={loading}
-                  className="h-12 w-auto shrink-0 px-2 text-base font-normal"
+                  className="h-12 w-auto shrink-0 px-3 text-base font-normal border-0 rounded-none rounded-l-md bg-transparent hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                 >
                   <span className="flex items-center overflow-hidden">
                     <span className="mr-1.5">{selectedCountry.flag}</span>
@@ -372,7 +372,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
                   setLocalNumber(formatLocalNumber(e.target.value, selectedCountry.maxLength));
                   setError(null);
                 }}
-                className="h-12 text-base text-left flex-1"
+                className="h-12 text-base text-left flex-1 border-0 rounded-none rounded-r-md bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                 disabled={loading}
               />
             </div>
