@@ -372,7 +372,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
                   setLocalNumber(formatLocalNumber(e.target.value, selectedCountry.maxLength));
                   setError(null);
                 }}
-                className="h-12 text-base text-left flex-1"
+                className="h-12 text-base text-left flex-1 border-0 rounded-none rounded-r-md bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                 disabled={loading}
               />
             </div>
