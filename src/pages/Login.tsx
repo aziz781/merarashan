@@ -144,7 +144,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to send code");
       setStep("otp");
-      setResendIn(30);
+      setResendIn(120);
 
       toast({ title: "Code sent", description: `OTP sent to ${m}` });
     } catch (e) {
@@ -506,7 +506,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
                   type="button"
                   className="text-primary font-medium hover:underline disabled:opacity-50"
                   onClick={() => {
-                    setResendIn(30);
+                    setResendIn(120);
                     sendOtp(mobile);
                   }}
                   disabled={loading}
