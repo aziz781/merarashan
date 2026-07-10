@@ -438,7 +438,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
               style={{ background: "var(--gradient-primary)" }}
               disabled={loading}
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send code"}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Log in"}
             </Button>
           </form>
         )}
