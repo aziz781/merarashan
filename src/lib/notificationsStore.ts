@@ -121,7 +121,7 @@ export function addNotification(n: {
 export async function syncNotificationInbox(): Promise<void> {
   const { data, error } = await supabase
     .from("notification_inbox")
-    .select("id, title, body, url, created_at, month, year")
+    .select("id, title, body, url, created_at, month, year, read_at")
     .order("created_at", { ascending: false })
     .limit(100);
   if (error || !data) return;
@@ -136,7 +136,22 @@ export async function syncNotificationInbox(): Promise<void> {
       year: (n as { year?: string | null }).year ?? null,
     });
   }
+  // Reconcile local read state with server-side read_at.
+  const list = read();
+  let changed = false;
+  const next = list.map((n) => {
+    const row = data.find((d) => `k:inbox:${d.id}` === n.id);
+    if (!row) return n;
+    const serverRead = !!row.read_at;
+    if (serverRead !== n.read) {
+      changed = true;
+      return { ...n, read: serverRead };
+    }
+    return n;
+  });
+  if (changed) write(next);
 }
+
 
 function inboxIdFromLocalId(id: string): string | null {
   const prefix = "k:inbox:";

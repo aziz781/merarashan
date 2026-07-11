@@ -66,14 +66,23 @@ export default function Notifications() {
   useEffect(() => {
     setMobile(localStorage.getItem(MOBILE_KEY) || "");
     const unsub = subscribeNotifications(() => setItems(getNotifications()));
-    void syncNotificationInbox().finally(() => {
-      setItems(getNotifications());
-    });
+    const resync = () => {
+      void syncNotificationInbox().finally(() => setItems(getNotifications()));
+    };
+    resync();
     setItems(getNotifications());
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") resync();
+    };
+    window.addEventListener("focus", resync);
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
       unsub();
+      window.removeEventListener("focus", resync);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, []);
+
 
 
   const openNotification = (n: StoredNotification) => {
