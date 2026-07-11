@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowUp, Bell, BellOff, Home, Trash2, CheckCheck, Filter } from "lucide-react";
+import { ArrowLeft, ArrowUp, Bell, BellOff, Home, Loader2, RefreshCw, Trash2, CheckCheck, Filter } from "lucide-react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
