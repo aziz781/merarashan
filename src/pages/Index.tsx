@@ -339,10 +339,15 @@ const Index = () => {
   const [freezeConfirmOpen, setFreezeConfirmOpen] = useState(false);
   const [freezeConfirmed, setFreezeConfirmed] = useState(false);
   const [frozenInfoOpen, setFrozenInfoOpen] = useState(false);
+  const [unfreezeConfirmed, setUnfreezeConfirmed] = useState(false);
 
   useEffect(() => {
     if (!freezeConfirmOpen) setFreezeConfirmed(false);
   }, [freezeConfirmOpen]);
+
+  useEffect(() => {
+    if (!frozenInfoOpen) setUnfreezeConfirmed(false);
+  }, [frozenInfoOpen]);
 
   const handleFreezeAccount = useCallback(async () => {
     const customerNumber = resolvePayerId();
