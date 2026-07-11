@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowUp, Bell, BellOff, Home, Trash2, CheckCheck, Filter } from "lucide-react";
+import { ArrowLeft, ArrowUp, Bell, BellOff, Home, Loader2, RefreshCw, Trash2, CheckCheck, Filter } from "lucide-react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -47,6 +47,9 @@ function timeAgo(ts: number): string {
 
 const MOBILE_KEY = "mr_mobile";
 
+const PULL_THRESHOLD = 70;
+const PULL_MAX = 120;
+
 export default function Notifications() {
   const navigate = useNavigate();
   const [items, setItems] = useState<StoredNotification[]>(() => getNotifications());
@@ -55,6 +58,10 @@ export default function Notifications() {
   const [unreadOnly, setUnreadOnly] = useState<boolean>(false);
   const [showBackToTop, setShowBackToTop] = useState<boolean>(false);
   const [deleteAllOpen, setDeleteAllOpen] = useState<boolean>(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const pullStartY = useRef<number | null>(null);
+  const pulling = useRef(false);
 
   useEffect(() => {
     const onScroll = () => setShowBackToTop(window.scrollY > 400);
@@ -63,25 +70,83 @@ export default function Notifications() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const resync = useCallback(async () => {
+    await syncNotificationInbox();
+    setItems(getNotifications());
+  }, []);
+
   useEffect(() => {
     setMobile(localStorage.getItem(MOBILE_KEY) || "");
     const unsub = subscribeNotifications(() => setItems(getNotifications()));
-    const resync = () => {
-      void syncNotificationInbox().finally(() => setItems(getNotifications()));
-    };
-    resync();
+    void resync();
     setItems(getNotifications());
     const onVisibility = () => {
-      if (document.visibilityState === "visible") resync();
+      if (document.visibilityState === "visible") void resync();
     };
-    window.addEventListener("focus", resync);
+    const onFocus = () => void resync();
+    window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
       unsub();
-      window.removeEventListener("focus", resync);
+      window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, []);
+  }, [resync]);
+
+  const triggerRefresh = useCallback(async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    try {
+      await resync();
+    } finally {
+      setRefreshing(false);
+      setPullDistance(0);
+    }
+  }, [refreshing, resync]);
+
+  useEffect(() => {
+    const onTouchStart = (e: TouchEvent) => {
+      if (window.scrollY > 0 || refreshing) return;
+      pullStartY.current = e.touches[0].clientY;
+      pulling.current = true;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!pulling.current || pullStartY.current === null) return;
+      const delta = e.touches[0].clientY - pullStartY.current;
+      if (delta <= 0) {
+        setPullDistance(0);
+        return;
+      }
+      // dampen the pull
+      const damped = Math.min(PULL_MAX, delta * 0.5);
+      setPullDistance(damped);
+      if (damped > 8 && e.cancelable) e.preventDefault();
+    };
+    const onTouchEnd = () => {
+      if (!pulling.current) return;
+      pulling.current = false;
+      pullStartY.current = null;
+      if (pullDistance >= PULL_THRESHOLD) {
+        void triggerRefresh();
+      } else {
+        setPullDistance(0);
+      }
+    };
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onTouchEnd);
+    window.addEventListener("touchcancel", onTouchEnd);
+    return () => {
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, [pullDistance, refreshing, triggerRefresh]);
+
+  const indicatorOffset = refreshing ? 56 : pullDistance;
+  const reached = pullDistance >= PULL_THRESHOLD;
+
 
 
 
@@ -94,7 +159,24 @@ export default function Notifications() {
   const visible = items.filter((n) => (unreadOnly ? !n.read : true));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" style={{ transform: `translateY(${indicatorOffset}px)`, transition: pulling.current ? "none" : "transform 200ms ease" }}>
+      <div
+        className="pointer-events-none fixed left-1/2 -translate-x-1/2 z-40 flex items-center justify-center h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg"
+        style={{
+          top: 8,
+          opacity: indicatorOffset > 0 ? Math.min(1, indicatorOffset / PULL_THRESHOLD) : 0,
+          transform: `translateX(-50%) translateY(${indicatorOffset - 48}px)`,
+          transition: pulling.current ? "none" : "transform 200ms ease, opacity 200ms ease",
+        }}
+        aria-hidden={indicatorOffset === 0}
+      >
+        {refreshing ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+          <RefreshCw className={`h-5 w-5 transition-transform ${reached ? "rotate-180" : ""}`} />
+        )}
+      </div>
+
       <PageHeader>
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
