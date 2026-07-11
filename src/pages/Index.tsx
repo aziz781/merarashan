@@ -866,10 +866,10 @@ const Index = () => {
       <AlertDialog open={frozenInfoOpen} onOpenChange={setFrozenInfoOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Account frozen</AlertDialogTitle>
-            <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 flex gap-3 items-start text-sm">
+            <AlertDialogTitle>Account Frozen</AlertDialogTitle>
+            <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 flex gap-3 items-start text-sm text-left">
               <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-              <div className="text-foreground space-y-1">
+              <div className="text-foreground space-y-1 text-left">
                 <p>While your account is frozen:</p>
                 <ul className="space-y-1">
                   <li className="flex items-start gap-2">
