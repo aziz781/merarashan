@@ -198,6 +198,16 @@ export function toggleRead(id: string) {
   void updateInboxReadAt([id], nextRead ? new Date().toISOString() : null);
 }
 
+async function deleteInboxRows(ids: string[]) {
+  const inboxIds = ids.map(inboxIdFromLocalId).filter((x): x is string => !!x);
+  if (inboxIds.length === 0) return;
+  try {
+    await supabase.from("notification_inbox").delete().in("id", inboxIds);
+  } catch {
+    /* ignore */
+  }
+}
+
 export function removeNotification(id: string) {
   write(read().filter((n) => n.id !== id));
   const deleted = readDeleted();
@@ -205,6 +215,7 @@ export function removeNotification(id: string) {
     deleted.push(id);
     writeDeleted(deleted);
   }
+  void deleteInboxRows([id]);
 }
 
 export function clearAll() {
@@ -213,7 +224,9 @@ export function clearAll() {
   for (const n of all) if (!deleted.includes(n.id)) deleted.push(n.id);
   writeDeleted(deleted);
   write([]);
+  void deleteInboxRows(all.map((n) => n.id));
 }
+
 
 export function unreadCount(): number {
   return read().filter((n) => !n.read).length;
