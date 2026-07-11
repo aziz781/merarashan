@@ -159,7 +159,24 @@ export default function Notifications() {
   const visible = items.filter((n) => (unreadOnly ? !n.read : true));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" style={{ transform: `translateY(${indicatorOffset}px)`, transition: pulling.current ? "none" : "transform 200ms ease" }}>
+      <div
+        className="pointer-events-none fixed left-1/2 -translate-x-1/2 z-40 flex items-center justify-center h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg"
+        style={{
+          top: 8,
+          opacity: indicatorOffset > 0 ? Math.min(1, indicatorOffset / PULL_THRESHOLD) : 0,
+          transform: `translateX(-50%) translateY(${indicatorOffset - 48}px)`,
+          transition: pulling.current ? "none" : "transform 200ms ease, opacity 200ms ease",
+        }}
+        aria-hidden={indicatorOffset === 0}
+      >
+        {refreshing ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+          <RefreshCw className={`h-5 w-5 transition-transform ${reached ? "rotate-180" : ""}`} />
+        )}
+      </div>
+
       <PageHeader>
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
