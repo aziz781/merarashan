@@ -71,9 +71,15 @@ export default function Notifications() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const resync = useCallback(async () => {
-    await syncNotificationInbox();
+  const resync = useCallback(async (opts?: { notifyOnError?: boolean }) => {
+    const result = await syncNotificationInbox();
     setItems(getNotifications());
+    if (!result.ok && opts?.notifyOnError) {
+      toast.error("Couldn't refresh notifications", {
+        description: result.error || "Please check your connection and try again.",
+      });
+    }
+    return result;
   }, []);
 
   useEffect(() => {
@@ -98,12 +104,13 @@ export default function Notifications() {
     if (refreshing) return;
     setRefreshing(true);
     try {
-      await resync();
+      await resync({ notifyOnError: true });
     } finally {
       setRefreshing(false);
       setPullDistance(0);
     }
   }, [refreshing, resync]);
+
 
   useEffect(() => {
     const onTouchStart = (e: TouchEvent) => {
