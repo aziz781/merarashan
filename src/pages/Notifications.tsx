@@ -74,9 +74,12 @@ export default function Notifications() {
   const resync = useCallback(async (opts?: { notifyOnError?: boolean }) => {
     const result = await syncNotificationInbox();
     setItems(getNotifications());
-    if (!result.ok && opts?.notifyOnError) {
-      const message = result.error || "Please check your connection and try again.";
-      toast.error("Couldn't refresh notifications", { description: message });
+    if (!result.ok) {
+      if (opts?.notifyOnError) {
+        toast.error("Couldn't refresh notifications", {
+          description: result.error || "Please check your connection and try again.",
+        });
+      }
     }
     return result;
   }, []);
