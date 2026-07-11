@@ -898,7 +898,7 @@ const Index = () => {
                 checked={unfreezeConfirmed}
                 onChange={(e) => setUnfreezeConfirmed(e.target.checked)}
               />
-              <span>I understand and want to unfreeze my account.</span>
+              <span>I understand and unfreezing will reactivate my account and restore full access.</span>
             </label>
           </AlertDialogHeader>
           <AlertDialogFooter>
