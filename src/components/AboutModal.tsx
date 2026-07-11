@@ -29,13 +29,13 @@ export function AboutModal({ open, onOpenChange }: AboutModalProps) {
           </div>
           <DialogTitle>About Mera Rashan</DialogTitle>
           <DialogDescription>
-            Track your ration card, subsidies, and transactions in one secure place.
+            Track your rashan card, subsidies, and transactions in one secure place.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           <p className="text-sm text-muted-foreground text-center leading-relaxed">
-            Mera Rashan helps Pakistani families view their registered ration cards,
+            Mera Rashan helps Pakistani families view their registered rashan cards,
             track monthly entitlements, review transactions, download statements, and receive
             instant notifications — all from a simple, mobile-first experience.
           </p>
