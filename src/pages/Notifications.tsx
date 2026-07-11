@@ -169,7 +169,8 @@ export default function Notifications() {
   const visible = items.filter((n) => (unreadOnly ? !n.read : true));
 
   return (
-    <div className="min-h-screen bg-background" style={{ transform: `translateY(${indicatorOffset}px)`, transition: pulling.current ? "none" : "transform 200ms ease" }}>
+    <div className="min-h-screen bg-background">
+      <div style={{ transform: `translateY(${indicatorOffset}px)`, transition: pulling.current ? "none" : "transform 200ms ease" }}>
       <div
         className="pointer-events-none fixed left-1/2 -translate-x-1/2 z-40 flex items-center justify-center h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg"
         style={{
@@ -259,6 +260,7 @@ export default function Notifications() {
         ) : (
           <NotificationList items={visible} onOpen={openNotification} />
         )}
+      </div>
       </div>
 
       {items.length > 0 && (
