@@ -351,8 +351,8 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-5">
-      <Card className="w-full max-w-sm p-8 shadow-[var(--shadow-card)] border-0 bg-card/80 backdrop-blur">
+    <div className="min-h-screen flex items-center justify-center px-2">
+      <Card className="w-full max-w-sm px-3 py-8 shadow-[var(--shadow-card)] border-0 bg-card/80 backdrop-blur">
         <img src={meraRashanLogo} alt="Mera Rashan Card" className="w-32 h-32 mx-auto mb-4 object-contain" />
         <h1 className="sr-only">Mera Rashan</h1>
         <div className="text-sm text-muted-foreground text-center mt-1 mb-6 space-y-1">
