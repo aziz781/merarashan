@@ -339,10 +339,15 @@ const Index = () => {
   const [freezeConfirmOpen, setFreezeConfirmOpen] = useState(false);
   const [freezeConfirmed, setFreezeConfirmed] = useState(false);
   const [frozenInfoOpen, setFrozenInfoOpen] = useState(false);
+  const [unfreezeConfirmed, setUnfreezeConfirmed] = useState(false);
 
   useEffect(() => {
     if (!freezeConfirmOpen) setFreezeConfirmed(false);
   }, [freezeConfirmOpen]);
+
+  useEffect(() => {
+    if (!frozenInfoOpen) setUnfreezeConfirmed(false);
+  }, [frozenInfoOpen]);
 
   const handleFreezeAccount = useCallback(async () => {
     const customerNumber = resolvePayerId();
@@ -866,15 +871,35 @@ const Index = () => {
               <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               <div className="text-foreground space-y-1">
                 <p>While your account is frozen:</p>
-                <ul className="list-disc pl-4 space-y-1">
-                  <li><strong>Card Inactive:</strong> Your Mera Rashan Card will not work.</li>
-                  <li><strong>No New Codes:</strong> Ration Codes cannot be generated.</li>
-                  <li><strong>View Only:</strong> You can still log in to view your cards, rations, and statements.</li>
-                  <li><strong>Unfreeze Anytime:</strong> Restore full access whenever you need to.</li>
+                <ul className="space-y-1">
+                  <li className="flex items-start gap-2">
+                    <X className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+                    <span>Your Mera Rashan Card will not work.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <X className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+                    <span>Ration Codes cannot be generated.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
+                    <span>You can still log in to view your cards, rashans, and statements.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
+                    <span>Restore full access whenever you need to.</span>
+                  </li>
                 </ul>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground"><strong>Unfreezing will reactivate your account and restore full access. Are you sure?</strong></p>
+            <label className="flex items-start gap-2 text-sm text-muted-foreground cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-1 h-4 w-4 rounded border-input text-primary focus:ring-primary accent-primary"
+                checked={unfreezeConfirmed}
+                onChange={(e) => setUnfreezeConfirmed(e.target.checked)}
+              />
+              <span>I understand and want to unfreeze my account.</span>
+            </label>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -884,12 +909,13 @@ const Index = () => {
                 setFrozenInfoOpen(false);
                 void handleUnfreezeAccount();
               }}
-              disabled={unfreezing}
+              disabled={unfreezing || !unfreezeConfirmed}
               className="bg-green-500 text-white hover:bg-green-600 inline-flex items-center gap-2"
             >
               <Unlock className="h-4 w-4" />
               Unfreeze account
             </AlertDialogAction>
+
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
