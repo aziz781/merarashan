@@ -75,9 +75,8 @@ export default function Notifications() {
     const result = await syncNotificationInbox();
     setItems(getNotifications());
     if (!result.ok && opts?.notifyOnError) {
-      toast.error("Couldn't refresh notifications", {
-        description: result.error || "Please check your connection and try again.",
-      });
+      const message = result.error || "Please check your connection and try again.";
+      toast.error("Couldn't refresh notifications", { description: message });
     }
     return result;
   }, []);
