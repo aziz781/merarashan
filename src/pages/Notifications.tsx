@@ -261,6 +261,7 @@ export default function Notifications() {
           <NotificationList items={visible} onOpen={openNotification} />
         )}
       </div>
+      </div>
 
       {items.length > 0 && (
         <button
