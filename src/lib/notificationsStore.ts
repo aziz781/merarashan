@@ -118,39 +118,58 @@ export function addNotification(n: {
   return item;
 }
 
-export async function syncNotificationInbox(): Promise<void> {
-  const { data, error } = await supabase
-    .from("notification_inbox")
-    .select("id, title, body, url, created_at, month, year, read_at")
-    .order("created_at", { ascending: false })
-    .limit(100);
-  if (error || !data) return;
-  for (const n of data.slice().reverse()) {
-    addNotification({
-      title: n.title,
-      body: n.body || "",
-      url: n.url || undefined,
-      dedupeKey: `inbox:${n.id}`,
-      receivedAt: new Date(n.created_at).getTime(),
-      month: (n as { month?: string | null }).month ?? null,
-      year: (n as { year?: string | null }).year ?? null,
-    });
-  }
-  // Reconcile local read state with server-side read_at.
-  const list = read();
-  let changed = false;
-  const next = list.map((n) => {
-    const row = data.find((d) => `k:inbox:${d.id}` === n.id);
-    if (!row) return n;
-    const serverRead = !!row.read_at;
-    if (serverRead !== n.read) {
-      changed = true;
-      return { ...n, read: serverRead };
+export type SyncResult = { ok: true } | { ok: false; error: string };
+
+let syncInFlight: Promise<SyncResult> | null = null;
+
+async function performSync(): Promise<SyncResult> {
+  try {
+    const { data, error } = await supabase
+      .from("notification_inbox")
+      .select("id, title, body, url, created_at, month, year, read_at")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) return { ok: false, error: error.message };
+    if (!data) return { ok: false, error: "No response from server" };
+    for (const n of data.slice().reverse()) {
+      addNotification({
+        title: n.title,
+        body: n.body || "",
+        url: n.url || undefined,
+        dedupeKey: `inbox:${n.id}`,
+        receivedAt: new Date(n.created_at).getTime(),
+        month: (n as { month?: string | null }).month ?? null,
+        year: (n as { year?: string | null }).year ?? null,
+      });
     }
-    return n;
-  });
-  if (changed) write(next);
+    // Reconcile local read state with server-side read_at.
+    const list = read();
+    let changed = false;
+    const next = list.map((n) => {
+      const row = data.find((d) => `k:inbox:${d.id}` === n.id);
+      if (!row) return n;
+      const serverRead = !!row.read_at;
+      if (serverRead !== n.read) {
+        changed = true;
+        return { ...n, read: serverRead };
+      }
+      return n;
+    });
+    if (changed) write(next);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Network error" };
+  }
 }
+
+export function syncNotificationInbox(): Promise<SyncResult> {
+  if (syncInFlight) return syncInFlight;
+  syncInFlight = performSync().finally(() => {
+    syncInFlight = null;
+  });
+  return syncInFlight;
+}
+
 
 
 function inboxIdFromLocalId(id: string): string | null {
