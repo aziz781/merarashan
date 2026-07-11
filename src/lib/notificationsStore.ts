@@ -138,24 +138,49 @@ export async function syncNotificationInbox(): Promise<void> {
   }
 }
 
+function inboxIdFromLocalId(id: string): string | null {
+  const prefix = "k:inbox:";
+  return id.startsWith(prefix) ? id.slice(prefix.length) : null;
+}
+
+async function updateInboxReadAt(ids: string[], readAt: string | null) {
+  const inboxIds = ids.map(inboxIdFromLocalId).filter((x): x is string => !!x);
+  if (inboxIds.length === 0) return;
+  try {
+    await supabase
+      .from("notification_inbox")
+      .update({ read_at: readAt })
+      .in("id", inboxIds);
+  } catch {
+    /* ignore */
+  }
+}
+
 export function markAllRead() {
-  const list = read().map((n) => ({ ...n, read: true }));
-  write(list);
+  const list = read();
+  const changedIds = list.filter((n) => !n.read).map((n) => n.id);
+  write(list.map((n) => ({ ...n, read: true })));
+  void updateInboxReadAt(changedIds, new Date().toISOString());
 }
 
 export function markRead(id: string) {
   const list = read().map((n) => (n.id === id ? { ...n, read: true } : n));
   write(list);
+  void updateInboxReadAt([id], new Date().toISOString());
 }
 
 export function markUnread(id: string) {
   const list = read().map((n) => (n.id === id ? { ...n, read: false } : n));
   write(list);
+  void updateInboxReadAt([id], null);
 }
 
 export function toggleRead(id: string) {
-  const list = read().map((n) => (n.id === id ? { ...n, read: !n.read } : n));
+  const current = read().find((n) => n.id === id);
+  const nextRead = current ? !current.read : true;
+  const list = read().map((n) => (n.id === id ? { ...n, read: nextRead } : n));
   write(list);
+  void updateInboxReadAt([id], nextRead ? new Date().toISOString() : null);
 }
 
 export function removeNotification(id: string) {
