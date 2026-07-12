@@ -20,6 +20,7 @@ export const COUNTRIES: Country[] = [
   { code: "KW", name: "Kuwait", dialCode: "965", flag: "🇰🇼", placeholder: "50123456", maxLength: 8 },
   { code: "BH", name: "Bahrain", dialCode: "973", flag: "🇧🇭", placeholder: "35123456", maxLength: 8 },
   { code: "AT", name: "Austria", dialCode: "43", flag: "🇦🇹", placeholder: "650123456", maxLength: 9 },
+  { code: "AU", name: "Australia", dialCode: "61", flag: "🇦🇺", placeholder: "412345678", maxLength: 9 },
   { code: "NZ", name: "New Zealand", dialCode: "64", flag: "🇳🇿", placeholder: "211234567", maxLength: 9 },
   { code: "DE", name: "Germany", dialCode: "49", flag: "🇩🇪", placeholder: "1511234567", maxLength: 10 },
   { code: "FR", name: "France", dialCode: "33", flag: "🇫🇷", placeholder: "612345678", maxLength: 9 },
