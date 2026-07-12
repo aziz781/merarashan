@@ -403,7 +403,6 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
                     value={countrySearch}
                     onChange={(e) => setCountrySearch(e.target.value)}
                     className="mx-4 mb-2 w-auto"
-                    autoFocus
                   />
                   <div className="flex-1 overflow-y-auto p-2">
                     {filteredCountries.map((country) => (
