@@ -395,7 +395,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
               </SheetTrigger>
                 <SheetContent side="bottom" className="p-0 rounded-t-xl max-h-[85vh] flex flex-col">
                   <SheetHeader className="px-4 pt-4 pb-2 text-left">
-                    <SheetTitle>Select country</SheetTitle>
+                    <SheetTitle>Choose country</SheetTitle>
                   </SheetHeader>
                   <Input
                     type="text"
