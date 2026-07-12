@@ -16,7 +16,7 @@ import {
   formatLocalNumber,
   buildFullNumber,
 } from "@/lib/countries";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 
@@ -378,8 +378,8 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
         {step === "mobile" && (
           <form onSubmit={submitMobile} className="space-y-3">
             <div className="flex flex-row items-stretch rounded-md border border-input bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-              <Popover open={countryOpen} onOpenChange={setCountryOpen}>
-              <PopoverTrigger asChild>
+              <Sheet open={countryOpen} onOpenChange={setCountryOpen}>
+              <SheetTrigger asChild>
                 <Button
                   type="button"
                   variant="outline"
@@ -392,22 +392,25 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
                   </span>
                   <ChevronDown className="h-4 w-4 opacity-50 shrink-0 ml-2" />
                 </Button>
-              </PopoverTrigger>
-                <PopoverContent className="w-[calc(100vw-2.5rem)] max-w-sm p-0" align="start">
+              </SheetTrigger>
+                <SheetContent side="bottom" className="p-0 rounded-t-xl max-h-[85vh] flex flex-col">
+                  <SheetHeader className="px-4 pt-4 pb-2 text-left">
+                    <SheetTitle>Select country</SheetTitle>
+                  </SheetHeader>
                   <Input
                     type="text"
                     placeholder="Search country or code"
                     value={countrySearch}
                     onChange={(e) => setCountrySearch(e.target.value)}
-                    className="rounded-none border-0 border-b px-3 py-3 focus-visible:ring-0"
+                    className="mx-4 mb-2 w-auto"
                     autoFocus
                   />
-                  <div className="max-h-60 overflow-y-auto p-1">
+                  <div className="flex-1 overflow-y-auto p-2">
                     {filteredCountries.map((country) => (
                       <button
                         key={country.code}
                         type="button"
-                        className="w-full flex items-center rounded-sm px-2 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
+                        className="w-full flex items-center rounded-sm px-3 py-3 text-sm text-left hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
                         onClick={() => {
                           setSelectedCountry(country);
                           setLocalNumber((prev) => formatLocalNumber(prev, country.maxLength));
@@ -427,8 +430,8 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
                       </p>
                     )}
                   </div>
-                </PopoverContent>
-              </Popover>
+                </SheetContent>
+              </Sheet>
               <Input
                 type="tel"
                 inputMode="numeric"
