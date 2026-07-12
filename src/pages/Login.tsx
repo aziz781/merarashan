@@ -456,6 +456,17 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Log in"}
             </Button>
+            <p className="text-sm text-center text-muted-foreground pt-1">
+              New to Mera Rashan?{" "}
+              <a
+                href="https://wa.me/923030812222"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary font-medium hover:underline"
+              >
+                Create account
+              </a>
+            </p>
           </form>
         )}
         {step === "otp" && (
