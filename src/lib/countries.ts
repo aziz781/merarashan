@@ -106,6 +106,7 @@ const LANGUAGE_COUNTRY_MAP: Record<string, string> = {
   "ar-BH": "BH",
   "de-AT": "AT",
   "de-DE": "DE",
+  "en-AU": "AU",
   "en-NZ": "NZ",
   "fr-FR": "FR",
   "it-IT": "IT",
