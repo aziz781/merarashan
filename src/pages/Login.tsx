@@ -393,7 +393,7 @@ export default function Login({ onLogin }: { onLogin: (m: string) => void }) {
                   <ChevronDown className="h-4 w-4 opacity-50 shrink-0 ml-2" />
                 </Button>
               </SheetTrigger>
-                <SheetContent side="bottom" className="p-0 rounded-t-xl max-h-[85vh] flex flex-col">
+                <SheetContent side="bottom" className="p-0 rounded-t-xl max-h-[85vh] flex flex-col" onOpenAutoFocus={(e) => e.preventDefault()}>
                   <SheetHeader className="px-4 pt-4 pb-2 text-left">
                     <SheetTitle>Choose country</SheetTitle>
                   </SheetHeader>
