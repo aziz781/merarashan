@@ -7,6 +7,7 @@ import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
 import { toast } from "@/hooks/use-toast";
 import { AppVersionInfo } from "@/components/AppVersionInfo";
 import { AboutModal } from "@/components/AboutModal";
+import { isNativeCapacitor } from "@/lib/isNative";
 
 interface SideMenuProps {
   open: boolean;
