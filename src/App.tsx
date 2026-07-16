@@ -30,6 +30,7 @@ const AdminNotify = lazy(() => import("./pages/AdminNotify.tsx"));
 const Notifications = lazy(() => import("./pages/Notifications.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const OAuthConsent = lazy(() => import("./pages/OAuthConsent.tsx"));
+const AgentIntegrations = lazy(() => import("./pages/AgentIntegrations.tsx"));
 
 function RouteFallback() {
   return (
