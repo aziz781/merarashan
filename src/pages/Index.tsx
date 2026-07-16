@@ -267,6 +267,14 @@ const Index = () => {
         // notification permission (the prompt itself skips if permission is
         // already granted or the user dismissed it this session).
         setShowNotificationPrompt(true);
+        // Honor ?next= for already-signed-in users (e.g. OAuth consent flows).
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const next = params.get("next");
+          if (next && next.startsWith("/") && !next.startsWith("//")) {
+            window.location.replace(next);
+          }
+        } catch { /* ignore */ }
       } else {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) setMobile(saved);
@@ -281,6 +289,14 @@ const Index = () => {
     setMobile(m);
     toast({ title: "Welcome", description: `Signed in as ${m}` });
     setShowNotificationPrompt(true);
+    // Honor ?next= for post-login redirects (e.g. OAuth consent flows).
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get("next");
+      if (next && next.startsWith("/") && !next.startsWith("//")) {
+        window.location.replace(next);
+      }
+    } catch { /* ignore */ }
   }, []);
 
   const handleLogout = useCallback(async () => {
