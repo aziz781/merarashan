@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Copy, HelpCircle, Info, LogOut, Settings, Share2, Shield, User } from "lucide-react";
+import { Bot, Copy, HelpCircle, Info, LogOut, Settings, Share2, Shield, User } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
