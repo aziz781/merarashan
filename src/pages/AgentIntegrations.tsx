@@ -42,12 +42,8 @@ const AgentIntegrations = () => {
   const [issuerStatus, setIssuerStatus] = useState<Status>("checking");
   const [registrationEndpoint, setRegistrationEndpoint] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (cancelled) return;
+  const refreshStatuses = () => {
+    void supabase.auth.getSession().then(({ data }) => {
       if (data.session) {
         setSessionStatus("ok");
         setEmail(data.session.user.email ?? null);
@@ -55,26 +51,31 @@ const AgentIntegrations = () => {
       } else {
         setSessionStatus("fail");
       }
-    })();
+    });
 
-    fetch(`${MCP_URL}/.well-known/oauth-protected-resource`)
+    setMcpStatus("checking");
+    fetch(`${MCP_URL}/.well-known/oauth-protected-resource`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then(() => !cancelled && setMcpStatus("ok"))
-      .catch(() => !cancelled && setMcpStatus("fail"));
+      .then(() => setMcpStatus("ok"))
+      .catch(() => setMcpStatus("fail"));
 
-    fetch(`${ISSUER}/.well-known/oauth-authorization-server`)
+    setIssuerStatus("checking");
+    fetch(`${ISSUER}/.well-known/oauth-authorization-server`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((meta) => {
-        if (cancelled) return;
         setIssuerStatus("ok");
         setRegistrationEndpoint(meta?.registration_endpoint ?? null);
       })
-      .catch(() => !cancelled && setIssuerStatus("fail"));
+      .catch(() => setIssuerStatus("fail"));
+  };
 
-    return () => {
-      cancelled = true;
-    };
+  useEffect(() => {
+    refreshStatuses();
+    const onFocus = () => refreshStatuses();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, []);
+
 
   const overallConnected = sessionStatus === "ok" && mcpStatus === "ok" && issuerStatus === "ok";
 
