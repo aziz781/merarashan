@@ -1,0 +1,248 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, CheckCircle2, XCircle, Loader2, Plug, Clock, Server, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { PageFooter } from "@/components/PageFooter";
+import { supabase } from "@/integrations/supabase/client";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const PROJECT_REF = import.meta.env.VITE_SUPABASE_PROJECT_ID as string;
+const MCP_URL = `${SUPABASE_URL}/functions/v1/mcp`;
+const ISSUER = `https://${PROJECT_REF}.supabase.co/auth/v1`;
+
+type Status = "checking" | "ok" | "fail";
+
+function formatWhen(seconds: number | null | undefined): string {
+  if (!seconds) return "—";
+  const d = new Date(seconds * 1000);
+  const now = Date.now();
+  const diffMs = d.getTime() - now;
+  const abs = Math.abs(diffMs);
+  const mins = Math.round(abs / 60000);
+  const hrs = Math.round(abs / 3600000);
+  const days = Math.round(abs / 86400000);
+  let rel: string;
+  if (mins < 60) rel = `${mins} min`;
+  else if (hrs < 48) rel = `${hrs} hr`;
+  else rel = `${days} days`;
+  const suffix = diffMs >= 0 ? `in ${rel}` : `${rel} ago`;
+  return `${d.toLocaleString()} (${suffix})`;
+}
+
+const AgentIntegrations = () => {
+  const navigate = useNavigate();
+  const [sessionStatus, setSessionStatus] = useState<Status>("checking");
+  const [email, setEmail] = useState<string | null>(null);
+  const [expiresAt, setExpiresAt] = useState<number | null>(null);
+  const [mcpStatus, setMcpStatus] = useState<Status>("checking");
+  const [issuerStatus, setIssuerStatus] = useState<Status>("checking");
+  const [registrationEndpoint, setRegistrationEndpoint] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (cancelled) return;
+      if (data.session) {
+        setSessionStatus("ok");
+        setEmail(data.session.user.email ?? null);
+        setExpiresAt(data.session.expires_at ?? null);
+      } else {
+        setSessionStatus("fail");
+      }
+    })();
+
+    fetch(`${MCP_URL}/.well-known/oauth-protected-resource`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then(() => !cancelled && setMcpStatus("ok"))
+      .catch(() => !cancelled && setMcpStatus("fail"));
+
+    fetch(`${ISSUER}/.well-known/oauth-authorization-server`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((meta) => {
+        if (cancelled) return;
+        setIssuerStatus("ok");
+        setRegistrationEndpoint(meta?.registration_endpoint ?? null);
+      })
+      .catch(() => !cancelled && setIssuerStatus("fail"));
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const overallConnected = sessionStatus === "ok" && mcpStatus === "ok" && issuerStatus === "ok";
+
+  return (
+    <div className="min-h-screen pb-16">
+      <header
+        className="px-5 pt-10 pb-6 text-primary-foreground"
+        style={{ background: "var(--gradient-primary)" }}
+      >
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="text-primary-foreground hover:bg-white/10 -ml-2 mb-3"
+        >
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Back
+        </Button>
+        <div className="flex items-center gap-3">
+          <Plug className="w-6 h-6 opacity-90" />
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold truncate">Agent integrations</h1>
+            <p className="text-xs opacity-80 truncate">MCP server status &amp; OAuth connection</p>
+          </div>
+        </div>
+      </header>
+
+      <main className="px-5 -mt-3 space-y-4">
+        {/* Overall */}
+        <Card className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+          <div className="flex items-center gap-3">
+            <StatusIcon
+              status={
+                sessionStatus === "checking" || mcpStatus === "checking" || issuerStatus === "checking"
+                  ? "checking"
+                  : overallConnected
+                  ? "ok"
+                  : "fail"
+              }
+              size="lg"
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">
+                {overallConnected ? "Connected" : sessionStatus === "checking" ? "Checking…" : "Not fully connected"}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {email ? `Signed in as ${email}` : "Sign in to enable agent access"}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Session / OAuth expiry */}
+        <Card className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+          <div className="flex items-center gap-2 mb-3">
+            <Clock className="w-4 h-4 text-primary" />
+            <h2 className="text-xs uppercase tracking-wider text-muted-foreground font-bold">
+              OAuth session
+            </h2>
+          </div>
+          <Row label="Status" value={<StatusBadge status={sessionStatus} okLabel="Active" failLabel="Signed out" />} />
+          <Row label="User" value={<span className="font-mono text-xs">{email ?? "—"}</span>} />
+          <Row
+            label="Access token expires"
+            value={<span className="text-xs">{formatWhen(expiresAt)}</span>}
+          />
+          <p className="mt-3 text-xs text-muted-foreground">
+            The app auto-refreshes this token in the background. Agents connected via OAuth receive
+            their own tokens with independent expiries.
+          </p>
+        </Card>
+
+        {/* MCP endpoint */}
+        <Card className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+          <div className="flex items-center gap-2 mb-3">
+            <Server className="w-4 h-4 text-primary" />
+            <h2 className="text-xs uppercase tracking-wider text-muted-foreground font-bold">
+              MCP server
+            </h2>
+          </div>
+          <Row label="Status" value={<StatusBadge status={mcpStatus} okLabel="Reachable" failLabel="Unreachable" />} />
+          <Row
+            label="Endpoint"
+            value={
+              <code className="font-mono text-[11px] break-all text-foreground">{MCP_URL}</code>
+            }
+          />
+          <Row label="Tools exposed" value={<Badge variant="outline" className="font-mono">5</Badge>} />
+        </Card>
+
+        {/* OAuth server */}
+        <Card className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+          <div className="flex items-center gap-2 mb-3">
+            <ShieldCheck className="w-4 h-4 text-primary" />
+            <h2 className="text-xs uppercase tracking-wider text-muted-foreground font-bold">
+              OAuth authorization server
+            </h2>
+          </div>
+          <Row label="Status" value={<StatusBadge status={issuerStatus} okLabel="Discoverable" failLabel="Unreachable" />} />
+          <Row
+            label="Issuer"
+            value={
+              <code className="font-mono text-[11px] break-all text-foreground">{ISSUER}</code>
+            }
+          />
+          <Row
+            label="Dynamic client registration"
+            value={
+              registrationEndpoint ? (
+                <Badge className="font-mono">Enabled</Badge>
+              ) : issuerStatus === "ok" ? (
+                <Badge variant="outline" className="font-mono">Disabled</Badge>
+              ) : (
+                <span className="text-xs text-muted-foreground">—</span>
+              )
+            }
+          />
+          <p className="mt-3 text-xs text-muted-foreground">
+            Agents like ChatGPT, Claude, and Cursor use this server to sign you in and receive
+            per-user access tokens for the MCP endpoint above.
+          </p>
+        </Card>
+      </main>
+      <PageFooter />
+    </div>
+  );
+};
+
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-start justify-between gap-3 py-1.5 border-b border-border/30 last:border-0">
+      <span className="text-xs text-muted-foreground shrink-0">{label}</span>
+      <span className="text-sm text-right min-w-0">{value}</span>
+    </div>
+  );
+}
+
+function StatusIcon({ status, size = "sm" }: { status: Status; size?: "sm" | "lg" }) {
+  const cls = size === "lg" ? "w-8 h-8" : "w-4 h-4";
+  if (status === "checking") return <Loader2 className={`${cls} animate-spin text-muted-foreground`} />;
+  if (status === "ok") return <CheckCircle2 className={`${cls} text-green-600 dark:text-green-500`} />;
+  return <XCircle className={`${cls} text-destructive`} />;
+}
+
+function StatusBadge({
+  status,
+  okLabel,
+  failLabel,
+}: {
+  status: Status;
+  okLabel: string;
+  failLabel: string;
+}) {
+  if (status === "checking")
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Loader2 className="w-3 h-3 animate-spin" /> Checking…
+      </span>
+    );
+  if (status === "ok")
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 dark:text-green-500">
+        <CheckCircle2 className="w-3.5 h-3.5" /> {okLabel}
+      </span>
+    );
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-destructive">
+      <XCircle className="w-3.5 h-3.5" /> {failLabel}
+    </span>
+  );
+}
+
+export default AgentIntegrations;
