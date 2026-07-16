@@ -36,6 +36,7 @@ export function SideMenu({
   onLogout,
 }: SideMenuProps) {
   const [aboutOpen, setAboutOpen] = useState(false);
+  const navigate = useNavigate();
   const swipe = useSwipeToClose({
     direction: "left",
     onClose: () => onOpenChange(false),
