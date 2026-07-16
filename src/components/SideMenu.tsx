@@ -87,6 +87,14 @@ export function SideMenu({
           <MenuItem icon={<Settings className="w-4 h-4" />} label="Settings" onClick={onOpenSettings} />
           <MenuItem icon={<Shield className="w-4 h-4" />} label="Privacy & Security" onClick={onOpenPrivacy} />
           <MenuItem icon={<Share2 className="w-4 h-4" />} label="Social media" onClick={onOpenSocial} />
+          <MenuItem
+            icon={<Bot className="w-4 h-4" />}
+            label="AI Agent integrations"
+            onClick={() => {
+              onOpenChange(false);
+              navigate("/agent-integrations");
+            }}
+          />
           <MenuItem icon={<HelpCircle className="w-4 h-4" />} label="Help" onClick={onOpenHelp} />
           <MenuItem
             icon={<Info className="w-4 h-4" />}
