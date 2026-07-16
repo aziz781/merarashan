@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ExternalLink, Loader2, Plug } from "lucide-react";
+import { Check, Copy, ExternalLink, Loader2, Plug } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -179,12 +179,12 @@ export function AgentConnectButtons() {
           </Tooltip>
         </div>
         {AGENTS.map((a) => (
-          <div key={a.name} className="relative">
+          <div key={a.name} className="relative flex items-stretch gap-2">
             <button
               type="button"
               disabled={busy === a.name || status !== "ok"}
               onClick={() => connect(a.name, a.connectorsUrl)}
-              className="w-full flex items-center gap-3 rounded-md border border-border/60 bg-card px-4 py-3 text-left hover:bg-muted transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex-1 min-w-0 flex items-center gap-3 rounded-md border border-border/60 bg-card px-4 py-3 text-left hover:bg-muted transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
                 {busy === a.name ? (
@@ -199,6 +199,7 @@ export function AgentConnectButtons() {
               </span>
               <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden />
             </button>
+            <CopyMcpUrlButton agentName={a.name} />
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
@@ -218,5 +219,34 @@ export function AgentConnectButtons() {
         ))}
       </div>
     </TooltipProvider>
+  );
+}
+
+function CopyMcpUrlButton({ agentName }: { agentName: string }) {
+  const [copied, setCopied] = useState(false);
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(MCP_URL);
+      setCopied(true);
+      toast.success(`MCP URL copied for ${agentName}`);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      toast.error("Copy failed");
+    }
+  };
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          onClick={onCopy}
+          aria-label={`Copy MCP URL for ${agentName}`}
+          className="shrink-0 flex items-center justify-center w-11 rounded-md border border-border/60 bg-card hover:bg-muted transition-colors text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="top">Copy MCP URL</TooltipContent>
+    </Tooltip>
   );
 }
