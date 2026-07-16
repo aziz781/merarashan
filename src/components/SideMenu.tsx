@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bot, Copy, HelpCircle, Info, LogOut, Settings, Share2, Shield, User } from "lucide-react";
+import { Bot, Copy, HelpCircle, Info, LogOut, Settings, Share2, Shield, Sparkles, User } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
@@ -88,6 +88,14 @@ export function SideMenu({
           <MenuItem icon={<Settings className="w-4 h-4" />} label="Settings" onClick={onOpenSettings} />
           <MenuItem icon={<Shield className="w-4 h-4" />} label="Privacy & Security" onClick={onOpenPrivacy} />
           <MenuItem icon={<Share2 className="w-4 h-4" />} label="Social media" onClick={onOpenSocial} />
+          <MenuItem
+            icon={<Sparkles className="w-4 h-4" />}
+            label="AI Assistant"
+            onClick={() => {
+              onOpenChange(false);
+              navigate("/assistant");
+            }}
+          />
           {!isNativeCapacitor && (
             <MenuItem
               icon={<Bot className="w-4 h-4" />}
