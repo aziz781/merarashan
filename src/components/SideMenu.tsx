@@ -89,10 +89,10 @@ export function SideMenu({
           <MenuItem icon={<Share2 className="w-4 h-4" />} label="Social media" onClick={onOpenSocial} />
           <MenuItem
             icon={<Bot className="w-4 h-4" />}
-            label="AI Agent integrations"
+            label="AI Agents"
             onClick={() => {
               onOpenChange(false);
-              navigate("/agent-integrations");
+              navigate("/ai-agents");
             }}
           />
           <MenuItem icon={<HelpCircle className="w-4 h-4" />} label="Help" onClick={onOpenHelp} />

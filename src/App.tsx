@@ -31,6 +31,7 @@ const Notifications = lazy(() => import("./pages/Notifications.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const OAuthConsent = lazy(() => import("./pages/OAuthConsent.tsx"));
 const AgentIntegrations = lazy(() => import("./pages/AgentIntegrations.tsx"));
+const AIAgents = lazy(() => import("./pages/AIAgents.tsx"));
 
 function RouteFallback() {
   return (
@@ -163,6 +164,7 @@ const App = () => (
             <Route path="/customers" element={<Index />} />
             <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
             <Route path="/agent-integrations" element={<AgentIntegrations />} />
+            <Route path="/ai-agents" element={<AIAgents />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
