@@ -42,12 +42,8 @@ const AgentIntegrations = () => {
   const [issuerStatus, setIssuerStatus] = useState<Status>("checking");
   const [registrationEndpoint, setRegistrationEndpoint] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (cancelled) return;
+  const refreshStatuses = () => {
+    void supabase.auth.getSession().then(({ data }) => {
       if (data.session) {
         setSessionStatus("ok");
         setEmail(data.session.user.email ?? null);
@@ -55,26 +51,31 @@ const AgentIntegrations = () => {
       } else {
         setSessionStatus("fail");
       }
-    })();
+    });
 
-    fetch(`${MCP_URL}/.well-known/oauth-protected-resource`)
+    setMcpStatus("checking");
+    fetch(`${MCP_URL}/.well-known/oauth-protected-resource`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then(() => !cancelled && setMcpStatus("ok"))
-      .catch(() => !cancelled && setMcpStatus("fail"));
+      .then(() => setMcpStatus("ok"))
+      .catch(() => setMcpStatus("fail"));
 
-    fetch(`${ISSUER}/.well-known/oauth-authorization-server`)
+    setIssuerStatus("checking");
+    fetch(`${ISSUER}/.well-known/oauth-authorization-server`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((meta) => {
-        if (cancelled) return;
         setIssuerStatus("ok");
         setRegistrationEndpoint(meta?.registration_endpoint ?? null);
       })
-      .catch(() => !cancelled && setIssuerStatus("fail"));
+      .catch(() => setIssuerStatus("fail"));
+  };
 
-    return () => {
-      cancelled = true;
-    };
+  useEffect(() => {
+    refreshStatuses();
+    const onFocus = () => refreshStatuses();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, []);
+
 
   const overallConnected = sessionStatus === "ok" && mcpStatus === "ok" && issuerStatus === "ok";
 
@@ -218,27 +219,28 @@ const AgentIntegrations = () => {
             <AgentGuide
               name="Claude (claude.ai / Desktop)"
               badge="Recommended"
+              mcpUrl={MCP_URL}
+              connectorsUrl="https://claude.ai/settings/connectors"
               steps={[
-                "Open claude.ai → Settings → Connectors (or Claude Desktop → Settings → Connectors).",
-                "Click \"Add custom connector\".",
-                "Name it \"Mera Rashan\" and paste the MCP URL above.",
-                "Click Connect — a browser tab opens the Mera Rashan sign-in and consent page.",
-                "Approve access. Back in Claude, the 5 tools will appear as available.",
+                "Tap \"Connect with Mera Rashan\" below — the MCP URL is copied and Claude's Connectors page opens.",
+                "In Claude, click \"Add custom connector\" and paste the URL.",
+                "Click Connect — a tab opens Mera Rashan's sign-in and consent page.",
+                "Approve access. Return here — status refreshes automatically.",
               ]}
-              link={{ href: "https://claude.ai/settings/connectors", label: "Open Claude connectors" }}
             />
 
             <AgentGuide
               name="ChatGPT (Pro / Business / Enterprise)"
+              mcpUrl={MCP_URL}
+              connectorsUrl="https://chatgpt.com/#settings/Connectors"
               steps={[
-                "Open ChatGPT → Settings → Connectors → Advanced.",
-                "Click \"Add\" under Custom connectors (MCP).",
-                "Paste the MCP URL above and give it a name like \"Mera Rashan\".",
-                "Choose OAuth as the auth method — ChatGPT auto-discovers the sign-in flow.",
-                "Sign in with your mobile + OTP and approve. Enable the connector in a chat via the + menu → Connectors.",
+                "Tap \"Connect with Mera Rashan\" below — the MCP URL is copied and ChatGPT's Connectors page opens.",
+                "In ChatGPT → Connectors → Advanced, click \"Add\" and paste the URL.",
+                "Choose OAuth — sign in with your mobile + OTP and approve.",
+                "Enable the connector in a chat via the + menu → Connectors.",
               ]}
-              link={{ href: "https://chatgpt.com/#settings/Connectors", label: "Open ChatGPT connectors" }}
             />
+
           </div>
 
           <p className="mt-4 text-xs text-muted-foreground">
@@ -323,14 +325,33 @@ function CopyRow({ value }: { value: string }) {
 function AgentGuide({
   name,
   steps,
-  link,
+  mcpUrl,
+  connectorsUrl,
   badge,
 }: {
   name: string;
   steps: string[];
-  link?: { href: string; label: string };
+  mcpUrl: string;
+  connectorsUrl: string;
   badge?: string;
 }) {
+  const [busy, setBusy] = useState(false);
+
+  const connect = async () => {
+    setBusy(true);
+    try {
+      try {
+        await navigator.clipboard.writeText(mcpUrl);
+        toast.success("MCP URL copied — paste it in the connector dialog", { duration: 5000 });
+      } catch {
+        toast.message("Copy the MCP URL manually and paste it in the connector dialog");
+      }
+      window.open(connectorsUrl, "_blank", "noopener,noreferrer");
+    } finally {
+      setTimeout(() => setBusy(false), 800);
+    }
+  };
+
   return (
     <div className="rounded-lg border border-border/50 p-3 bg-muted/20">
       <div className="flex items-center justify-between gap-2 mb-2">
@@ -342,19 +363,20 @@ function AgentGuide({
           <li key={i}>{s}</li>
         ))}
       </ol>
-      {link && (
-        <a
-          href={link.href}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-        >
-          {link.label} <ExternalLink className="w-3 h-3" />
-        </a>
-      )}
+      <Button
+        onClick={connect}
+        disabled={busy}
+        className="mt-3 w-full h-9"
+        style={{ background: "var(--gradient-primary)" }}
+      >
+        {busy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plug className="w-4 h-4 mr-2" />}
+        Connect with Mera Rashan
+        <ExternalLink className="w-3.5 h-3.5 ml-2 opacity-80" />
+      </Button>
     </div>
   );
 }
+
 
 
 
