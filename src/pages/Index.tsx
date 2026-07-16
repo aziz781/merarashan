@@ -42,6 +42,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Customer } from "@/types/domain";
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 import { PageFooter } from "@/components/PageFooter";
+import { BiometricLockSetting } from "@/components/BiometricLockSetting";
 
 // Lazy-load the four primary tab views so each tab's code (and its
 // dependencies — virtualizer, stat components, etc.) ships in its own chunk.
@@ -751,6 +752,7 @@ const Index = () => {
             <span className="flex-1">Terms of Service</span>
             <span aria-hidden className="text-muted-foreground">↗</span>
           </a>
+          <BiometricLockSetting />
           <div className="mt-auto space-y-3">
             <button
               type="button"
