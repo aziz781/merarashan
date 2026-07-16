@@ -7,6 +7,7 @@ import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
 import { toast } from "@/hooks/use-toast";
 import { AppVersionInfo } from "@/components/AppVersionInfo";
 import { AboutModal } from "@/components/AboutModal";
+import { isNativeCapacitor } from "@/lib/isNative";
 
 interface SideMenuProps {
   open: boolean;
@@ -87,14 +88,16 @@ export function SideMenu({
           <MenuItem icon={<Settings className="w-4 h-4" />} label="Settings" onClick={onOpenSettings} />
           <MenuItem icon={<Shield className="w-4 h-4" />} label="Privacy & Security" onClick={onOpenPrivacy} />
           <MenuItem icon={<Share2 className="w-4 h-4" />} label="Social media" onClick={onOpenSocial} />
-          <MenuItem
-            icon={<Bot className="w-4 h-4" />}
-            label="AI Agents"
-            onClick={() => {
-              onOpenChange(false);
-              navigate("/ai-agents");
-            }}
-          />
+          {!isNativeCapacitor && (
+            <MenuItem
+              icon={<Bot className="w-4 h-4" />}
+              label="AI Agents"
+              onClick={() => {
+                onOpenChange(false);
+                navigate("/ai-agents");
+              }}
+            />
+          )}
           <MenuItem icon={<HelpCircle className="w-4 h-4" />} label="Help" onClick={onOpenHelp} />
           <MenuItem
             icon={<Info className="w-4 h-4" />}

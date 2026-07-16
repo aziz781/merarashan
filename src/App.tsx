@@ -18,6 +18,7 @@ import { addNotification, syncNotificationInbox } from "@/lib/notificationsStore
 import { supabase } from "@/integrations/supabase/client";
 import { openAppLink } from "@/lib/openAppLink";
 import { queryClient } from "@/lib/queryClient";
+import { isNativeCapacitor } from "@/lib/isNative";
 
 // Lazy-load every route — including the authenticated shell — so the
 // initial bundle for unauthenticated/first-time visitors stays minimal.
@@ -164,7 +165,7 @@ const App = () => (
             <Route path="/customers" element={<Index />} />
             <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
             <Route path="/agent-integrations" element={<AgentIntegrations />} />
-            <Route path="/ai-agents" element={<AIAgents />} />
+            {!isNativeCapacitor && <Route path="/ai-agents" element={<AIAgents />} />}
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
