@@ -225,13 +225,13 @@ export function AgentConnectButtons() {
   );
 }
 
-function CopyMcpUrlButton({ agentName }: { agentName: string }) {
+function CopyMcpUrlButton() {
   const [copied, setCopied] = useState(false);
   const onCopy = async () => {
     try {
       await navigator.clipboard.writeText(MCP_URL);
       setCopied(true);
-      toast.success(`MCP URL copied for ${agentName}`);
+      toast.success("MCP URL copied");
       setTimeout(() => setCopied(false), 1600);
     } catch {
       toast.error("Copy failed");
@@ -243,10 +243,10 @@ function CopyMcpUrlButton({ agentName }: { agentName: string }) {
         <button
           type="button"
           onClick={onCopy}
-          aria-label={`Copy MCP URL for ${agentName}`}
-          className="shrink-0 flex items-center justify-center w-11 rounded-md border border-border/60 bg-card hover:bg-muted transition-colors text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label="Copy MCP URL"
+          className="shrink-0 flex items-center justify-center h-7 w-7 rounded-md border border-border/60 bg-card hover:bg-muted transition-colors text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+          {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
         </button>
       </TooltipTrigger>
       <TooltipContent side="top">Copy MCP URL</TooltipContent>
