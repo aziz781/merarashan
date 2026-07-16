@@ -162,21 +162,24 @@ export function AgentConnectButtons() {
           <p className="text-xs uppercase tracking-wider text-muted-foreground font-bold">
             AI Agent integrations
           </p>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground rounded px-1 -mr-1 hover:text-foreground"
-                aria-label="Connection status details"
-              >
-                <span className={`h-2 w-2 rounded-full ${dotClass}`} aria-hidden />
-                {statusLabel}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" align="end">
-              {tooltipContent}
-            </TooltipContent>
-          </Tooltip>
+          <div className="flex items-center gap-2">
+            <CopyMcpUrlButton />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground rounded px-1 hover:text-foreground"
+                  aria-label="Connection status details"
+                >
+                  <span className={`h-2 w-2 rounded-full ${dotClass}`} aria-hidden />
+                  {statusLabel}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="end">
+                {tooltipContent}
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
         {AGENTS.map((a) => (
           <div key={a.name} className="relative flex items-stretch gap-2">
