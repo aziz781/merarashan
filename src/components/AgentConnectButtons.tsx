@@ -202,7 +202,7 @@ export function AgentConnectButtons() {
               </span>
               <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden />
             </button>
-            <CopyMcpUrlButton agentName={a.name} />
+            
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
