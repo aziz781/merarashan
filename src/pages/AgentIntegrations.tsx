@@ -356,6 +356,6 @@ function AgentGuide({
   );
 }
 
-}
+
 
 export default AgentIntegrations;
