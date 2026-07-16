@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { openAppLink } from "@/lib/openAppLink";
 import { queryClient } from "@/lib/queryClient";
 import { isNativeCapacitor } from "@/lib/isNative";
+import { BiometricLockGate } from "@/components/BiometricLockGate";
 
 // Lazy-load every route — including the authenticated shell — so the
 // initial bundle for unauthenticated/first-time visitors stays minimal.
@@ -33,6 +34,7 @@ const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const OAuthConsent = lazy(() => import("./pages/OAuthConsent.tsx"));
 const AgentIntegrations = lazy(() => import("./pages/AgentIntegrations.tsx"));
 const AIAgents = lazy(() => import("./pages/AIAgents.tsx"));
+const AIAssistant = lazy(() => import("./pages/AIAssistant.tsx"));
 
 function RouteFallback() {
   return (
@@ -146,10 +148,11 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <OfflineBanner />
-        <InstallNativeAppBanner />
-        <NativePushBridge />
-        <Suspense fallback={<RouteFallback />}>
+        <BiometricLockGate>
+          <OfflineBanner />
+          <InstallNativeAppBanner />
+          <NativePushBridge />
+          <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/cards/:rcNum" element={<CardDetails />} />
@@ -166,10 +169,12 @@ const App = () => (
             <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
             <Route path="/agent-integrations" element={<AgentIntegrations />} />
             {!isNativeCapacitor && <Route path="/ai-agents" element={<AIAgents />} />}
+            <Route path="/assistant" element={<AIAssistant />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </Suspense>
+          </Suspense>
+        </BiometricLockGate>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
