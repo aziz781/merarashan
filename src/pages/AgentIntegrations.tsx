@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, XCircle, Loader2, Plug, Clock, Server, ShieldCheck } from "lucide-react";
+import { ArrowLeft, CheckCircle2, XCircle, Loader2, Plug, Clock, Server, ShieldCheck, Copy, Check, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -195,8 +197,58 @@ const AgentIntegrations = () => {
             per-user access tokens for the MCP endpoint above.
           </p>
         </Card>
+
+        {/* Connect your agent */}
+        <Card className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+          <div className="flex items-center gap-2 mb-3">
+            <Plug className="w-4 h-4 text-primary" />
+            <h2 className="text-xs uppercase tracking-wider text-muted-foreground font-bold">
+              Connect your agent
+            </h2>
+          </div>
+
+          <p className="text-xs text-muted-foreground mb-3">
+            Copy this MCP server URL and paste it into your AI agent's connector settings. You'll
+            sign in with your Mera Rashan mobile + OTP the first time.
+          </p>
+
+          <CopyRow value={MCP_URL} />
+
+          <div className="mt-5 space-y-4">
+            <AgentGuide
+              name="Claude (claude.ai / Desktop)"
+              badge="Recommended"
+              steps={[
+                "Open claude.ai → Settings → Connectors (or Claude Desktop → Settings → Connectors).",
+                "Click \"Add custom connector\".",
+                "Name it \"Mera Rashan\" and paste the MCP URL above.",
+                "Click Connect — a browser tab opens the Mera Rashan sign-in and consent page.",
+                "Approve access. Back in Claude, the 5 tools will appear as available.",
+              ]}
+              link={{ href: "https://claude.ai/settings/connectors", label: "Open Claude connectors" }}
+            />
+
+            <AgentGuide
+              name="ChatGPT (Pro / Business / Enterprise)"
+              steps={[
+                "Open ChatGPT → Settings → Connectors → Advanced.",
+                "Click \"Add\" under Custom connectors (MCP).",
+                "Paste the MCP URL above and give it a name like \"Mera Rashan\".",
+                "Choose OAuth as the auth method — ChatGPT auto-discovers the sign-in flow.",
+                "Sign in with your mobile + OTP and approve. Enable the connector in a chat via the + menu → Connectors.",
+              ]}
+              link={{ href: "https://chatgpt.com/#settings/Connectors", label: "Open ChatGPT connectors" }}
+            />
+          </div>
+
+          <p className="mt-4 text-xs text-muted-foreground">
+            The agent only sees your own account data. You can revoke access anytime by removing
+            the connector from your agent's settings.
+          </p>
+        </Card>
       </main>
       <PageFooter />
+
     </div>
   );
 };
@@ -244,5 +296,66 @@ function StatusBadge({
     </span>
   );
 }
+
+function CopyRow({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      toast.success("MCP URL copied");
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      toast.error("Copy failed");
+    }
+  };
+  return (
+    <div className="flex items-center gap-2 rounded-md border border-border/60 bg-muted/40 p-2">
+      <code className="font-mono text-[11px] break-all flex-1 min-w-0">{value}</code>
+      <Button size="sm" variant="secondary" className="shrink-0 h-8" onClick={onCopy}>
+        {copied ? <Check className="w-3.5 h-3.5 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+        {copied ? "Copied" : "Copy"}
+      </Button>
+    </div>
+  );
+}
+
+function AgentGuide({
+  name,
+  steps,
+  link,
+  badge,
+}: {
+  name: string;
+  steps: string[];
+  link?: { href: string; label: string };
+  badge?: string;
+}) {
+  return (
+    <div className="rounded-lg border border-border/50 p-3 bg-muted/20">
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <h3 className="text-sm font-semibold">{name}</h3>
+        {badge && <Badge className="text-[10px]">{badge}</Badge>}
+      </div>
+      <ol className="list-decimal ml-4 space-y-1 text-xs text-foreground/90">
+        {steps.map((s, i) => (
+          <li key={i}>{s}</li>
+        ))}
+      </ol>
+      {link && (
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+        >
+          {link.label} <ExternalLink className="w-3 h-3" />
+        </a>
+      )}
+    </div>
+  );
+}
+
+
 
 export default AgentIntegrations;
