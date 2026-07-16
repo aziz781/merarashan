@@ -717,6 +717,7 @@ const Index = () => {
           <ThemeToggle />
           <AccessibilitySettings />
           <NotificationToggle mobile={mobile} />
+          <AgentConnectButtons />
         </div>
       </SlideInPanel>
 
