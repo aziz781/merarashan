@@ -79,7 +79,6 @@ import { PostLoginNotificationPrompt } from "@/components/PostLoginNotificationP
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/hooks/use-theme";
 import { AccessibilitySettings } from "@/components/AccessibilitySettings";
-import { AgentConnectButtons } from "@/components/AgentConnectButtons";
 
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
 
@@ -718,7 +717,7 @@ const Index = () => {
           <ThemeToggle />
           <AccessibilitySettings />
           <NotificationToggle mobile={mobile} />
-          <AgentConnectButtons />
+          
         </div>
       </SlideInPanel>
 

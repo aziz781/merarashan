@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageFooter } from "@/components/PageFooter";
+import { AgentConnectButtons } from "@/components/AgentConnectButtons";
 import { supabase } from "@/integrations/supabase/client";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
@@ -76,6 +77,24 @@ const AgentIntegrations = () => {
     return () => window.removeEventListener("focus", onFocus);
   }, []);
 
+  useEffect(() => {
+    const prevTitle = document.title;
+    document.title = "AI Agent integrations — Mera Rashan";
+    const desc = "Connect Mera Rashan to AI agents like Claude and ChatGPT via MCP. View live OAuth session and MCP server status.";
+    let meta = document.querySelector('meta[name="description"]');
+    const prevDesc = meta?.getAttribute("content") ?? null;
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "description");
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute("content", desc);
+    return () => {
+      document.title = prevTitle;
+      if (prevDesc !== null) meta!.setAttribute("content", prevDesc);
+    };
+  }, []);
+
 
   const overallConnected = sessionStatus === "ok" && mcpStatus === "ok" && issuerStatus === "ok";
 
@@ -104,6 +123,9 @@ const AgentIntegrations = () => {
       </header>
 
       <main className="px-5 -mt-3 space-y-4">
+        <Card className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+          <AgentConnectButtons />
+        </Card>
         {/* Overall */}
         <Card className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
           <div className="flex items-center gap-3">
