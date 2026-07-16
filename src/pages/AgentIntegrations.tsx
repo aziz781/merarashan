@@ -297,4 +297,65 @@ function StatusBadge({
   );
 }
 
+function CopyRow({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      toast.success("MCP URL copied");
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      toast.error("Copy failed");
+    }
+  };
+  return (
+    <div className="flex items-center gap-2 rounded-md border border-border/60 bg-muted/40 p-2">
+      <code className="font-mono text-[11px] break-all flex-1 min-w-0">{value}</code>
+      <Button size="sm" variant="secondary" className="shrink-0 h-8" onClick={onCopy}>
+        {copied ? <Check className="w-3.5 h-3.5 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+        {copied ? "Copied" : "Copy"}
+      </Button>
+    </div>
+  );
+}
+
+function AgentGuide({
+  name,
+  steps,
+  link,
+  badge,
+}: {
+  name: string;
+  steps: string[];
+  link?: { href: string; label: string };
+  badge?: string;
+}) {
+  return (
+    <div className="rounded-lg border border-border/50 p-3 bg-muted/20">
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <h3 className="text-sm font-semibold">{name}</h3>
+        {badge && <Badge className="text-[10px]">{badge}</Badge>}
+      </div>
+      <ol className="list-decimal ml-4 space-y-1 text-xs text-foreground/90">
+        {steps.map((s, i) => (
+          <li key={i}>{s}</li>
+        ))}
+      </ol>
+      {link && (
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+        >
+          {link.label} <ExternalLink className="w-3 h-3" />
+        </a>
+      )}
+    </div>
+  );
+}
+
+}
+
 export default AgentIntegrations;
