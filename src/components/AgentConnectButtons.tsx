@@ -160,7 +160,7 @@ export function AgentConnectButtons() {
       <div className="space-y-2">
         <div className="flex items-center justify-between px-1">
           <p className="text-xs uppercase tracking-wider text-muted-foreground font-bold">
-            Agent integrations
+            AI Agent integrations
           </p>
           <Tooltip>
             <TooltipTrigger asChild>
