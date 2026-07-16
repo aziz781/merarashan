@@ -219,27 +219,28 @@ const AgentIntegrations = () => {
             <AgentGuide
               name="Claude (claude.ai / Desktop)"
               badge="Recommended"
+              mcpUrl={MCP_URL}
+              connectorsUrl="https://claude.ai/settings/connectors"
               steps={[
-                "Open claude.ai → Settings → Connectors (or Claude Desktop → Settings → Connectors).",
-                "Click \"Add custom connector\".",
-                "Name it \"Mera Rashan\" and paste the MCP URL above.",
-                "Click Connect — a browser tab opens the Mera Rashan sign-in and consent page.",
-                "Approve access. Back in Claude, the 5 tools will appear as available.",
+                "Tap \"Connect with Mera Rashan\" below — the MCP URL is copied and Claude's Connectors page opens.",
+                "In Claude, click \"Add custom connector\" and paste the URL.",
+                "Click Connect — a tab opens Mera Rashan's sign-in and consent page.",
+                "Approve access. Return here — status refreshes automatically.",
               ]}
-              link={{ href: "https://claude.ai/settings/connectors", label: "Open Claude connectors" }}
             />
 
             <AgentGuide
               name="ChatGPT (Pro / Business / Enterprise)"
+              mcpUrl={MCP_URL}
+              connectorsUrl="https://chatgpt.com/#settings/Connectors"
               steps={[
-                "Open ChatGPT → Settings → Connectors → Advanced.",
-                "Click \"Add\" under Custom connectors (MCP).",
-                "Paste the MCP URL above and give it a name like \"Mera Rashan\".",
-                "Choose OAuth as the auth method — ChatGPT auto-discovers the sign-in flow.",
-                "Sign in with your mobile + OTP and approve. Enable the connector in a chat via the + menu → Connectors.",
+                "Tap \"Connect with Mera Rashan\" below — the MCP URL is copied and ChatGPT's Connectors page opens.",
+                "In ChatGPT → Connectors → Advanced, click \"Add\" and paste the URL.",
+                "Choose OAuth — sign in with your mobile + OTP and approve.",
+                "Enable the connector in a chat via the + menu → Connectors.",
               ]}
-              link={{ href: "https://chatgpt.com/#settings/Connectors", label: "Open ChatGPT connectors" }}
             />
+
           </div>
 
           <p className="mt-4 text-xs text-muted-foreground">
