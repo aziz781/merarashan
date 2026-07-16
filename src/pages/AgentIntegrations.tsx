@@ -325,14 +325,33 @@ function CopyRow({ value }: { value: string }) {
 function AgentGuide({
   name,
   steps,
-  link,
+  mcpUrl,
+  connectorsUrl,
   badge,
 }: {
   name: string;
   steps: string[];
-  link?: { href: string; label: string };
+  mcpUrl: string;
+  connectorsUrl: string;
   badge?: string;
 }) {
+  const [busy, setBusy] = useState(false);
+
+  const connect = async () => {
+    setBusy(true);
+    try {
+      try {
+        await navigator.clipboard.writeText(mcpUrl);
+        toast.success("MCP URL copied — paste it in the connector dialog", { duration: 5000 });
+      } catch {
+        toast.message("Copy the MCP URL manually and paste it in the connector dialog");
+      }
+      window.open(connectorsUrl, "_blank", "noopener,noreferrer");
+    } finally {
+      setTimeout(() => setBusy(false), 800);
+    }
+  };
+
   return (
     <div className="rounded-lg border border-border/50 p-3 bg-muted/20">
       <div className="flex items-center justify-between gap-2 mb-2">
@@ -344,19 +363,20 @@ function AgentGuide({
           <li key={i}>{s}</li>
         ))}
       </ol>
-      {link && (
-        <a
-          href={link.href}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-        >
-          {link.label} <ExternalLink className="w-3 h-3" />
-        </a>
-      )}
+      <Button
+        onClick={connect}
+        disabled={busy}
+        className="mt-3 w-full h-9"
+        style={{ background: "var(--gradient-primary)" }}
+      >
+        {busy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plug className="w-4 h-4 mr-2" />}
+        Connect with Mera Rashan
+        <ExternalLink className="w-3.5 h-3.5 ml-2 opacity-80" />
+      </Button>
     </div>
   );
 }
+
 
 
 
