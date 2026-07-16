@@ -123,6 +123,9 @@ const AgentIntegrations = () => {
       </header>
 
       <main className="px-5 -mt-3 space-y-4">
+        <Card className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+          <AgentConnectButtons />
+        </Card>
         {/* Overall */}
         <Card className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
           <div className="flex items-center gap-3">
