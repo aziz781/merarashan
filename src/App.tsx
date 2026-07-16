@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { openAppLink } from "@/lib/openAppLink";
 import { queryClient } from "@/lib/queryClient";
 import { isNativeCapacitor } from "@/lib/isNative";
+import { BiometricLockGate } from "@/components/BiometricLockGate";
 
 // Lazy-load every route — including the authenticated shell — so the
 // initial bundle for unauthenticated/first-time visitors stays minimal.
