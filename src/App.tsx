@@ -162,6 +162,7 @@ const App = () => (
             <Route path="/transactions" element={<Index />} />
             <Route path="/customers" element={<Index />} />
             <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
+            <Route path="/agent-integrations" element={<AgentIntegrations />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
