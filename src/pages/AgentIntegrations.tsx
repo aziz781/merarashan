@@ -197,8 +197,58 @@ const AgentIntegrations = () => {
             per-user access tokens for the MCP endpoint above.
           </p>
         </Card>
+
+        {/* Connect your agent */}
+        <Card className="p-4 bg-card/90 backdrop-blur shadow-[var(--shadow-soft)] border-border/50">
+          <div className="flex items-center gap-2 mb-3">
+            <Plug className="w-4 h-4 text-primary" />
+            <h2 className="text-xs uppercase tracking-wider text-muted-foreground font-bold">
+              Connect your agent
+            </h2>
+          </div>
+
+          <p className="text-xs text-muted-foreground mb-3">
+            Copy this MCP server URL and paste it into your AI agent's connector settings. You'll
+            sign in with your Mera Rashan mobile + OTP the first time.
+          </p>
+
+          <CopyRow value={MCP_URL} />
+
+          <div className="mt-5 space-y-4">
+            <AgentGuide
+              name="Claude (claude.ai / Desktop)"
+              badge="Recommended"
+              steps={[
+                "Open claude.ai → Settings → Connectors (or Claude Desktop → Settings → Connectors).",
+                "Click \"Add custom connector\".",
+                "Name it \"Mera Rashan\" and paste the MCP URL above.",
+                "Click Connect — a browser tab opens the Mera Rashan sign-in and consent page.",
+                "Approve access. Back in Claude, the 5 tools will appear as available.",
+              ]}
+              link={{ href: "https://claude.ai/settings/connectors", label: "Open Claude connectors" }}
+            />
+
+            <AgentGuide
+              name="ChatGPT (Pro / Business / Enterprise)"
+              steps={[
+                "Open ChatGPT → Settings → Connectors → Advanced.",
+                "Click \"Add\" under Custom connectors (MCP).",
+                "Paste the MCP URL above and give it a name like \"Mera Rashan\".",
+                "Choose OAuth as the auth method — ChatGPT auto-discovers the sign-in flow.",
+                "Sign in with your mobile + OTP and approve. Enable the connector in a chat via the + menu → Connectors.",
+              ]}
+              link={{ href: "https://chatgpt.com/#settings/Connectors", label: "Open ChatGPT connectors" }}
+            />
+          </div>
+
+          <p className="mt-4 text-xs text-muted-foreground">
+            The agent only sees your own account data. You can revoke access anytime by removing
+            the connector from your agent's settings.
+          </p>
+        </Card>
       </main>
       <PageFooter />
+
     </div>
   );
 };
