@@ -147,10 +147,11 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <OfflineBanner />
-        <InstallNativeAppBanner />
-        <NativePushBridge />
-        <Suspense fallback={<RouteFallback />}>
+        <BiometricLockGate>
+          <OfflineBanner />
+          <InstallNativeAppBanner />
+          <NativePushBridge />
+          <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/cards/:rcNum" element={<CardDetails />} />
@@ -167,6 +168,7 @@ const App = () => (
             <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
             <Route path="/agent-integrations" element={<AgentIntegrations />} />
             {!isNativeCapacitor && <Route path="/ai-agents" element={<AIAgents />} />}
+            <Route path="/assistant" element={<AIAssistant />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
