@@ -97,7 +97,7 @@ const AgentIntegrations = () => {
         <div className="flex items-center gap-3">
           <Plug className="w-6 h-6 opacity-90" />
           <div className="min-w-0">
-            <h1 className="text-xl font-bold truncate">Agent integrations</h1>
+            <h1 className="text-xl font-bold truncate">AI Agent integrations</h1>
             <p className="text-xs opacity-80 truncate">MCP server status &amp; OAuth connection</p>
           </div>
         </div>
