@@ -77,6 +77,24 @@ const AgentIntegrations = () => {
     return () => window.removeEventListener("focus", onFocus);
   }, []);
 
+  useEffect(() => {
+    const prevTitle = document.title;
+    document.title = "AI Agent integrations — Mera Rashan";
+    const desc = "Connect Mera Rashan to AI agents like Claude and ChatGPT via MCP. View live OAuth session and MCP server status.";
+    let meta = document.querySelector('meta[name="description"]');
+    const prevDesc = meta?.getAttribute("content") ?? null;
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "description");
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute("content", desc);
+    return () => {
+      document.title = prevTitle;
+      if (prevDesc !== null) meta!.setAttribute("content", prevDesc);
+    };
+  }, []);
+
 
   const overallConnected = sessionStatus === "ok" && mcpStatus === "ok" && issuerStatus === "ok";
 
