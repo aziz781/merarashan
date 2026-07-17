@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Send, Sparkles, Trash2, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -26,12 +26,15 @@ const SUGGESTIONS = [
 
 const AIAssistant = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [messages, setMessages] = useState<ChatMessage[]>(() => loadMessages());
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const autoPromptRef = useRef<string | null>(null);
+  const autoPromptFiredRef = useRef(false);
 
   useEffect(() => {
     const prevTitle = document.title;
@@ -100,6 +103,25 @@ const AIAssistant = () => {
       abortRef.current = null;
     }
   }, [messages, sending]);
+
+  // Auto-send a prompt passed via navigation state (from home quick-action chips)
+  useEffect(() => {
+    const state = location.state as { prompt?: string } | null;
+    if (state?.prompt && !autoPromptFiredRef.current) {
+      autoPromptRef.current = state.prompt;
+      // Clear state so it won't fire again on back/forward navigation
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location, navigate]);
+
+  useEffect(() => {
+    if (autoPromptRef.current && signedIn && !sending && !autoPromptFiredRef.current) {
+      autoPromptFiredRef.current = true;
+      const p = autoPromptRef.current;
+      autoPromptRef.current = null;
+      void send(p);
+    }
+  }, [signedIn, sending, send]);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
