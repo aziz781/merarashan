@@ -26,12 +26,15 @@ const SUGGESTIONS = [
 
 const AIAssistant = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [messages, setMessages] = useState<ChatMessage[]>(() => loadMessages());
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const autoPromptRef = useRef<string | null>(null);
+  const autoPromptFiredRef = useRef(false);
 
   useEffect(() => {
     const prevTitle = document.title;
