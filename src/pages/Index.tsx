@@ -186,6 +186,11 @@ const Index = () => {
     setAssistantOnboardOpen(false);
     navigate("/assistant");
   }, [navigate]);
+
+  const askAssistant = useCallback((prompt: string) => {
+    try { localStorage.setItem(ASSISTANT_ONBOARD_KEY, "1"); } catch { /* ignore */ }
+    navigate("/assistant", { state: { prompt } });
+  }, [navigate]);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
