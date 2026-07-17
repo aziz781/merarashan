@@ -104,6 +104,25 @@ const AIAssistant = () => {
     }
   }, [messages, sending]);
 
+  // Auto-send a prompt passed via navigation state (from home quick-action chips)
+  useEffect(() => {
+    const state = location.state as { prompt?: string } | null;
+    if (state?.prompt && !autoPromptFiredRef.current) {
+      autoPromptRef.current = state.prompt;
+      // Clear state so it won't fire again on back/forward navigation
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location, navigate]);
+
+  useEffect(() => {
+    if (autoPromptRef.current && signedIn && !sending && !autoPromptFiredRef.current) {
+      autoPromptFiredRef.current = true;
+      const p = autoPromptRef.current;
+      autoPromptRef.current = null;
+      void send(p);
+    }
+  }, [signedIn, sending, send]);
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     void send(input);
