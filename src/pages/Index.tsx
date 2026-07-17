@@ -43,6 +43,7 @@ import type { Customer } from "@/types/domain";
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 import { PageFooter } from "@/components/PageFooter";
 import { BiometricLockSetting } from "@/components/BiometricLockSetting";
+import { AssistantHintBadge } from "@/components/AssistantHintBadge";
 
 // Lazy-load the four primary tab views so each tab's code (and its
 // dependencies — virtualizer, stat components, etc.) ships in its own chunk.
@@ -561,9 +562,10 @@ const Index = () => {
               type="button"
               onClick={() => navigate("/assistant")}
               aria-label="Open AI Assistant"
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
+              className="relative flex h-11 items-center gap-1.5 shrink-0 rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35 px-2"
             >
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="w-5 h-5 shrink-0" />
+              {mobile && <AssistantHintBadge mobile={mobile} />}
             </button>
             <button
               type="button"
