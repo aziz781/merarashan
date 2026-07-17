@@ -26,6 +26,40 @@ export function clearMessages() {
   try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
 }
 
+// ---------- Recent quick-action prompts ----------
+const RECENT_PROMPTS_KEY = "mr_ai_recent_prompts_v1";
+const RECENT_PROMPTS_MAX = 8;
+
+export type RecentPrompt = { prompt: string; usedAt: number };
+
+export function loadRecentPrompts(): RecentPrompt[] {
+  try {
+    const raw = localStorage.getItem(RECENT_PROMPTS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((p) => p && typeof p.prompt === "string") : [];
+  } catch { return []; }
+}
+
+export function addRecentPrompt(prompt: string) {
+  const trimmed = prompt.trim();
+  if (!trimmed) return;
+  try {
+    const current = loadRecentPrompts().filter((p) => p.prompt !== trimmed);
+    const next = [{ prompt: trimmed, usedAt: Date.now() }, ...current].slice(0, RECENT_PROMPTS_MAX);
+    localStorage.setItem(RECENT_PROMPTS_KEY, JSON.stringify(next));
+    window.dispatchEvent(new CustomEvent("mr:recent-prompts-updated"));
+  } catch { /* ignore */ }
+}
+
+export function clearRecentPrompts() {
+  try {
+    localStorage.removeItem(RECENT_PROMPTS_KEY);
+    window.dispatchEvent(new CustomEvent("mr:recent-prompts-updated"));
+  } catch { /* ignore */ }
+}
+
+
 /**
  * Send messages to the ai-chat edge function and stream the assistant's
  * reply. `onDelta` is called for each text chunk.
