@@ -88,6 +88,8 @@ const AIAssistant = () => {
     setMessages((prev) => [...prev, userMsg, assistantMsg]);
     setInput("");
     setSending(true);
+    addRecentPrompt(trimmed);
+
 
     const controller = new AbortController();
     abortRef.current = controller;
