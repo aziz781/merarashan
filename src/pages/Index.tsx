@@ -44,6 +44,7 @@ import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 import { PageFooter } from "@/components/PageFooter";
 import { BiometricLockSetting } from "@/components/BiometricLockSetting";
 import { AssistantHintBadge } from "@/components/AssistantHintBadge";
+import { AssistantOnboardingDialog } from "@/components/AssistantOnboardingDialog";
 
 // Lazy-load the four primary tab views so each tab's code (and its
 // dependencies — virtualizer, stat components, etc.) ships in its own chunk.
