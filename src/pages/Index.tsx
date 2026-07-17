@@ -579,7 +579,7 @@ const Index = () => {
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
-              onClick={() => navigate("/assistant")}
+              onClick={openAssistant}
               aria-label="Open AI Assistant"
               className="relative flex h-11 items-center gap-1.5 shrink-0 rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35 px-2"
             >
