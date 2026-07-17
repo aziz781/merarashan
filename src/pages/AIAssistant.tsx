@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Send, Sparkles, Trash2, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
