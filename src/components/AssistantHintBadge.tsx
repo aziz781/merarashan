@@ -66,10 +66,10 @@ export function AssistantHintBadge({ mobile }: Props) {
   return (
     <span
       aria-label={`AI Assistant hint: ${hint.text}`}
-      className={`hidden xs:inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ${toneClass}`}
+      className={`inline-flex max-w-[7.5rem] items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 truncate ${toneClass}`}
     >
-      <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
-      {hint.text}
+      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-80" />
+      <span className="truncate">{hint.text}</span>
     </span>
   );
 }
