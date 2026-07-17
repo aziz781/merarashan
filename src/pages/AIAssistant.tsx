@@ -8,12 +8,17 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PageFooter } from "@/components/PageFooter";
 import {
+  addRecentPrompt,
   clearMessages,
+  clearRecentPrompts,
   loadMessages,
+  loadRecentPrompts,
   saveMessages,
   streamChat,
   type ChatMessage,
+  type RecentPrompt,
 } from "@/lib/aiChat";
+
 
 const MessageMarkdown = lazy(() => import("@/components/MessageMarkdown"));
 
@@ -35,6 +40,18 @@ const AIAssistant = () => {
   const abortRef = useRef<AbortController | null>(null);
   const autoPromptRef = useRef<string | null>(null);
   const autoPromptFiredRef = useRef(false);
+  const [recentPrompts, setRecentPrompts] = useState<RecentPrompt[]>(() => loadRecentPrompts());
+
+  useEffect(() => {
+    const refresh = () => setRecentPrompts(loadRecentPrompts());
+    window.addEventListener("mr:recent-prompts-updated", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("mr:recent-prompts-updated", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
+
 
   useEffect(() => {
     const prevTitle = document.title;
@@ -71,6 +88,8 @@ const AIAssistant = () => {
     setMessages((prev) => [...prev, userMsg, assistantMsg]);
     setInput("");
     setSending(true);
+    addRecentPrompt(trimmed);
+
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -184,24 +203,56 @@ const AIAssistant = () => {
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {messages.length === 0 ? (
-          <div className="max-w-md mx-auto text-center pt-6">
-            <p className="text-sm text-muted-foreground mb-4">
-              Ask a question about your rashan data. Try:
-            </p>
-            <div className="grid gap-2">
-              {SUGGESTIONS.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => void send(s)}
-                  className="text-left text-sm px-3 py-2 rounded-lg border border-border/60 bg-card hover:bg-muted transition-colors"
-                >
-                  {s}
-                </button>
-              ))}
+          <div className="max-w-md mx-auto pt-6 space-y-6">
+            {recentPrompts.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Recent prompts
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => { clearRecentPrompts(); setRecentPrompts([]); }}
+                    className="text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    Clear
+                  </button>
+                </div>
+                <div className="grid gap-2">
+                  {recentPrompts.map((r) => (
+                    <button
+                      key={r.usedAt + r.prompt}
+                      type="button"
+                      onClick={() => void send(r.prompt)}
+                      className="text-left text-sm px-3 py-2 rounded-lg border border-border/60 bg-card hover:bg-muted transition-colors flex items-start gap-2"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
+                      <span className="line-clamp-2">{r.prompt}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-4">
+                Ask a question about your rashan data. Try:
+              </p>
+              <div className="grid gap-2">
+                {SUGGESTIONS.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => void send(s)}
+                    className="text-left text-sm px-3 py-2 rounded-lg border border-border/60 bg-card hover:bg-muted transition-colors"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         ) : (
+
           messages.map((m) => (
             <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
               <div
