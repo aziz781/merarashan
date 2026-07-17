@@ -44,6 +44,7 @@ import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 import { PageFooter } from "@/components/PageFooter";
 import { BiometricLockSetting } from "@/components/BiometricLockSetting";
 import { AssistantHintBadge } from "@/components/AssistantHintBadge";
+import { AssistantOnboardingDialog } from "@/components/AssistantOnboardingDialog";
 
 // Lazy-load the four primary tab views so each tab's code (and its
 // dependencies — virtualizer, stat components, etc.) ships in its own chunk.
@@ -167,6 +168,24 @@ const Index = () => {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [socialOpen, setSocialOpen] = useState(false);
   const [sponsorProfileOpen, setSponsorProfileOpen] = useState(false);
+  const [assistantOnboardOpen, setAssistantOnboardOpen] = useState(false);
+
+  const ASSISTANT_ONBOARD_KEY = "mr_assistant_onboarded";
+  const openAssistant = useCallback(() => {
+    let seen = false;
+    try { seen = localStorage.getItem(ASSISTANT_ONBOARD_KEY) === "1"; } catch { /* ignore */ }
+    if (seen) {
+      navigate("/assistant");
+    } else {
+      setAssistantOnboardOpen(true);
+    }
+  }, [navigate]);
+
+  const finishAssistantOnboard = useCallback(() => {
+    try { localStorage.setItem(ASSISTANT_ONBOARD_KEY, "1"); } catch { /* ignore */ }
+    setAssistantOnboardOpen(false);
+    navigate("/assistant");
+  }, [navigate]);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
@@ -560,7 +579,7 @@ const Index = () => {
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
-              onClick={() => navigate("/assistant")}
+              onClick={openAssistant}
               aria-label="Open AI Assistant"
               className="relative flex h-11 items-center gap-1.5 shrink-0 rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35 px-2"
             >
@@ -591,6 +610,14 @@ const Index = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AssistantOnboardingDialog
+        open={assistantOnboardOpen}
+        onOpenChange={setAssistantOnboardOpen}
+        onContinue={finishAssistantOnboard}
+      />
+
+
 
 
       <SideMenu
