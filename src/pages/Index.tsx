@@ -168,6 +168,24 @@ const Index = () => {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [socialOpen, setSocialOpen] = useState(false);
   const [sponsorProfileOpen, setSponsorProfileOpen] = useState(false);
+  const [assistantOnboardOpen, setAssistantOnboardOpen] = useState(false);
+
+  const ASSISTANT_ONBOARD_KEY = "mr_assistant_onboarded";
+  const openAssistant = useCallback(() => {
+    let seen = false;
+    try { seen = localStorage.getItem(ASSISTANT_ONBOARD_KEY) === "1"; } catch { /* ignore */ }
+    if (seen) {
+      navigate("/assistant");
+    } else {
+      setAssistantOnboardOpen(true);
+    }
+  }, [navigate]);
+
+  const finishAssistantOnboard = useCallback(() => {
+    try { localStorage.setItem(ASSISTANT_ONBOARD_KEY, "1"); } catch { /* ignore */ }
+    setAssistantOnboardOpen(false);
+    navigate("/assistant");
+  }, [navigate]);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [notifUnread, setNotifUnread] = useState<number>(() => {
     try { return unreadCount(); } catch { return 0; }
