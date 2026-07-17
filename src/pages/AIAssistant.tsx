@@ -40,6 +40,18 @@ const AIAssistant = () => {
   const abortRef = useRef<AbortController | null>(null);
   const autoPromptRef = useRef<string | null>(null);
   const autoPromptFiredRef = useRef(false);
+  const [recentPrompts, setRecentPrompts] = useState<RecentPrompt[]>(() => loadRecentPrompts());
+
+  useEffect(() => {
+    const refresh = () => setRecentPrompts(loadRecentPrompts());
+    window.addEventListener("mr:recent-prompts-updated", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("mr:recent-prompts-updated", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
+
 
   useEffect(() => {
     const prevTitle = document.title;
