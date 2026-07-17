@@ -8,12 +8,17 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PageFooter } from "@/components/PageFooter";
 import {
+  addRecentPrompt,
   clearMessages,
+  clearRecentPrompts,
   loadMessages,
+  loadRecentPrompts,
   saveMessages,
   streamChat,
   type ChatMessage,
+  type RecentPrompt,
 } from "@/lib/aiChat";
+
 
 const MessageMarkdown = lazy(() => import("@/components/MessageMarkdown"));
 
