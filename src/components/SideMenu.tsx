@@ -88,14 +88,6 @@ export function SideMenu({
           <MenuItem icon={<Settings className="w-4 h-4" />} label="Settings" onClick={onOpenSettings} />
           <MenuItem icon={<Shield className="w-4 h-4" />} label="Privacy & Security" onClick={onOpenPrivacy} />
           <MenuItem icon={<Share2 className="w-4 h-4" />} label="Social media" onClick={onOpenSocial} />
-          <MenuItem
-            icon={<Sparkles className="w-4 h-4" />}
-            label="Ask Mera AI"
-            onClick={() => {
-              onOpenChange(false);
-              navigate("/assistant");
-            }}
-          />
           {!isNativeCapacitor && (
             <MenuItem
               icon={<Bot className="w-4 h-4" />}
