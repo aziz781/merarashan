@@ -481,15 +481,16 @@ const AIAssistant = () => {
       >
         {messages.length > 0 && (
           <div className="max-w-2xl mx-auto mb-2 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-            {SUGGESTIONS.map((s) => (
+            {SUGGESTIONS.map(({ text, icon: Icon }) => (
               <button
-                key={s}
+                key={text}
                 type="button"
-                onClick={() => void send(s)}
+                onClick={() => void send(text)}
                 disabled={sending}
-                className="shrink-0 text-xs px-3 py-1.5 rounded-full border border-border/60 bg-card hover:bg-muted transition-colors disabled:opacity-50"
+                className="shrink-0 inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border/60 bg-card hover:bg-muted transition-colors disabled:opacity-50"
               >
-                {s}
+                <Icon className="w-3.5 h-3.5 text-primary" />
+                {text}
               </button>
             ))}
           </div>
