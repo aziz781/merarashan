@@ -358,7 +358,14 @@ const AIAssistant = () => {
           </div>
         </div>
         <div className="flex items-center gap-3 mt-2">
-          <Sparkles className="w-6 h-6 opacity-90" />
+          <img
+            src={askMeraAiLogo}
+            alt=""
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-xl shrink-0 shadow-md shadow-black/10"
+            loading="lazy"
+          />
           <div className="min-w-0">
             <h1 className="text-xl font-bold truncate">Ask Mera AI</h1>
             <p className="text-xs opacity-80 truncate">
