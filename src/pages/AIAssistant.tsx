@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Send, Sparkles, Trash2, Loader2, Menu, Plus, MessageSquare } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, Trash2, Loader2, Menu, Plus, MessageSquare, ChevronRight, Wallet, PackageCheck, ReceiptText, ClipboardList, type LucideIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,11 +36,12 @@ import {
 
 const MessageMarkdown = lazy(() => import("@/components/MessageMarkdown"));
 
-const SUGGESTIONS = [
-  "How much did I spend this month?",
-  "Which cards have not been delivered this month?",
-  "Show a summary of my last 3 rashans.",
-  "How many statements are unpaid this year?",
+type Suggestion = { text: string; icon: LucideIcon };
+const SUGGESTIONS: Suggestion[] = [
+  { text: "How much did I spend this month?", icon: Wallet },
+  { text: "Which cards have not been delivered this month?", icon: PackageCheck },
+  { text: "Show a summary of my last 3 rashans.", icon: ClipboardList },
+  { text: "How many statements are unpaid this year?", icon: ReceiptText },
 ];
 
 const AIAssistant = () => {
@@ -414,19 +415,32 @@ const AIAssistant = () => {
                 </div>
               </div>
             )}
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-4">
-                Ask a question about your rashan data. Try:
+            <div>
+              <div className="flex flex-col items-center text-center mb-5">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 ring-4 ring-primary/5 flex items-center justify-center mb-3">
+                  <Sparkles className="w-7 h-7 text-primary" />
+                </div>
+                <h2 className="text-lg font-semibold text-foreground">How can I help?</h2>
+                <p className="text-sm text-muted-foreground mt-1 px-4">
+                  Ask anything about your rashans, statements, or cards.
+                </p>
+              </div>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2 px-1">
+                Try asking
               </p>
               <div className="grid gap-2">
-                {SUGGESTIONS.map((s) => (
+                {SUGGESTIONS.map(({ text, icon: Icon }) => (
                   <button
-                    key={s}
+                    key={text}
                     type="button"
-                    onClick={() => void send(s)}
-                    className="text-left text-sm px-3 py-2 rounded-lg border border-border/60 bg-card hover:bg-muted transition-colors"
+                    onClick={() => void send(text)}
+                    className="group w-full text-left flex items-center gap-3 px-4 py-3 rounded-2xl border border-border/60 bg-card shadow-sm hover:shadow-md hover:border-primary/30 transition-all active:scale-[0.99]"
                   >
-                    {s}
+                    <span className="w-8 h-8 shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                      <Icon className="w-4 h-4" />
+                    </span>
+                    <span className="text-sm font-medium text-foreground flex-1">{text}</span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                   </button>
                 ))}
               </div>
@@ -467,26 +481,27 @@ const AIAssistant = () => {
       >
         {messages.length > 0 && (
           <div className="max-w-2xl mx-auto mb-2 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-            {SUGGESTIONS.map((s) => (
+            {SUGGESTIONS.map(({ text, icon: Icon }) => (
               <button
-                key={s}
+                key={text}
                 type="button"
-                onClick={() => void send(s)}
+                onClick={() => void send(text)}
                 disabled={sending}
-                className="shrink-0 text-xs px-3 py-1.5 rounded-full border border-border/60 bg-card hover:bg-muted transition-colors disabled:opacity-50"
+                className="shrink-0 inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border/60 bg-card hover:bg-muted transition-colors disabled:opacity-50"
               >
-                {s}
+                <Icon className="w-3.5 h-3.5 text-primary" />
+                {text}
               </button>
             ))}
           </div>
         )}
-        <div className="flex items-end gap-2 max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto flex items-end gap-2 rounded-3xl border border-border/60 bg-muted/40 p-1.5 pl-3 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/15 focus-within:bg-background transition-all">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about your rashans…"
             rows={1}
-            className="min-h-[44px] max-h-32 resize-none"
+            className="min-h-[40px] max-h-32 resize-none flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none px-1 py-2 text-sm"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -500,6 +515,7 @@ const AIAssistant = () => {
             size="icon"
             disabled={sending || !input.trim()}
             aria-label="Send"
+            className="rounded-full h-10 w-10 shrink-0 shadow-md shadow-primary/20"
           >
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </Button>
