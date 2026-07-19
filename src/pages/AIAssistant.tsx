@@ -495,13 +495,13 @@ const AIAssistant = () => {
             ))}
           </div>
         )}
-        <div className="flex items-end gap-2 max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto flex items-end gap-2 rounded-3xl border border-border/60 bg-muted/40 p-1.5 pl-3 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/15 focus-within:bg-background transition-all">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about your rashans…"
             rows={1}
-            className="min-h-[44px] max-h-32 resize-none"
+            className="min-h-[40px] max-h-32 resize-none flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none px-1 py-2 text-sm"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -515,6 +515,7 @@ const AIAssistant = () => {
             size="icon"
             disabled={sending || !input.trim()}
             aria-label="Send"
+            className="rounded-full h-10 w-10 shrink-0 shadow-md shadow-primary/20"
           >
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </Button>
