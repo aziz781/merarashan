@@ -7,23 +7,117 @@ export type ChatMessage = {
   createdAt: number;
 };
 
-const STORAGE_KEY = "mr_ai_chat_v1";
+export type ChatThread = {
+  id: string;
+  title: string;
+  updatedAt: number;
+  createdAt: number;
+  messages: ChatMessage[];
+};
 
-export function loadMessages(): ChatMessage[] {
+const THREADS_KEY = "mr_ai_threads_v1";
+const LEGACY_KEY = "mr_ai_chat_v1";
+const MAX_THREADS = 30;
+const MAX_MESSAGES_PER_THREAD = 100;
+
+function safeParse<T>(raw: string | null, fallback: T): T {
+  if (!raw) return fallback;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    const p = JSON.parse(raw);
+    return p ?? fallback;
+  } catch { return fallback; }
+}
+
+function emitThreadsUpdated() {
+  try { window.dispatchEvent(new CustomEvent("mr:threads-updated")); } catch { /* ignore */ }
+}
+
+export function loadThreads(): ChatThread[] {
+  try {
+    const arr = safeParse<ChatThread[]>(localStorage.getItem(THREADS_KEY), []);
+    if (Array.isArray(arr) && arr.length > 0) {
+      return arr
+        .filter((t) => t && typeof t.id === "string" && Array.isArray(t.messages))
+        .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    }
+    // Migrate legacy single-conversation storage
+    const legacy = safeParse<ChatMessage[]>(localStorage.getItem(LEGACY_KEY), []);
+    if (Array.isArray(legacy) && legacy.length > 0) {
+      const migrated: ChatThread = {
+        id: crypto.randomUUID(),
+        title: deriveTitle(legacy),
+        createdAt: legacy[0]?.createdAt ?? Date.now(),
+        updatedAt: legacy[legacy.length - 1]?.createdAt ?? Date.now(),
+        messages: legacy,
+      };
+      localStorage.setItem(THREADS_KEY, JSON.stringify([migrated]));
+      try { localStorage.removeItem(LEGACY_KEY); } catch { /* ignore */ }
+      return [migrated];
+    }
+    return [];
   } catch { return []; }
 }
 
-export function saveMessages(messages: ChatMessage[]) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-100))); } catch { /* ignore */ }
+function persist(threads: ChatThread[]) {
+  try {
+    const trimmed = threads
+      .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
+      .slice(0, MAX_THREADS)
+      .map((t) => ({ ...t, messages: t.messages.slice(-MAX_MESSAGES_PER_THREAD) }));
+    localStorage.setItem(THREADS_KEY, JSON.stringify(trimmed));
+    emitThreadsUpdated();
+  } catch { /* ignore */ }
 }
 
-export function clearMessages() {
-  try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+export function getThread(id: string): ChatThread | undefined {
+  return loadThreads().find((t) => t.id === id);
+}
+
+export function createThread(): ChatThread {
+  const thread: ChatThread = {
+    id: crypto.randomUUID(),
+    title: "New chat",
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    messages: [],
+  };
+  const all = [thread, ...loadThreads()];
+  persist(all);
+  return thread;
+}
+
+export function updateThread(id: string, patch: Partial<Omit<ChatThread, "id">>) {
+  const all = loadThreads();
+  const idx = all.findIndex((t) => t.id === id);
+  if (idx === -1) return;
+  const next: ChatThread = { ...all[idx], ...patch, id };
+  if (patch.messages) {
+    next.title = all[idx].title === "New chat" || !all[idx].title
+      ? deriveTitle(patch.messages) || all[idx].title || "New chat"
+      : all[idx].title;
+    next.updatedAt = Date.now();
+  }
+  all[idx] = next;
+  persist(all);
+}
+
+export function deleteThread(id: string) {
+  const all = loadThreads().filter((t) => t.id !== id);
+  persist(all);
+}
+
+export function clearAllThreads() {
+  try {
+    localStorage.removeItem(THREADS_KEY);
+    emitThreadsUpdated();
+  } catch { /* ignore */ }
+}
+
+function deriveTitle(messages: ChatMessage[]): string {
+  const firstUser = messages.find((m) => m.role === "user");
+  if (!firstUser) return "New chat";
+  const t = firstUser.content.trim().replace(/\s+/g, " ");
+  return t.length > 48 ? `${t.slice(0, 45)}…` : t || "New chat";
 }
 
 // ---------- Recent quick-action prompts ----------
@@ -58,7 +152,6 @@ export function clearRecentPrompts() {
     window.dispatchEvent(new CustomEvent("mr:recent-prompts-updated"));
   } catch { /* ignore */ }
 }
-
 
 /**
  * Send messages to the ai-chat edge function and stream the assistant's
@@ -103,7 +196,6 @@ export async function streamChat(
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
 
-    // Parse SSE frames: lines of "data: <json>" separated by blank lines.
     let idx: number;
     while ((idx = buffer.indexOf("\n")) !== -1) {
       const line = buffer.slice(0, idx).trim();
