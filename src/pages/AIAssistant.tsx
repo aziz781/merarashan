@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Send, Sparkles, Trash2, Loader2, Menu, Plus, MessageSquare } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, Trash2, Loader2, Menu, Plus, MessageSquare, ChevronRight, Wallet, PackageCheck, ReceiptText, ClipboardList, type LucideIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
