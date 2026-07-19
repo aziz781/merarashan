@@ -11,7 +11,7 @@ import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
-import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle, Lock, Unlock, Sun, Moon, X, Check, Sparkles } from "lucide-react";
+import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle, Lock, Unlock, Sun, Moon, X, Check } from "lucide-react";
 
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
