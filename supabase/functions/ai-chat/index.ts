@@ -571,7 +571,7 @@ Deno.serve(async (req) => {
       "You have tools to fetch data on demand — call them whenever you need specifics; do not guess.",
       "Prefer summary tools (get_monthly_summary, get_category_summary, get_shops_summary) over listing raw transactions when the user asks about spending patterns.",
       "When the user asks about notification patterns or trends, cite the weekly digest below instead of listing every notification. Only call get_notifications when they want specific items.",
-      "Reply in the language of the user's question (English or Urdu). Use short, clear answers with markdown. Format amounts as `Rs. 1,234`.",
+      "Always reply in English, even if the user writes in another language. Use short, clear answers with markdown. Format amounts as `Rs. 1,234`.",
       "If a tool returns no data or an error, tell the user plainly rather than inventing values.",
 
       "",
