@@ -318,7 +318,68 @@ async function callGateway(apiKey: string, body: unknown): Promise<Response> {
   });
 }
 
+// ---------- Weekly digest cache ----------
+// In-memory per-isolate cache. Edge functions reuse warm isolates for a while,
+// so this meaningfully cuts repeat Supabase reads for chatty users without
+// changing correctness — TTL keeps the digest reasonably fresh.
+const DIGEST_TTL_MS = 10 * 60 * 1000; // 10 minutes
+const digestCache = new Map<string, { digest: string; expires: number }>();
+
+function getCachedDigest(mobile: string): string | null {
+  const hit = digestCache.get(mobile);
+  if (!hit) return null;
+  if (hit.expires < Date.now()) { digestCache.delete(mobile); return null; }
+  return hit.digest;
+}
+function setCachedDigest(mobile: string, digest: string) {
+  digestCache.set(mobile, { digest, expires: Date.now() + DIGEST_TTL_MS });
+  if (digestCache.size > 500) {
+    const oldest = digestCache.keys().next().value;
+    if (oldest) digestCache.delete(oldest);
+  }
+}
+
+function buildWeeklyDigest(rows: any[]): string {
+  const weekStart = (d: Date) => {
+    const dt = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    const dow = dt.getUTCDay() || 7;
+    if (dow !== 1) dt.setUTCDate(dt.getUTCDate() - (dow - 1));
+    return dt.toISOString().slice(0, 10);
+  };
+  type WeekBucket = { total: number; unread: number; tags: Record<string, number>; titles: Record<string, number> };
+  const weeks = new Map<string, WeekBucket>();
+  for (const n of rows) {
+    const created = n.created_at ? new Date(n.created_at) : null;
+    if (!created || isNaN(created.getTime())) continue;
+    const wk = weekStart(created);
+    let b = weeks.get(wk);
+    if (!b) { b = { total: 0, unread: 0, tags: {}, titles: {} }; weeks.set(wk, b); }
+    b.total += 1;
+    if (!n.read_at) b.unread += 1;
+    const tag = (n.tag || "").toString().trim();
+    if (tag) b.tags[tag] = (b.tags[tag] || 0) + 1;
+    const title = (n.title || "").toString().trim();
+    if (title) b.titles[title] = (b.titles[title] || 0) + 1;
+  }
+  const topEntries = (rec: Record<string, number>, k = 2) =>
+    Object.entries(rec).sort((a, b) => b[1] - a[1]).slice(0, k)
+      .map(([k2, v]) => `${k2}×${v}`).join(", ");
+  return [...weeks.entries()]
+    .sort((a, b) => a[0] < b[0] ? 1 : -1)
+    .slice(0, 8)
+    .map(([wk, b]) => {
+      const parts = [`${b.total} total`, `${b.unread} unread`];
+      const tagTop = topEntries(b.tags);
+      const titleTop = topEntries(b.titles);
+      if (tagTop) parts.push(`tags: ${tagTop}`);
+      else if (titleTop) parts.push(`top: ${titleTop}`);
+      return `- Week of ${wk}: ${parts.join(" · ")}`;
+    })
+    .join("\n");
+}
+
 // ---------- Handler ----------
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
