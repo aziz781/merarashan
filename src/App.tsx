@@ -34,7 +34,7 @@ const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const OAuthConsent = lazy(() => import("./pages/OAuthConsent.tsx"));
 const AgentIntegrations = lazy(() => import("./pages/AgentIntegrations.tsx"));
 const AIAgents = lazy(() => import("./pages/AIAgents.tsx"));
-const AIAssistant = lazy(() => import("./pages/AIAssistant.tsx"));
+
 
 function RouteFallback() {
   return (
