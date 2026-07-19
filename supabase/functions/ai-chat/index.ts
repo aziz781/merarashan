@@ -499,54 +499,6 @@ Deno.serve(async (req) => {
     }
 
 
-    const truncate = (s: string, n = 400) => (s && s.length > n ? s.slice(0, n) + "…" : s || "");
-    const unreadDetails = (notifCounts.unreadRecent as any[])
-      .map((n) => {
-        const date = n.created_at ? String(n.created_at).slice(0, 10) : "";
-        return `- [${date}] ${n.title}\n  ${truncate(n.body)}`.trimEnd();
-      })
-      .join("\n");
-
-
-    // Weekly digest of the last ~8 weeks so the model can reason about
-    // notification patterns without seeing every single row.
-    const weekStart = (d: Date) => {
-      // ISO week starts Monday. Return YYYY-MM-DD of that Monday.
-      const dt = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-      const dow = dt.getUTCDay() || 7; // Sun=7
-      if (dow !== 1) dt.setUTCDate(dt.getUTCDate() - (dow - 1));
-      return dt.toISOString().slice(0, 10);
-    };
-    type WeekBucket = { total: number; unread: number; tags: Record<string, number>; titles: Record<string, number> };
-    const weeks = new Map<string, WeekBucket>();
-    for (const n of (notifCounts.recentWindow as any[])) {
-      const created = n.created_at ? new Date(n.created_at) : null;
-      if (!created || isNaN(created.getTime())) continue;
-      const wk = weekStart(created);
-      let b = weeks.get(wk);
-      if (!b) { b = { total: 0, unread: 0, tags: {}, titles: {} }; weeks.set(wk, b); }
-      b.total += 1;
-      if (!n.read_at) b.unread += 1;
-      const tag = (n.tag || "").toString().trim();
-      if (tag) b.tags[tag] = (b.tags[tag] || 0) + 1;
-      const title = (n.title || "").toString().trim();
-      if (title) b.titles[title] = (b.titles[title] || 0) + 1;
-    }
-    const topEntries = (rec: Record<string, number>, k = 2) =>
-      Object.entries(rec).sort((a, b) => b[1] - a[1]).slice(0, k)
-        .map(([k2, v]) => `${k2}×${v}`).join(", ");
-    const weeklyDigest = [...weeks.entries()]
-      .sort((a, b) => a[0] < b[0] ? 1 : -1)
-      .slice(0, 8)
-      .map(([wk, b]) => {
-        const parts = [`${b.total} total`, `${b.unread} unread`];
-        const tagTop = topEntries(b.tags);
-        const titleTop = topEntries(b.titles);
-        if (tagTop) parts.push(`tags: ${tagTop}`);
-        else if (titleTop) parts.push(`top: ${titleTop}`);
-        return `- Week of ${wk}: ${parts.join(" · ")}`;
-      })
-      .join("\n");
 
     const systemPrompt = [
       "You are the in-app AI assistant for Mera Rashan (a Pakistani grocery-ration management app).",
