@@ -314,14 +314,34 @@ const AIAssistant = () => {
                             {new Date(t.updatedAt).toLocaleString()}
                           </p>
                         </div>
-                        <button
-                          type="button"
-                          onClick={(e) => onDeleteThread(t.id, e)}
-                          className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive p-1"
-                          aria-label="Delete conversation"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button
+                              type="button"
+                              onClick={(e) => e.stopPropagation()}
+                              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive p-1"
+                              aria-label="Delete conversation"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete this conversation?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently remove "{t.title || "New chat"}" and its messages from this device. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={(e) => onDeleteThread(t.id, e as unknown as React.MouseEvent)}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     ))
                   )}
