@@ -604,30 +604,6 @@ const Index = () => {
       />
 
       <main className="px-5 pt-5">
-        {tab === "customers" && (
-          <div className="mb-4 -mx-1">
-            <p className="px-1 mb-2 text-xs font-medium text-muted-foreground">
-              Ask the assistant
-            </p>
-            <div className="flex gap-2 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {[
-                { label: "This month's spending", prompt: "How much did I spend this month? Give a short summary." },
-                { label: "My ration statement", prompt: "Show me a summary of my latest ration statement and whether it is paid." },
-                { label: "Recent transactions", prompt: "List my 5 most recent rashan transactions with amount and status." },
-              ].map((chip) => (
-                <button
-                  key={chip.label}
-                  type="button"
-                  onClick={() => askAssistant(chip.prompt)}
-                  className="inline-flex items-center gap-1.5 shrink-0 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-primary" />
-                  {chip.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
         {/* Only the active tab is rendered — keeps inactive view code
             from parsing/running until the user actually opens it. */}
         <Suspense fallback={<LoadingState label="Loading…" />}>
