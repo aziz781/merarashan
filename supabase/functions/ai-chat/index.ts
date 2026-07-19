@@ -323,33 +323,47 @@ async function callGateway(apiKey: string, body: unknown): Promise<Response> {
 // so this meaningfully cuts repeat Supabase reads for chatty users without
 // changing correctness — TTL keeps the digest reasonably fresh.
 const DIGEST_TTL_MS = 10 * 60 * 1000; // 10 minutes
-const digestCache = new Map<string, { digest: string; expires: number }>();
+type DigestEntry = { digest: string; expires: number; builtAt: number };
+const digestCache = new Map<string, DigestEntry>();
 
-function getCachedDigest(mobile: string): string | null {
+// Returns the cached digest only if it is still fresh AND was built at/after
+// the caller-provided `minBuiltAt` watermark. This lets callers invalidate
+// the cache when they observe newer notification activity (new arrivals or
+// read/unread status changes) without waiting for the TTL to expire.
+function getCachedDigest(mobile: string, minBuiltAt = 0): string | null {
   const hit = digestCache.get(mobile);
   if (!hit) return null;
   if (hit.expires < Date.now()) { digestCache.delete(mobile); return null; }
+  if (minBuiltAt && hit.builtAt < minBuiltAt) {
+    digestCache.delete(mobile);
+    return null;
+  }
   return hit.digest;
 }
 function setCachedDigest(mobile: string, digest: string) {
-  digestCache.set(mobile, { digest, expires: Date.now() + DIGEST_TTL_MS });
+  const now = Date.now();
+  digestCache.set(mobile, { digest, expires: now + DIGEST_TTL_MS, builtAt: now });
   if (digestCache.size > 500) {
     const oldest = digestCache.keys().next().value;
     if (oldest) digestCache.delete(oldest);
   }
 }
+function invalidateDigest(mobile: string) {
+  digestCache.delete(mobile);
+}
 
 // ---------- Weekly digest concurrency control ----------
 // If multiple chat turns for the same user race to rebuild the digest (cache
-// miss / expiry), we only want ONE Supabase 8-week query + aggregation in
-// flight. Late arrivals await the same promise and reuse the result.
+// miss / expiry / invalidation), we only want ONE Supabase 8-week query +
+// aggregation in flight. Late arrivals await the same promise.
 const digestInflight = new Map<string, Promise<string>>();
 
 async function getOrBuildDigest(
   mobile: string,
   fetchRows: () => Promise<any[]>,
+  minBuiltAt = 0,
 ): Promise<string> {
-  const cached = getCachedDigest(mobile);
+  const cached = getCachedDigest(mobile, minBuiltAt);
   if (cached) return cached;
   const existing = digestInflight.get(mobile);
   if (existing) return existing;
@@ -365,6 +379,22 @@ async function getOrBuildDigest(
   })();
   digestInflight.set(mobile, p);
   return p;
+}
+
+// Compute the newest activity timestamp across a set of notification rows
+// (both created_at and read_at). Used as the invalidation watermark.
+function latestActivityMs(rows: any[] | null | undefined): number {
+  if (!rows || !rows.length) return 0;
+  let max = 0;
+  for (const r of rows) {
+    for (const field of ["created_at", "read_at", "updated_at"]) {
+      const v = r?.[field];
+      if (!v) continue;
+      const t = Date.parse(v);
+      if (!isNaN(t) && t > max) max = t;
+    }
+  }
+  return max;
 }
 
 function buildWeeklyDigest(rows: any[]): string {
