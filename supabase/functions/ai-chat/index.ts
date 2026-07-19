@@ -523,13 +523,9 @@ Deno.serve(async (req) => {
       .join("\n");
 
 
-    // Weekly digest — cached per mobile for DIGEST_TTL_MS to avoid re-running
-    // the 8-week query and re-aggregating on every chat turn.
-    let weeklyDigest = notifCounts.cachedDigest ?? "";
-    if (!weeklyDigest) {
-      weeklyDigest = buildWeeklyDigest(notifCounts.recentWindow as any[]);
-      if (weeklyDigest) setCachedDigest(mobile, weeklyDigest);
-    }
+    // Weekly digest is now built (and deduped across concurrent requests)
+    // inside the notifCounts block above.
+    const weeklyDigest = notifCounts.weeklyDigest ?? "";
 
 
 
