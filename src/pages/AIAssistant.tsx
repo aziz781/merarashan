@@ -341,13 +341,32 @@ const AIAssistant = () => {
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     Recent prompts
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => { clearRecentPrompts(); setRecentPrompts([]); }}
-                    className="text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    Clear
-                  </button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        Clear
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Clear recent prompts?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will remove all your recent prompt suggestions. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => { clearRecentPrompts(); setRecentPrompts([]); }}
+                        >
+                          Clear
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
                 <div className="grid gap-2">
                   {recentPrompts.map((r) => (
