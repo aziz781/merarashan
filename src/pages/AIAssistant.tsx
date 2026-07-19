@@ -90,11 +90,15 @@ const AIAssistant = () => {
   }, []);
 
   // Route sync: if no threadId, pick most recent or create one and navigate.
+  // Guarded against React StrictMode double-invocation so we never create
+  // two blank threads on first mount.
+  const bootstrappedRef = useRef(false);
   useEffect(() => {
     if (threadId) {
       const t = getThread(threadId);
       if (!t) {
-        // Unknown id — create fresh
+        if (bootstrappedRef.current) return;
+        bootstrappedRef.current = true;
         const created = createThread();
         navigate(`/assistant/${created.id}`, { replace: true, state: location.state });
         return;
@@ -102,6 +106,8 @@ const AIAssistant = () => {
       setMessages(t.messages);
       return;
     }
+    if (bootstrappedRef.current) return;
+    bootstrappedRef.current = true;
     const all = loadThreads();
     const target = all[0] ?? createThread();
     refreshThreads();
