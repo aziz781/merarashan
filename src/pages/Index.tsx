@@ -11,7 +11,7 @@ import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
-import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle, Lock, Unlock, Sun, Moon, X, Check, Sparkles } from "lucide-react";
+import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle, Lock, Unlock, Sun, Moon, X, Check } from "lucide-react";
 
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
@@ -43,8 +43,6 @@ import type { Customer } from "@/types/domain";
 import meraRashanLogo from "@/assets/mera-rashan-logo.webp";
 import { PageFooter } from "@/components/PageFooter";
 import { BiometricLockSetting } from "@/components/BiometricLockSetting";
-import { AssistantHintBadge } from "@/components/AssistantHintBadge";
-import { AssistantOnboardingDialog } from "@/components/AssistantOnboardingDialog";
 
 // Lazy-load the four primary tab views so each tab's code (and its
 // dependencies — virtualizer, stat components, etc.) ships in its own chunk.
@@ -168,33 +166,8 @@ const Index = () => {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [socialOpen, setSocialOpen] = useState(false);
   const [sponsorProfileOpen, setSponsorProfileOpen] = useState(false);
-  const [assistantOnboardOpen, setAssistantOnboardOpen] = useState(false);
 
-  const ASSISTANT_ONBOARD_KEY = "mr_assistant_onboarded";
-  const openAssistant = useCallback(() => {
-    let seen = false;
-    try { seen = localStorage.getItem(ASSISTANT_ONBOARD_KEY) === "1"; } catch { /* ignore */ }
-    if (seen) {
-      navigate("/assistant");
-    } else {
-      setAssistantOnboardOpen(true);
-    }
-  }, [navigate]);
 
-  const finishAssistantOnboard = useCallback(() => {
-    try { localStorage.setItem(ASSISTANT_ONBOARD_KEY, "1"); } catch { /* ignore */ }
-    setAssistantOnboardOpen(false);
-    navigate("/assistant");
-  }, [navigate]);
-
-  const askAssistant = useCallback(async (prompt: string) => {
-    try { localStorage.setItem(ASSISTANT_ONBOARD_KEY, "1"); } catch { /* ignore */ }
-    try {
-      const { addRecentPrompt } = await import("@/lib/aiChat");
-      addRecentPrompt(prompt);
-    } catch { /* ignore */ }
-    navigate("/assistant", { state: { prompt } });
-  }, [navigate]);
 
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [notifUnread, setNotifUnread] = useState<number>(() => {
@@ -589,15 +562,6 @@ const Index = () => {
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
-              onClick={openAssistant}
-              aria-label="Open AI Assistant"
-              className="relative flex h-11 items-center gap-1.5 shrink-0 rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35 px-2"
-            >
-              <Sparkles className="w-5 h-5 shrink-0" />
-              {mobile && <AssistantHintBadge mobile={mobile} />}
-            </button>
-            <button
-              type="button"
               onClick={toggleTheme}
               aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
@@ -621,11 +585,6 @@ const Index = () => {
         </DialogContent>
       </Dialog>
 
-      <AssistantOnboardingDialog
-        open={assistantOnboardOpen}
-        onOpenChange={setAssistantOnboardOpen}
-        onContinue={finishAssistantOnboard}
-      />
 
 
 
@@ -645,30 +604,6 @@ const Index = () => {
       />
 
       <main className="px-5 pt-5">
-        {tab === "customers" && (
-          <div className="mb-4 -mx-1">
-            <p className="px-1 mb-2 text-xs font-medium text-muted-foreground">
-              Ask the assistant
-            </p>
-            <div className="flex gap-2 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {[
-                { label: "This month's spending", prompt: "How much did I spend this month? Give a short summary." },
-                { label: "My ration statement", prompt: "Show me a summary of my latest ration statement and whether it is paid." },
-                { label: "Recent transactions", prompt: "List my 5 most recent rashan transactions with amount and status." },
-              ].map((chip) => (
-                <button
-                  key={chip.label}
-                  type="button"
-                  onClick={() => askAssistant(chip.prompt)}
-                  className="inline-flex items-center gap-1.5 shrink-0 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-primary" />
-                  {chip.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
         {/* Only the active tab is rendered — keeps inactive view code
             from parsing/running until the user actually opens it. */}
         <Suspense fallback={<LoadingState label="Loading…" />}>
