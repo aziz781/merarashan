@@ -424,6 +424,8 @@ Deno.serve(async (req) => {
       `Deliveries in ${currentYear}: ${deliveriesYear} total, ${deliveriesMonth} this month${lastDelivery ? `, last on ${lastDelivery}` : ""}.`,
       `Notifications: ${notifCounts.total} total, ${notifCounts.unread} unread.`,
       recentTitles ? `Recent notifications:\n${recentTitles}` : "",
+      unreadDetails ? `Recent unread notification messages:\n${unreadDetails}` : "",
+
     ].filter(Boolean).join("\n");
 
     const convo: GwMessage[] = [
