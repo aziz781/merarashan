@@ -585,11 +585,6 @@ const Index = () => {
         </DialogContent>
       </Dialog>
 
-      <AssistantOnboardingDialog
-        open={assistantOnboardOpen}
-        onOpenChange={setAssistantOnboardOpen}
-        onContinue={finishAssistantOnboard}
-      />
 
 
 
