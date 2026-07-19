@@ -355,7 +355,8 @@ Deno.serve(async (req) => {
             Deno.env.get("SUPABASE_ANON_KEY")!,
             { global: { headers: { Authorization: `Bearer ${token}` } } },
           );
-          const [totalR, unreadR, recentR, unreadRecentR] = await Promise.all([
+          const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 24 * 60 * 60 * 1000).toISOString();
+          const [totalR, unreadR, recentR, unreadRecentR, weeklyR] = await Promise.all([
             supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile),
             supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile).is("read_at", null),
             supa.from("notification_inbox")
@@ -369,14 +370,22 @@ Deno.serve(async (req) => {
               .is("read_at", null)
               .order("created_at", { ascending: false })
               .limit(5),
+            supa.from("notification_inbox")
+              .select("title,tag,created_at,read_at")
+              .eq("mobile", mobile)
+              .gte("created_at", eightWeeksAgo)
+              .order("created_at", { ascending: false })
+              .limit(500),
           ]);
           return {
             total: totalR.count ?? 0,
             unread: unreadR.count ?? 0,
             recent: recentR.data ?? [],
             unreadRecent: unreadRecentR.data ?? [],
+            recentWindow: weeklyR.data ?? [],
           };
-        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[] }; }
+        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[], recentWindow: [] as any[] }; }
+
       })(),
     ]);
 
