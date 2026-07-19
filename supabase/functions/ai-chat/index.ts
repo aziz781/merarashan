@@ -339,6 +339,34 @@ function setCachedDigest(mobile: string, digest: string) {
   }
 }
 
+// ---------- Weekly digest concurrency control ----------
+// If multiple chat turns for the same user race to rebuild the digest (cache
+// miss / expiry), we only want ONE Supabase 8-week query + aggregation in
+// flight. Late arrivals await the same promise and reuse the result.
+const digestInflight = new Map<string, Promise<string>>();
+
+async function getOrBuildDigest(
+  mobile: string,
+  fetchRows: () => Promise<any[]>,
+): Promise<string> {
+  const cached = getCachedDigest(mobile);
+  if (cached) return cached;
+  const existing = digestInflight.get(mobile);
+  if (existing) return existing;
+  const p = (async () => {
+    try {
+      const rows = await fetchRows();
+      const digest = buildWeeklyDigest(rows);
+      if (digest) setCachedDigest(mobile, digest);
+      return digest;
+    } finally {
+      digestInflight.delete(mobile);
+    }
+  })();
+  digestInflight.set(mobile, p);
+  return p;
+}
+
 function buildWeeklyDigest(rows: any[]): string {
   const weekStart = (d: Date) => {
     const dt = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
@@ -433,28 +461,33 @@ Deno.serve(async (req) => {
               .order("created_at", { ascending: false })
               .limit(5),
           ];
-          // Skip the heavy 8-week query entirely on a cache hit.
-          if (!cachedDigest) {
-            queries.push(
-              supa.from("notification_inbox")
-                .select("title,tag,created_at,read_at")
-                .eq("mobile", mobile)
-                .gte("created_at", eightWeeksAgo)
-                .order("created_at", { ascending: false })
-                .limit(500),
-            );
-          }
-          const results = await Promise.all(queries);
-          const [totalR, unreadR, recentR, unreadRecentR, weeklyR] = results;
+          // Dedupe the heavy 8-week query: if another concurrent request for the
+          // same mobile is already fetching + aggregating, await that promise
+          // instead of hitting Supabase again. On a cache hit, skip entirely.
+          const digestPromise: Promise<string> = cachedDigest
+            ? Promise.resolve(cachedDigest)
+            : getOrBuildDigest(mobile, async () => {
+                const { data } = await supa.from("notification_inbox")
+                  .select("title,tag,created_at,read_at")
+                  .eq("mobile", mobile)
+                  .gte("created_at", eightWeeksAgo)
+                  .order("created_at", { ascending: false })
+                  .limit(500);
+                return data ?? [];
+              });
+          const [results, weeklyDigest] = await Promise.all([
+            Promise.all(queries),
+            digestPromise,
+          ]);
+          const [totalR, unreadR, recentR, unreadRecentR] = results;
           return {
             total: totalR.count ?? 0,
             unread: unreadR.count ?? 0,
             recent: recentR.data ?? [],
             unreadRecent: unreadRecentR.data ?? [],
-            recentWindow: cachedDigest ? [] : (weeklyR?.data ?? []),
-            cachedDigest,
+            weeklyDigest,
           };
-        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[], recentWindow: [] as any[], cachedDigest: null as string | null }; }
+        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[], weeklyDigest: "" }; }
 
       })(),
     ]);
@@ -490,13 +523,9 @@ Deno.serve(async (req) => {
       .join("\n");
 
 
-    // Weekly digest — cached per mobile for DIGEST_TTL_MS to avoid re-running
-    // the 8-week query and re-aggregating on every chat turn.
-    let weeklyDigest = notifCounts.cachedDigest ?? "";
-    if (!weeklyDigest) {
-      weeklyDigest = buildWeeklyDigest(notifCounts.recentWindow as any[]);
-      if (weeklyDigest) setCachedDigest(mobile, weeklyDigest);
-    }
+    // Weekly digest is now built (and deduped across concurrent requests)
+    // inside the notifCounts block above.
+    const weeklyDigest = notifCounts.weeklyDigest ?? "";
 
 
 
