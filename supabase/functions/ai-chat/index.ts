@@ -1,20 +1,30 @@
-// AI Assistant chat endpoint — streams a Lovable AI Gateway completion back to
-// the client as text/event-stream, with the signed-in user's own rashan
-// transactions and statements injected into the system prompt.
+// AI Assistant chat endpoint — Lovable AI Gateway with OpenAI-compatible tool
+// calling. The model runs a tool loop to fetch transactions, statements,
+// notifications, and shop summaries on demand; the final answer is streamed
+// back to the client as text/event-stream.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const UPSTREAM = "https://data.merarashan.pk";
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash";
+const MAX_TOOL_ROUNDS = 5;
 
 type ChatMessage = { role: "user" | "assistant" | "system"; content: string };
+type ToolCall = { id: string; type: "function"; function: { name: string; arguments: string } };
+type GwMessage = {
+  role: "system" | "user" | "assistant" | "tool";
+  content: string | null;
+  tool_calls?: ToolCall[];
+  tool_call_id?: string;
+  name?: string;
+};
 
 function normalize(m: string): string {
   return String(m || "").replace(/\D/g, "");
 }
 
-async function getMobile(req: Request): Promise<string> {
+async function getMobileAndToken(req: Request): Promise<{ mobile: string; token: string }> {
   const authHeader = req.headers.get("Authorization");
   if (!authHeader?.startsWith("Bearer ")) throw new Error("Unauthorized");
   const token = authHeader.replace("Bearer ", "");
@@ -29,7 +39,7 @@ async function getMobile(req: Request): Promise<string> {
   const email = data.user.email || "";
   const mobile = normalize(meta.mobile || email.split("@")[0] || "");
   if (!/^\d{6,15}$/.test(mobile)) throw new Error("No mobile identity");
-  return mobile;
+  return { mobile, token };
 }
 
 async function fetchResource(resource: string, mobile: string, extra?: Record<string, string>) {
@@ -45,87 +55,386 @@ async function fetchResource(resource: string, mobile: string, extra?: Record<st
   try { return await res.json(); } catch { return null; }
 }
 
+// ---------- Helpers to normalize upstream shapes ----------
+
+function toArray(v: unknown): any[] {
+  if (Array.isArray(v)) return v;
+  if (v && typeof v === "object") {
+    const o = v as Record<string, unknown>;
+    for (const k of ["data", "items", "results", "transactions", "statements", "cards"]) {
+      if (Array.isArray(o[k])) return o[k] as any[];
+    }
+  }
+  return [];
+}
+
+function pickDate(t: any): Date | null {
+  const cand = t?.date || t?.created_at || t?.createdAt || t?.transaction_date || t?.txnDate || t?.monthYear;
+  if (!cand) return null;
+  const d = new Date(cand);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function pickAmount(t: any): number {
+  const n = Number(t?.amount ?? t?.total ?? t?.value ?? t?.price ?? 0);
+  return isFinite(n) ? n : 0;
+}
+
+function pickShop(t: any): string {
+  return String(t?.shop_name || t?.shopName || t?.shop || t?.merchant || t?.store || "Unknown").trim() || "Unknown";
+}
+
+function pickCategory(t: any): string {
+  return String(t?.category || t?.item_category || t?.type || "Uncategorized").trim() || "Uncategorized";
+}
+
+// ---------- Tool definitions ----------
+
+const tools = [
+  {
+    type: "function",
+    function: {
+      name: "get_transactions",
+      description: "List the user's rashan transactions (deliveries). Optionally filter by year, month (1-12), or shop name substring. Returns up to `limit` records (default 50, max 200), newest first.",
+      parameters: {
+        type: "object",
+        properties: {
+          year: { type: "string", description: "4-digit year, e.g. '2026'. Defaults to current year." },
+          month: { type: "integer", description: "Month 1-12. Optional." },
+          shop: { type: "string", description: "Case-insensitive shop name substring. Optional." },
+          limit: { type: "integer", description: "Max records to return (default 50, max 200)." },
+        },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_monthly_summary",
+      description: "Aggregate the user's transactions by month for a given year. Returns per-month totals (count, total amount).",
+      parameters: {
+        type: "object",
+        properties: {
+          year: { type: "string", description: "4-digit year. Defaults to current year." },
+        },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_category_summary",
+      description: "Aggregate the user's transactions by category for a given year. Returns per-category totals.",
+      parameters: {
+        type: "object",
+        properties: {
+          year: { type: "string", description: "4-digit year. Defaults to current year." },
+        },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_shops_summary",
+      description: "Aggregate the user's transactions by shop for a given year. Returns per-shop totals (count, total amount, last visit date).",
+      parameters: {
+        type: "object",
+        properties: {
+          year: { type: "string", description: "4-digit year. Defaults to current year." },
+        },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_statements",
+      description: "List the user's monthly rashan statements for a given year (paid/unpaid, amounts).",
+      parameters: {
+        type: "object",
+        properties: {
+          year: { type: "string", description: "4-digit year. Defaults to current year." },
+        },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_cards",
+      description: "List the user's Mera Rashan cards (id, holder, status).",
+      parameters: { type: "object", properties: {} },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_notifications",
+      description: "List the user's in-app notifications from the notification inbox, newest first.",
+      parameters: {
+        type: "object",
+        properties: {
+          limit: { type: "integer", description: "Max records (default 20, max 100)." },
+          unread_only: { type: "boolean", description: "If true, only unread notifications." },
+        },
+      },
+    },
+  },
+];
+
+// ---------- Tool executors ----------
+
+async function runTool(
+  name: string,
+  args: Record<string, any>,
+  ctx: { mobile: string; token: string },
+): Promise<unknown> {
+  const currentYear = String(new Date().getFullYear());
+  switch (name) {
+    case "get_transactions": {
+      const year = String(args.year || currentYear);
+      const limit = Math.max(1, Math.min(200, Number(args.limit) || 50));
+      const raw = await fetchResource("transactions", ctx.mobile, { monthYear: year });
+      let list = toArray(raw);
+      if (args.month) {
+        const m = Number(args.month);
+        list = list.filter((t) => {
+          const d = pickDate(t);
+          return d && d.getMonth() + 1 === m;
+        });
+      }
+      if (args.shop) {
+        const q = String(args.shop).toLowerCase();
+        list = list.filter((t) => pickShop(t).toLowerCase().includes(q));
+      }
+      list.sort((a, b) => (pickDate(b)?.getTime() || 0) - (pickDate(a)?.getTime() || 0));
+      return { count: list.length, transactions: list.slice(0, limit) };
+    }
+    case "get_monthly_summary": {
+      const year = String(args.year || currentYear);
+      const raw = await fetchResource("transactions", ctx.mobile, { monthYear: year });
+      const list = toArray(raw);
+      const buckets: Record<string, { month: number; count: number; total: number }> = {};
+      for (const t of list) {
+        const d = pickDate(t);
+        if (!d) continue;
+        const key = String(d.getMonth() + 1).padStart(2, "0");
+        buckets[key] ??= { month: d.getMonth() + 1, count: 0, total: 0 };
+        buckets[key].count += 1;
+        buckets[key].total += pickAmount(t);
+      }
+      const months = Object.keys(buckets).sort().map((k) => buckets[k]);
+      const grand = months.reduce((s, m) => s + m.total, 0);
+      return { year, months, grand_total: Math.round(grand * 100) / 100 };
+    }
+    case "get_category_summary": {
+      const year = String(args.year || currentYear);
+      const raw = await fetchResource("transactions", ctx.mobile, { monthYear: year });
+      const list = toArray(raw);
+      const buckets: Record<string, { category: string; count: number; total: number }> = {};
+      for (const t of list) {
+        const c = pickCategory(t);
+        buckets[c] ??= { category: c, count: 0, total: 0 };
+        buckets[c].count += 1;
+        buckets[c].total += pickAmount(t);
+      }
+      const categories = Object.values(buckets).sort((a, b) => b.total - a.total);
+      return { year, categories };
+    }
+    case "get_shops_summary": {
+      const year = String(args.year || currentYear);
+      const raw = await fetchResource("transactions", ctx.mobile, { monthYear: year });
+      const list = toArray(raw);
+      const buckets: Record<string, { shop: string; count: number; total: number; last_visit: string | null }> = {};
+      for (const t of list) {
+        const s = pickShop(t);
+        const d = pickDate(t);
+        buckets[s] ??= { shop: s, count: 0, total: 0, last_visit: null };
+        buckets[s].count += 1;
+        buckets[s].total += pickAmount(t);
+        const iso = d ? d.toISOString().slice(0, 10) : null;
+        if (iso && (!buckets[s].last_visit || iso > buckets[s].last_visit!)) {
+          buckets[s].last_visit = iso;
+        }
+      }
+      const shops = Object.values(buckets).sort((a, b) => b.total - a.total);
+      return { year, shops };
+    }
+    case "get_statements": {
+      const year = String(args.year || currentYear);
+      const raw = await fetchResource("statements", ctx.mobile, { year });
+      return { year, statements: toArray(raw) };
+    }
+    case "get_cards": {
+      const raw = await fetchResource("cards", ctx.mobile);
+      return { cards: toArray(raw) };
+    }
+    case "get_notifications": {
+      const limit = Math.max(1, Math.min(100, Number(args.limit) || 20));
+      const supa = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: `Bearer ${ctx.token}` } } },
+      );
+      let q = supa.from("notification_inbox")
+        .select("id,title,body,tag,url,created_at,read_at")
+        .eq("mobile", ctx.mobile)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      if (args.unread_only) q = q.is("read_at", null);
+      const { data, error } = await q;
+      if (error) return { error: error.message, notifications: [] };
+      return { count: data?.length || 0, notifications: data || [] };
+    }
+    default:
+      return { error: `Unknown tool: ${name}` };
+  }
+}
+
+// ---------- Gateway helpers ----------
+
+function gwError(status: number, text: string) {
+  if (status === 429) {
+    return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
+      status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  if (status === 402) {
+    return new Response(JSON.stringify({ error: "AI credits exhausted. Please contact support." }), {
+      status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  return new Response(JSON.stringify({ error: `AI gateway error: ${text.slice(0, 300)}` }), {
+    status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+async function callGateway(apiKey: string, body: unknown): Promise<Response> {
+  return await fetch(GATEWAY, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+// ---------- Handler ----------
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405, headers: corsHeaders });
   }
   try {
-    const mobile = await getMobile(req);
+    const { mobile, token } = await getMobileAndToken(req);
     const { messages } = (await req.json()) as { messages: ChatMessage[] };
     if (!Array.isArray(messages) || messages.length === 0) {
       return new Response(JSON.stringify({ error: "messages required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    // Pull the current year of transactions + statements + cards + customer.
-    const year = String(new Date().getFullYear());
-    const [customers, cards, transactions, statements] = await Promise.all([
-      fetchResource("customers", mobile),
-      fetchResource("cards", mobile),
-      fetchResource("transactions", mobile, { monthYear: year }),
-      fetchResource("statements", mobile, { year }),
-    ]);
-
-    // Cap the size of each blob to keep the prompt reasonable.
-    const cap = (v: unknown, n: number) => JSON.stringify(v).slice(0, n);
-    const systemPrompt = [
-      "You are the in-app AI assistant for Mera Rashan (a Pakistani grocery-ration management app).",
-      "Answer the signed-in user's questions about their own rashan cards, transactions (deliveries), and monthly statements using ONLY the JSON data provided below.",
-      "Reply in the language of the user's question (English or Urdu). Use short, clear answers with markdown when helpful. Format amounts as `Rs. 1,234`.",
-      "If the data does not contain the answer, say you don't have that information rather than guessing.",
-      `Today's date: ${new Date().toISOString().slice(0, 10)}. Signed-in mobile: ${mobile}.`,
-      "",
-      `CUSTOMER: ${cap(customers, 4000)}`,
-      `CARDS: ${cap(cards, 6000)}`,
-      `TRANSACTIONS (${year}): ${cap(transactions, 18000)}`,
-      `STATEMENTS (${year}): ${cap(statements, 8000)}`,
-    ].join("\n");
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) {
       return new Response(JSON.stringify({ error: "LOVABLE_API_KEY not configured" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const upstream = await fetch(GATEWAY, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        stream: true,
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...messages.slice(-20).map((m) => ({ role: m.role, content: m.content })),
-        ],
-      }),
-    });
-
-    if (!upstream.ok) {
-      const text = await upstream.text();
-      if (upstream.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (upstream.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please contact support." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      return new Response(JSON.stringify({ error: `AI gateway error: ${text.slice(0, 300)}` }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(upstream.body, {
+    // Lightweight overview to seed context without dumping every record.
+    const [customers, cards, unreadCount] = await Promise.all([
+      fetchResource("customers", mobile),
+      fetchResource("cards", mobile),
+      (async () => {
+        try {
+          const supa = createClient(
+            Deno.env.get("SUPABASE_URL")!,
+            Deno.env.get("SUPABASE_ANON_KEY")!,
+            { global: { headers: { Authorization: `Bearer ${token}` } } },
+          );
+          const { count } = await supa.from("notification_inbox")
+            .select("*", { count: "exact", head: true })
+            .eq("mobile", mobile)
+            .is("read_at", null);
+          return count ?? 0;
+        } catch { return 0; }
+      })(),
+    ]);
+
+    const cardCount = toArray(cards).length;
+    const cust = toArray(customers)[0] || customers || {};
+    const custName = (cust as any)?.name || (cust as any)?.customer_name || "";
+
+    const systemPrompt = [
+      "You are the in-app AI assistant for Mera Rashan (a Pakistani grocery-ration management app).",
+      "Answer the signed-in user's questions about their own rashan cards, transactions (deliveries), monthly statements, and notifications.",
+      "You have tools to fetch data on demand — call them whenever you need specifics; do not guess.",
+      "Prefer summary tools (get_monthly_summary, get_category_summary, get_shops_summary) over listing raw transactions when the user asks about spending patterns.",
+      "Reply in the language of the user's question (English or Urdu). Use short, clear answers with markdown. Format amounts as `Rs. 1,234`.",
+      "If a tool returns no data or an error, tell the user plainly rather than inventing values.",
+      "",
+      `Today's date: ${new Date().toISOString().slice(0, 10)}. Signed-in mobile: ${mobile}.`,
+      `Overview: ${custName ? `customer name "${custName}", ` : ""}${cardCount} card(s), ${unreadCount} unread notification(s).`,
+    ].join("\n");
+
+    const convo: GwMessage[] = [
+      { role: "system", content: systemPrompt },
+      ...messages.slice(-20).map((m) => ({ role: m.role, content: m.content })),
+    ];
+
+    // Tool loop: iterate non-streaming until the model stops calling tools,
+    // then stream the final answer.
+    for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+      const res = await callGateway(apiKey, {
+        model: MODEL,
+        messages: convo,
+        tools,
+        tool_choice: "auto",
+        stream: false,
+      });
+      if (!res.ok) return gwError(res.status, await res.text());
+      const json = await res.json() as {
+        choices: { message: GwMessage; finish_reason?: string }[];
+      };
+      const msg = json.choices?.[0]?.message;
+      if (!msg) return gwError(500, "Empty gateway response");
+
+      const calls = msg.tool_calls;
+      if (!calls || calls.length === 0) {
+        // No tools requested — stream a follow-up completion so the client
+        // receives the answer as text/event-stream chunks.
+        break;
+      }
+
+      // Append assistant tool_calls message, then execute each call.
+      convo.push({ role: "assistant", content: msg.content ?? "", tool_calls: calls });
+      for (const call of calls) {
+        let args: Record<string, any> = {};
+        try { args = JSON.parse(call.function.arguments || "{}"); } catch { /* ignore */ }
+        let result: unknown;
+        try {
+          result = await runTool(call.function.name, args, { mobile, token });
+        } catch (e) {
+          result = { error: e instanceof Error ? e.message : "Tool failed" };
+        }
+        convo.push({
+          role: "tool",
+          tool_call_id: call.id,
+          name: call.function.name,
+          content: JSON.stringify(result).slice(0, 20000),
+        });
+      }
+    }
+
+    // Final streaming call — no tools; produce the user-facing answer.
+    const finalRes = await callGateway(apiKey, {
+      model: MODEL,
+      messages: convo,
+      stream: true,
+    });
+    if (!finalRes.ok) return gwError(finalRes.status, await finalRes.text());
+
+    return new Response(finalRes.body, {
       headers: {
         ...corsHeaders,
         "Content-Type": "text/event-stream",
