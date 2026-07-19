@@ -355,7 +355,7 @@ Deno.serve(async (req) => {
             Deno.env.get("SUPABASE_ANON_KEY")!,
             { global: { headers: { Authorization: `Bearer ${token}` } } },
           );
-          const [totalR, unreadR, recentR] = await Promise.all([
+          const [totalR, unreadR, recentR, unreadRecentR] = await Promise.all([
             supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile),
             supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile).is("read_at", null),
             supa.from("notification_inbox")
@@ -363,13 +363,20 @@ Deno.serve(async (req) => {
               .eq("mobile", mobile)
               .order("created_at", { ascending: false })
               .limit(5),
+            supa.from("notification_inbox")
+              .select("title,body,created_at")
+              .eq("mobile", mobile)
+              .is("read_at", null)
+              .order("created_at", { ascending: false })
+              .limit(5),
           ]);
           return {
             total: totalR.count ?? 0,
             unread: unreadR.count ?? 0,
             recent: recentR.data ?? [],
+            unreadRecent: unreadRecentR.data ?? [],
           };
-        } catch { return { total: 0, unread: 0, recent: [] as any[] }; }
+        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[] }; }
       })(),
     ]);
 
@@ -395,6 +402,15 @@ Deno.serve(async (req) => {
       .map((n) => `- ${n.title}${n.read_at ? "" : " (unread)"}`)
       .join("\n");
 
+    const truncate = (s: string, n = 400) => (s && s.length > n ? s.slice(0, n) + "…" : s || "");
+    const unreadDetails = (notifCounts.unreadRecent as any[])
+      .map((n) => {
+        const date = n.created_at ? String(n.created_at).slice(0, 10) : "";
+        return `- [${date}] ${n.title}\n  ${truncate(n.body)}`.trimEnd();
+      })
+      .join("\n");
+
+
     const systemPrompt = [
       "You are the in-app AI assistant for Mera Rashan (a Pakistani grocery-ration management app).",
       "Answer the signed-in user's questions about their own rashan cards, transactions (deliveries), monthly statements, and notifications.",
@@ -408,6 +424,8 @@ Deno.serve(async (req) => {
       `Deliveries in ${currentYear}: ${deliveriesYear} total, ${deliveriesMonth} this month${lastDelivery ? `, last on ${lastDelivery}` : ""}.`,
       `Notifications: ${notifCounts.total} total, ${notifCounts.unread} unread.`,
       recentTitles ? `Recent notifications:\n${recentTitles}` : "",
+      unreadDetails ? `Recent unread notification messages:\n${unreadDetails}` : "",
+
     ].filter(Boolean).join("\n");
 
     const convo: GwMessage[] = [
