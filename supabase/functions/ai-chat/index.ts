@@ -323,33 +323,47 @@ async function callGateway(apiKey: string, body: unknown): Promise<Response> {
 // so this meaningfully cuts repeat Supabase reads for chatty users without
 // changing correctness — TTL keeps the digest reasonably fresh.
 const DIGEST_TTL_MS = 10 * 60 * 1000; // 10 minutes
-const digestCache = new Map<string, { digest: string; expires: number }>();
+type DigestEntry = { digest: string; expires: number; builtAt: number };
+const digestCache = new Map<string, DigestEntry>();
 
-function getCachedDigest(mobile: string): string | null {
+// Returns the cached digest only if it is still fresh AND was built at/after
+// the caller-provided `minBuiltAt` watermark. This lets callers invalidate
+// the cache when they observe newer notification activity (new arrivals or
+// read/unread status changes) without waiting for the TTL to expire.
+function getCachedDigest(mobile: string, minBuiltAt = 0): string | null {
   const hit = digestCache.get(mobile);
   if (!hit) return null;
   if (hit.expires < Date.now()) { digestCache.delete(mobile); return null; }
+  if (minBuiltAt && hit.builtAt < minBuiltAt) {
+    digestCache.delete(mobile);
+    return null;
+  }
   return hit.digest;
 }
 function setCachedDigest(mobile: string, digest: string) {
-  digestCache.set(mobile, { digest, expires: Date.now() + DIGEST_TTL_MS });
+  const now = Date.now();
+  digestCache.set(mobile, { digest, expires: now + DIGEST_TTL_MS, builtAt: now });
   if (digestCache.size > 500) {
     const oldest = digestCache.keys().next().value;
     if (oldest) digestCache.delete(oldest);
   }
 }
+function invalidateDigest(mobile: string) {
+  digestCache.delete(mobile);
+}
 
 // ---------- Weekly digest concurrency control ----------
 // If multiple chat turns for the same user race to rebuild the digest (cache
-// miss / expiry), we only want ONE Supabase 8-week query + aggregation in
-// flight. Late arrivals await the same promise and reuse the result.
+// miss / expiry / invalidation), we only want ONE Supabase 8-week query +
+// aggregation in flight. Late arrivals await the same promise.
 const digestInflight = new Map<string, Promise<string>>();
 
 async function getOrBuildDigest(
   mobile: string,
   fetchRows: () => Promise<any[]>,
+  minBuiltAt = 0,
 ): Promise<string> {
-  const cached = getCachedDigest(mobile);
+  const cached = getCachedDigest(mobile, minBuiltAt);
   if (cached) return cached;
   const existing = digestInflight.get(mobile);
   if (existing) return existing;
@@ -365,6 +379,22 @@ async function getOrBuildDigest(
   })();
   digestInflight.set(mobile, p);
   return p;
+}
+
+// Compute the newest activity timestamp across a set of notification rows
+// (both created_at and read_at). Used as the invalidation watermark.
+function latestActivityMs(rows: any[] | null | undefined): number {
+  if (!rows || !rows.length) return 0;
+  let max = 0;
+  for (const r of rows) {
+    for (const field of ["created_at", "read_at", "updated_at"]) {
+      const v = r?.[field];
+      if (!v) continue;
+      const t = Date.parse(v);
+      if (!isNaN(t) && t > max) max = t;
+    }
+  }
+  return max;
 }
 
 function buildWeeklyDigest(rows: any[]): string {
@@ -444,16 +474,23 @@ Deno.serve(async (req) => {
             Deno.env.get("SUPABASE_ANON_KEY")!,
             { global: { headers: { Authorization: `Bearer ${token}` } } },
           );
-          const cachedDigest = getCachedDigest(mobile);
           const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 24 * 60 * 60 * 1000).toISOString();
+
+          // Fetch the "recent 5" first — it's cheap and gives us the newest
+          // created_at / read_at timestamps, which we use as an invalidation
+          // watermark for the cached weekly digest. If a new notification
+          // arrived or its read/unread status changed after the digest was
+          // built, we drop the cache and rebuild immediately.
+          const recentR = await supa.from("notification_inbox")
+            .select("title,created_at,read_at,updated_at")
+            .eq("mobile", mobile)
+            .order("updated_at", { ascending: false })
+            .limit(5);
+          const activityStamp = latestActivityMs(recentR.data as any[]);
+
           const queries: Promise<any>[] = [
             supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile),
             supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile).is("read_at", null),
-            supa.from("notification_inbox")
-              .select("title,created_at,read_at")
-              .eq("mobile", mobile)
-              .order("created_at", { ascending: false })
-              .limit(5),
             supa.from("notification_inbox")
               .select("title,body,created_at")
               .eq("mobile", mobile)
@@ -461,25 +498,24 @@ Deno.serve(async (req) => {
               .order("created_at", { ascending: false })
               .limit(5),
           ];
-          // Dedupe the heavy 8-week query: if another concurrent request for the
-          // same mobile is already fetching + aggregating, await that promise
-          // instead of hitting Supabase again. On a cache hit, skip entirely.
-          const digestPromise: Promise<string> = cachedDigest
-            ? Promise.resolve(cachedDigest)
-            : getOrBuildDigest(mobile, async () => {
-                const { data } = await supa.from("notification_inbox")
-                  .select("title,tag,created_at,read_at")
-                  .eq("mobile", mobile)
-                  .gte("created_at", eightWeeksAgo)
-                  .order("created_at", { ascending: false })
-                  .limit(500);
-                return data ?? [];
-              });
+          // Dedupe the heavy 8-week query: concurrent requests for the same
+          // mobile share one promise. Cache hits skip Supabase entirely, and
+          // the `activityStamp` watermark invalidates a stale digest the
+          // moment we notice newer notification activity.
+          const digestPromise = getOrBuildDigest(mobile, async () => {
+            const { data } = await supa.from("notification_inbox")
+              .select("title,tag,created_at,read_at")
+              .eq("mobile", mobile)
+              .gte("created_at", eightWeeksAgo)
+              .order("created_at", { ascending: false })
+              .limit(500);
+            return data ?? [];
+          }, activityStamp);
           const [results, weeklyDigest] = await Promise.all([
             Promise.all(queries),
             digestPromise,
           ]);
-          const [totalR, unreadR, recentR, unreadRecentR] = results;
+          const [totalR, unreadR, unreadRecentR] = results;
           return {
             total: totalR.count ?? 0,
             unread: unreadR.count ?? 0,
