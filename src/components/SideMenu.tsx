@@ -90,7 +90,7 @@ export function SideMenu({
           <MenuItem icon={<Share2 className="w-4 h-4" />} label="Social media" onClick={onOpenSocial} />
           <MenuItem
             icon={<Sparkles className="w-4 h-4" />}
-            label="AI Assistant"
+            label="Ask Mera AI"
             onClick={() => {
               onOpenChange(false);
               navigate("/assistant");
