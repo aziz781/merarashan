@@ -36,11 +36,12 @@ import {
 
 const MessageMarkdown = lazy(() => import("@/components/MessageMarkdown"));
 
-const SUGGESTIONS = [
-  "How much did I spend this month?",
-  "Which cards have not been delivered this month?",
-  "Show a summary of my last 3 rashans.",
-  "How many statements are unpaid this year?",
+type Suggestion = { text: string; icon: LucideIcon };
+const SUGGESTIONS: Suggestion[] = [
+  { text: "How much did I spend this month?", icon: Wallet },
+  { text: "Which cards have not been delivered this month?", icon: PackageCheck },
+  { text: "Show a summary of my last 3 rashans.", icon: ClipboardList },
+  { text: "How many statements are unpaid this year?", icon: ReceiptText },
 ];
 
 const AIAssistant = () => {
