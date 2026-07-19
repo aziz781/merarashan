@@ -415,19 +415,32 @@ const AIAssistant = () => {
                 </div>
               </div>
             )}
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-4">
-                Ask a question about your rashan data. Try:
+            <div>
+              <div className="flex flex-col items-center text-center mb-5">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 ring-4 ring-primary/5 flex items-center justify-center mb-3">
+                  <Sparkles className="w-7 h-7 text-primary" />
+                </div>
+                <h2 className="text-lg font-semibold text-foreground">How can I help?</h2>
+                <p className="text-sm text-muted-foreground mt-1 px-4">
+                  Ask anything about your rashans, statements, or cards.
+                </p>
+              </div>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2 px-1">
+                Try asking
               </p>
               <div className="grid gap-2">
-                {SUGGESTIONS.map((s) => (
+                {SUGGESTIONS.map(({ text, icon: Icon }) => (
                   <button
-                    key={s}
+                    key={text}
                     type="button"
-                    onClick={() => void send(s)}
-                    className="text-left text-sm px-3 py-2 rounded-lg border border-border/60 bg-card hover:bg-muted transition-colors"
+                    onClick={() => void send(text)}
+                    className="group w-full text-left flex items-center gap-3 px-4 py-3 rounded-2xl border border-border/60 bg-card shadow-sm hover:shadow-md hover:border-primary/30 transition-all active:scale-[0.99]"
                   >
-                    {s}
+                    <span className="w-8 h-8 shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                      <Icon className="w-4 h-4" />
+                    </span>
+                    <span className="text-sm font-medium text-foreground flex-1">{text}</span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                   </button>
                 ))}
               </div>
