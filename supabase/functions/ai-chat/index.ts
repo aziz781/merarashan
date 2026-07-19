@@ -416,8 +416,9 @@ Deno.serve(async (req) => {
             Deno.env.get("SUPABASE_ANON_KEY")!,
             { global: { headers: { Authorization: `Bearer ${token}` } } },
           );
+          const cachedDigest = getCachedDigest(mobile);
           const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 24 * 60 * 60 * 1000).toISOString();
-          const [totalR, unreadR, recentR, unreadRecentR, weeklyR] = await Promise.all([
+          const queries: Promise<any>[] = [
             supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile),
             supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile).is("read_at", null),
             supa.from("notification_inbox")
@@ -431,21 +432,29 @@ Deno.serve(async (req) => {
               .is("read_at", null)
               .order("created_at", { ascending: false })
               .limit(5),
-            supa.from("notification_inbox")
-              .select("title,tag,created_at,read_at")
-              .eq("mobile", mobile)
-              .gte("created_at", eightWeeksAgo)
-              .order("created_at", { ascending: false })
-              .limit(500),
-          ]);
+          ];
+          // Skip the heavy 8-week query entirely on a cache hit.
+          if (!cachedDigest) {
+            queries.push(
+              supa.from("notification_inbox")
+                .select("title,tag,created_at,read_at")
+                .eq("mobile", mobile)
+                .gte("created_at", eightWeeksAgo)
+                .order("created_at", { ascending: false })
+                .limit(500),
+            );
+          }
+          const results = await Promise.all(queries);
+          const [totalR, unreadR, recentR, unreadRecentR, weeklyR] = results;
           return {
             total: totalR.count ?? 0,
             unread: unreadR.count ?? 0,
             recent: recentR.data ?? [],
             unreadRecent: unreadRecentR.data ?? [],
-            recentWindow: weeklyR.data ?? [],
+            recentWindow: cachedDigest ? [] : (weeklyR?.data ?? []),
+            cachedDigest,
           };
-        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[], recentWindow: [] as any[] }; }
+        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[], recentWindow: [] as any[], cachedDigest: null as string | null }; }
 
       })(),
     ]);
@@ -471,6 +480,24 @@ Deno.serve(async (req) => {
     const recentTitles = (notifCounts.recent as any[])
       .map((n) => `- ${n.title}${n.read_at ? "" : " (unread)"}`)
       .join("\n");
+
+    const truncate = (s: string, n = 400) => (s && s.length > n ? s.slice(0, n) + "…" : s || "");
+    const unreadDetails = (notifCounts.unreadRecent as any[])
+      .map((n) => {
+        const date = n.created_at ? String(n.created_at).slice(0, 10) : "";
+        return `- [${date}] ${n.title}\n  ${truncate(n.body)}`.trimEnd();
+      })
+      .join("\n");
+
+
+    // Weekly digest — cached per mobile for DIGEST_TTL_MS to avoid re-running
+    // the 8-week query and re-aggregating on every chat turn.
+    let weeklyDigest = notifCounts.cachedDigest ?? "";
+    if (!weeklyDigest) {
+      weeklyDigest = buildWeeklyDigest(notifCounts.recentWindow as any[]);
+      if (weeklyDigest) setCachedDigest(mobile, weeklyDigest);
+    }
+
 
     const truncate = (s: string, n = 400) => (s && s.length > n ? s.slice(0, n) + "…" : s || "");
     const unreadDetails = (notifCounts.unreadRecent as any[])
