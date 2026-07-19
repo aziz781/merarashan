@@ -461,28 +461,33 @@ Deno.serve(async (req) => {
               .order("created_at", { ascending: false })
               .limit(5),
           ];
-          // Skip the heavy 8-week query entirely on a cache hit.
-          if (!cachedDigest) {
-            queries.push(
-              supa.from("notification_inbox")
-                .select("title,tag,created_at,read_at")
-                .eq("mobile", mobile)
-                .gte("created_at", eightWeeksAgo)
-                .order("created_at", { ascending: false })
-                .limit(500),
-            );
-          }
-          const results = await Promise.all(queries);
-          const [totalR, unreadR, recentR, unreadRecentR, weeklyR] = results;
+          // Dedupe the heavy 8-week query: if another concurrent request for the
+          // same mobile is already fetching + aggregating, await that promise
+          // instead of hitting Supabase again. On a cache hit, skip entirely.
+          const digestPromise: Promise<string> = cachedDigest
+            ? Promise.resolve(cachedDigest)
+            : getOrBuildDigest(mobile, async () => {
+                const { data } = await supa.from("notification_inbox")
+                  .select("title,tag,created_at,read_at")
+                  .eq("mobile", mobile)
+                  .gte("created_at", eightWeeksAgo)
+                  .order("created_at", { ascending: false })
+                  .limit(500);
+                return data ?? [];
+              });
+          const [results, weeklyDigest] = await Promise.all([
+            Promise.all(queries),
+            digestPromise,
+          ]);
+          const [totalR, unreadR, recentR, unreadRecentR] = results;
           return {
             total: totalR.count ?? 0,
             unread: unreadR.count ?? 0,
             recent: recentR.data ?? [],
             unreadRecent: unreadRecentR.data ?? [],
-            recentWindow: cachedDigest ? [] : (weeklyR?.data ?? []),
-            cachedDigest,
+            weeklyDigest,
           };
-        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[], recentWindow: [] as any[], cachedDigest: null as string | null }; }
+        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[], weeklyDigest: "" }; }
 
       })(),
     ]);
