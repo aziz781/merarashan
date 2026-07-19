@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Send, Sparkles, Trash2, Loader2, Menu, Plus, MessageSquare, ChevronRight, Wallet, PackageCheck, ReceiptText, ClipboardList, type LucideIcon } from "lucide-react";
+import askMeraAiLogo from "@/assets/ask-mera-ai-logo.png";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -89,11 +90,15 @@ const AIAssistant = () => {
   }, []);
 
   // Route sync: if no threadId, pick most recent or create one and navigate.
+  // Guarded against React StrictMode double-invocation so we never create
+  // two blank threads on first mount.
+  const bootstrappedRef = useRef(false);
   useEffect(() => {
     if (threadId) {
       const t = getThread(threadId);
       if (!t) {
-        // Unknown id — create fresh
+        if (bootstrappedRef.current) return;
+        bootstrappedRef.current = true;
         const created = createThread();
         navigate(`/assistant/${created.id}`, { replace: true, state: location.state });
         return;
@@ -101,6 +106,8 @@ const AIAssistant = () => {
       setMessages(t.messages);
       return;
     }
+    if (bootstrappedRef.current) return;
+    bootstrappedRef.current = true;
     const all = loadThreads();
     const target = all[0] ?? createThread();
     refreshThreads();
@@ -237,7 +244,14 @@ const AIAssistant = () => {
   if (signedIn === false) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
-        <Sparkles className="w-10 h-10 text-primary mb-3" />
+        <img
+          src={askMeraAiLogo}
+          alt="Ask Mera AI"
+          width={64}
+          height={64}
+          className="w-16 h-16 mb-3"
+          loading="lazy"
+        />
         <h1 className="text-lg font-semibold mb-1">Ask Mera AI</h1>
         <p className="text-sm text-muted-foreground mb-4">Please sign in to chat with the assistant.</p>
         <Button onClick={() => navigate("/")}>Go to sign in</Button>
@@ -344,7 +358,14 @@ const AIAssistant = () => {
           </div>
         </div>
         <div className="flex items-center gap-3 mt-2">
-          <Sparkles className="w-6 h-6 opacity-90" />
+          <img
+            src={askMeraAiLogo}
+            alt=""
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-xl shrink-0 shadow-md shadow-black/10"
+            loading="lazy"
+          />
           <div className="min-w-0">
             <h1 className="text-xl font-bold truncate">Ask Mera AI</h1>
             <p className="text-xs opacity-80 truncate">
@@ -409,9 +430,14 @@ const AIAssistant = () => {
             )}
             <div>
               <div className="flex flex-col items-center text-center mb-5">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 ring-4 ring-primary/5 flex items-center justify-center mb-3">
-                  <Sparkles className="w-7 h-7 text-primary" />
-                </div>
+                <img
+                  src={askMeraAiLogo}
+                  alt="Ask Mera AI"
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 mb-3 drop-shadow-md"
+                  loading="lazy"
+                />
                 <h2 className="text-lg font-semibold text-foreground">How can I help?</h2>
                 <p className="text-sm text-muted-foreground mt-1 px-4">
                   Ask anything about your rashans, statements, or cards.
