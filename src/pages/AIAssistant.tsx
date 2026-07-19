@@ -471,6 +471,16 @@ const AIAssistant = () => {
         onSubmit={onSubmit}
         className="sticky bottom-0 border-t border-border/60 bg-background/95 backdrop-blur px-3 py-3"
       >
+        <Button
+          type="button"
+          onClick={onNewChat}
+          size="icon"
+          aria-label="New chat"
+          className="absolute -top-14 right-4 rounded-full h-12 w-12 shadow-lg shadow-primary/30 z-10"
+        >
+          <Plus className="w-5 h-5" />
+        </Button>
+
         {messages.length > 0 && (
           <div className="max-w-2xl mx-auto mb-2 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
             {SUGGESTIONS.map(({ text, icon: Icon }) => (
