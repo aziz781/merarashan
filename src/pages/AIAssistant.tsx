@@ -262,15 +262,7 @@ const AIAssistant = () => {
             Back
           </Button>
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onNewChat}
-              className="text-primary-foreground hover:bg-white/10"
-              aria-label="New chat"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
+
             <Sheet open={threadListOpen} onOpenChange={setThreadListOpen}>
               <SheetTrigger asChild>
                 <Button
@@ -479,6 +471,16 @@ const AIAssistant = () => {
         onSubmit={onSubmit}
         className="sticky bottom-0 border-t border-border/60 bg-background/95 backdrop-blur px-3 py-3"
       >
+        <Button
+          type="button"
+          onClick={onNewChat}
+          size="icon"
+          aria-label="New chat"
+          className="absolute -top-14 right-4 rounded-full h-12 w-12 shadow-lg shadow-primary/30 z-10"
+        >
+          <Plus className="w-5 h-5" />
+        </Button>
+
         {messages.length > 0 && (
           <div className="max-w-2xl mx-auto mb-2 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
             {SUGGESTIONS.map(({ text, icon: Icon }) => (
