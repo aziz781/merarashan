@@ -342,9 +342,12 @@ Deno.serve(async (req) => {
     }
 
     // Lightweight overview to seed context without dumping every record.
-    const [customers, cards, unreadCount] = await Promise.all([
+    const currentYear = String(new Date().getFullYear());
+    const currentMonth = new Date().getMonth() + 1;
+    const [customers, cards, txnsRaw, notifCounts] = await Promise.all([
       fetchResource("customers", mobile),
       fetchResource("cards", mobile),
+      fetchResource("transactions", mobile, { monthYear: currentYear }),
       (async () => {
         try {
           const supa = createClient(
@@ -352,18 +355,45 @@ Deno.serve(async (req) => {
             Deno.env.get("SUPABASE_ANON_KEY")!,
             { global: { headers: { Authorization: `Bearer ${token}` } } },
           );
-          const { count } = await supa.from("notification_inbox")
-            .select("*", { count: "exact", head: true })
-            .eq("mobile", mobile)
-            .is("read_at", null);
-          return count ?? 0;
-        } catch { return 0; }
+          const [totalR, unreadR, recentR] = await Promise.all([
+            supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile),
+            supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile).is("read_at", null),
+            supa.from("notification_inbox")
+              .select("title,created_at,read_at")
+              .eq("mobile", mobile)
+              .order("created_at", { ascending: false })
+              .limit(5),
+          ]);
+          return {
+            total: totalR.count ?? 0,
+            unread: unreadR.count ?? 0,
+            recent: recentR.data ?? [],
+          };
+        } catch { return { total: 0, unread: 0, recent: [] as any[] }; }
       })(),
     ]);
 
     const cardCount = toArray(cards).length;
     const cust = toArray(customers)[0] || customers || {};
     const custName = (cust as any)?.name || (cust as any)?.customer_name || "";
+
+    // Delivery (transaction) counts derived from upstream transactions.
+    const txnList = toArray(txnsRaw);
+    let deliveriesYear = 0;
+    let deliveriesMonth = 0;
+    let lastDelivery: string | null = null;
+    for (const t of txnList) {
+      const d = pickDate(t);
+      if (!d) continue;
+      deliveriesYear += 1;
+      if (d.getMonth() + 1 === currentMonth) deliveriesMonth += 1;
+      const iso = d.toISOString().slice(0, 10);
+      if (!lastDelivery || iso > lastDelivery) lastDelivery = iso;
+    }
+
+    const recentTitles = (notifCounts.recent as any[])
+      .map((n) => `- ${n.title}${n.read_at ? "" : " (unread)"}`)
+      .join("\n");
 
     const systemPrompt = [
       "You are the in-app AI assistant for Mera Rashan (a Pakistani grocery-ration management app).",
@@ -374,8 +404,11 @@ Deno.serve(async (req) => {
       "If a tool returns no data or an error, tell the user plainly rather than inventing values.",
       "",
       `Today's date: ${new Date().toISOString().slice(0, 10)}. Signed-in mobile: ${mobile}.`,
-      `Overview: ${custName ? `customer name "${custName}", ` : ""}${cardCount} card(s), ${unreadCount} unread notification(s).`,
-    ].join("\n");
+      `Profile: ${custName ? `customer name "${custName}", ` : ""}${cardCount} card(s).`,
+      `Deliveries in ${currentYear}: ${deliveriesYear} total, ${deliveriesMonth} this month${lastDelivery ? `, last on ${lastDelivery}` : ""}.`,
+      `Notifications: ${notifCounts.total} total, ${notifCounts.unread} unread.`,
+      recentTitles ? `Recent notifications:\n${recentTitles}` : "",
+    ].filter(Boolean).join("\n");
 
     const convo: GwMessage[] = [
       { role: "system", content: systemPrompt },
