@@ -5,6 +5,17 @@ import { ArrowLeft, Send, Sparkles, Trash2, Loader2, Menu, Plus, MessageSquare }
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PageFooter } from "@/components/PageFooter";
@@ -341,13 +352,32 @@ const AIAssistant = () => {
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     Recent prompts
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => { clearRecentPrompts(); setRecentPrompts([]); }}
-                    className="text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    Clear
-                  </button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        Clear
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Clear recent prompts?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will remove all your recent prompt suggestions. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => { clearRecentPrompts(); setRecentPrompts([]); }}
+                        >
+                          Clear
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
                 <div className="grid gap-2">
                   {recentPrompts.map((r) => (
