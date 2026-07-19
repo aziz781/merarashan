@@ -339,6 +339,34 @@ function setCachedDigest(mobile: string, digest: string) {
   }
 }
 
+// ---------- Weekly digest concurrency control ----------
+// If multiple chat turns for the same user race to rebuild the digest (cache
+// miss / expiry), we only want ONE Supabase 8-week query + aggregation in
+// flight. Late arrivals await the same promise and reuse the result.
+const digestInflight = new Map<string, Promise<string>>();
+
+async function getOrBuildDigest(
+  mobile: string,
+  fetchRows: () => Promise<any[]>,
+): Promise<string> {
+  const cached = getCachedDigest(mobile);
+  if (cached) return cached;
+  const existing = digestInflight.get(mobile);
+  if (existing) return existing;
+  const p = (async () => {
+    try {
+      const rows = await fetchRows();
+      const digest = buildWeeklyDigest(rows);
+      if (digest) setCachedDigest(mobile, digest);
+      return digest;
+    } finally {
+      digestInflight.delete(mobile);
+    }
+  })();
+  digestInflight.set(mobile, p);
+  return p;
+}
+
 function buildWeeklyDigest(rows: any[]): string {
   const weekStart = (d: Date) => {
     const dt = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
