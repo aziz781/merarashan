@@ -318,7 +318,68 @@ async function callGateway(apiKey: string, body: unknown): Promise<Response> {
   });
 }
 
+// ---------- Weekly digest cache ----------
+// In-memory per-isolate cache. Edge functions reuse warm isolates for a while,
+// so this meaningfully cuts repeat Supabase reads for chatty users without
+// changing correctness — TTL keeps the digest reasonably fresh.
+const DIGEST_TTL_MS = 10 * 60 * 1000; // 10 minutes
+const digestCache = new Map<string, { digest: string; expires: number }>();
+
+function getCachedDigest(mobile: string): string | null {
+  const hit = digestCache.get(mobile);
+  if (!hit) return null;
+  if (hit.expires < Date.now()) { digestCache.delete(mobile); return null; }
+  return hit.digest;
+}
+function setCachedDigest(mobile: string, digest: string) {
+  digestCache.set(mobile, { digest, expires: Date.now() + DIGEST_TTL_MS });
+  if (digestCache.size > 500) {
+    const oldest = digestCache.keys().next().value;
+    if (oldest) digestCache.delete(oldest);
+  }
+}
+
+function buildWeeklyDigest(rows: any[]): string {
+  const weekStart = (d: Date) => {
+    const dt = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    const dow = dt.getUTCDay() || 7;
+    if (dow !== 1) dt.setUTCDate(dt.getUTCDate() - (dow - 1));
+    return dt.toISOString().slice(0, 10);
+  };
+  type WeekBucket = { total: number; unread: number; tags: Record<string, number>; titles: Record<string, number> };
+  const weeks = new Map<string, WeekBucket>();
+  for (const n of rows) {
+    const created = n.created_at ? new Date(n.created_at) : null;
+    if (!created || isNaN(created.getTime())) continue;
+    const wk = weekStart(created);
+    let b = weeks.get(wk);
+    if (!b) { b = { total: 0, unread: 0, tags: {}, titles: {} }; weeks.set(wk, b); }
+    b.total += 1;
+    if (!n.read_at) b.unread += 1;
+    const tag = (n.tag || "").toString().trim();
+    if (tag) b.tags[tag] = (b.tags[tag] || 0) + 1;
+    const title = (n.title || "").toString().trim();
+    if (title) b.titles[title] = (b.titles[title] || 0) + 1;
+  }
+  const topEntries = (rec: Record<string, number>, k = 2) =>
+    Object.entries(rec).sort((a, b) => b[1] - a[1]).slice(0, k)
+      .map(([k2, v]) => `${k2}×${v}`).join(", ");
+  return [...weeks.entries()]
+    .sort((a, b) => a[0] < b[0] ? 1 : -1)
+    .slice(0, 8)
+    .map(([wk, b]) => {
+      const parts = [`${b.total} total`, `${b.unread} unread`];
+      const tagTop = topEntries(b.tags);
+      const titleTop = topEntries(b.titles);
+      if (tagTop) parts.push(`tags: ${tagTop}`);
+      else if (titleTop) parts.push(`top: ${titleTop}`);
+      return `- Week of ${wk}: ${parts.join(" · ")}`;
+    })
+    .join("\n");
+}
+
 // ---------- Handler ----------
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -355,8 +416,9 @@ Deno.serve(async (req) => {
             Deno.env.get("SUPABASE_ANON_KEY")!,
             { global: { headers: { Authorization: `Bearer ${token}` } } },
           );
+          const cachedDigest = getCachedDigest(mobile);
           const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 24 * 60 * 60 * 1000).toISOString();
-          const [totalR, unreadR, recentR, unreadRecentR, weeklyR] = await Promise.all([
+          const queries: Promise<any>[] = [
             supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile),
             supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile).is("read_at", null),
             supa.from("notification_inbox")
@@ -370,21 +432,29 @@ Deno.serve(async (req) => {
               .is("read_at", null)
               .order("created_at", { ascending: false })
               .limit(5),
-            supa.from("notification_inbox")
-              .select("title,tag,created_at,read_at")
-              .eq("mobile", mobile)
-              .gte("created_at", eightWeeksAgo)
-              .order("created_at", { ascending: false })
-              .limit(500),
-          ]);
+          ];
+          // Skip the heavy 8-week query entirely on a cache hit.
+          if (!cachedDigest) {
+            queries.push(
+              supa.from("notification_inbox")
+                .select("title,tag,created_at,read_at")
+                .eq("mobile", mobile)
+                .gte("created_at", eightWeeksAgo)
+                .order("created_at", { ascending: false })
+                .limit(500),
+            );
+          }
+          const results = await Promise.all(queries);
+          const [totalR, unreadR, recentR, unreadRecentR, weeklyR] = results;
           return {
             total: totalR.count ?? 0,
             unread: unreadR.count ?? 0,
             recent: recentR.data ?? [],
             unreadRecent: unreadRecentR.data ?? [],
-            recentWindow: weeklyR.data ?? [],
+            recentWindow: cachedDigest ? [] : (weeklyR?.data ?? []),
+            cachedDigest,
           };
-        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[], recentWindow: [] as any[] }; }
+        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[], recentWindow: [] as any[], cachedDigest: null as string | null }; }
 
       })(),
     ]);
@@ -420,45 +490,15 @@ Deno.serve(async (req) => {
       .join("\n");
 
 
-    // Weekly digest of the last ~8 weeks so the model can reason about
-    // notification patterns without seeing every single row.
-    const weekStart = (d: Date) => {
-      // ISO week starts Monday. Return YYYY-MM-DD of that Monday.
-      const dt = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-      const dow = dt.getUTCDay() || 7; // Sun=7
-      if (dow !== 1) dt.setUTCDate(dt.getUTCDate() - (dow - 1));
-      return dt.toISOString().slice(0, 10);
-    };
-    type WeekBucket = { total: number; unread: number; tags: Record<string, number>; titles: Record<string, number> };
-    const weeks = new Map<string, WeekBucket>();
-    for (const n of (notifCounts.recentWindow as any[])) {
-      const created = n.created_at ? new Date(n.created_at) : null;
-      if (!created || isNaN(created.getTime())) continue;
-      const wk = weekStart(created);
-      let b = weeks.get(wk);
-      if (!b) { b = { total: 0, unread: 0, tags: {}, titles: {} }; weeks.set(wk, b); }
-      b.total += 1;
-      if (!n.read_at) b.unread += 1;
-      const tag = (n.tag || "").toString().trim();
-      if (tag) b.tags[tag] = (b.tags[tag] || 0) + 1;
-      const title = (n.title || "").toString().trim();
-      if (title) b.titles[title] = (b.titles[title] || 0) + 1;
+    // Weekly digest — cached per mobile for DIGEST_TTL_MS to avoid re-running
+    // the 8-week query and re-aggregating on every chat turn.
+    let weeklyDigest = notifCounts.cachedDigest ?? "";
+    if (!weeklyDigest) {
+      weeklyDigest = buildWeeklyDigest(notifCounts.recentWindow as any[]);
+      if (weeklyDigest) setCachedDigest(mobile, weeklyDigest);
     }
-    const topEntries = (rec: Record<string, number>, k = 2) =>
-      Object.entries(rec).sort((a, b) => b[1] - a[1]).slice(0, k)
-        .map(([k2, v]) => `${k2}×${v}`).join(", ");
-    const weeklyDigest = [...weeks.entries()]
-      .sort((a, b) => a[0] < b[0] ? 1 : -1)
-      .slice(0, 8)
-      .map(([wk, b]) => {
-        const parts = [`${b.total} total`, `${b.unread} unread`];
-        const tagTop = topEntries(b.tags);
-        const titleTop = topEntries(b.titles);
-        if (tagTop) parts.push(`tags: ${tagTop}`);
-        else if (titleTop) parts.push(`top: ${titleTop}`);
-        return `- Week of ${wk}: ${parts.join(" · ")}`;
-      })
-      .join("\n");
+
+
 
     const systemPrompt = [
       "You are the in-app AI assistant for Mera Rashan (a Pakistani grocery-ration management app).",
