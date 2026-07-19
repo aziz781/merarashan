@@ -55,7 +55,7 @@ const AIAssistant = () => {
 
   useEffect(() => {
     const prevTitle = document.title;
-    document.title = "AI Assistant — Mera Rashan";
+    document.title = "Ask Mera AI — Mera Rashan";
     return () => { document.title = prevTitle; };
   }, []);
 
@@ -195,7 +195,7 @@ const AIAssistant = () => {
         <div className="flex items-center gap-3 mt-2">
           <Sparkles className="w-6 h-6 opacity-90" />
           <div className="min-w-0">
-            <h1 className="text-xl font-bold truncate">AI Assistant</h1>
+            <h1 className="text-xl font-bold truncate">Ask Mera AI</h1>
             <p className="text-xs opacity-80 truncate">Ask about your rashans, statements & cards</p>
           </div>
         </div>
