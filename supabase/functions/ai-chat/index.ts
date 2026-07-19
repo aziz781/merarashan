@@ -36,8 +36,11 @@ async function getMobileAndToken(req: Request): Promise<{ mobile: string; token:
   const { data, error } = await supa.auth.getUser(token);
   if (error || !data.user) throw new Error("Unauthorized");
   const meta = (data.user.user_metadata || {}) as { mobile?: string };
-  const email = data.user.email || "";
-  const mobile = normalize(meta.mobile || email.split("@")[0] || "");
+  // Only accept a mobile explicitly stored in user_metadata. Deriving it from
+  // the email local-part is unsafe: a signed-in user whose email happens to
+  // start with digits (e.g. numeric OAuth aliases) could otherwise be scoped
+  // to another user's data.
+  const mobile = normalize(meta.mobile || "");
   if (!/^\d{6,15}$/.test(mobile)) throw new Error("No mobile identity");
   return { mobile, token };
 }
