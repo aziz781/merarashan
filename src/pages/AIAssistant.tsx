@@ -244,7 +244,14 @@ const AIAssistant = () => {
   if (signedIn === false) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
-        <Sparkles className="w-10 h-10 text-primary mb-3" />
+        <img
+          src={askMeraAiLogo}
+          alt="Ask Mera AI"
+          width={64}
+          height={64}
+          className="w-16 h-16 mb-3"
+          loading="lazy"
+        />
         <h1 className="text-lg font-semibold mb-1">Ask Mera AI</h1>
         <p className="text-sm text-muted-foreground mb-4">Please sign in to chat with the assistant.</p>
         <Button onClick={() => navigate("/")}>Go to sign in</Button>
