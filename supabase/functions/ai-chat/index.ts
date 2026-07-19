@@ -476,6 +476,8 @@ Deno.serve(async (req) => {
       `Notifications: ${notifCounts.total} total, ${notifCounts.unread} unread.`,
       recentTitles ? `Recent notifications:\n${recentTitles}` : "",
       unreadDetails ? `Recent unread notification messages:\n${unreadDetails}` : "",
+      weeklyDigest ? `Weekly notification digest (last ~8 weeks, newest first):\n${weeklyDigest}` : "",
+
 
     ].filter(Boolean).join("\n");
 
