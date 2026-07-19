@@ -262,15 +262,7 @@ const AIAssistant = () => {
             Back
           </Button>
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onNewChat}
-              className="text-primary-foreground hover:bg-white/10"
-              aria-label="New chat"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
+
             <Sheet open={threadListOpen} onOpenChange={setThreadListOpen}>
               <SheetTrigger asChild>
                 <Button
