@@ -430,9 +430,14 @@ const AIAssistant = () => {
             )}
             <div>
               <div className="flex flex-col items-center text-center mb-5">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 ring-4 ring-primary/5 flex items-center justify-center mb-3">
-                  <Sparkles className="w-7 h-7 text-primary" />
-                </div>
+                <img
+                  src={askMeraAiLogo}
+                  alt="Ask Mera AI"
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 mb-3 drop-shadow-md"
+                  loading="lazy"
+                />
                 <h2 className="text-lg font-semibold text-foreground">How can I help?</h2>
                 <p className="text-sm text-muted-foreground mt-1 px-4">
                   Ask anything about your rashans, statements, or cards.
