@@ -355,7 +355,8 @@ Deno.serve(async (req) => {
             Deno.env.get("SUPABASE_ANON_KEY")!,
             { global: { headers: { Authorization: `Bearer ${token}` } } },
           );
-          const [totalR, unreadR, recentR, unreadRecentR] = await Promise.all([
+          const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 24 * 60 * 60 * 1000).toISOString();
+          const [totalR, unreadR, recentR, unreadRecentR, weeklyR] = await Promise.all([
             supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile),
             supa.from("notification_inbox").select("*", { count: "exact", head: true }).eq("mobile", mobile).is("read_at", null),
             supa.from("notification_inbox")
@@ -369,14 +370,22 @@ Deno.serve(async (req) => {
               .is("read_at", null)
               .order("created_at", { ascending: false })
               .limit(5),
+            supa.from("notification_inbox")
+              .select("title,tag,created_at,read_at")
+              .eq("mobile", mobile)
+              .gte("created_at", eightWeeksAgo)
+              .order("created_at", { ascending: false })
+              .limit(500),
           ]);
           return {
             total: totalR.count ?? 0,
             unread: unreadR.count ?? 0,
             recent: recentR.data ?? [],
             unreadRecent: unreadRecentR.data ?? [],
+            recentWindow: weeklyR.data ?? [],
           };
-        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[] }; }
+        } catch { return { total: 0, unread: 0, recent: [] as any[], unreadRecent: [] as any[], recentWindow: [] as any[] }; }
+
       })(),
     ]);
 
@@ -411,13 +420,55 @@ Deno.serve(async (req) => {
       .join("\n");
 
 
+    // Weekly digest of the last ~8 weeks so the model can reason about
+    // notification patterns without seeing every single row.
+    const weekStart = (d: Date) => {
+      // ISO week starts Monday. Return YYYY-MM-DD of that Monday.
+      const dt = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+      const dow = dt.getUTCDay() || 7; // Sun=7
+      if (dow !== 1) dt.setUTCDate(dt.getUTCDate() - (dow - 1));
+      return dt.toISOString().slice(0, 10);
+    };
+    type WeekBucket = { total: number; unread: number; tags: Record<string, number>; titles: Record<string, number> };
+    const weeks = new Map<string, WeekBucket>();
+    for (const n of (notifCounts.recentWindow as any[])) {
+      const created = n.created_at ? new Date(n.created_at) : null;
+      if (!created || isNaN(created.getTime())) continue;
+      const wk = weekStart(created);
+      let b = weeks.get(wk);
+      if (!b) { b = { total: 0, unread: 0, tags: {}, titles: {} }; weeks.set(wk, b); }
+      b.total += 1;
+      if (!n.read_at) b.unread += 1;
+      const tag = (n.tag || "").toString().trim();
+      if (tag) b.tags[tag] = (b.tags[tag] || 0) + 1;
+      const title = (n.title || "").toString().trim();
+      if (title) b.titles[title] = (b.titles[title] || 0) + 1;
+    }
+    const topEntries = (rec: Record<string, number>, k = 2) =>
+      Object.entries(rec).sort((a, b) => b[1] - a[1]).slice(0, k)
+        .map(([k2, v]) => `${k2}×${v}`).join(", ");
+    const weeklyDigest = [...weeks.entries()]
+      .sort((a, b) => a[0] < b[0] ? 1 : -1)
+      .slice(0, 8)
+      .map(([wk, b]) => {
+        const parts = [`${b.total} total`, `${b.unread} unread`];
+        const tagTop = topEntries(b.tags);
+        const titleTop = topEntries(b.titles);
+        if (tagTop) parts.push(`tags: ${tagTop}`);
+        else if (titleTop) parts.push(`top: ${titleTop}`);
+        return `- Week of ${wk}: ${parts.join(" · ")}`;
+      })
+      .join("\n");
+
     const systemPrompt = [
       "You are the in-app AI assistant for Mera Rashan (a Pakistani grocery-ration management app).",
       "Answer the signed-in user's questions about their own rashan cards, transactions (deliveries), monthly statements, and notifications.",
       "You have tools to fetch data on demand — call them whenever you need specifics; do not guess.",
       "Prefer summary tools (get_monthly_summary, get_category_summary, get_shops_summary) over listing raw transactions when the user asks about spending patterns.",
+      "When the user asks about notification patterns or trends, cite the weekly digest below instead of listing every notification. Only call get_notifications when they want specific items.",
       "Reply in the language of the user's question (English or Urdu). Use short, clear answers with markdown. Format amounts as `Rs. 1,234`.",
       "If a tool returns no data or an error, tell the user plainly rather than inventing values.",
+
       "",
       `Today's date: ${new Date().toISOString().slice(0, 10)}. Signed-in mobile: ${mobile}.`,
       `Profile: ${custName ? `customer name "${custName}", ` : ""}${cardCount} card(s).`,
@@ -425,6 +476,8 @@ Deno.serve(async (req) => {
       `Notifications: ${notifCounts.total} total, ${notifCounts.unread} unread.`,
       recentTitles ? `Recent notifications:\n${recentTitles}` : "",
       unreadDetails ? `Recent unread notification messages:\n${unreadDetails}` : "",
+      weeklyDigest ? `Weekly notification digest (last ~8 weeks, newest first):\n${weeklyDigest}` : "",
+
 
     ].filter(Boolean).join("\n");
 
