@@ -725,9 +725,9 @@ const Index = () => {
       >
         <div className="space-y-3 pt-2">
           <ThemeToggle />
+          <BiometricLockSetting />
           <AccessibilitySettings />
           <NotificationToggle mobile={mobile} />
-          <BiometricLockSetting />
         </div>
       </SlideInPanel>
 
