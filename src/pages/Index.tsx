@@ -727,7 +727,7 @@ const Index = () => {
           <ThemeToggle />
           <AccessibilitySettings />
           <NotificationToggle mobile={mobile} />
-          
+          <BiometricLockSetting />
         </div>
       </SlideInPanel>
 
