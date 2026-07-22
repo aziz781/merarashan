@@ -761,7 +761,6 @@ const Index = () => {
             <span className="flex-1">Terms of Service</span>
             <span aria-hidden className="text-muted-foreground">↗</span>
           </a>
-          <BiometricLockSetting />
           <div className="mt-auto space-y-3">
             <button
               type="button"
