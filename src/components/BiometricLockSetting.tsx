@@ -39,7 +39,8 @@ export function BiometricLockSetting() {
     void isBiometricAvailable().then(setAvailable);
   }, []);
 
-  if (!isNativeCapacitor) return null;
+  const unsupported = !isNativeCapacitor;
+
 
   const finishEnable = () => {
     setLockEnabled(true);
