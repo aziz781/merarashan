@@ -725,10 +725,10 @@ const Index = () => {
       >
         <div className="space-y-3 pt-2">
           <ThemeToggle />
-          <BiometricLockSetting />
           <AccessibilitySettings />
           <NotificationToggle mobile={mobile} />
         </div>
+
       </SlideInPanel>
 
       <SlideInPanel
@@ -737,6 +737,8 @@ const Index = () => {
         title="Privacy & Security"
       >
         <div className="flex flex-col flex-1 gap-3">
+          <BiometricLockSetting />
+
           <a
             href="https://merarashan.pk/privacy-policy.html"
             target="_blank"
