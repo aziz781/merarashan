@@ -101,7 +101,7 @@ export function BiometricLockSetting() {
       <div className="flex items-start gap-3">
         <Fingerprint className="w-5 h-5 text-primary shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium">App lock</p>
+          <p className="text-sm font-medium">Biometric App Lock</p>
           <p className="text-xs text-muted-foreground mt-0.5">
             {unsupported
               ? "Available only in the mobile app."
@@ -121,7 +121,7 @@ export function BiometricLockSetting() {
       <div className="flex items-center gap-3 pt-1 border-t border-border/40">
         <KeyRound className="w-4 h-4 text-muted-foreground shrink-0" />
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium">Fallback PIN</p>
+          <p className="text-xs font-medium">App PIN</p>
           <p className="text-[11px] text-muted-foreground">
             {pinSet ? "PIN is set." : "No PIN set."}
           </p>
