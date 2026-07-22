@@ -8,7 +8,8 @@ const PIN_HASH_KEY = "mr_biometric_lock_pin_hash";
 const PIN_SALT_KEY = "mr_biometric_lock_pin_salt";
 
 export const PIN_MIN_LENGTH = 4;
-export const PIN_MAX_LENGTH = 6;
+export const PIN_MAX_LENGTH = 4;
+
 
 type BiometricModule = {
   NativeBiometric: {
