@@ -97,13 +97,15 @@ export function BiometricLockSetting() {
   };
 
   return (
-    <div className="rounded-lg border border-border/60 bg-card/60 px-3 py-3 space-y-3">
+    <div className={`rounded-lg border border-border/60 bg-card/60 px-3 py-3 space-y-3 ${unsupported ? "opacity-50" : ""}`} aria-disabled={unsupported}>
       <div className="flex items-start gap-3">
         <Fingerprint className="w-5 h-5 text-primary shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium">App lock</p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {available === false
+            {unsupported
+              ? "Available only in the mobile app."
+              : available === false
               ? "Biometrics unavailable — a PIN will be required."
               : "Use fingerprint or face, with a PIN fallback."}
           </p>
@@ -112,6 +114,7 @@ export function BiometricLockSetting() {
           checked={enabled}
           onCheckedChange={(v) => void onToggle(v)}
           aria-label="Toggle app lock"
+          disabled={unsupported}
         />
       </div>
 
@@ -127,6 +130,7 @@ export function BiometricLockSetting() {
           type="button"
           size="sm"
           variant="outline"
+          disabled={unsupported}
           onClick={() => { setPendingEnable(false); setPinDialogOpen(true); }}
         >
           {pinSet ? "Change" : "Set PIN"}
@@ -136,12 +140,14 @@ export function BiometricLockSetting() {
             type="button"
             size="sm"
             variant="ghost"
+            disabled={unsupported}
             onClick={() => { clearPin(); setPinSet(false); toast.success("PIN removed"); }}
           >
             Remove
           </Button>
         )}
       </div>
+
 
       <SetPinDialog
         open={pinDialogOpen}
