@@ -24,8 +24,8 @@
 		"classpath": "com.capacitorjs.plugins.share.SharePlugin"
 	},
 	{
-		"pkg": "capacitor-native-biometric",
-		"classpath": "com.epicshaggy.biometric.NativeBiometric"
+		"pkg": "@capgo/capacitor-native-biometric",
+		"classpath": "ee.forgr.biometric.NativeBiometric"
 	},
 	{
 		"pkg": "capacitor-native-settings",
