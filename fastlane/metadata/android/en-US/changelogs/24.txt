@@ -1,0 +1,11 @@
+What's new in this build:
+• Biometric App Lock — unlock Mera Rashan with fingerprint or Face ID
+• 4-digit App PIN fallback when biometrics aren't available or fail
+• Manage from Profile → Privacy & Security (set, change, or remove PIN)
+• Auto-switch to PIN entry after 3 failed biometric attempts
+• Secure PIN storage (SHA-256 with per-device salt)
+
+Also test:
+• Login with OTP, view cards & rashans, statements PDF
+• Push notifications & in-app inbox
+• Light/dark theme, logout & re-login
