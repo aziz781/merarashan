@@ -13,13 +13,19 @@ export const PIN_MAX_LENGTH = 4;
 
 type BiometricModule = {
   NativeBiometric: {
-    isAvailable: () => Promise<{ isAvailable: boolean; biometryType?: number }>;
+    isAvailable: (opts?: { useFallback: boolean }) => Promise<{
+      isAvailable: boolean;
+      biometryType?: number;
+      strongBiometryIsAvailable?: boolean;
+    }>;
     verifyIdentity: (opts: {
       reason?: string;
       title?: string;
       subtitle?: string;
       description?: string;
       negativeButtonText?: string;
+      useFallback?: boolean;
+      fallbackTitle?: string;
     }) => Promise<void>;
   };
 };
@@ -27,7 +33,7 @@ type BiometricModule = {
 async function loadBiometric(): Promise<BiometricModule | null> {
   if (!isNativeCapacitor) return null;
   try {
-    return (await import("capacitor-native-biometric")) as unknown as BiometricModule;
+    return (await import("@capgo/capacitor-native-biometric")) as unknown as BiometricModule;
   } catch {
     return null;
   }
@@ -37,8 +43,8 @@ export async function isBiometricAvailable(): Promise<boolean> {
   const mod = await loadBiometric();
   if (!mod) return false;
   try {
-    const r = await mod.NativeBiometric.isAvailable();
-    return !!r?.isAvailable;
+    const r = await mod.NativeBiometric.isAvailable({ useFallback: false });
+    return !!(r?.strongBiometryIsAvailable ?? r?.isAvailable);
   } catch {
     return false;
   }
@@ -66,6 +72,7 @@ export async function verifyBiometric(reason = "Unlock Mera Rashan"): Promise<bo
       subtitle: "Verify to unlock",
       description: reason,
       negativeButtonText: "Cancel",
+      useFallback: false,
     });
     return true;
   } catch {
