@@ -1,8 +1,21 @@
-import { QueryClient } from "@tanstack/react-query";
+import { QueryCache, MutationCache, QueryClient } from "@tanstack/react-query";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
+import { isNetworkishError, reportNetworkIssue, reportNetworkOk } from "./networkStatus";
 
 export const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (err) => {
+      if (isNetworkishError(err)) reportNetworkIssue();
+    },
+    onSuccess: () => reportNetworkOk(),
+  }),
+  mutationCache: new MutationCache({
+    onError: (err) => {
+      if (isNetworkishError(err)) reportNetworkIssue();
+    },
+    onSuccess: () => reportNetworkOk(),
+  }),
   defaultOptions: {
     queries: {
       // Treat data as fresh for 5 minutes — no refetch on remount / focus within window.
