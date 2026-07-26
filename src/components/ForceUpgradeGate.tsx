@@ -133,30 +133,42 @@ export function ForceUpgradeGate({ children }: { children: ReactNode }) {
 
   return (
     <>
+      {children}
       {showSuggest && suggest && (
-        <div className="sticky top-0 z-40 flex items-center gap-2 border-b border-border bg-primary/10 px-3 py-2 text-sm">
-          <Download className="h-4 w-4 shrink-0 text-primary" />
-          <span className="flex-1 text-foreground">
-            Version {suggest.latest_version_name} is available.
-          </span>
-          <button
-            type="button"
-            className="rounded-md px-2 py-1 text-xs font-medium text-primary hover:bg-primary/10"
-            onClick={() => void openStore(suggest.store_url)}
-          >
-            Update
-          </button>
-          <button
-            type="button"
-            aria-label="Dismiss"
-            className="rounded-md p-1 text-muted-foreground hover:bg-muted"
-            onClick={dismissSuggest}
-          >
-            <X className="h-4 w-4" />
-          </button>
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-background/80 backdrop-blur-sm p-6">
+          <div className="max-w-sm w-full rounded-2xl border border-border bg-card p-6 shadow-lg text-center relative">
+            <button
+              type="button"
+              aria-label="Dismiss"
+              className="absolute right-3 top-3 rounded-md p-1 text-muted-foreground hover:bg-muted"
+              onClick={dismissSuggest}
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+              <Download className="h-7 w-7 text-primary" />
+            </div>
+            <h2 className="text-lg font-semibold text-foreground">New version available</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              A newer version of Mera Rashan is available. Update now for the latest features and improvements.
+            </p>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Latest version: <span className="font-medium text-foreground">{suggest.latest_version_name}</span>
+            </p>
+            <Button className="mt-5 w-full" onClick={() => void openStore(suggest.store_url)}>
+              <Download className="mr-2 h-4 w-4" />
+              Go to {Capacitor.getPlatform() === "ios" ? "App Store" : "Play Store"}
+            </Button>
+            <button
+              type="button"
+              className="mt-3 text-sm text-muted-foreground hover:text-foreground"
+              onClick={dismissSuggest}
+            >
+              Later
+            </button>
+          </div>
         </div>
       )}
-      {children}
     </>
   );
 }
