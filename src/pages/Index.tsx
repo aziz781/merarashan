@@ -82,6 +82,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { AccessibilitySettings } from "@/components/AccessibilitySettings";
 
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
+import { ConnectionStatusDot } from "@/components/ConnectionStatusDot";
 
 const STORAGE_KEY = "mr_mobile";
 const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
@@ -517,7 +518,10 @@ const Index = () => {
               </button>
             )}
             <div className="min-w-0 min-h-[44px]">
-              <h1 className="text-3xl font-bold leading-tight truncate">{tab === "transactions" ? "Rashans" : tab === "cards" ? "Cards" : tab === "statements" ? "Statements" : String(displayName)}</h1>
+              <div className="flex items-center gap-2 min-w-0">
+                <h1 className="text-3xl font-bold leading-tight truncate">{tab === "transactions" ? "Rashans" : tab === "cards" ? "Cards" : tab === "statements" ? "Statements" : String(displayName)}</h1>
+                <ConnectionStatusDot />
+              </div>
               {tab === "transactions" && (
                 <p className="text-xs text-primary-foreground/80 dark:!text-foreground/70 mt-0.5 truncate">Mera Rashan Details</p>
               )}
