@@ -37,8 +37,11 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         clientsClaim: true,
         skipWaiting: true,
+        cleanupOutdatedCaches: true,
         importScripts: ["/push-sw.js"],
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,woff,woff2}"],
+        // Ensure the offline shell fallback is always in the precache manifest.
+        additionalManifestEntries: [{ url: "/offline.html", revision: "1" }],
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/\~oauth/, /^\/api/, /^\/functions/],
         runtimeCaching: [
