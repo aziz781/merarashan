@@ -20,6 +20,7 @@ import { openAppLink } from "@/lib/openAppLink";
 import { queryClient } from "@/lib/queryClient";
 import { isNativeCapacitor } from "@/lib/isNative";
 import { BiometricLockGate } from "@/components/BiometricLockGate";
+import { ForceUpgradeGate } from "@/components/ForceUpgradeGate";
 
 // Lazy-load every route — including the authenticated shell — so the
 // initial bundle for unauthenticated/first-time visitors stays minimal.
@@ -148,32 +149,34 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <BiometricLockGate>
-          <OfflineBanner />
-          <InstallNativeAppBanner />
-          <NativePushBridge />
-          <Suspense fallback={<RouteFallback />}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/cards/:rcNum" element={<CardDetails />} />
-            <Route path="/rashans/detail" element={<RashanDetails />} />
-            <Route path="/rashans/detail/:rcNum" element={<RashanDetails />} />
-            <Route path="/rashans/dashboard" element={<RashanDashboard />} />
-            <Route path="/dev/troubleshooting" element={<DevTroubleshooting />} />
-            <Route path="/admin/notify" element={<AdminNotify />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/statements" element={<Index />} />
-            <Route path="/cards" element={<Index />} />
-            <Route path="/transactions" element={<Index />} />
-            <Route path="/customers" element={<Index />} />
-            <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
-            <Route path="/agent-integrations" element={<AgentIntegrations />} />
-            {!isNativeCapacitor && <Route path="/ai-agents" element={<AIAgents />} />}
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          </Suspense>
-        </BiometricLockGate>
+        <ForceUpgradeGate>
+          <BiometricLockGate>
+            <OfflineBanner />
+            <InstallNativeAppBanner />
+            <NativePushBridge />
+            <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/cards/:rcNum" element={<CardDetails />} />
+              <Route path="/rashans/detail" element={<RashanDetails />} />
+              <Route path="/rashans/detail/:rcNum" element={<RashanDetails />} />
+              <Route path="/rashans/dashboard" element={<RashanDashboard />} />
+              <Route path="/dev/troubleshooting" element={<DevTroubleshooting />} />
+              <Route path="/admin/notify" element={<AdminNotify />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/statements" element={<Index />} />
+              <Route path="/cards" element={<Index />} />
+              <Route path="/transactions" element={<Index />} />
+              <Route path="/customers" element={<Index />} />
+              <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
+              <Route path="/agent-integrations" element={<AgentIntegrations />} />
+              {!isNativeCapacitor && <Route path="/ai-agents" element={<AIAgents />} />}
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            </Suspense>
+          </BiometricLockGate>
+        </ForceUpgradeGate>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

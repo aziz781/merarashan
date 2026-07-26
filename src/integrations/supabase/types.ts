@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_version_config: {
+        Row: {
+          latest_version_code: number
+          latest_version_name: string
+          min_supported_version_code: number
+          platform: string
+          store_url: string
+          updated_at: string
+        }
+        Insert: {
+          latest_version_code: number
+          latest_version_name: string
+          min_supported_version_code: number
+          platform: string
+          store_url: string
+          updated_at?: string
+        }
+        Update: {
+          latest_version_code?: number
+          latest_version_name?: string
+          min_supported_version_code?: number
+          platform?: string
+          store_url?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       native_push_subscriptions: {
         Row: {
           created_at: string
