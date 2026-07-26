@@ -1,19 +1,41 @@
 import { useEffect, useState } from "react";
-import { WifiOff, AlertTriangle } from "lucide-react";
+import { WifiOff, AlertTriangle, X } from "lucide-react";
 import { useOnlineStatus } from "@/hooks/use-online-status";
 import { subscribeNetworkIssue } from "@/lib/networkStatus";
+
+const DISMISS_KEY = "mr_offline_banner_dismissed";
+
+function readDismissed(): string | null {
+  try {
+    return localStorage.getItem(DISMISS_KEY);
+  } catch {
+    return null;
+  }
+}
+function writeDismissed(key: string | null) {
+  try {
+    if (key === null) localStorage.removeItem(DISMISS_KEY);
+    else localStorage.setItem(DISMISS_KEY, key);
+  } catch {
+    /* ignore */
+  }
+}
 
 /**
  * Top-of-screen banner for connectivity problems:
  *  - Device offline (navigator.onLine === false)
  *  - Transient network/server errors reported via reportNetworkIssue()
  *  - Brief "Back online" confirmation on recovery
+ *
+ * Dismissed state persists in localStorage, keyed by the current condition,
+ * so it stays hidden until the next connectivity change.
  */
 export function OfflineBanner() {
   const online = useOnlineStatus();
   const [showReconnected, setShowReconnected] = useState(false);
   const [wasOffline, setWasOffline] = useState(false);
   const [issueAt, setIssueAt] = useState<number>(0);
+  const [dismissedKey, setDismissedKey] = useState<string | null>(readDismissed);
 
   // Track offline → online transition for the "Back online" toast.
   useEffect(() => {
@@ -43,7 +65,26 @@ export function OfflineBanner() {
 
   const hasIssue = online && issueAt > 0;
 
-  if (online && !showReconnected && !hasIssue) return null;
+  // Compute a stable key for the current banner condition. When it changes
+  // (i.e. connectivity state changes), the previous dismissal no longer applies.
+  const currentKey = !online
+    ? "offline"
+    : hasIssue
+      ? `issue:${issueAt}`
+      : showReconnected
+        ? "reconnected"
+        : null;
+
+  // If condition changed away from what was dismissed, clear the flag.
+  useEffect(() => {
+    if (dismissedKey && dismissedKey !== currentKey) {
+      setDismissedKey(null);
+      writeDismissed(null);
+    }
+  }, [currentKey, dismissedKey]);
+
+  if (!currentKey) return null;
+  if (dismissedKey === currentKey) return null;
 
   let content: React.ReactNode;
   let cls: string;
@@ -73,6 +114,11 @@ export function OfflineBanner() {
     ((window as unknown as { Capacitor?: { getPlatform?: () => string } })
       .Capacitor?.getPlatform?.() === "ios");
 
+  const onDismiss = () => {
+    setDismissedKey(currentKey);
+    writeDismissed(currentKey);
+  };
+
   return (
     <div
       role="status"
@@ -87,7 +133,15 @@ export function OfflineBanner() {
           : "calc(env(safe-area-inset-top) + 0.75rem + 60px)",
       }}
     >
-      {content}
+      <div className="flex items-center gap-2">{content}</div>
+      <button
+        type="button"
+        onClick={onDismiss}
+        aria-label="Dismiss"
+        className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center rounded-full hover:bg-black/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-current"
+      >
+        <X className="h-4 w-4" aria-hidden="true" />
+      </button>
     </div>
   );
 }
