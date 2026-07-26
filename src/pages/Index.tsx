@@ -82,6 +82,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { AccessibilitySettings } from "@/components/AccessibilitySettings";
 
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
+import { ConnectionStatusDot } from "@/components/ConnectionStatusDot";
 
 const STORAGE_KEY = "mr_mobile";
 const PHONE_EMAIL_DOMAIN = "phone.merarashan.local";
