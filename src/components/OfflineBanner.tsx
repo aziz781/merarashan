@@ -68,14 +68,24 @@ export function OfflineBanner() {
     content = <span>Back online — refreshing data</span>;
   }
 
+  const isNativeIOS =
+    typeof window !== "undefined" &&
+    ((window as unknown as { Capacitor?: { getPlatform?: () => string } })
+      .Capacitor?.getPlatform?.() === "ios");
+
   return (
     <div
       role="status"
       aria-live="polite"
       className={
-        "fixed inset-x-0 top-0 z-[60] flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium shadow-sm " +
+        "fixed inset-x-0 z-[60] flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium shadow-sm " +
         cls
       }
+      style={{
+        top: isNativeIOS
+          ? "calc(max(env(safe-area-inset-top), 44px) + 1.5rem + 60px)"
+          : "calc(env(safe-area-inset-top) + 0.75rem + 60px)",
+      }}
     >
       {content}
     </div>
