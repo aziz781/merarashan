@@ -515,6 +515,7 @@ export default function SupportChat() {
                 })}
               </div>
             ))}
+            {otherTyping && <TypingIndicator label="Support is typing…" />}
             <div ref={bottomRef} />
           </div>
 
