@@ -42,12 +42,22 @@ Deno.serve(async (req) => {
       if (error) throw error;
 
       const userIds = [...new Set((conversations || []).map((c) => c.user_id))];
-      const { data: users, error: usersError } = await supabase.auth.admin.getUsers({
-        ids: userIds,
-      });
-      if (usersError) throw usersError;
+      const userMap = new Map<string, { user_metadata?: { mobile?: string } }>();
+      await Promise.all(
+        userIds.map(async (id) => {
+          const res = await fetch(
+            `${Deno.env.get("SUPABASE_URL")}/auth/v1/admin/users/${id}`,
+            {
+              headers: {
+                apikey: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+                Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!}`,
+              },
+            },
+          );
+          if (res.ok) userMap.set(id, await res.json());
+        }),
+      );
 
-      const userMap = new Map((users?.users || []).map((u) => [u.id, u]));
 
       const { data: messages, error: msgError } = await supabase
         .from("support_messages")
