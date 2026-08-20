@@ -18,6 +18,8 @@ import {
   Download,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useSupportTyping } from "@/hooks/useSupportTyping";
+import { TypingIndicator } from "@/components/TypingIndicator";
 
 interface SupportConversation {
   id: string;
