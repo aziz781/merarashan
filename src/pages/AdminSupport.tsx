@@ -28,9 +28,12 @@ interface SupportMessage {
   id: string;
   conversation_id: string;
   sender_type: "user" | "agent";
-  content: string;
+  content: string | null;
   read_at: string | null;
   created_at: string;
+  attachment_url?: string | null;
+  attachment_name?: string | null;
+  attachment_type?: string | null;
 }
 
 export default function AdminSupport() {
