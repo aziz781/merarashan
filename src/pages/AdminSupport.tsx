@@ -207,6 +207,8 @@ export default function AdminSupport() {
     }
   }, [selectedId]);
 
+  const { otherTyping, notifyTyping, notifyStopped } = useSupportTyping(selectedId, "agent");
+
   const handleSend = async () => {
     const content = input.trim();
     if (!content || !selectedId || sending) return;
