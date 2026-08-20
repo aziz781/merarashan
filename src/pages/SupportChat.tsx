@@ -18,6 +18,8 @@ import {
   Download,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useSupportTyping } from "@/hooks/useSupportTyping";
+import { TypingIndicator } from "@/components/TypingIndicator";
 
 interface SupportConversation {
   id: string;
@@ -242,6 +244,11 @@ export default function SupportChat() {
 
   const isClosed = conversation?.status === "closed";
 
+  const { otherTyping, notifyTyping, notifyStopped } = useSupportTyping(
+    conversation?.id ?? null,
+    "user",
+  );
+
   const handleSend = useCallback(
     async (override?: string) => {
       const content = (override ?? input).trim();
@@ -272,6 +279,7 @@ export default function SupportChat() {
         if (sendErr) throw sendErr;
         setInput("");
         setPendingFile(null);
+        notifyStopped();
         textareaRef.current?.focus();
         // Notify support agents (push + their in-app inbox). Best-effort.
         void supabase.functions
@@ -507,6 +515,7 @@ export default function SupportChat() {
                 })}
               </div>
             ))}
+            {otherTyping && <TypingIndicator label="Support is typing…" />}
             <div ref={bottomRef} />
           </div>
 
@@ -548,7 +557,12 @@ export default function SupportChat() {
                 <Textarea
                   ref={textareaRef}
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    if (e.target.value.trim()) notifyTyping();
+                    else notifyStopped();
+                  }}
+                  onBlur={() => notifyStopped()}
                   onKeyDown={handleKeyDown}
                   placeholder="Type your message…"
                   disabled={isClosed}

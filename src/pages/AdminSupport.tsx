@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Send, Loader2, RefreshCw, CheckCircle2, Circle, MessageSquare, Inbox, AlertCircle, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useSupportTyping } from "@/hooks/useSupportTyping";
+import { TypingIndicator } from "@/components/TypingIndicator";
 
 interface AdminConversation {
   id: string;
@@ -205,6 +207,8 @@ export default function AdminSupport() {
     }
   }, [selectedId]);
 
+  const { otherTyping, notifyTyping, notifyStopped } = useSupportTyping(selectedId, "agent");
+
   const handleSend = async () => {
     const content = input.trim();
     if (!content || !selectedId || sending) return;
@@ -224,6 +228,7 @@ export default function AdminSupport() {
       });
       if (!res.ok) throw new Error(await res.text());
       setInput("");
+      notifyStopped();
       textareaRef.current?.focus();
       // Refresh conversation list to update latest message.
       void loadConversations();
@@ -515,6 +520,7 @@ export default function AdminSupport() {
                     </div>
                   );
                 })}
+                {otherTyping && <TypingIndicator label="Customer is typing…" />}
                 <div ref={bottomRef} />
               </div>
 
@@ -523,7 +529,12 @@ export default function AdminSupport() {
                   <Textarea
                     ref={textareaRef}
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      if (e.target.value.trim()) notifyTyping();
+                      else notifyStopped();
+                    }}
+                    onBlur={() => notifyStopped()}
                     onKeyDown={handleKeyDown}
                     placeholder="Type a reply…"
                     rows={1}
