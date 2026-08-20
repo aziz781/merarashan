@@ -70,9 +70,9 @@ export default function AdminSupport() {
     void checkAdmin();
   }, []);
 
-  const loadConversations = async () => {
+  const loadConversations = async (opts?: { silent?: boolean }) => {
     try {
-      setRefreshing(true);
+      if (!opts?.silent) setRefreshing(true);
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
       const res = await fetch(
@@ -86,21 +86,47 @@ export default function AdminSupport() {
       );
       if (!res.ok) throw new Error(await res.text());
       const json = (await res.json()) as { conversations: AdminConversation[] };
-      setConversations(json.conversations || []);
+      const next = json.conversations || [];
+      const nextUnread = next.reduce((s, c) => s + (c.unread_user_messages || 0), 0);
+      if (
+        prevUnreadRef.current !== null &&
+        nextUnread > prevUnreadRef.current &&
+        document.visibilityState !== "hidden"
+      ) {
+        toast.message("New support message", {
+          description: `${nextUnread} unread message${nextUnread === 1 ? "" : "s"} waiting.`,
+        });
+      }
+      prevUnreadRef.current = nextUnread;
+      setConversations(next);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Could not load conversations";
-      toast.error("Load failed", { description: msg });
+      if (!opts?.silent) {
+        const msg = e instanceof Error ? e.message : "Could not load conversations";
+        toast.error("Load failed", { description: msg });
+      }
     } finally {
-      setRefreshing(false);
+      if (!opts?.silent) setRefreshing(false);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (isAdmin) void loadConversations();
+    if (!isAdmin) return;
+    void loadConversations();
+    // RLS hides other users' rows from realtime for agents, so poll instead.
+    const id = window.setInterval(() => void loadConversations({ silent: true }), 15000);
+    const onFocus = () => void loadConversations({ silent: true });
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onFocus);
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onFocus);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin]);
 
-  // Load messages for selected conversation.
+  // Load messages for selected conversation (and keep them fresh).
   useEffect(() => {
     if (!selectedId) return;
 
@@ -120,6 +146,10 @@ export default function AdminSupport() {
         if (!res.ok) throw new Error(await res.text());
         const json = (await res.json()) as { messages: SupportMessage[] };
         setMessages(json.messages || []);
+        // Opening the thread marks user messages read server-side.
+        setConversations((prev) =>
+          prev.map((c) => (c.id === selectedId ? { ...c, unread_user_messages: 0 } : c)),
+        );
       } catch (e) {
         const msg = e instanceof Error ? e.message : "Could not load messages";
         toast.error("Load failed", { description: msg });
@@ -127,7 +157,10 @@ export default function AdminSupport() {
     };
 
     void loadMessages();
+    const id = window.setInterval(() => void loadMessages(), 10000);
+    return () => window.clearInterval(id);
   }, [selectedId]);
+
 
   // Realtime subscription for selected conversation.
   useEffect(() => {
