@@ -299,6 +299,7 @@ export default function AdminSupport() {
   }
 
   const selectedConversation = conversations.find((c) => c.id === selectedId);
+  const totalUnread = conversations.reduce((s, c) => s + (c.unread_user_messages || 0), 0);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -313,11 +314,23 @@ export default function AdminSupport() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <h1 className="text-xl font-bold">Support Dashboard</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-bold">Support Dashboard</h1>
+              {totalUnread > 0 && (
+                <span
+                  aria-label={`${totalUnread} unread messages`}
+                  className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground"
+                >
+                  {totalUnread > 99 ? "99+" : totalUnread}
+                </span>
+              )}
+            </div>
             <p className="text-xs text-primary-foreground/80 dark:text-foreground/70">
               {conversations.length} conversation{conversations.length === 1 ? "" : "s"}
+              {totalUnread > 0 ? ` · ${totalUnread} unread` : ""}
             </p>
           </div>
+
         </div>
         <button
           type="button"
