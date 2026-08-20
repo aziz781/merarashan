@@ -520,6 +520,7 @@ export default function AdminSupport() {
                     </div>
                   );
                 })}
+                {otherTyping && <TypingIndicator label="Customer is typing…" />}
                 <div ref={bottomRef} />
               </div>
 
