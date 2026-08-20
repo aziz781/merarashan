@@ -81,6 +81,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { AccessibilitySettings } from "@/components/AccessibilitySettings";
 
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
+import { useAgentSupportUnread } from "@/hooks/useAgentSupportUnread";
 
 
 const STORAGE_KEY = "mr_mobile";
@@ -158,6 +159,7 @@ const Index = () => {
       } catch { /* ignore */ }
     };
   }, [tab, mobile]);
+  const agentSupport = useAgentSupportUnread();
   const [profileOpen, setProfileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -561,14 +563,24 @@ const Index = () => {
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
-              onClick={() => navigate("/support")}
-              aria-label="Customer support chat"
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
+              onClick={() => navigate(agentSupport.isAgent ? "/admin/support" : "/support")}
+              aria-label={
+                agentSupport.isAgent
+                  ? `Support dashboard${agentSupport.unread > 0 ? `, ${agentSupport.unread} unread` : ""}`
+                  : "Customer support chat"
+              }
+              className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm text-primary-foreground ring-1 ring-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-white/25 transition-colors dark:bg-primary/25 dark:text-primary dark:ring-primary/50 dark:hover:bg-primary/35"
             >
               <Headphones className="w-5 h-5" />
+              {agentSupport.isAgent && agentSupport.unread > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground ring-2 ring-primary">
+                  {agentSupport.unread > 99 ? "99+" : agentSupport.unread}
+                </span>
+              )}
             </button>
           </div>
         )}
+
         </div>
       </header>
 
