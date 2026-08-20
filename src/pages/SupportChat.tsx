@@ -1,10 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Send, Loader2, AlertCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Send,
+  Loader2,
+  AlertCircle,
+  Paperclip,
+  X,
+  Check,
+  CheckCheck,
+  Headphones,
+  FileText,
+  Download,
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface SupportConversation {
@@ -19,10 +31,25 @@ interface SupportMessage {
   id: string;
   conversation_id: string;
   sender_type: "user" | "agent";
-  content: string;
+  content: string | null;
   read_at: string | null;
   created_at: string;
+  attachment_path: string | null;
+  attachment_name: string | null;
+  attachment_type: string | null;
 }
+
+const MESSAGE_COLUMNS =
+  "id, conversation_id, sender_type, content, read_at, created_at, attachment_path, attachment_name, attachment_type";
+
+const QUICK_REPLIES = [
+  "My Mera Rashan card is not working",
+  "I can't generate a Rashan Code",
+  "A transaction looks wrong",
+  "How do I update my mobile number?",
+];
+
+const MAX_FILE_BYTES = 5 * 1024 * 1024;
 
 export default function SupportChat() {
   const navigate = useNavigate();
@@ -36,8 +63,11 @@ export default function SupportChat() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [attachmentUrls, setAttachmentUrls] = useState<Record<string, string>>({});
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Extract mobile from session metadata.
   useEffect(() => {
@@ -116,7 +146,7 @@ export default function SupportChat() {
     const loadMessages = async () => {
       const { data, error: msgErr } = await supabase
         .from("support_messages")
-        .select("id, conversation_id, sender_type, content, read_at, created_at")
+        .select(MESSAGE_COLUMNS)
         .eq("conversation_id", conversation.id)
         .order("created_at", { ascending: true });
 
@@ -147,12 +177,48 @@ export default function SupportChat() {
           });
         },
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "support_messages",
+          filter: `conversation_id=eq.${conversation.id}`,
+        },
+        (payload) => {
+          const updated = payload.new as SupportMessage;
+          setMessages((prev) => prev.map((m) => (m.id === updated.id ? { ...m, ...updated } : m)));
+        },
+      )
       .subscribe();
 
     return () => {
       void supabase.removeChannel(channel);
     };
   }, [conversation]);
+
+  // Resolve signed URLs for attachments.
+  useEffect(() => {
+    const missing = messages.filter((m) => m.attachment_path && !attachmentUrls[m.attachment_path]);
+    if (missing.length === 0) return;
+    let cancelled = false;
+
+    void (async () => {
+      const entries: [string, string][] = [];
+      for (const m of missing) {
+        const path = m.attachment_path as string;
+        const { data } = await supabase.storage.from("support-attachments").createSignedUrl(path, 3600);
+        if (data?.signedUrl) entries.push([path, data.signedUrl]);
+      }
+      if (!cancelled && entries.length > 0) {
+        setAttachmentUrls((prev) => ({ ...prev, ...Object.fromEntries(entries) }));
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [messages, attachmentUrls]);
 
   // Scroll to bottom on new messages.
   useEffect(() => {
@@ -166,40 +232,83 @@ export default function SupportChat() {
     }
   }, [loading, conversation]);
 
-  const handleSend = async () => {
-    const content = input.trim();
-    if (!content || !conversation || sending) return;
+  // Auto-grow composer.
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 140)}px`;
+  }, [input]);
 
-    setSending(true);
-    try {
-      const { error: sendErr } = await supabase.from("support_messages").insert({
-        conversation_id: conversation.id,
-        sender_type: "user",
-        content,
-      });
-      if (sendErr) throw sendErr;
-      setInput("");
-      textareaRef.current?.focus();
-      // Notify support agents (push + their in-app inbox). Best-effort.
-      void supabase.functions
-        .invoke("support-notify", {
-          body: { conversation_id: conversation.id, preview: content.slice(0, 160) },
-        })
-        .catch(() => undefined);
+  const isClosed = conversation?.status === "closed";
 
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Send failed";
-      toast.error("Message not sent", { description: msg });
-    } finally {
-      setSending(false);
-    }
-  };
+  const handleSend = useCallback(
+    async (override?: string) => {
+      const content = (override ?? input).trim();
+      const file = pendingFile;
+      if ((!content && !file) || !conversation || !session || sending) return;
+
+      setSending(true);
+      try {
+        let attachment: { path: string; name: string; type: string } | null = null;
+        if (file) {
+          const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
+          const path = `${session.userId}/${conversation.id}/${crypto.randomUUID()}.${ext}`;
+          const { error: upErr } = await supabase.storage
+            .from("support-attachments")
+            .upload(path, file, { contentType: file.type || "application/octet-stream" });
+          if (upErr) throw upErr;
+          attachment = { path, name: file.name, type: file.type || "application/octet-stream" };
+        }
+
+        const { error: sendErr } = await supabase.from("support_messages").insert({
+          conversation_id: conversation.id,
+          sender_type: "user",
+          content: content || null,
+          attachment_path: attachment?.path ?? null,
+          attachment_name: attachment?.name ?? null,
+          attachment_type: attachment?.type ?? null,
+        });
+        if (sendErr) throw sendErr;
+        setInput("");
+        setPendingFile(null);
+        textareaRef.current?.focus();
+        // Notify support agents (push + their in-app inbox). Best-effort.
+        void supabase.functions
+          .invoke("support-notify", {
+            body: {
+              conversation_id: conversation.id,
+              preview: (content || `Sent an attachment: ${attachment?.name ?? "file"}`).slice(0, 160),
+            },
+          })
+          .catch(() => undefined);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "Send failed";
+        toast.error("Message not sent", { description: msg });
+      } finally {
+        setSending(false);
+      }
+    },
+    [input, pendingFile, conversation, session, sending],
+  );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       void handleSend();
     }
+  };
+
+  const handlePickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > MAX_FILE_BYTES) {
+      toast.error("File too large", { description: "Please attach a file under 5 MB." });
+      return;
+    }
+    setPendingFile(file);
+    textareaRef.current?.focus();
   };
 
   const formatTime = (iso: string) => {
@@ -212,6 +321,80 @@ export default function SupportChat() {
     } catch {
       return "";
     }
+  };
+
+  const formatDay = (iso: string) => {
+    const d = new Date(iso);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    const same = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+    if (same(d, today)) return "Today";
+    if (same(d, yesterday)) return "Yesterday";
+    try {
+      return new Intl.DateTimeFormat(undefined, {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+      }).format(d);
+    } catch {
+      return "";
+    }
+  };
+
+  // Group messages by day for separators.
+  const grouped = useMemo(() => {
+    const out: { day: string; items: SupportMessage[] }[] = [];
+    for (const m of messages) {
+      const day = formatDay(m.created_at);
+      const last = out[out.length - 1];
+      if (last && last.day === day) last.items.push(m);
+      else out.push({ day, items: [m] });
+    }
+    return out;
+  }, [messages]);
+
+  const lastUserMessageId = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].sender_type === "user") return messages[i].id;
+    }
+    return null;
+  }, [messages]);
+
+  const renderAttachment = (msg: SupportMessage, isUser: boolean) => {
+    if (!msg.attachment_path) return null;
+    const url = attachmentUrls[msg.attachment_path];
+    const isImage = (msg.attachment_type || "").startsWith("image/");
+
+    if (isImage) {
+      return url ? (
+        <a href={url} target="_blank" rel="noopener noreferrer" className="block mt-1">
+          <img
+            src={url}
+            alt={msg.attachment_name || "Attachment"}
+            loading="lazy"
+            className="max-h-56 w-auto rounded-lg object-cover"
+          />
+        </a>
+      ) : (
+        <div className="mt-1 h-24 w-40 animate-pulse rounded-lg bg-foreground/10" />
+      );
+    }
+
+    return (
+      <a
+        href={url || "#"}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`mt-1 flex items-center gap-2 rounded-lg px-2.5 py-2 ${
+          isUser ? "bg-primary-foreground/15" : "bg-foreground/5"
+        }`}
+      >
+        <FileText className="h-4 w-4 shrink-0" />
+        <span className="truncate text-xs">{msg.attachment_name || "Attachment"}</span>
+        <Download className="ml-auto h-3.5 w-3.5 shrink-0 opacity-70" />
+      </a>
+    );
   };
 
   if (loading) {
@@ -253,66 +436,138 @@ export default function SupportChat() {
         <>
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
             {messages.length === 0 && (
-              <div className="text-center py-10 text-muted-foreground">
-                <p className="text-sm">Start a conversation with our support team.</p>
+              <div className="text-center py-8">
+                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <Headphones className="h-7 w-7" />
+                </div>
+                <p className="text-sm font-medium">How can we help?</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Send us a message and our team will reply here.
+                </p>
                 {session?.mobile && (
-                  <p className="text-xs mt-1">Account: +{session.mobile}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Account: +{session.mobile}</p>
+                )}
+                {!isClosed && (
+                  <div className="mt-5 flex flex-wrap justify-center gap-2">
+                    {QUICK_REPLIES.map((q) => (
+                      <button
+                        key={q}
+                        type="button"
+                        onClick={() => void handleSend(q)}
+                        disabled={sending}
+                        className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-foreground hover:bg-muted transition-colors disabled:opacity-60"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
                 )}
               </div>
             )}
-            {messages.map((msg) => {
-              const isUser = msg.sender_type === "user";
-              return (
-                <div
-                  key={msg.id}
-                  className={`flex ${isUser ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${
-                      isUser
-                        ? "bg-primary text-primary-foreground rounded-br-md"
-                        : "bg-muted text-foreground rounded-bl-md border border-border"
-                    }`}
-                  >
-                    <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-                    <span
-                      className={`block text-[10px] mt-1 ${
-                        isUser ? "text-primary-foreground/70" : "text-muted-foreground"
-                      }`}
-                    >
-                      {formatTime(msg.created_at)}
-                    </span>
-                  </div>
+
+            {grouped.map((group) => (
+              <div key={group.day} className="space-y-4">
+                <div className="flex items-center justify-center">
+                  <span className="rounded-full bg-muted px-3 py-1 text-[10px] font-medium text-muted-foreground">
+                    {group.day}
+                  </span>
                 </div>
-              );
-            })}
+                {group.items.map((msg) => {
+                  const isUser = msg.sender_type === "user";
+                  const showReceipt = isUser && msg.id === lastUserMessageId;
+                  return (
+                    <div key={msg.id} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+                      <div
+                        className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${
+                          isUser
+                            ? "bg-primary text-primary-foreground rounded-br-md"
+                            : "bg-muted text-foreground rounded-bl-md border border-border"
+                        }`}
+                      >
+                        {msg.content && (
+                          <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                        )}
+                        {renderAttachment(msg, isUser)}
+                        <span
+                          className={`mt-1 flex items-center gap-1 text-[10px] ${
+                            isUser ? "justify-end text-primary-foreground/70" : "text-muted-foreground"
+                          }`}
+                        >
+                          {formatTime(msg.created_at)}
+                          {showReceipt &&
+                            (msg.read_at ? (
+                              <CheckCheck className="h-3 w-3" aria-label="Read" />
+                            ) : (
+                              <Check className="h-3 w-3" aria-label="Sent" />
+                            ))}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
             <div ref={bottomRef} />
           </div>
 
           <div className="border-t border-border bg-card p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-            <div className="flex items-end gap-2 max-w-2xl mx-auto">
-              <Textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Type your message…"
-                disabled={conversation?.status === "closed"}
-                rows={1}
-                className="min-h-[48px] max-h-[120px] resize-none rounded-xl bg-background border-border focus-visible:ring-primary"
-              />
-              <Button
-                type="button"
-                size="icon"
-                onClick={() => void handleSend()}
-                disabled={!input.trim() || sending || conversation?.status === "closed"}
-                className="h-12 w-12 shrink-0 rounded-xl"
-                aria-label="Send message"
-              >
-                {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-              </Button>
+            <div className="max-w-2xl mx-auto space-y-2">
+              {pendingFile && (
+                <div className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2">
+                  <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="truncate text-xs">{pendingFile.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => setPendingFile(null)}
+                    aria-label="Remove attachment"
+                    className="ml-auto rounded-full p-1 hover:bg-muted"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+              <div className="flex items-end gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={handlePickFile}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isClosed || sending}
+                  className="h-12 w-12 shrink-0 rounded-xl"
+                  aria-label="Attach a file"
+                >
+                  <Paperclip className="h-5 w-5" />
+                </Button>
+                <Textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Type your message…"
+                  disabled={isClosed}
+                  rows={1}
+                  className="min-h-[48px] max-h-[140px] resize-none rounded-xl bg-background border-border focus-visible:ring-primary"
+                />
+                <Button
+                  type="button"
+                  size="icon"
+                  onClick={() => void handleSend()}
+                  disabled={(!input.trim() && !pendingFile) || sending || isClosed}
+                  className="h-12 w-12 shrink-0 rounded-xl"
+                  aria-label="Send message"
+                >
+                  {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                </Button>
+              </div>
             </div>
-            {conversation?.status === "closed" && (
+            {isClosed && (
               <p className="text-xs text-muted-foreground text-center mt-2">
                 This conversation is closed. Start a new chat from the help menu if you need more help.
               </p>
