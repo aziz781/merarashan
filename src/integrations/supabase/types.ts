@@ -229,7 +229,10 @@ export type Database = {
       }
       support_messages: {
         Row: {
-          content: string
+          attachment_name: string | null
+          attachment_path: string | null
+          attachment_type: string | null
+          content: string | null
           conversation_id: string
           created_at: string
           id: string
@@ -238,7 +241,10 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          content: string
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_type?: string | null
+          content?: string | null
           conversation_id: string
           created_at?: string
           id?: string
@@ -247,7 +253,10 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          content?: string
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_type?: string | null
+          content?: string | null
           conversation_id?: string
           created_at?: string
           id?: string
