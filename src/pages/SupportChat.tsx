@@ -279,6 +279,7 @@ export default function SupportChat() {
         if (sendErr) throw sendErr;
         setInput("");
         setPendingFile(null);
+        notifyStopped();
         textareaRef.current?.focus();
         // Notify support agents (push + their in-app inbox). Best-effort.
         void supabase.functions
