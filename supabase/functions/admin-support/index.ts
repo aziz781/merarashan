@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
 
       const { data: messages, error: msgError } = await supabase
         .from("support_messages")
-        .select("id, conversation_id, sender_type, content, read_at, created_at")
+        .select("id, conversation_id, sender_type, content, read_at, created_at, attachment_path, attachment_name, attachment_type")
         .in(
           "conversation_id",
           (conversations || []).map((c) => c.id),
@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
           latest_message: latest
             ? {
                 sender_type: latest.sender_type,
-                content: latest.content,
+                content: latest.content || (latest.attachment_name ? `📎 ${latest.attachment_name}` : ""),
                 created_at: latest.created_at,
                 read_at: latest.read_at,
               }
@@ -114,11 +114,22 @@ Deno.serve(async (req) => {
 
       const { data, error } = await supabase
         .from("support_messages")
-        .select("id, conversation_id, sender_type, content, read_at, created_at")
+        .select("id, conversation_id, sender_type, content, read_at, created_at, attachment_path, attachment_name, attachment_type")
         .eq("conversation_id", conversationId)
         .order("created_at", { ascending: true });
 
       if (error) throw error;
+
+      // Sign attachment URLs so agents can view customer uploads.
+      const withUrls = await Promise.all(
+        (data || []).map(async (m) => {
+          if (!m.attachment_path) return { ...m, attachment_url: null };
+          const { data: signed } = await supabase.storage
+            .from("support-attachments")
+            .createSignedUrl(m.attachment_path, 3600);
+          return { ...m, attachment_url: signed?.signedUrl ?? null };
+        }),
+      );
 
       // Mark user messages as read when an agent opens the conversation.
       await supabase
@@ -128,7 +139,7 @@ Deno.serve(async (req) => {
         .eq("sender_type", "user")
         .is("read_at", null);
 
-      return new Response(JSON.stringify({ messages: data || [] }), {
+      return new Response(JSON.stringify({ messages: withUrls }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -152,7 +163,7 @@ Deno.serve(async (req) => {
       const { data: message, error } = await supabase
         .from("support_messages")
         .insert({ conversation_id, sender_type: "agent", content })
-        .select("id, conversation_id, sender_type, content, read_at, created_at")
+        .select("id, conversation_id, sender_type, content, read_at, created_at, attachment_path, attachment_name, attachment_type")
         .single();
 
       if (error) throw error;
