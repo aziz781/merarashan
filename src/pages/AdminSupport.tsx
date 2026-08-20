@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Send, Loader2, RefreshCw, CheckCircle2, Circle, MessageSquare, Inbox, AlertCircle } from "lucide-react";
+import { ArrowLeft, Send, Loader2, RefreshCw, CheckCircle2, Circle, MessageSquare, Inbox, AlertCircle, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
