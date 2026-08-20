@@ -244,6 +244,11 @@ export default function SupportChat() {
 
   const isClosed = conversation?.status === "closed";
 
+  const { otherTyping, notifyTyping, notifyStopped } = useSupportTyping(
+    conversation?.id ?? null,
+    "user",
+  );
+
   const handleSend = useCallback(
     async (override?: string) => {
       const content = (override ?? input).trim();
