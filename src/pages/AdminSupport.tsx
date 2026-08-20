@@ -47,6 +47,8 @@ export default function AdminSupport() {
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const prevUnreadRef = useRef<number | null>(null);
+
 
   // Verify admin access.
   useEffect(() => {
