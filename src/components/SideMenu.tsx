@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bot, Copy, HelpCircle, Info, LogOut, Settings, Share2, Shield, User } from "lucide-react";
+import { Bot, Copy, Headphones, HelpCircle, Info, LogOut, Settings, Share2, Shield, User } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useSwipeToClose } from "@/hooks/use-swipe-to-close";
@@ -98,6 +98,14 @@ export function SideMenu({
               }}
             />
           )}
+          <MenuItem
+            icon={<Headphones className="w-4 h-4" />}
+            label="Customer Support"
+            onClick={() => {
+              onOpenChange(false);
+              navigate("/support");
+            }}
+          />
           <MenuItem icon={<HelpCircle className="w-4 h-4" />} label="Help" onClick={onOpenHelp} />
           <MenuItem
             icon={<Info className="w-4 h-4" />}

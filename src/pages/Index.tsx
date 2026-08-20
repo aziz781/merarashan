@@ -11,7 +11,7 @@ import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useNavigate } from "react-router-dom";
 import { WhatsAppTile } from "@/components/WhatsAppTile";
 import { extractItems, isTruthy } from "@/lib/itemUtils";
-import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle, Lock, Unlock, Sun, Moon, X, Check } from "lucide-react";
+import { CreditCard, ArrowLeftRight, User, FileText, Instagram, Facebook, ShieldCheck, ScrollText, BarChart3, Trash2, Snowflake, AlertTriangle, Lock, Unlock, Sun, Moon, X, Check, Headphones } from "lucide-react";
 
 import { SideMenu } from "@/components/SideMenu";
 import { SlideInPanel } from "@/components/SlideInPanel";
@@ -627,6 +627,16 @@ const Index = () => {
         </button>
       )}
 
+      <button
+        type="button"
+        onClick={() => navigate("/support")}
+        aria-label="Customer support chat"
+        className="fixed right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
+        style={{ bottom: "5rem", marginBottom: "env(safe-area-inset-bottom, 0px)" }}
+      >
+        <Headphones className="h-5 w-5" />
+      </button>
+
 
       <nav
         className="fixed bottom-0 inset-x-0 z-40 border-t border-border/60 bg-card/85 backdrop-blur-md shadow-[0_-4px_20px_-8px_hsl(var(--foreground)/0.15)]"
@@ -704,6 +714,20 @@ const Index = () => {
         description="Get instant help from our virtual agent 24/7. Live support: Mon-Sun 06:00-18:00 (UTC)"
       >
         <div className="space-y-3 pt-2">
+          <button
+            type="button"
+            onClick={() => {
+              setHelpOpen(false);
+              navigate("/support");
+            }}
+            className="flex w-full items-center gap-3 rounded-md border border-border/60 bg-card px-4 py-3 text-left text-sm font-medium hover:bg-muted transition-colors"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+              <Headphones className="h-5 w-5 text-primary" />
+            </span>
+            <span className="flex-1">In-app customer support</span>
+            <span aria-hidden className="text-muted-foreground">›</span>
+          </button>
           <WhatsAppTile
             href="https://wa.me/923030812222"
             number="923030812222"

@@ -35,6 +35,8 @@ const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const OAuthConsent = lazy(() => import("./pages/OAuthConsent.tsx"));
 const AgentIntegrations = lazy(() => import("./pages/AgentIntegrations.tsx"));
 const AIAgents = lazy(() => import("./pages/AIAgents.tsx"));
+const SupportChat = lazy(() => import("./pages/SupportChat.tsx"));
+const AdminSupport = lazy(() => import("./pages/AdminSupport.tsx"));
 
 
 function RouteFallback() {
@@ -171,6 +173,8 @@ const App = () => (
               <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
               <Route path="/agent-integrations" element={<AgentIntegrations />} />
               {!isNativeCapacitor && <Route path="/ai-agents" element={<AIAgents />} />}
+              <Route path="/support" element={<SupportChat />} />
+              <Route path="/admin/support" element={<AdminSupport />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
