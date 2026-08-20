@@ -62,7 +62,8 @@ export function useAgentSupportUnread(pollMs = 30000) {
           return;
         }
         const res = await supabase.functions.invoke("is-admin", { body: {} });
-        if (!cancelled) setIsAgent(!res.error && !!res.data?.isAdmin);
+        const payload = res.data as { admin?: boolean; isAdmin?: boolean } | null;
+        if (!cancelled) setIsAgent(!res.error && !!(payload?.admin ?? payload?.isAdmin));
       } catch {
         if (!cancelled) setIsAgent(false);
       }

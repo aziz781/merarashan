@@ -64,7 +64,8 @@ export default function AdminSupport() {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.error) throw res.error;
-        setIsAdmin(!!res.data?.isAdmin);
+        const payload = res.data as { admin?: boolean; isAdmin?: boolean } | null;
+        setIsAdmin(!!(payload?.admin ?? payload?.isAdmin));
       } catch {
         setIsAdmin(false);
       }
