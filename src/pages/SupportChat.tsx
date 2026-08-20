@@ -557,7 +557,12 @@ export default function SupportChat() {
                 <Textarea
                   ref={textareaRef}
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    if (e.target.value.trim()) notifyTyping();
+                    else notifyStopped();
+                  }}
+                  onBlur={() => notifyStopped()}
                   onKeyDown={handleKeyDown}
                   placeholder="Type your message…"
                   disabled={isClosed}
