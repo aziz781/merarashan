@@ -180,6 +180,13 @@ export default function SupportChat() {
       if (sendErr) throw sendErr;
       setInput("");
       textareaRef.current?.focus();
+      // Notify support agents (push + their in-app inbox). Best-effort.
+      void supabase.functions
+        .invoke("support-notify", {
+          body: { conversation_id: conversation.id, preview: content.slice(0, 160) },
+        })
+        .catch(() => undefined);
+
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Send failed";
       toast.error("Message not sent", { description: msg });
