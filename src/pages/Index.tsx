@@ -77,6 +77,7 @@ const scheduleIdle: IdleScheduler =
 
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { PostLoginNotificationPrompt } from "@/components/PostLoginNotificationPrompt";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { AccessibilitySettings } from "@/components/AccessibilitySettings";
 
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
