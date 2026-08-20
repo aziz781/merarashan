@@ -98,14 +98,6 @@ export function SideMenu({
               }}
             />
           )}
-          <MenuItem
-            icon={<Headphones className="w-4 h-4" />}
-            label="Customer Support"
-            onClick={() => {
-              onOpenChange(false);
-              navigate("/support");
-            }}
-          />
           <MenuItem icon={<HelpCircle className="w-4 h-4" />} label="Help" onClick={onOpenHelp} />
           <MenuItem
             icon={<Info className="w-4 h-4" />}
