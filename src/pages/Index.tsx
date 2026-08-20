@@ -81,6 +81,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { AccessibilitySettings } from "@/components/AccessibilitySettings";
 
 import { subscribeNotifications, syncNotificationInbox, unreadCount } from "@/lib/notificationsStore";
+import { useAgentSupportUnread } from "@/hooks/useAgentSupportUnread";
 
 
 const STORAGE_KEY = "mr_mobile";
@@ -158,6 +159,7 @@ const Index = () => {
       } catch { /* ignore */ }
     };
   }, [tab, mobile]);
+  const agentSupport = useAgentSupportUnread();
   const [profileOpen, setProfileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
