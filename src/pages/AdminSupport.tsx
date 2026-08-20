@@ -470,7 +470,40 @@ export default function AdminSupport() {
                             : "bg-muted text-foreground rounded-bl-md border border-border"
                         }`}
                       >
-                        <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                        {msg.content && (
+                          <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                        )}
+                        {msg.attachment_url &&
+                          ((msg.attachment_type || "").startsWith("image/") ? (
+                            <a
+                              href={msg.attachment_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-1 block"
+                            >
+                              <img
+                                src={msg.attachment_url}
+                                alt={msg.attachment_name || "Attachment"}
+                                loading="lazy"
+                                className="max-h-56 w-auto rounded-lg object-cover"
+                              />
+                            </a>
+                          ) : (
+                            <a
+                              href={msg.attachment_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={cn(
+                                "mt-1 flex items-center gap-2 rounded-lg px-2.5 py-2",
+                                isAgent ? "bg-primary-foreground/15" : "bg-foreground/5",
+                              )}
+                            >
+                              <FileText className="h-4 w-4 shrink-0" />
+                              <span className="truncate text-xs">
+                                {msg.attachment_name || "Attachment"}
+                              </span>
+                            </a>
+                          ))}
                         <span
                           className={`block text-[10px] mt-1 ${
                             isAgent ? "text-primary-foreground/70" : "text-muted-foreground"
