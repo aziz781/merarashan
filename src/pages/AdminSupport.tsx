@@ -529,7 +529,12 @@ export default function AdminSupport() {
                   <Textarea
                     ref={textareaRef}
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      if (e.target.value.trim()) notifyTyping();
+                      else notifyStopped();
+                    }}
+                    onBlur={() => notifyStopped()}
                     onKeyDown={handleKeyDown}
                     placeholder="Type a reply…"
                     rows={1}
