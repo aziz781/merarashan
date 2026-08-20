@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Send, Loader2, RefreshCw, CheckCircle2, Circle, MessageSquare, Inbox, AlertCircle, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useSupportTyping } from "@/hooks/useSupportTyping";
+import { TypingIndicator } from "@/components/TypingIndicator";
 
 interface AdminConversation {
   id: string;
