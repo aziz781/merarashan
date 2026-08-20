@@ -715,6 +715,27 @@ const Index = () => {
         description="Get instant help from our virtual agent 24/7. Live support: Mon-Sun 06:00-18:00 (UTC)"
       >
         <div className="space-y-3 pt-2">
+          {agentSupport.isAgent && (
+            <button
+              type="button"
+              onClick={() => {
+                setHelpOpen(false);
+                navigate("/admin/support");
+              }}
+              className="flex w-full items-center gap-3 rounded-md border border-border/60 bg-card px-4 py-3 text-left text-sm font-medium hover:bg-muted transition-colors"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                <Headphones className="h-5 w-5 text-primary" />
+              </span>
+              <span className="flex-1">Support Dashboard</span>
+              {agentSupport.unread > 0 && (
+                <span className="mr-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                  {agentSupport.unread > 99 ? "99+" : agentSupport.unread}
+                </span>
+              )}
+              <span aria-hidden className="text-muted-foreground">›</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => {
