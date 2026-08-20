@@ -625,15 +625,6 @@ const Index = () => {
         </button>
       )}
 
-      <button
-        type="button"
-        onClick={() => navigate("/support")}
-        aria-label="Customer support chat"
-        className="fixed right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 hover:opacity-90 transition"
-        style={{ bottom: "5rem", marginBottom: "env(safe-area-inset-bottom, 0px)" }}
-      >
-        <Headphones className="h-5 w-5" />
-      </button>
 
 
       <nav
