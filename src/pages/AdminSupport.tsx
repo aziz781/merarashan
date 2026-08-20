@@ -228,6 +228,7 @@ export default function AdminSupport() {
       });
       if (!res.ok) throw new Error(await res.text());
       setInput("");
+      notifyStopped();
       textareaRef.current?.focus();
       // Refresh conversation list to update latest message.
       void loadConversations();
